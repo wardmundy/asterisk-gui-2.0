@@ -1,0 +1,222 @@
+<!--
+ * Asterisk-GUI	- an Asterisk configuration interface
+ *
+ * General VoiceMail Settings
+ *
+ * Copyright (C) 2006-2008, Digium, Inc.
+ *
+ * Mark Spencer <markster@digium.com>
+ * Pari Nannapaneni <pari@digium.com>
+ *
+ * See http://www.asterisk.org for more information about
+ * the Asterisk project. Please do not directly contact
+ * any of the maintainers of this project for assistance;
+ * the project provides a web site, mailing lists and IRC
+ * channels for your use.
+ *
+ * This program is free software, distributed under the terms of
+ * the GNU General Public License Version 2. See the LICENSE file
+ * at the top of the source tree.
+ *
+-->
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+
+
+</style>
+<script>
+var TODELETE = '';
+var DVD = ',1,VoiceMail(${EXTEN:1}@default)' ; // direct voicemail dial
+
+var localajaxinit = function( ){
+	ASTGUI.tabbedOptions( _$('tabbedMenu') , [ {url:'#', desc:'General Settings', selected:true }, {url:'emailsettings.html', desc:'Email Settings for VoiceMails'} ] );
+	top.document.title = 'General Voice Mail Settings' ;
+
+	(function (){
+		if(parent.sessionData.pbxinfo['localextensions'].hasOwnProperty('VoiceMailMain') ){
+			TODELETE = parent.sessionData.pbxinfo['localextensions']['VoiceMailMain'] ;
+			_$('VoiceMailExtension').value = ASTGUI.parseContextLine.getExten(TODELETE);
+		}
+	})();
+
+	(function (){
+		_$('directVoiceMailDial').checked = false;
+		var r = context2json({ filename:'extensions.conf' , context : 'default' , usf:0 });
+		for( var ri = 0; ri < r.length ; ri ++ ){
+			if( r[ri].beginsWith('exten=_*') && r[ri].contains(DVD) ){
+				_$('directVoiceMailDial').checked = true;
+				break;
+			}
+		}
+	})();
+
+	var c = config2json({filename:'voicemail.conf', usf:1});
+	if(! c.hasOwnProperty('general') ){return;}
+
+	_$('maxgreet').value = ( c.general.hasOwnProperty('maxgreet') ) ? c.general.maxgreet : '' ;
+	_$('operator').checked = ( c.general.hasOwnProperty('operator') && c.general.operator =='yes' ) ? true : false ;
+
+	var maxmsg = ( c.general.hasOwnProperty('maxmsg') ) ? c.general.maxmsg : '' ;
+	ASTGUI.selectbox.selectOption_Add( _$('maxmsg') , maxmsg );
+	var maxmessage = ( c.general.hasOwnProperty('maxmessage') ) ? c.general.maxmessage : '' ;
+	ASTGUI.selectbox.selectOption_Add( _$('maxmessage') , maxmessage );
+	var minmessage = ( c.general.hasOwnProperty('minmessage') ) ? c.general.minmessage : '' ;
+	ASTGUI.selectbox.selectOption_Add( _$('minmessage') , minmessage );
+
+	_$('saycid').checked = ( c.general.hasOwnProperty('saycid') && c.general.saycid =='yes' ) ? true : false ;
+	_$('sayduration').checked = ( c.general.hasOwnProperty('sayduration') && c.general.sayduration =='yes' ) ? true : false ;
+	_$('envelope').checked = ( c.general.hasOwnProperty('envelope') && c.general.envelope =='yes' ) ? true : false ;
+	_$('review').checked = ( c.general.hasOwnProperty('review') && c.general.review=='yes' ) ? true : false ;
+}
+
+
+var update = function(){
+	var after = function(){
+		var u = new listOfSynActions('extensions.conf') ;
+		if(TODELETE){
+			u.new_action('delete', 'default', 'exten', '', TODELETE);
+			delete parent.sessionData.pbxinfo['localextensions']['VoiceMailMain'];
+		}
+
+		var y = ASTGUI.getFieldValue('VoiceMailExtension');
+		if(y){
+			ASTGUI.updateaValue({file:'users.conf', context :'general', variable :'vmexten', value : y});
+			var t = y + ',1,VoiceMailMain(${CALLERID(num)}@default)' ;
+			u.new_action('append', 'default', 'exten', t );
+			parent.sessionData.pbxinfo['localextensions']['VoiceMailMain'] = t;
+		}
+		u.callActions();
+
+		ASTGUI.feedback( { msg: 'Changes Saved !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' } );
+		window.location.reload();
+	};
+
+
+
+	(function(){
+		ASTGUI.miscFunctions.delete_LinesLike(
+			{ context_name : 'default' ,
+				beginsWithArr: ['exten=_*'] ,
+				filename: 'extensions.conf',
+				hasThisString: DVD,
+				cb:function(){}
+			}
+		);
+
+		if( _$('directVoiceMailDial').checked && parent.sessionData.GUI_PREFERENCES.ue_start ){
+			var s = '_*' + parent.sessionData.GUI_PREFERENCES.ue_start.charAt(0) + 'X'.times( String(parent.sessionData.GUI_PREFERENCES.ue_start).length -1 ) + DVD ;
+			var u = new listOfSynActions('extensions.conf');
+			u.new_action('append', 'default', 'exten', s);
+			u.callActions();
+		}
+	})();
+
+
+	var x = new listOfActions();
+	x.filename('voicemail.conf');
+	x.new_action( 'update', 'general' , 'maxgreet', _$('maxgreet').value );
+	var tmp_operator = (_$('operator').checked) ?'yes' : 'no' ;
+	x.new_action( 'update', 'general' , 'operator', tmp_operator );
+	x.new_action( 'update', 'general' , 'maxmsg', _$('maxmsg').value );
+	x.new_action( 'update', 'general' , 'maxmessage', _$('maxmessage').value );
+	x.new_action( 'update', 'general' , 'minmessage', _$('minmessage').value );
+
+	var tmp_saycid = (_$('saycid').checked) ?'yes' : 'no' ;
+	x.new_action( 'update', 'general' , 'saycid', tmp_saycid );
+	var tmp_sayduration = (_$('sayduration').checked) ?'yes' : 'no' ;
+	x.new_action( 'update', 'general' , 'sayduration', tmp_sayduration );
+	if( tmp_sayduration.isAstTrue() ){
+		x.new_action( 'update', 'general' , 'saydurationm', '0' );
+	}
+	var tmp_envelope = (_$('envelope').checked) ?'yes' : 'no' ;
+	x.new_action( 'update', 'general' , 'envelope', tmp_envelope );
+	var tmp_review = (_$('review').checked) ?'yes' : 'no' ;
+	x.new_action( 'update', 'general' , 'review', tmp_review );
+
+	x.callActions(after) ;
+
+}
+
+</script>
+<body bgcolor="#EFEFEF">
+<div class="iframeTitleBar">
+	General VoiceMail Settings&nbsp;
+	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+</div>
+
+<center><div id="tabbedMenu"></div></center>
+
+<table align=center width=350>
+	<tr>	<td colspan=2><span class='lite_Heading'>General VoiceMail Settings</span> </td></tr>
+	<tr>	<td align=right>Extension for checking messages <img src="images/tooltip_info.gif" tip="en,voicemail,0" class='tooltipinfo'> : </td>
+		<td><input size='5' id='VoiceMailExtension'></td>
+	</tr>
+	<tr>	<td align=right>Direct Voicemail Dial <img src="images/tooltip_info.gif" tip="en,voicemail,15" class='tooltipinfo'> : </td>
+		<td><input type='checkbox' id='directVoiceMailDial'></td>
+	</tr>
+	<tr>	<td align=right>Max greeting (in seconds) <img src="images/tooltip_info.gif" tip="en,voicemail,13" class='tooltipinfo'> : </td>
+		<td><input size=4 id='maxgreet'></td>
+	</tr>
+	<tr>	<td align=right><label for='operator'>Dial '0' for Operator <img src="images/tooltip_info.gif" tip="en,voicemail,9" class='tooltipinfo'> : </label></td>
+		<td><input type='checkbox' id='operator'></td>
+	</tr>
+
+
+	<tr>	<td colspan=2><BR><B>Message Options</B> </td></tr>
+	<tr>	<td align=right>Maximum messages per folder <img src="images/tooltip_info.gif" tip="en,voicemail,5" class='tooltipinfo'> : </td>
+		<td> <select id='maxmsg'>
+			<option value='10'>10</option>
+			<option value='25'>25</option>
+			<option value='100'>100</option>
+			<option value='250'>250</option>
+			<option value='500'>500</option>
+			<option value='1000'>1000</option>
+			</select>
+		</td>
+	</tr>
+	<tr>	<td align=right>Max message time <img src="images/tooltip_info.gif" tip="en,voicemail,6" class='tooltipinfo'> : </td>
+		<td><select id='maxmessage'>
+			<option value='60'>1 minute</option>
+			<option value='120'>2 minutes</option>
+			<option value='300'>5 minutes</option>
+			<option value='900'>15 minutes</option>
+			<option value='1800'>30 minutes</option>
+			<option value='0'>Unlimited</option>
+			</select>
+		</td>
+	</tr>
+	<tr>	<td align=right>Min message time <img src="images/tooltip_info.gif" tip="en,voicemail,7" class='tooltipinfo'> : </td>
+		<td><select id='minmessage'>
+			<option value='0'>No minimum</option>
+			<option value='1'>1 second</option>
+			<option value='2'>2 seconds</option>
+			<option value='3'>3 seconds</option>
+			<option value='4'>4 seconds</option>
+			<option value='5'>5 seconds</option>
+			</select>
+		</td>
+	</tr>
+	<tr>	<td colspan=2><BR> <B>Playback Options</B></td></tr>
+
+	<tr>	<td align=right><label for='saycid'>Say message Caller-ID <img src="images/tooltip_info.gif" tip="en,voicemail,2" class='tooltipinfo'> : </label></td>
+		<td><input type='checkbox' id='saycid'></td>
+	</tr>
+	<tr>	<td align=right><label for='sayduration'>Say message duration <img src="images/tooltip_info.gif" tip="en,voicemail,3" class='tooltipinfo'> : </label></td>
+		<td><input type='checkbox' id='sayduration'></td>
+	</tr>
+	<tr>	<td align=right><label for='envelope'>Play envelope <img src="images/tooltip_info.gif" tip="en,voicemail,12" class='tooltipinfo'> : </label></td>
+		<td><input type='checkbox' id='envelope'></td>
+	</tr>
+	<tr>	<td align=right><label for='review'>Allow users to review <img src="images/tooltip_info.gif" tip="en,voicemail,11" class='tooltipinfo'> : </label></td>
+		<td><input type='checkbox' id='review'></td>
+	</tr>
+	<TR>	<TD colspan=2 align=center><BR>
+			<span class='guiButtonCancel' id='cancel' onclick='window.location.reload();'>Cancel</span>
+			<span class='guiButtonEdit' id='save' onclick='update();'>Save</span>
+		</TD>
+	</TR>
+</table>
+</body>
