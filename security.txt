@@ -1,0 +1,7 @@
+Asterisk-GUI Security
+=====================
+
+The login to the system must be a valid user in manager.conf who has
+config permission in read/write. Please note that the Asterisk-GUI framework 
+does not support subpermissions at this time, meaning that a user with config
+permission may change ANY configuration file in ANY way  

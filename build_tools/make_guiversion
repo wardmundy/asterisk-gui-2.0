@@ -1,0 +1,9 @@
+#!/bin/sh
+
+VERSION_FILE=config/js/guiversion.js
+
+build_tools/make_version > ${VERSION_FILE}
+svn add ${VERSION_FILE}
+svn propset svn:mime-type text/plain ${VERSION_FILE}
+svn propset svn:eol-style native ${VERSION_FILE}
+svn propset svn:keywords 'Author Date Id Revision' ${VERSION_FILE}
