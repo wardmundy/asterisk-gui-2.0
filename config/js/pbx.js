@@ -637,6 +637,7 @@ astgui_manageusers  = { // all the functions related to user management would re
 		x.new_action('delcat', exten, '', '');
 		x.new_action('newcat', exten, '', '');
 		x.new_action('append', exten, 'username', exten );
+		x.new_action('append', exten, 'transfer', 'yes' );
 		x.new_action('append', exten, 'disallow', disallow ); // makesure 'disallow' is added before 'allow'
 		x.new_action('append', exten, 'allow', allow );
 		x.new_action('append', exten, 'mailbox', userinfo.mailbox || exten );
