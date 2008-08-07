@@ -625,6 +625,13 @@ astgui_manageusers  = { // all the functions related to user management would re
 		// note: 	this function updates sessionData.pbxinfo['users'] before actually making the ajax requests
 		//		we need to address this issue at some point in future
 		userinfo = ASTGUI.toCustomObject(userinfo) ;
+
+		var x = new listOfActions();
+		x.filename('users.conf');
+		if( sessionData.pbxinfo['users'].hasOwnProperty(exten) ){
+			x.new_action('delcat', exten, '', '');
+		}
+
 		var disallow = userinfo.getProperty('disallow') || 'all' ;
 		var allow = userinfo.getProperty('allow') || 'all' ;
 		sessionData.pbxinfo['users'][exten] = userinfo ;
@@ -632,9 +639,6 @@ astgui_manageusers  = { // all the functions related to user management would re
 		sessionData.pbxinfo['users'][exten]['allow'] = allow ;
 		delete userinfo.disallow ;
 		delete userinfo.allow ;
-		var x = new listOfActions();
-		x.filename('users.conf');
-		x.new_action('delcat', exten, '', '');
 		x.new_action('newcat', exten, '', '');
 		x.new_action('append', exten, 'username', exten );
 		x.new_action('append', exten, 'transfer', 'yes' );
@@ -642,11 +646,8 @@ astgui_manageusers  = { // all the functions related to user management would re
 		x.new_action('append', exten, 'allow', allow );
 		x.new_action('append', exten, 'mailbox', userinfo.mailbox || exten );
 		sessionData.pbxinfo['users'][exten]['mailbox'] = userinfo.mailbox || exten ;
-
 		x.new_action('append', exten, 'call-limit', '100' );
 		sessionData.pbxinfo['users'][exten]['mailbox'] = '100' ;
-
-
 		if(userinfo.mailbox) delete userinfo.mailbox;
 		for( var d in userinfo ){ if( userinfo.hasOwnProperty(d) ) {
 			x.new_action( 'append', exten, d, userinfo[d] );
@@ -1164,7 +1165,9 @@ astgui_manageCallPlans = { // manage calling plans/Dialplans
 		}
 		var x = new listOfActions();
 		x.filename('extensions.conf');
-		x.new_action('delcat', dp_name, '', ''); 
+		if( sessionData.pbxinfo.callingPlans.hasOwnProperty(dp_name) ){
+			x.new_action('delcat', dp_name, '', '') ;
+		}
 		x.new_action('newcat', dp_name , '', ''); // create new callplan
 		dp.includes.each( function(include_context) {
 			x.new_action( 'append', dp_name , 'include' , include_context );
