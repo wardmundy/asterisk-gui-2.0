@@ -4,6 +4,9 @@ Andrew Latham
  their order be an option in the future.  Some users don't need the
  hardware or mISDN sections...
 
- Another thing I noticed.... "make update" is missing, I think I was 
- the one that submitted it the last time so could we get that back?
- Please....
+
+******----------------------Completed-------------------------******
+
+Another thing I noticed.... "make update" is missing, I think I was 
+the one that submitted it the last time so could we get that back?
+Please....
