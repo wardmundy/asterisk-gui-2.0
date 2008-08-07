@@ -2205,8 +2205,16 @@ var ASTGUI = {
 
 	updateaValue: function(e){
 		// ASTGUI.updateaValue(  {file:'users.conf', context :'6000', variable :'hassip', value :'yes'}   )
+		var cxt = context2json({ filename : e.file , context : e.context , usf : 1 }) ;
+
 		var u = new listOfSynActions(e.file) ;
-		u.new_action('update', e.context, e.variable , e.value );
+
+		if( cxt.hasOwnProperty(e.variable) ){
+			u.new_action('delete', e.context, e.variable , '' , '');
+		}else{
+			u.new_action('append', e.context, e.variable , e.value );
+		}
+
 		var g = u.callActions();
 		return (g.contains('Response: Success')) ? true : false ;
 	},
