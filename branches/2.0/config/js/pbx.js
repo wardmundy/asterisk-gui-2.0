@@ -49,7 +49,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			return;
 		}
 
-		if( ecnf.hasOwnProperty('general') && ecnf.general.getProperty('clearglobalvars') != 'yes' ){
+		if( ecnf.hasOwnProperty('general') && ecnf.general.hasOwnProperty('clearglobalvars') && ecnf.general.getProperty('clearglobalvars') != 'yes' ){
 			var u = new listOfSynActions('extensions.conf');
 			u.new_action('update', 'general', 'clearglobalvars', 'yes');
 			u.callActions();
@@ -166,10 +166,9 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=' + tmp_file , async: false }).responseText;
 			if( s.contains('Response: Error') && s.contains('Message: Config file not found') ){
 				ASTGUI.miscFunctions.createConfig( tmp_file , function(){
-					var u = new listOfSynActions(tmp_file) ;
-					u.new_action('delcat', 'general', "", ""); 
+					var u = new listOfSynActions(tmp_file);
 					u.new_action('newcat', 'general', "", ""); 
-					u.new_action('update', 'general', '#include "../zaptel.conf" ;', ' ;');
+					u.new_action('append', 'general', '#include "../zaptel.conf" ;', ' ;');
 					u.callActions();
 				});
 				return;
@@ -681,7 +680,11 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 
 		var EXT_CNF = config2json({filename:'extensions.conf', usf:0 }) ;
 		var v = new listOfSynActions('extensions.conf') ;
-		v.new_action('delete', 'globals', trunk , '' );
+
+		if( EXT_CNF['globals'].indexOfLike( trunk + '=' )  != -1 ){
+			v.new_action('delete', 'globals', trunk , '' );
+		}
+
 		for( var ct in EXT_CNF){ if( EXT_CNF.hasOwnProperty(ct) ){
 			if( ct == ASTGUI.contexts.TrunkDIDPrefix + trunk || ct.beginsWith( ASTGUI.contexts.TrunkDIDPrefix + trunk + '_' ) ){
 				v.new_action('delcat', ct , '' , '' );
@@ -784,7 +787,12 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 		// any other patterns are not defined for Analag trunks
 		var x = new listOfActions();
 		x.filename('users.conf');
-		x.new_action('delcat', trunk , '', ''); // not really needed - but just in case
+
+		var tmp_USCNF = config2json({ filename:'users.conf', usf:1 });
+		if( tmp_USCNF.hasOwnProperty(trunk) ){
+			x.new_action('delcat', trunk , '', ''); // not really needed - but just in case
+		}
+
 		x.new_action('newcat', trunk, '', ''); // create new trunk
 		// add some default values for any AnalogTrunk
 			sessionData.pbxinfo.trunks.analog[trunk] = new ASTGUI.customObject; // add new/reset analog trunk info in sessionData
@@ -830,13 +838,19 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 		} );
 
 		var cb = function(){
-			var v = new listOfSynActions('extensions.conf') ;
-			v.new_action('delcat', ct, '', '');
+			var v = new listOfSynActions('extensions.conf');
+			var tmp_EXTNCF = config2json({ filename:'extensions.conf', usf:1 });
+			if( tmp_EXTNCF.hasOwnProperty(ct) ){
+				v.new_action('delcat', ct, '', '');
+			}
+
 			v.new_action('newcat', ct, '', ''); // add context
-			v.new_action('delcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', '');
+
+			if( tmp_EXTNCF.hasOwnProperty(ct + ASTGUI.contexts.TrunkDefaultSuffix) ){
+				v.new_action('delcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', '');
+			}
 			v.new_action('newcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', ''); // add context
 			v.new_action('append', ct , 'include', ct + ASTGUI.contexts.TrunkDefaultSuffix );
-
 			v.new_action('append', 'globals', trunk , 'Zap/g' + group);
 
 			var h = v.callActions();
@@ -873,7 +887,10 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 		var x = new listOfActions();
 
 		x.filename('users.conf');
-		x.new_action('delcat', trunk , '', ''); // not really needed - but just in case
+			var tmp_USCNF = config2json({ filename:'users.conf', usf:1 });
+			if( tmp_USCNF.hasOwnProperty(trunk) ){
+				x.new_action('delcat', trunk , '', ''); // not really needed - but just in case
+			}
 		x.new_action('newcat', trunk, '', ''); // create new trunk
 
 		x.new_action('append', trunk, 'context', ct);
@@ -889,9 +906,14 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 
 		var cb = function(){
 			var v = new listOfSynActions('extensions.conf') ;
-			v.new_action('delcat', ct, '', '');
+				var tmp_EXTNCF = config2json({ filename:'extensions.conf', usf:1 });
+				if( tmp_EXTNCF.hasOwnProperty(ct) ){
+					v.new_action('delcat', ct, '', '');
+				}
 			v.new_action('newcat', ct, '', ''); // add context
-			v.new_action('delcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', '');
+				if( tmp_EXTNCF.hasOwnProperty(ct + ASTGUI.contexts.TrunkDefaultSuffix) ){
+					v.new_action('delcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', '');
+				}
 			v.new_action('newcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', ''); // add context
 			v.new_action('append', ct , 'include', ct + ASTGUI.contexts.TrunkDefaultSuffix );
 
@@ -925,7 +947,10 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 		var x = new listOfActions();
 
 		x.filename('users.conf');
-		x.new_action('delcat', trunk , '', ''); // not really needed - but just in case
+			var tmp_USCNF = config2json({ filename:'users.conf', usf:1 });
+			if( tmp_USCNF.hasOwnProperty(trunk) ){
+				x.new_action('delcat', trunk , '', ''); // not really needed - but just in case
+			}
 		x.new_action('newcat', trunk, '', ''); // create new trunk
 			sessionData.pbxinfo.trunks.sip[trunk] = new ASTGUI.customObject; // add new/reset sip trunk info in sessionData
 		x.new_action('append', trunk, 'context', ct);
@@ -941,10 +966,15 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 
 		var cb = function(){
 			var v = new listOfSynActions('extensions.conf') ;
-			v.new_action('delcat', ct, '', '');
+				var tmp_EXTNCF = config2json({ filename:'extensions.conf', usf:1 });
+				if( tmp_EXTNCF.hasOwnProperty(ct) ){
+					v.new_action('delcat', ct, '', '');
+				}
 			v.new_action('newcat', ct, '', ''); // add context
 
-			v.new_action('delcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', '');
+				if( tmp_EXTNCF.hasOwnProperty(ct + ASTGUI.contexts.TrunkDefaultSuffix) ){
+					v.new_action('delcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', '');
+				}
 			v.new_action('newcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', ''); // add context
 			v.new_action('append', ct , 'include', ct + ASTGUI.contexts.TrunkDefaultSuffix );
 
@@ -1322,7 +1352,10 @@ astgui_manageVoiceMenus = {
 	addMenu: function(new_name, new_menu, cbf){ // Creates a New Voicemenu 'new_name' with a standard VoiceMenu structure of 'new_menu'
 		var x = new listOfActions();
 		x.filename('extensions.conf');
-		x.new_action('delcat', new_name , '', ''); // not really needed - but just in case
+			var tmp_EXTNCF = config2json({ filename:'extensions.conf', usf:1 });
+			if( tmp_EXTNCF.hasOwnProperty(new_name) ){
+				x.new_action('delcat', new_name , '', ''); // not really needed - but just in case
+			}
 		x.new_action('newcat', new_name , '', ''); // create new VoiceMenu
 		new_menu.includes.each( function(item) { // usually ['default'] or just [] 
 			x.new_action( 'append', new_name , 'include', item );
@@ -1355,7 +1388,10 @@ astgui_manageVoiceMenus = {
 
 	deleteMenu: function(menu_name){ // deletes voicemenu 'menu_name'
 		var v = new listOfSynActions('extensions.conf') ;
-		v.new_action('delcat', menu_name, '', ''); 
+			var tmp_EXTNCF = config2json({ filename:'extensions.conf', usf:1 });
+			if( tmp_EXTNCF.hasOwnProperty(menu_name) ){
+				v.new_action('delcat', menu_name, '', '');
+			}
 		if( sessionData.pbxinfo.voicemenus[menu_name]['alias_exten'] != '' ){
 			var aext = sessionData.pbxinfo.voicemenus[menu_name]['alias_exten'] ;
 			v.new_action('delete', ASTGUI.contexts.VoiceMenuExtensions , 'exten', '', aext);
@@ -1640,12 +1676,9 @@ astgui_manageRingGroups = {
 		u.new_action('delcat', rgname , '', '');
 		if( sessionData.pbxinfo.ringgroups[rgname].extension ){
 
-
-
 			var f = sessionData.pbxinfo.ringgroups[rgname].extension ;
-
-
 			u.new_action( 'delete', ASTGUI.contexts.RingGroupExtensions , 'exten', '', f + ',1,Goto(' + rgname + '|s|1)' ) ;
+
 			if( sessionData.pbxinfo.ringgroups[rgname].hasOwnProperty('isOLDRG') && sessionData.pbxinfo.ringgroups[rgname].isOLDRG == true ){
 				u.new_action( 'delete', 'default' , 'exten', '', f + ',1,Goto(' + rgname + '|s|1)' ) ;
 			}
