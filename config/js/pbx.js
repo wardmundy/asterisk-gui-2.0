@@ -49,7 +49,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			return;
 		}
 
-		if( ecnf.hasOwnProperty('general') && ecnf.general.hasOwnProperty('clearglobalvars') && ecnf.general.getProperty('clearglobalvars') != 'yes' ){
+		if( ecnf.hasOwnProperty('general') && ecnf.general.hasOwnProperty('clearglobalvars') && ecnf.general..clearglobalvars != 'yes' ){
 			var u = new listOfSynActions('extensions.conf');
 			u.new_action('update', 'general', 'clearglobalvars', 'yes');
 			u.callActions();
@@ -917,7 +917,7 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 			v.new_action('newcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', ''); // add context
 			v.new_action('append', ct , 'include', ct + ASTGUI.contexts.TrunkDefaultSuffix );
 
-			v.new_action('update', 'globals', trunk, 'IAX2/' + trunk);
+			v.new_action('append', 'globals', trunk, 'IAX2/' + trunk);
 			var h = v.callActions();
 			if( h.contains('Response: Success') ){
 				cbf();
@@ -978,7 +978,7 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 			v.new_action('newcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', ''); // add context
 			v.new_action('append', ct , 'include', ct + ASTGUI.contexts.TrunkDefaultSuffix );
 
-			v.new_action('update', 'globals', trunk, 'SIP/' + trunk);
+			v.new_action('append', 'globals', trunk, 'SIP/' + trunk);
 			var h = v.callActions();
 
 			if( h.contains('Response: Success') ){ 
