@@ -2639,30 +2639,31 @@ var listOfSynActions = function(file){
 
 listOfSynActions.prototype = {
 	new_action: function(action, cat, name, value, match){
+		var s="";
 		if( !parent.sessionData.PLATFORM.isAST_1_4 && this.FILE_CONTENT != null ){
 			// the update/delete/delcat commands fail in Asterisk 1.6.X/trunk if the corresponding category/variables are not found
 			// In Asterisk 1.4 we do not have to do this check
 			switch( action ){
 				case 'update':
-					if( !this.FILE_CONTENT.hasOwnProperty(cat) || this.FILE_CONTENT[cat].indexOfLike(name+'=') == -1 ){
+					if( !this.FILE_CONTENT.hasOwnProperty(cat) ) return s;
+					if( this.FILE_CONTENT[cat].indexOfLike(name+'=') == -1 ){
 						action = 'append';
 					}
 					break;
 				case 'delete':
 					if( !this.FILE_CONTENT.hasOwnProperty(cat) || this.FILE_CONTENT[cat].indexOfLike(name+'=') == -1 ){
-						return ;
+						return s;
 					}
 					break;
 				case 'delcat':
 					if( !this.FILE_CONTENT.hasOwnProperty(cat) ){
-						return ;
+						return s;
 					}
 					break;
 				default: break;
 			}
 		}
 
-		var s="";
 		var cnt = "" + this.actionCount;
 		if(this.actionCount > 5){
 			ASTGUI.ErrorLog('AG150'); // alert to developer
@@ -2733,23 +2734,25 @@ listOfActions.prototype = {
 		return this.current_batch_actionnumber;
 	},
 	build_action: function(action, count, cat, name, value, match){
+		var s="";
 		if( !parent.sessionData.PLATFORM.isAST_1_4 && this.FILE_CONTENT != null ){
 			// the update/delete/delcat commands fail in Asterisk 1.6.X/trunk if the corresponding category/variables are not found
 			// In Asterisk 1.4 we do not have to do this check
 			switch( action ){
 				case 'update':
-					if( !this.FILE_CONTENT.hasOwnProperty(cat) || this.FILE_CONTENT[cat].indexOfLike(name+'=') == -1 ){
+					if( !this.FILE_CONTENT.hasOwnProperty(cat) ) return s;
+					if( this.FILE_CONTENT[cat].indexOfLike(name+'=') == -1 ){
 						action = 'append';
 					}
 					break;
 				case 'delete':
 					if( !this.FILE_CONTENT.hasOwnProperty(cat) || this.FILE_CONTENT[cat].indexOfLike(name+'=') == -1 ){
-						return ;
+						return s;
 					}
 					break;
 				case 'delcat':
 					if( !this.FILE_CONTENT.hasOwnProperty(cat) ){
-						return ;
+						return s;
 					}
 					break;
 				default: break;
@@ -2762,7 +2765,6 @@ listOfActions.prototype = {
 			//	This should not be a problem for the time being, but I will fix this issue once i get everything else working with 'asterisk 1.4/1.6.0/trunk'
 			//	Note: this is not an issue with listOfSynActions() as clearActions() will take care of updating the file changes
 		}
-		var s="";
 		var cnt = "" + count;
 		while(cnt.length < 6)
 			cnt = "0" + cnt;
