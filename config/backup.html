@@ -52,6 +52,10 @@ var starteduploading = 0;
 var upload_Path; // path for 'uploads' as defined in http.conf - this variable will be automatically updated from http.conf
 
 onUploadForm_beforeUploading = function(){
+	if( top.sessionData.PLATFORM.isAST_1_4 ){
+		alert("File Uploads are supported in Asterisk 1.6.0/trunk");
+		return;
+	}
 	starteduploading = 1;
 	parent.ASTGUI.dialog.waitWhile('File Upload in progress, please wait ..');
 	return true;

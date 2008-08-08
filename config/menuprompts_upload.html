@@ -76,6 +76,10 @@ onUploadForm_load = function(){
 
 
 onUploadForm_beforeUploading = function(){
+	if( top.sessionData.PLATFORM.isAST_1_4 ){
+		alert("File Uploads are supported in Asterisk 1.6.0/trunk");
+		return;
+	}
 	var tmp_fname = upload_Filename.toLowerCase();
 	if( tmp_fname.endsWith('.wav') || tmp_fname.endsWith('.gsm') || tmp_fname.endsWith('.ulaw') || tmp_fname.endsWith('.alaw') ){
 		starteduploading = 1;
