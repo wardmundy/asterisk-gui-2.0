@@ -174,12 +174,13 @@ var new_ATRNK_save_go = function(){
 	// just update the selected channels
 	(function(){
 		var x = new listOfSynActions('users.conf');
+			x.new_action('update', EDIT_TRUNK , 'zapchan', scs );
 			x.new_action('delete', EDIT_TRUNK , 'gui_volume', '' );
 			x.new_action('delete', EDIT_TRUNK , 'gui_fxooffset', '' );
 			x.new_action('delete', EDIT_TRUNK , 'rxgain', '' );
 			x.new_action('delete', EDIT_TRUNK , 'txgain', '' );
 			x.new_action('delete', EDIT_TRUNK , 'signalling', '' );
-			x.new_action('delete', EDIT_TRUNK , 'zapchan', '' );
+			x.new_action('delete', EDIT_TRUNK , 'channel', '' );
 			x.callActions();
 			x.clearActions();
 
@@ -187,10 +188,14 @@ var new_ATRNK_save_go = function(){
 		parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['trunkname'] = trunk_name ;
 
 		var zap_channels = ASTGUI.miscFunctions.chanStringToArray(scs);
+
+		for(var p in VOLSETTINGS){ if (  VOLSETTINGS.hasOwnProperty(p) && !zap_channels.contains(p) ) {
+			delete VOLSETTINGS[p];
+		}}
 		zap_channels.each( function(channel){
 			var sg = (parent.sessionData.PORTS_SIGNALLING.ls.contains(channel)) ? 'fxs_ls':'fxs_ks' ;
 			x.new_action('append', EDIT_TRUNK, 'signalling', sg);
-			x.new_action( 'append', EDIT_TRUNK , 'zapchan', channel );
+			x.new_action( 'append', EDIT_TRUNK , 'channel', channel );
 		} );
 			x.callActions();
 	})();
@@ -329,14 +334,14 @@ var getPreviousVolumeForChannelsofThisTrunk = function( trunk ){
 			sel.id='port_' + channel+ '_guivolume' ;
 		newcell.appendChild(sel);
 		VOLSETTINGS[channel] = {};
-		var t = c.indexOf( 'zapchan=' + channel );
+		var t = c.indexOf( 'channel=' + channel );
 		if( t == -1 ){
 			ASTGUI.selectbox.selectOption (sel, '2') ;
 			VOLSETTINGS[channel].gui_volume = 2 ;
 			VOLSETTINGS[channel].linestodelete = [];
 			return;
 		}
-		var s = c.slice(0, t).lastIndexOfLike('zapchan=') ;
+		var s = c.slice(0, t).lastIndexOfLike('channel=') ;
 		s = (s == -1) ? 0 : s ;
 		var thisChannelSettings_ConfigArray = c.slice(s,t);
 		var gvi = thisChannelSettings_ConfigArray.indexOfLike('gui_volume') ;
@@ -356,7 +361,7 @@ var save_audioLevels = function( CB_FN ){
 		x.new_action('delete', EDIT_TRUNK , 'rxgain', '' );
 		x.new_action('delete', EDIT_TRUNK , 'txgain', '' );
 		x.new_action('delete', EDIT_TRUNK , 'signalling', '' );
-		x.new_action('delete', EDIT_TRUNK , 'zapchan', '' );
+		x.new_action('delete', EDIT_TRUNK , 'channel', '' );
 	for(var p in VOLSETTINGS){ if ( VOLSETTINGS.hasOwnProperty(p) ) {
 		var gv = ASTGUI.getFieldValue( _$( 'port_' + p + '_guivolume' ) );
 		x.new_action('append', EDIT_TRUNK , 'gui_volume', gv.guiMetaData() );
@@ -370,7 +375,7 @@ var save_audioLevels = function( CB_FN ){
 		x.new_action('append', EDIT_TRUNK , 'gui_fxooffset', fx.guiMetaData() );
 		x.new_action('append', EDIT_TRUNK , 'rxgain', fx + Number(get_guiVolValue[gv]) );
 		x.new_action('append', EDIT_TRUNK , 'txgain', '0.0' );
-		x.new_action('append', EDIT_TRUNK , 'zapchan', p );
+		x.new_action('append', EDIT_TRUNK , 'channel', p );
 	}}
 
 	var after = function(){
@@ -390,7 +395,7 @@ var reset_calibration = function(){
 		x.new_action('delete', EDIT_TRUNK , 'gui_fxooffset', '' );
 		x.new_action('delete', EDIT_TRUNK , 'rxgain', '' );
 		x.new_action('delete', EDIT_TRUNK , 'txgain', '' );
-		x.new_action('delete', EDIT_TRUNK , 'zapchan', '' );
+		x.new_action('delete', EDIT_TRUNK , 'channel', '' );
 
 	var after = function(){
 		var f = new listOfSynActions('fxotune.conf');

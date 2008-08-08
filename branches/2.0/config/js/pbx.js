@@ -789,6 +789,11 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 			sessionData.pbxinfo.trunks.analog[trunk] = new ASTGUI.customObject; // add new/reset analog trunk info in sessionData
 		x.new_action('append', trunk, 'group', group);
 			sessionData.pbxinfo.trunks.analog[trunk]['group'] = group;
+		x.new_action('append', trunk, 'zapchan', tr.zapchan);
+			sessionData.pbxinfo.trunks.analog[trunk]['zapchan'] = tr.zapchan ;
+		var zap_channels = ASTGUI.miscFunctions.chanStringToArray(tr.zapchan);
+		delete tr.zapchan ;
+
 		x.new_action('append', trunk, 'hasexten', 'no');
 			sessionData.pbxinfo.trunks.analog[trunk]['hasexten'] = 'no';
 		x.new_action('append', trunk, 'hasiax', 'no');
@@ -799,11 +804,8 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 			sessionData.pbxinfo.trunks.analog[trunk]['trunkstyle'] = 'analog';
 		x.new_action('append', trunk, 'context', ct);
 			sessionData.pbxinfo.trunks.analog[trunk]['context'] = ct;
-		var zap_channels = ASTGUI.miscFunctions.chanStringToArray(tr.zapchan);
-// 		var trunk_name = ( zap_channels.length > 1 ) ? 'Ports ' + tr.zapchan : 'Port ' + tr.zapchan ;
-			sessionData.pbxinfo.trunks.analog[trunk]['zapchan'] = tr.zapchan ;
-		delete tr.zapchan ;
 
+// 		var trunk_name = ( zap_channels.length > 1 ) ? 'Ports ' + tr.zapchan : 'Port ' + tr.zapchan ;
 		x.new_action('append', trunk, 'trunkname', tr.trunkname.guiMetaData() );
 			sessionData.pbxinfo.trunks.analog[trunk]['trunkname'] = tr.trunkname;
 			delete tr.trunkname;
@@ -825,7 +827,7 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 			var temp_ls_List = ASTGUI.cloneObject( parent.sessionData.PORTS_SIGNALLING.ls ) ;
 			var sg = ( temp_ls_List.contains(channel) ) ? 'fxs_ls':'fxs_ks' ;
 			x.new_action('append', trunk, 'signalling', sg);
-			x.new_action( 'append', trunk , 'zapchan', channel );
+			x.new_action( 'append', trunk , 'channel', channel );
 		} );
 
 		var cb = function(){
