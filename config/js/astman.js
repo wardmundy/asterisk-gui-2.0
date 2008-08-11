@@ -2415,6 +2415,7 @@ ASTGUI.scripts['restoreBackup'] = 'sh ' + ASTGUI.paths['scripts'] + 'restoreback
 ASTGUI.scripts['SysInfo'] = 'sh ' + ASTGUI.paths['scripts'] + 'gui_sysinfo';
 ASTGUI.scripts['ListFiles'] = 'sh ' + ASTGUI.paths['scripts'] + 'listfiles';
 ASTGUI.scripts['generateZaptel'] = 'sh ' + ASTGUI.paths['scripts'] + 'editzap.sh';
+ASTGUI.scripts['generatemISDN_init'] = 'sh ' + ASTGUI.paths['scripts'] + 'editmisdn.sh';
 ASTGUI.scripts['dldsoundpack'] = 'sh ' + ASTGUI.paths['scripts'] + 'dldsoundpack';
 
 ASTGUI.apps = {};

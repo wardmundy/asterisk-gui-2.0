@@ -292,7 +292,7 @@ function generate_applyMisdn(){
 	x.new_action('append', d, "debug" , "0");
 	x.callActions(function(){
 		// call the script that would generate /etc/misdn-init.conf from /etc/asterisk/applymisdn.conf
-		parent.ASTGUI.systemCmd( "sh /var/lib/asterisk/scripts/editmisdn.sh applysettings", function(){ 
+		parent.ASTGUI.systemCmd( ASTGUI.scripts.generatemISDN_init + " applysettings", function(){ 
 			alert("You need to restart your machine for these settings to take effect");
 			window.location.reload();
 			return true; 
