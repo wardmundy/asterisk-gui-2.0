@@ -204,7 +204,7 @@ _install: _all $(SUBDIRS_INSTALL)
 	mkdir -p $(CONFIGDIR)/js
 	mkdir -p $(CONFIGDIR)/private/bkps
 	mkdir -p $(CONFIGDIR)/stylesheets
-	mkdir -p $(ASTVARLIBDIR)/gui/scripts
+	mkdir -p $(ASTVARLIBDIR)/scripts
 	mkdir -p $(ASTVARLIBDIR)/gui_backups
 	@for x in config/images/*; do \
 		echo "$$x  -->  $(CONFIGDIR)/images/" ; \
@@ -230,8 +230,8 @@ _install: _all $(SUBDIRS_INSTALL)
 		$(INSTALL) -m 644 $$x $(HTTPDIR)/index.html ; \
 	done
 	@for x in scripts/*; do \
-		echo "$$x  -->  $(ASTVARLIBDIR)/gui/scripts/" ; \
-		$(INSTALL) -m 755 $$x $(ASTVARLIBDIR)/gui/scripts/ ; \
+		echo "$$x  -->  $(ASTVARLIBDIR)/scripts/" ; \
+		$(INSTALL) -m 755 $$x $(ASTVARLIBDIR)/scripts/ ; \
 	done
 	@if [ -x /usr/sbin/asterisk-gui-post-install ]; then \
 		/usr/sbin/asterisk-gui-post-install $(DESTDIR) . ; \
