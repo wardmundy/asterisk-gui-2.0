@@ -1,8 +1,6 @@
 
 dennisharrison
  * Followme page in the gui
- * Expose Dial command in VoiceMenus
-
 
 Andrew Latham
  
@@ -16,3 +14,6 @@ Andrew Latham
 Another thing I noticed.... "make update" is missing, I think I was 
 the one that submitted it the last time so could we get that back?
 Please....
+
+ * Expose Dial command in VoiceMenus
+
