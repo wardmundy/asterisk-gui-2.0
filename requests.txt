@@ -1,6 +1,7 @@
 
 dennisharrison
- Followme page in the gui
+ * Followme page in the gui
+ * Expose Dial command in VoiceMenus
 
 
 Andrew Latham
