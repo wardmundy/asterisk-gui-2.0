@@ -282,6 +282,14 @@ var VoiceMenus_miscFunctions = {
 					lbl('Hangup');
 					tip_chosenStep.innerHTML = 'Hang up the calling channel';
 					break;
+				case 'DialViaTrunk':
+					lbl('Dial an external Number');
+					tip_chosenStep.innerHTML = 'Place a call outside the pbx using the selected trunk.';
+					$('#newstep_dial_ThisNumber').show();
+					$('#newstep_dial_ViaTrunk').show();
+					_$('newstep_dial_ThisNumber').value = '';
+					_$('newstep_dial_ViaTrunk').selectedIndex = -1 ;
+					break;
 				default:
 					break;
 			}
@@ -357,6 +365,10 @@ var VoiceMenus_miscFunctions = {
 				break;
 			case 'Hangup':
 				newstep = 'Hangup()';
+				break;
+			case 'DialViaTrunk':
+				var tmp_trunkName = ASTGUI.getFieldValue('newstep_dial_ViaTrunk');
+				newstep =  'Macro('+ ASTGUI.contexts.dialtrunks + ',${' + tmp_trunkName + '}/'+ ASTGUI.getFieldValue('newstep_dial_ThisNumber') +',,'+ tmp_trunkName + ',)' ;
 				break;
 			default:
 				break;
@@ -654,6 +666,20 @@ var localajaxinit = function(){
 	})();
 
 	(function(){
+		var t = ASTGUI.cloneObject( parent.astgui_managetrunks.listofAllTrunks() ) ;
+		var TMP_FORSORT = [];
+		t.each(function(item){
+			TMP_FORSORT.push( parent.astgui_managetrunks.misc.getTrunkName(item) + ':::::::' +  item);
+		});
+		TMP_FORSORT.sort();
+		var trunks_selectbox = _$('newstep_dial_ViaTrunk');
+		TMP_FORSORT.each( function(this_str){
+			var a = this_str.split(':::::::');
+			ASTGUI.selectbox.append( trunks_selectbox, 'via Trunk ' + a[0], a[1] );
+		});
+	})();
+
+	(function(){
 		var mcls = config2json({filename: 'musiconhold.conf', catlist:'yes'});
 		mcls.each( function(this_class){
 			ASTGUI.selectbox.append('newstep_mohClass', this_class, this_class );
@@ -772,6 +798,7 @@ var update_a_keyPressEvent = function(){
 							<option value="toDestination">Goto Destination</option>
 							<option value="setLanguage">Set Language</option>
 							<option value="GotoDirecotry">Goto Directory</option>
+							<option value="DialViaTrunk">Dial a Number via Trunk</option>
 <!--							<option value="CheckOwnVoiceMail">Check Voicemail for Own Extension</option>-->
 							<option value="Hangup">Hangup</option>
 						</select>
@@ -791,6 +818,8 @@ var update_a_keyPressEvent = function(){
 							<option value='es'>Spanish</option>
 							<option value='fr'>French</option>
 						</select>
+						<input class='class_newStep_details_td' id="newstep_dial_ThisNumber" size=10>
+						<select class='class_newStep_details_td' id="newstep_dial_ViaTrunk"></select>
 					</td>
 					<td>
 						<span class='guiButton' onclick='VoiceMenus_miscFunctions.push_newstep();'>&uarr; Add new Step</span>
