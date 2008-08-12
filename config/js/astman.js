@@ -1448,6 +1448,15 @@ var ASTGUI = {
 			var q_LC = q.toLowerCase();
 			var all_LC = app.toLowerCase() ;
 
+			if( all_LC == "macro" ){
+				if( args[0] && args[0].contains('trunkdial-failover') && args[1] ){
+					var tmp_trunkDetails = ASTGUI.parseContextLine.parseTrunkDialArgument(args[1]);
+					var tmp_trunkString = (tmp_trunkDetails.name) ? ' using trunk ' + tmp_trunkDetails.name : ' via ' + tmp_trunkDetails.channel ;
+					return 'Dial ' + tmp_trunkDetails.prepend + tmp_trunkString ;
+				}
+				return 'Run Macro ' + (args[0] || '???');
+			}
+
 			if( all_LC == "answer" ){
 				return 'Answer the call'
 			}
@@ -1506,10 +1515,6 @@ var ASTGUI = {
 
 			if( all_LC == "setmusiconhold" ){
 				return "Set Music-On-Hold class '" + (args[0] || 'default') + "'" ;
-			}
-
-			if( all_LC == "macro" ){
-				return 'Run Macro ' + (args[0] || '???');
 			}
 
 			if( all_LC == "meetme" ){
