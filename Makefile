@@ -35,9 +35,6 @@ ifneq ($(findstring BSD,$(OSARCH)),)
   ASTLDFLAGS+=-L/usr/local/lib
 endif
 
-# Overwite config files on "make samples"
-OVERWRITE:=y
-
 # Staging directory
 # Files are copied here temporarily during the install process
 # For example, make DESTDIR=/tmp/asterisk-gui would put things in
@@ -238,17 +235,13 @@ _install: _all $(SUBDIRS_INSTALL)
 	fi
 
 install: _install
+	@echo "                                              "
 	@echo " +---- Asterisk GUI Installation Complete ---+"
 	@echo " +                                           +"
 	@echo " +    YOU MUST READ THE SECURITY DOCUMENT    +"
 	@echo " +                                           +"
 	@echo " + Asterisk-GUI has successfully been        +"
-	@echo " + installed.  If you would like to install  +"
-	@echo " + the addtional sample configuration files  +"
-	@echo " + (overwriting any existing config files),  +"
-	@echo " + run:                                      +"
-	@echo " +                                           +"
-	@echo " +               $(MAKE) samples                +"
+	@echo " + installed.				     +"
 	@echo " +                                           +"
 	@echo " +-------------------------------------------+"
 	@echo " +                                           +"
@@ -286,28 +279,10 @@ update:
 		echo "Not under version control";  \
 	fi
 
-samples:
-	mkdir -p $(ASTETCDIR)
-	for x in configs/*.sample; do \
-		if [ -f $(ASTETCDIR)/`$(BASENAME) $$x .sample` ]; then \
-			if [ "$(OVERWRITE)" = "y" ]; then \
-				if cmp -s $(ASTETCDIR)/`$(BASENAME) $$x .sample` $$x ; then \
-					echo "Config file $$x is unchanged"; \
-					continue; \
-				fi ; \
-				mv -f $(ASTETCDIR)/`$(BASENAME) $$x .sample` $(ASTETCDIR)/`$(BASENAME) $$x .sample`.old ; \
-			else \
-				echo "Skipping config file $$x"; \
-				continue; \
-			fi ;\
-		fi ; \
-		$(INSTALL) -m 644 $$x $(ASTETCDIR)/`$(BASENAME) $$x .sample` ;\
-	done
-
 makeopts: configure
 	@echo "****"
 	@echo "**** The configure script must be executed before running '$(MAKE)'."
 	@echo "****"
 	@exit 1
 
-.PHONY: samples clean all install _all _install checkconfig distclean $(SUBDIRS_CLEAN) $(SUBDIRS_INSTALL) $(SUBDIRS)
+.PHONY: clean all install _all _install checkconfig distclean $(SUBDIRS_CLEAN) $(SUBDIRS_INSTALL) $(SUBDIRS)
