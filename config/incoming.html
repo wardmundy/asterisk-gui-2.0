@@ -94,7 +94,17 @@ var incomingRules_MiscFunctions = {
 		ASTGUI.updateFieldToValue( 'edit_itrl_tf', tmp_edit_itrl_tf ) ;
 
 		ASTGUI.updateFieldToValue( 'edit_itrl_pattern', ASTGUI.parseContextLine.getExten( EDIT_CONTEXT_IR_LINE ) );
-		ASTGUI.updateFieldToValue( 'edit_itrl_dest', ASTGUI.parseContextLine.getAppWithArgs( EDIT_CONTEXT_IR_LINE ) );
+
+		$('.localext_byDid').hide();
+		if( EDIT_CONTEXT_IR_LINE.contains(',1,Goto(default|${EXTEN') ){
+			$('.localext_byDid').show();
+			ASTGUI.updateFieldToValue( 'edit_itrl_dest', 'ByDID' );
+			var tmp_ldp = EDIT_CONTEXT_IR_LINE.betweenXY('{','}').lChop('EXTEN').lChop(':') ;
+			if( !tmp_ldp.length  ){ tmp_ldp = '0'; }
+			ASTGUI.updateFieldToValue( 'edit_itrl_LocalDest_Pattern', tmp_ldp );
+		}else{
+			ASTGUI.updateFieldToValue( 'edit_itrl_dest', ASTGUI.parseContextLine.getAppWithArgs( EDIT_CONTEXT_IR_LINE ) );
+		}
 
 		incomingRules_MiscFunctions.enableDisablePattern();
 		ASTGUI.feedback( { msg: 'Edit Incoming Rule !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' } );
@@ -331,6 +341,7 @@ var incomingRules_MiscFunctions = {
 		isNewIR = true ;
 		ASTGUI.resetTheseFields(['edit_itrl_trunk', 'edit_itrl_tf', 'edit_itrl_pattern', 'edit_itrl_dest' ]);
 		incomingRules_MiscFunctions.enableDisablePattern();
+		$('.localext_byDid').hide();
  		_$('div_ir_edit_title').innerHTML = 'New Incoming Rule';
 		ASTGUI.feedback( { msg: 'New Incoming Rule !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' } );
 		$('.hideOnEdit').show();
@@ -369,10 +380,22 @@ var incomingRules_MiscFunctions = {
 		var this_tiName = ASTGUI.getFieldValue('edit_itrl_tf') ;
 		var TMP_NEW_PATTERN = ASTGUI.getFieldValue('edit_itrl_pattern');
 
+		if( ASTGUI.getFieldValue('edit_itrl_dest') == 'ByDID' && parent.astgui_managetrunks.misc.getTrunkType(this_trunk) == 'analog' ){
+			ASTGUI.feedback ({ msg: 'Local Extension by DID is not applicable for Analog Trunks !' , showfor:3,  color:'red' });
+			return ;
+		}
+
 		if( isNewIR == true ){ // create new Incoming Rule
 			ASTGUI.debugLog("create New Incoming Rule" , 'parse');
 			parent.ASTGUI.dialog.waitWhile('Creating Incoming Rule ...');
-			var this_ActualRule = TMP_NEW_PATTERN + ',1,' + ASTGUI.getFieldValue('edit_itrl_dest') ;
+
+			if( ASTGUI.getFieldValue('edit_itrl_dest') == 'ByDID' ){
+				var tmp_didXdigits = ASTGUI.getFieldValue('edit_itrl_LocalDest_Pattern') || '0' ;
+				var this_ActualRule = TMP_NEW_PATTERN + ',1,Goto(default|${EXTEN:'+  tmp_didXdigits + '}|1)';
+			}else{
+				var this_ActualRule = TMP_NEW_PATTERN + ',1,' + ASTGUI.getFieldValue('edit_itrl_dest') ;
+			}
+
 			var x = new listOfActions( 'extensions.conf' );
 			var PREVIOUS = EX_CF[ ASTGUI.contexts.TrunkDIDPrefix + this_trunk ];
 
@@ -453,8 +476,6 @@ var incomingRules_MiscFunctions = {
 					}else{
 						PREVIOUS_DEFAULT_CONTEXT.push('exten=' + this_ActualRule ); // make sure that the s/_X. would always end up at the bottom of all rules
 					}
-
-					
 				}else{
 					PREVIOUS_DEFAULT_CONTEXT.unshift('exten=' + this_ActualRule );
 				}
@@ -481,7 +502,13 @@ var incomingRules_MiscFunctions = {
 		}else{ // edit/update existing incoming rule
 
 			var pp = ASTGUI.parseContextLine.getPriority(EDIT_CONTEXT_IR_LINE);
-			var this_ActualRule = ASTGUI.getFieldValue('edit_itrl_pattern') + ',' + pp  + ',' + ASTGUI.getFieldValue('edit_itrl_dest') ;
+
+			if( ASTGUI.getFieldValue('edit_itrl_dest') == 'ByDID' ){
+				var tmp_didXdigits = ASTGUI.getFieldValue('edit_itrl_LocalDest_Pattern') || '0' ;
+				var this_ActualRule = ASTGUI.getFieldValue('edit_itrl_pattern') + ',' + pp  + ',Goto(default|${EXTEN:'+ tmp_didXdigits + '}|1)';
+			}else{
+				var this_ActualRule = ASTGUI.getFieldValue('edit_itrl_pattern') + ',' + pp  + ',' + ASTGUI.getFieldValue('edit_itrl_dest') ;
+			}
 
 			var u = new listOfSynActions('extensions.conf') ;
 			u.new_action( 'update' , EDIT_CONTEXT_IR , 'exten' , this_ActualRule , EDIT_CONTEXT_IR_LINE.afterChar('=') );
@@ -503,8 +530,16 @@ var localajaxinit = function(){
 	ASTGUI.selectbox.populateArray( 'edit_itrl_tf', TI_LIST.getOwnProperties() );
 	ASTGUI.selectbox.append( 'edit_itrl_tf' , 'None (no TimeIntervals matched)' , '' );
 	ASTGUI.selectbox.populateArray( 'edit_itrl_dest' ,  parent.miscFunctions.getAllDestinations() );
+	ASTGUI.selectbox.append( 'edit_itrl_dest' , 'Local Extension by DID' , 'ByDID' );
 	ASTGUI.events.add( 'edit_itrl_trunk' , 'click' , incomingRules_MiscFunctions.enableDisablePattern );
 
+	ASTGUI.events.add( 'edit_itrl_dest', 'change' , function(){
+		if( _$('edit_itrl_dest').value == 'ByDID' ){
+			$('.localext_byDid').show();
+		}else{
+			$('.localext_byDid').hide();
+		}
+	});
 	//'edit_itrl_trunk', 'edit_itrl_tf', 'edit_itrl_pattern', 'edit_itrl_dest'
 };
 
@@ -548,6 +583,11 @@ var localajaxinit = function(){
 
 			<TR>	<TD align="right"><nobr>Destination :</nobr></TD>
 				<TD><select id='edit_itrl_dest'  required='yes'></select></TD>
+			</TR>
+
+			<TR class='localext_byDid' style='display:none'>
+				<TD align="right"><nobr>Local Extension by DID Pattern :</nobr></TD>
+				<TD>&nbsp;${EXTEN:<input id='edit_itrl_LocalDest_Pattern' size=2>}</TD>
 			</TR>
 
 			<TR>

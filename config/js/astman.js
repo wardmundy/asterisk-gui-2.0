@@ -227,7 +227,10 @@ _$ = function(x){
 	};
 
 	String.prototype.lChop = function(c){ // chop a string from the beginning of the string
-		return (this.beginsWith(c) && this.substr(c.length) ) || this;
+		if(this.beginsWith(c)){
+			return this.substr(c.length);
+		}
+		return this;
 	};
 
 	String.prototype.rChop = function(c){ // chop a string from the end of the string
