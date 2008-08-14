@@ -1,0 +1,219 @@
+<!--
+ * Asterisk-GUI	- an Asterisk configuration interface
+ *
+ * Follow Me
+ *
+ * Copyright (C) 2008, Digium, Inc.
+ *
+ * Pari Nannapaneni <pari@digium.com>
+ * Malcolm Davenport <malcolmd@digium.com>
+ *
+ * See http://www.asterisk.org for more information about
+ * the Asterisk project. Please do not directly contact
+ * any of the maintainers of this project for assistance;
+ * the project provides a web site, mailing lists and IRC
+ * channels for your use.
+ *
+ * This program is free software, distributed under the terms of
+ * the GNU General Public License Version 2. See the LICENSE file
+ * at the top of the source tree.
+ *
+-->
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+	#table_userslist {
+		border: 1px solid #666666;
+		margin-top: 5px;
+		margin-bottom:10px;
+		width: 96%;
+		text-align: center;
+		padding : 1px;
+	}
+	#table_userslist tr.frow { background: #6b79a5; color: #CED7EF; }
+	#table_userslist tr.frow td{ font-weight:bold; }
+	#table_userslist tr td{ padding : 3px; }
+	#table_userslist tr.even { background: #DFDFDF; }
+	#table_userslist tr.odd{ background: #FFFFFF; }
+	#table_userslist tr.even:hover, #table_userslist tr.odd:hover {
+		background: #a8b6e5;
+		cursor: default;
+	}
+
+
+	#sqSteps{
+		height:120px ;
+		background-color:#FFFFFF;
+		padding: 5px;
+		border-width: 1px;
+		border-color: #7E5538;
+		border-style: solid;
+		cursor: default;
+		font: 83%/1.4 arial, helvetica, sans-serif;
+		overflow :auto;
+	}
+	
+	#sqSteps div {
+		clear :both;
+		padding : 3px 5px 0px 5px;
+		min-height: 20px;
+	}
+	#sqSteps div:hover {
+		background-color:#DEDEDE;
+	}
+	
+	#sqSteps div span.step_desc {
+		float: left;
+		/* max-width: 300px; */
+		background: transparent;
+	}
+	#sqSteps div span.step_desc:hover{
+		background-color:#DEDEDE;
+	}
+	
+	#sqSteps div span.step_up {
+		float: right;
+		width: 20px;
+		background: transparent url("./images/asterisk-arrow-up.png") no-repeat;
+	}
+	
+	#sqSteps div span.step_down {
+		float: right;
+		width: 20px;
+		background: transparent url("./images/asterisk-arrow-down.png") no-repeat;
+	}
+	
+	#sqSteps div span.step_delete {
+		float: right;
+		width: 20px;
+		background: transparent url("./images/delete_circle.png") no-repeat;
+	}
+
+</style>
+<script>
+
+var load_users_table = function(){
+	var TBL = _$('table_userslist') ;
+	var addCell = ASTGUI.domActions.tr_addCell;
+	var ul = parent.astgui_manageusers.listOfUsers();  ul = ul.sortNumbers( );
+
+	if(!ul.length){
+		ASTGUI.domActions.clear_table(TBL);
+		var newRow = TBL.insertRow(-1);
+		newRow.className = 'even';
+		addCell( newRow , { html:'No users created !!'} );
+		return ;
+	}
+
+	(function(){ // add first row
+		var newRow = TBL.insertRow(-1);
+		newRow.className = "frow";
+		addCell( newRow , { html:'Extension'});
+		addCell( newRow , { html:'Follow Me'});
+		addCell( newRow , { html:'Follow Order'});
+
+		addCell( newRow , { html:''});
+	})();
+
+	var ext_globals = context2json({filename: 'extensions.conf', context: 'globals' , usf: 1});
+	var followme_cnf = config2json({filename: 'followme.conf', usf: 0});
+
+
+	ul.each( function(user){ // list each user in table
+		var fmvar = 'FOLLOWME_' + user ;
+		var tmp_a = "<span class='guiButton' onclick=\"show_Edit_FollowMeUser('" + user +"')\">Edit</span>&nbsp;" ;
+		var newRow = TBL.insertRow(-1); 
+		newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
+		addCell( newRow , { html: user });
+		if ( ext_globals.hasOwnProperty(fmvar) &&  ext_globals[fmvar] == '1' ){
+			addCell( newRow , { html: '<font color=green><b>Enabled</b></font>' });
+		}else{
+			addCell( newRow , { html: '<font color=red><b>Disabled<b></font>' });
+		}
+		if( followme_cnf.hasOwnProperty(user) &&  followme_cnf[user].containsLike('number=') ){
+			var tmp_followorder = [];
+			followme_cnf[user].each( function(line){
+				if (line.beginsWith('number=') ){
+					line = line.lChop('number=') ;
+					// var fl_number = line.split(',')[0] ;
+					// var fl_seconds = line.split(',')[1];
+					tmp_followorder.push( line.split(',')[0] );
+				}
+			});
+			tmp_followorder = tmp_followorder.join(', ');
+			addCell( newRow , { html: (tmp_followorder.length > 50) ? tmp_followorder.substr(0,50) + '....' : tmp_followorder , align :'left' });
+		}else{
+			addCell( newRow , { html: '<i>Not Configured</i>' });
+		}
+		addCell( newRow , { html: tmp_a , align:'center' });
+	} );
+};
+
+
+var localajaxinit = function(){
+	top.document.title = 'Follow Me' ;
+	load_users_table();
+};
+
+
+var show_Edit_FollowMeUser = function(){
+	$('#div_followUser_edit').showWithBg();
+};
+
+var save_FollowMeUser = function(){
+
+
+
+};
+
+
+var flip_userFMstatus = function(user){
+
+
+}
+
+</script>
+<body bgcolor="EFEFEF">
+	<div class="iframeTitleBar"> 
+		Follow Me <span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+	</div>
+
+	<div class='lite_Heading' id='thisPage_lite_Heading'>'<i>Follow Me</i>' preferences for users</div>
+	
+	<table id='table_userslist' cellpadding=0 cellspacing=0 border=0 align=center style='clear:both;'></table>
+
+
+<div id="div_followUser_edit" STYLE="width:550; display:none;" class='dialog'>
+	<TABLE width="100%" cellpadding=0 cellspacing=0>
+	<TR class="dialog_title_tr">
+		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);">
+			<span id="div_followUser_edit_title"></span></TD>
+		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
+	</TR>
+	</TABLE>
+	
+	<TABLE	align=center cellpadding=2 cellspacing=2 border=0 width='100%'>
+		<tr>	<td align=right width=200>Status <img src="images/tooltip_info.gif" tip="en,followme,0" class='tooltipinfo'> :</td>
+			<td>	<input type=radio id='FMU_Enable' name='radio_FMU_EnableDisable'> <font color=green><b>Enable</b></font> <input type=radio id='FMU_Disable' name='radio_FMU_EnableDisable'> <font color=red><b>Disable</b></font> </td>
+		</tr>
+		<tr>	<td align=right width=200>'Music On Hold' Class <img src="images/tooltip_info.gif" tip="en,followme,1" class='tooltipinfo'> :</td>
+			<td>	<select id='FMU_moh' required='yes'> </td>
+		</tr>
+		<tr>	<td align=right>DialPlan <img src="images/tooltip_info.gif" tip="en,followme,2" class='tooltipinfo'> :</td>
+			<td>	<select id='FMU_context' required='yes'> </td>
+		</tr>
+		<tr>	<td align=right valign=top>Destinations <img src="images/tooltip_info.gif" tip="en,followme,3" class='tooltipinfo'>
+			</td>
+			<td>	<div id='sqSteps'></div>	</td>
+		</tr>
+		<tr>	<td align=center valign=bottom colspan=2>
+				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
+				<span class='guiButtonEdit' onclick='save_FollowMeUser();'>Save</span>
+			</td>
+		</tr>
+	</TABLE>
+</div>
+
+</body>
