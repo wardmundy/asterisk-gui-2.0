@@ -47,6 +47,10 @@ _$ = function(x){
 		}
 		return false;
 	};
+
+	Array.prototype.containsLike = function(str) {
+		return this.indexOfLike(str) != -1;
+	};
 	
 	Array.prototype.each = function(iterator) {
 		for(var i=0 , j = this.length; i < j ; i++ ){
@@ -542,6 +546,15 @@ var ASTGUI = {
 
 	debugLog: function(msg, color){ // Ex:		ASTGUI.debugLog('Some debug message', 'get');
 		if(!top.sessionData.DEBUG_MODE ){ return true; }
+
+		if( typeof msg == 'object' ){
+			if( ASTGUI.isArray(msg) ){
+				msg = 'ARRAY : [' + msg.join(',') + ']' ;
+			}else{
+				msg = 'OBJECT : {' + ASTGUI.getObjectPropertiesAsString(msg) + '}' ;
+			}
+		}
+
 		if(!color){ color = '#324176'; }
 		switch(color){
 			case 'get':	// for getconfig and reading html files
