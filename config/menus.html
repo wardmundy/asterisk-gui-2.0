@@ -290,6 +290,11 @@ var VoiceMenus_miscFunctions = {
 					_$('newstep_dial_ThisNumber').value = '';
 					_$('newstep_dial_ViaTrunk').selectedIndex = -1 ;
 					break;
+				case 'CustomApp':
+					lbl('Custom App');
+					$('#newstep_custom').show();
+					tip_chosenStep.innerHTML = 'Add a <i>Custom Step</i> to the VoiceMenu';
+					break;
 				default:
 					break;
 			}
@@ -369,6 +374,9 @@ var VoiceMenus_miscFunctions = {
 			case 'DialViaTrunk':
 				var tmp_trunkName = ASTGUI.getFieldValue('newstep_dial_ViaTrunk');
 				newstep =  'Macro('+ ASTGUI.contexts.dialtrunks + ',${' + tmp_trunkName + '}/'+ ASTGUI.getFieldValue('newstep_dial_ThisNumber') +',,'+ tmp_trunkName + ',)' ;
+				break;
+			case 'CustomApp':
+				newstep = ASTGUI.getFieldValue('newstep_custom') ;
 				break;
 			default:
 				break;
@@ -799,6 +807,7 @@ var update_a_keyPressEvent = function(){
 							<option value="setLanguage">Set Language</option>
 							<option value="GotoDirecotry">Goto Directory</option>
 							<option value="DialViaTrunk">Dial a Number via Trunk</option>
+							<option value="CustomApp">Custom App</option>
 <!--							<option value="CheckOwnVoiceMail">Check Voicemail for Own Extension</option>-->
 							<option value="Hangup">Hangup</option>
 						</select>
@@ -818,6 +827,7 @@ var update_a_keyPressEvent = function(){
 							<option value='es'>Spanish</option>
 							<option value='fr'>French</option>
 						</select>
+						<input  class='class_newStep_details_td' id="newstep_custom" size=24>
 						<input class='class_newStep_details_td' id="newstep_dial_ThisNumber" size=10>
 						<select class='class_newStep_details_td' id="newstep_dial_ViaTrunk"></select>
 					</td>
