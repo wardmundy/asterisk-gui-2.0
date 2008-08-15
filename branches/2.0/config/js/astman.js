@@ -2345,6 +2345,13 @@ var ASTGUI = {
 					}
 					*/
 					break;
+				case 'voipusername':
+					var fb_msg = 'Punctuation and Special Characters are not allowed in this field.' ;
+					if ( /[^a-zA-Z_0-9\.]/.test(x) ){
+						ASTGUI.highlightField( field, fb_msg );
+						return false;
+					}
+					break;
 				default:
 					break;
 			}
