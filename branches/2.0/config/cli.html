@@ -81,6 +81,8 @@ var localajaxinit = function(){
 	top.document.title = "Asterisk CLI Emulator";
 	DOM_CLI_CMD = document.getElementById('cli_cmd');
 	DOM_CLI_CMD.focus();
+	DOM_CLI_CMD.value = "core show version";
+	executeCommand(DOM_CLI_CMD.value);
 }
 
 </script>

@@ -426,7 +426,7 @@ var updateTrunkInfo = function(){
 		x.new_action('append', newtrunkname , "context", "DID_" + newtrunkname);
 		x.new_action('append', newtrunkname , "ports", _$('edit_MTrunk_ports').value);
 		x.new_action('append', newtrunkname , "hasmisdn", 'yes');
-		x.new_action('append' , c , newtrunkname , "msns", '*');
+		x.new_action('append', newtrunkname , "msns", '*');
 
 		x.callActions(function(){
 			var u = new listOfSynActions('extensions.conf') ;
