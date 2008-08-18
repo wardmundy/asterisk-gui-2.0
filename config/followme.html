@@ -202,8 +202,6 @@ var localajaxinit = function(){
 		followMe_MiscFunctions.refresh_allDestinations();
 	});
 
-	followMe_MiscFunctions.updateExtensionsConf_Macro();
-
 };
 
 
@@ -326,49 +324,7 @@ var followMe_MiscFunctions = {
 		CURRENT_DESTINATIONS.push(t);
 		this.refresh_allDestinations();
 		ASTGUI.resetTheseFields (['FMU_newNumber','FMU_newNumber_seconds' ]);
-	},
-
-	updateExtensionsConf_Macro : function(){ // followMe_MiscFunctions.updateExtensionsConf_Macro() ;
-		var after = function(){
-			window.location.reload();
-		};
-
-		var stdextn = 'macro-stdexten' ;
-		var ecnf = config2json({ filename:'extensions.conf', usf:0 });
-		if( ecnf.hasOwnProperty(stdextn) && !ecnf[stdextn][0].contains('FOLLOWME_') ){ // needs update
-			var x = new listOfActions('extensions.conf');
-			x.new_action( 'delcat', stdextn , '', '');
-			x.new_action( 'newcat', stdextn , '', '');
-			x.new_action( 'append', stdextn , 'exten', 's,1,GotoIf($[${FOLLOWME_${ARG1}}="1"]?4:2)');
-			x.new_action( 'append', stdextn , 'exten', 's,2,Dial(${ARG2},20)');
-			x.new_action( 'append', stdextn , 'exten', 's,3,Goto(s-${DIALSTATUS},1)');
-			x.new_action( 'append', stdextn , 'exten', 's,4,Macro(stdexten-followme,${ARG1})');
-			x.new_action( 'append', stdextn , 'exten', 's-NOANSWER,1,Voicemail(${ARG1},u)');
-			x.new_action( 'append', stdextn , 'exten', 's-NOANSWER,2,Goto(default,s,1)');
-			x.new_action( 'append', stdextn , 'exten', 's-BUSY,1,Voicemail(${ARG1},b)');
-			x.new_action( 'append', stdextn , 'exten', 's-BUSY,2,Goto(default,s,1)');
-			x.new_action( 'append', stdextn , 'exten', '_s-.,1,Goto(s-NOANSWER,1)');
-			x.new_action( 'append', stdextn , 'exten', 'a,1,VoicemailMain(${ARG1})');
-			x.callActions(after);
-			return;
-		}
-
-		var fmcat = 'macro-stdexten-followme' ;
-		if( !ecnf.hasOwnProperty(fmcat) ){ // add follow-me macro
-			var x = new listOfActions('extensions.conf');
-			x.new_action( 'newcat', fmcat , '', '');
-			x.new_action( 'append', fmcat , 'exten', 's,1,Followme(${ARG1})');
-			x.new_action( 'append', fmcat , 'exten', 's,2,Goto(s-${DIALSTATUS},1)');
-			x.new_action( 'append', fmcat , 'exten', 's-NOANSWER,1,Voicemail(${ARG1},u)');
-			x.new_action( 'append', fmcat , 'exten', 's-BUSY,1,Voicemail(${ARG1},b)');
-			x.new_action( 'append', fmcat , 'exten', 's-BUSY,2,Goto(default,s,1)');
-			x.new_action( 'append', fmcat , 'exten', '_s-.,1,Goto(s-NOANSWER,1)');
-			x.new_action( 'append', fmcat , 'exten', 'a,1,VoicemailMain(${ARG1})');
-			x.callActions(after);
-		}
 	}
-
-
 };
 
 

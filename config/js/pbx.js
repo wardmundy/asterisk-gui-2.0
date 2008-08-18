@@ -161,6 +161,71 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			return;
 		}
 
+		var stdextn = 'macro-stdexten' ;
+		if( !ecnf.hasOwnProperty(stdextn) || ( ecnf.hasOwnProperty(stdextn) && !ecnf[stdextn]['exten'].contains('FOLLOWME_') ) ){ // if stdexten does not forward to followme 
+			sessionData.continueParsing = false;
+			(function(){
+				ASTGUI.dialog.waitWhile('Updating stdexten Macro in extensions.conf');
+				var after = function(){
+					setTimeout( function(){
+						var t = ASTGUI.cliCommand('dialplan reload') ;
+						if( parent.sessionData.DEBUG_MODE ){
+							alert('updated macro-stdexten in extensions.conf' + '\n' + 'Click OK to reload');
+						}
+						top.window.location.reload();
+					}, 1000);
+				}
+				var x = new listOfActions('extensions.conf');
+				x.new_action( 'delcat', stdextn , '', '');
+				x.new_action( 'newcat', stdextn , '', '');
+				x.new_action( 'append', stdextn , 'exten', 's,1,GotoIf($[${FOLLOWME_${ARG1}} = 1]?4:2)');
+				x.new_action( 'append', stdextn , 'exten', 's,2,Dial(${ARG2},20)');
+				x.new_action( 'append', stdextn , 'exten', 's,3,Goto(s-${DIALSTATUS},1)');
+				x.new_action( 'append', stdextn , 'exten', 's,4,Macro(stdexten-followme,${ARG1},${ARG2})');
+				x.new_action( 'append', stdextn , 'exten', 's-NOANSWER,1,Voicemail(${ARG1},u)');
+				x.new_action( 'append', stdextn , 'exten', 's-NOANSWER,2,Goto(default,s,1)');
+				x.new_action( 'append', stdextn , 'exten', 's-BUSY,1,Voicemail(${ARG1},b)');
+				x.new_action( 'append', stdextn , 'exten', 's-BUSY,2,Goto(default,s,1)');
+				x.new_action( 'append', stdextn , 'exten', '_s-.,1,Goto(s-NOANSWER,1)');
+				x.new_action( 'append', stdextn , 'exten', 'a,1,VoicemailMain(${ARG1})');
+				x.callActions(after);
+			})();
+			return;
+		}
+
+		var fmcat = 'macro-stdexten-followme' ;
+		if( !ecnf.hasOwnProperty(fmcat) ){ // add follow-me macro
+			sessionData.continueParsing = false;
+			(function(){
+				ASTGUI.dialog.waitWhile('Adding FollowMe Macro in extensions.conf');
+				var after = function(){
+					setTimeout( function(){
+						var t = ASTGUI.cliCommand('dialplan reload') ;
+						if( parent.sessionData.DEBUG_MODE ){
+							alert('Added FollowMe Macro to extensions.conf' + '\n' + 'Click OK to reload');
+						}
+						top.window.location.reload();
+					}, 1000);
+				}
+
+				var x = new listOfActions('extensions.conf');
+				x.new_action( 'newcat', fmcat , '', '');
+				x.new_action( 'append', fmcat , 'exten', 's,1,Dial(${ARG2},20)' );
+				x.new_action( 'append', fmcat , 'exten', 's,2,Followme(${ARG1},a)' );
+				x.new_action( 'append', fmcat , 'exten', 's,3,Voicemail(${ARG1},b)' );
+				x.new_action( 'append', fmcat , 'exten', 's-NOANSWER,1,Voicemail(${ARG1},u)' );
+				x.new_action( 'append', fmcat , 'exten', 's-BUSY,1,Voicemail(${ARG1},b)' );
+				x.new_action( 'append', fmcat , 'exten', 's-BUSY,2,Goto(default,s,1)' );
+				x.new_action( 'append', fmcat , 'exten', '_s-.,1,Goto(s-NOANSWER,1)' );
+				x.new_action( 'append', fmcat , 'exten', 'a,1,VoicemailMain(${ARG1})' );
+				x.callActions(after);
+			})();
+			return;
+		}
+
+
+
+
 		(function(){
 			var tmp_file = ASTGUI.globals.zaptelIncludeFile;
 			var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=' + tmp_file , async: false }).responseText;
