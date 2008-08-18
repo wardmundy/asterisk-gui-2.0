@@ -159,6 +159,22 @@ var localajaxinit = function(){
 	top.document.title = 'Follow Me' ;
 	load_users_table();
 
+	(function(){
+		var mcls = config2json({filename: 'musiconhold.conf', usf: 1});
+		for (var this_class in mcls ){
+			if(mcls.hasOwnProperty(this_class)){
+				ASTGUI.selectbox.append('FMU_moh', this_class, this_class );
+			}
+		}
+		_$('FMU_moh').selectedIndex = -1;
+
+		var c = parent.astgui_manageCallPlans.listPlans() ;
+		var tmp_pfx = ASTGUI.contexts.CallingPlanPrefix ;
+		for( var c_t = 0 ; c_t < c.length ; c_t++ ){
+			ASTGUI.selectbox.append( 'FMU_context' , c[c_t].withOut(tmp_pfx) , c[c_t] );
+		}
+	})();
+
 	$('#sqDestinations').click(function(event){
 
 		var s = ASTGUI.events.getTarget(event);
