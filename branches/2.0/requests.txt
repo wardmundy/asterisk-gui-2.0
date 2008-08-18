@@ -1,7 +1,4 @@
 
-dennisharrison
- * Followme page in the gui
-
 Andrew Latham
  
  Question:  Could the ability to turn off certain sections or change
@@ -13,6 +10,9 @@ Andrew Latham
 -- CDR
 
 ******----------------------Completed-------------------------******
+
+dennisharrison
+ * Followme page in the gui
 
 Another thing I noticed.... "make update" is missing, I think I was 
 the one that submitted it the last time so could we get that back?
