@@ -93,6 +93,7 @@
 
 </style>
 <script>
+var EDIT_USER ;
 var CURRENT_DESTINATIONS = [] ;
 
 var load_users_table = function(){
@@ -121,17 +122,18 @@ var load_users_table = function(){
 	var ext_globals = context2json({filename: 'extensions.conf', context: 'globals' , usf: 1});
 	var followme_cnf = config2json({filename: 'followme.conf', usf: 0});
 
-
 	ul.each( function(user){ // list each user in table
 		var fmvar = 'FOLLOWME_' + user ;
-		var tmp_a = "<span class='guiButton' onclick=\"show_Edit_FollowMeUser('" + user +"')\">Edit</span>&nbsp;" ;
+
 		var newRow = TBL.insertRow(-1); 
 		newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
 		addCell( newRow , { html: user });
 		if ( ext_globals.hasOwnProperty(fmvar) &&  ext_globals[fmvar] == '1' ){
 			addCell( newRow , { html: '<font color=green><b>Enabled</b></font>' });
+			var tmp_a = "<span class='guiButton' onclick=\"show_Edit_FollowMeUser('" + user +"', 1)\">Edit</span>&nbsp;" ;
 		}else{
 			addCell( newRow , { html: '<font color=red><b>Disabled<b></font>' });
+			var tmp_a = "<span class='guiButton' onclick=\"show_Edit_FollowMeUser('" + user +"', 0)\">Edit</span>&nbsp;" ;
 		}
 		if( followme_cnf.hasOwnProperty(user) &&  followme_cnf[user].containsLike('number=') ){
 			var tmp_followorder = [];
@@ -189,15 +191,77 @@ var localajaxinit = function(){
 };
 
 
-var show_Edit_FollowMeUser = function(){
+
+var show_Edit_FollowMeUser = function(u, fm_ed){
+
+	EDIT_USER = u ;
 	followMe_MiscFunctions.reset_Fields();
+
+	// load fields
+	if( !fm_ed ){
+		fm_ed = 0;
+	}else{
+		fm_ed = Number(fm_ed);
+	}
+
+	if( fm_ed ){
+		_$('FMU_Enable').checked = true ;
+		_$('FMU_Disable').checked = false ;
+	}else{
+		_$('FMU_Enable').checked = false ;
+		_$('FMU_Disable').checked = true ;
+	}
+
+	CURRENT_DESTINATIONS = [];
+
+	var cxt = context2json({ filename:'followme.conf' , context : EDIT_USER , usf: 0 });
+	if(!cxt){ cxt = []; }
+	for( var t =0; t < cxt.length ; t++ ){
+
+		if( cxt[t].beginsWith('musicclass=') ){
+			ASTGUI.updateFieldToValue('FMU_moh', cxt[t].afterChar('=') );
+		}
+
+		if( cxt[t].beginsWith('context=') ){
+			ASTGUI.updateFieldToValue('FMU_context', cxt[t].afterChar('=') );
+		}
+
+		if( cxt[t].beginsWith('number=') ){
+			CURRENT_DESTINATIONS.push( cxt[t].afterChar('=') );
+		}
+	}
+
+	followMe_MiscFunctions.refresh_allDestinations();
 	$('#div_followUser_edit').showWithBg();
 };
 
 
+
+
+
 var save_FollowMeUser = function(){
+ // we do not have seperate edit/new cases here, we just have to save the chosen preferences
 
+	// update follow me status of the user in extensions.conf
+	// update followme.conf with all other chosen preferences
+	// reload the page
 
+	var fm_enabled = ( _$('FMU_Enable').checked ) ? '1' : '0' ;
+	ASTGUI.updateaValue({ file:'extensions.conf', context :'globals', variable : 'FOLLOWME_' + EDIT_USER , value : fm_enabled });
+
+	var FOLLOWME_CONF = config2json({ filename:'followme.conf', usf:0 });
+
+	var u = new listOfActions('followme.conf');
+	if( FOLLOWME_CONF.hasOwnProperty(EDIT_USER) ){ u.new_action('delcat', EDIT_USER , '', ''); }
+	u.new_action( 'newcat', EDIT_USER , '', '');
+	u.new_action( 'append', EDIT_USER , 'musicclass', ASTGUI.getFieldValue('FMU_moh') );
+	u.new_action( 'append', EDIT_USER , 'context', ASTGUI.getFieldValue('FMU_context') );
+	for( var t=0; t < CURRENT_DESTINATIONS.length ; t++ ){
+		u.new_action( 'append', EDIT_USER , 'number', CURRENT_DESTINATIONS[t] );
+	}
+	u.callActions( function(){
+		window.location.reload();
+	});
 
 };
 
