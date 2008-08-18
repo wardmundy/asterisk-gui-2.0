@@ -43,7 +43,7 @@
 	}
 
 
-	#sqSteps{
+	#sqDestinations{
 		height:120px ;
 		background-color:#FFFFFF;
 		padding: 5px;
@@ -55,37 +55,37 @@
 		overflow :auto;
 	}
 	
-	#sqSteps div {
+	#sqDestinations div {
 		clear :both;
 		padding : 3px 5px 0px 5px;
 		min-height: 20px;
 	}
-	#sqSteps div:hover {
+	#sqDestinations div:hover {
 		background-color:#DEDEDE;
 	}
 	
-	#sqSteps div span.step_desc {
+	#sqDestinations div span.step_desc {
 		float: left;
 		/* max-width: 300px; */
 		background: transparent;
 	}
-	#sqSteps div span.step_desc:hover{
+	#sqDestinations div span.step_desc:hover{
 		background-color:#DEDEDE;
 	}
 	
-	#sqSteps div span.step_up {
+	#sqDestinations div span.step_up {
 		float: right;
 		width: 20px;
 		background: transparent url("./images/asterisk-arrow-up.png") no-repeat;
 	}
 	
-	#sqSteps div span.step_down {
+	#sqDestinations div span.step_down {
 		float: right;
 		width: 20px;
 		background: transparent url("./images/asterisk-arrow-down.png") no-repeat;
 	}
 	
-	#sqSteps div span.step_delete {
+	#sqDestinations div span.step_delete {
 		float: right;
 		width: 20px;
 		background: transparent url("./images/delete_circle.png") no-repeat;
@@ -93,6 +93,7 @@
 
 </style>
 <script>
+var CURRENT_DESTINATIONS = [] ;
 
 var load_users_table = function(){
 	var TBL = _$('table_userslist') ;
@@ -155,12 +156,44 @@ var load_users_table = function(){
 var localajaxinit = function(){
 	top.document.title = 'Follow Me' ;
 	load_users_table();
+
+	$('#sqDestinations').click(function(event){
+
+		var s = ASTGUI.events.getTarget(event);
+		var cl =  $(s).attr("class") ;
+		if(!cl || !cl.beginsWith('step_') ){return;}
+		var stepNo = Number( s.parentNode.STEPNO );
+		switch(cl){
+			case 'step_delete':
+				CURRENT_DESTINATIONS.splice(stepNo,1);
+				break;
+			case 'step_up':
+				if(stepNo == 0) return;
+				var tmp = CURRENT_DESTINATIONS[stepNo] ;
+				CURRENT_DESTINATIONS.splice(stepNo, 1);
+				CURRENT_DESTINATIONS.splice(stepNo-1, 0, tmp);
+				break;
+			case 'step_down':
+				if(stepNo == (CURRENT_DESTINATIONS.length-1) ) return;
+				var tmp = CURRENT_DESTINATIONS[stepNo] ;
+				CURRENT_DESTINATIONS.splice(stepNo+2, 0, tmp);
+				CURRENT_DESTINATIONS.splice(stepNo, 1);
+				break;
+			default:
+				break;
+		}
+
+		followMe_MiscFunctions.refresh_allDestinations();
+
+	});
 };
 
 
 var show_Edit_FollowMeUser = function(){
+	followMe_MiscFunctions.reset_Fields();
 	$('#div_followUser_edit').showWithBg();
 };
+
 
 var save_FollowMeUser = function(){
 
@@ -169,10 +202,54 @@ var save_FollowMeUser = function(){
 };
 
 
-var flip_userFMstatus = function(user){
+var followMe_MiscFunctions = {
 
+	reset_Fields : function(){ // followMe_MiscFunctions.reset_Fields()
+		ASTGUI.resetTheseFields ([ 'FMU_Enable', 'FMU_Disable', 'FMU_moh', 'FMU_context','FMU_newNumber','FMU_newNumber_seconds' ]);
+		ASTGUI.domActions.removeAllChilds( 'sqDestinations' ); CURRENT_DESTINATIONS = [] ;
 
-}
+	},
+
+	refresh_allDestinations: function(){ // followMe_MiscFunctions.refresh_allDestinations()
+		ASTGUI.domActions.removeAllChilds( 'sqDestinations' );
+		var add_sqStep = function(a){
+			var txt = CURRENT_DESTINATIONS[a];
+			var tmp = document.createElement('div');
+			tmp.STEPNO = a ;
+			var sp_desc = document.createElement('span');
+				sp_desc.className = 'step_desc';
+				sp_desc.innerHTML = txt.split(',')[0] + ' (' +  txt.split(',')[1] + ' seconds)' ;
+			var sp_up = document.createElement('span');
+				sp_up.className = 'step_up';
+				sp_up.innerHTML = '&nbsp;';
+			var sp_down = document.createElement('span');
+				sp_down.className = 'step_down';
+				sp_down.innerHTML = '&nbsp;';
+			var sp_delete = document.createElement('span');
+				sp_delete.className = 'step_delete';
+				sp_delete.innerHTML = '&nbsp;';
+	
+			tmp.appendChild(sp_desc) ;
+			tmp.appendChild(sp_delete) ;
+			tmp.appendChild(sp_up) ;
+			tmp.appendChild(sp_down) ;
+			_$('sqDestinations').appendChild(tmp) ;
+		};
+		for( var t=0; t < CURRENT_DESTINATIONS.length ; t++ ){
+			add_sqStep(t);
+		}
+	},
+
+	push_newdest: function(){ // followMe_MiscFunctions.push_newdest() ;
+		var t = ASTGUI.getFieldValue('FMU_newNumber') + ',' + ASTGUI.getFieldValue( 'FMU_newNumber_seconds' );
+
+		CURRENT_DESTINATIONS.push(t);
+		this.refresh_allDestinations();
+		ASTGUI.resetTheseFields (['FMU_newNumber','FMU_newNumber_seconds' ]);
+	}
+
+};
+
 
 </script>
 <body bgcolor="EFEFEF">
@@ -204,11 +281,15 @@ var flip_userFMstatus = function(user){
 		<tr>	<td align=right>DialPlan <img src="images/tooltip_info.gif" tip="en,followme,2" class='tooltipinfo'> :</td>
 			<td>	<select id='FMU_context' required='yes'> </td>
 		</tr>
-		<tr>	<td align=right valign=top>Destinations <img src="images/tooltip_info.gif" tip="en,followme,3" class='tooltipinfo'>
-			</td>
-			<td>	<div id='sqSteps'></div>	</td>
+		<tr>	<td align=right valign=top>Destinations <img src="images/tooltip_info.gif" tip="en,followme,3" class='tooltipinfo'> :</td>
+			<td>	<div id='sqDestinations'></div>	</td>
 		</tr>
-		<tr>	<td align=center valign=bottom colspan=2>
+
+		<tr>	<td align=right>Add FollowMe Number <img src="images/tooltip_info.gif" tip="en,followme,4" class='tooltipinfo'> :</td>
+			<td>&nbsp;try <input id='FMU_newNumber' size=10> for <input id='FMU_newNumber_seconds' size=1> Seconds <span class='guiButton' onclick="followMe_MiscFunctions.push_newdest();"> &uarr; Add</span></td>
+		</tr>
+
+		<tr>	<td align=center valign=bottom colspan=2 style="padding:15px; background-color: #f4deb7">
 				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
 				<span class='guiButtonEdit' onclick='save_FollowMeUser();'>Save</span>
 			</td>
