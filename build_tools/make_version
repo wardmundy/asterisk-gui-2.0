@@ -10,7 +10,7 @@ REV=`svnversion -c . | cut -d: -f2`
 
 if [ "${PARTS}" = "trunk" ]
 then
-    echo "gui_version = 'SVN-trunk-r${REV}';"
+    echo "gui_version = 'SVN-branches-2.0-r${REV}';"
     exit 0
 fi
 

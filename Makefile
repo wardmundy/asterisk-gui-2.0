@@ -203,6 +203,7 @@ _install: _all $(SUBDIRS_INSTALL)
 	mkdir -p $(CONFIGDIR)/stylesheets
 	mkdir -p $(ASTVARLIBDIR)/scripts
 	mkdir -p $(ASTVARLIBDIR)/gui_backups
+	@build_tools/make_version > $(CONFIGDIR)/js/guiversion.js
 	@for x in config/images/*; do \
 		echo "$$x  -->  $(CONFIGDIR)/images/" ; \
 		$(INSTALL) -m 644 $$x $(CONFIGDIR)/images/ ; \
