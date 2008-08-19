@@ -75,6 +75,18 @@ var load_DigitalTrunksTable = function(){
 			addCell( newRow , { html: c[d]['zapchan'] });
 			addCell( newRow , { html:''} );
 		}}
+
+
+		var c = parent.sessionData.pbxinfo['trunks']['bri'] ;
+		for(var d in c){if(c.hasOwnProperty(d)){
+			var newRow = DOM_table_DigitalTrunks_list.insertRow(-1);
+			newRow.className = ((DOM_table_DigitalTrunks_list.rows.length)%2==1)?'odd':'even';
+			addCell( newRow , { html:'', width:'15px' });
+			addCell( newRow , { html: c[d]['trunkname'] });
+			addCell( newRow , { html: 'mISDN' });
+			addCell( newRow , { html: c[d]['ports'] });
+			addCell( newRow , { html:''} );
+		}}
 	})();
 
 	if( DOM_table_DigitalTrunks_list.rows.length == 1  ){
