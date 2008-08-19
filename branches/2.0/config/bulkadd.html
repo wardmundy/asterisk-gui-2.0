@@ -1,0 +1,108 @@
+<!--
+ * Asterisk-GUI	- an Asterisk configuration interface
+ *
+ * Bulk Add
+ *
+ * Copyright (C) 2008, Digium, Inc.
+ *
+ * Pari Nannapaneni <pari@digium.com>
+ *
+ * See http://www.asterisk.org for more information about
+ * the Asterisk project. Please do not directly contact
+ * any of the maintainers of this project for assistance;
+ * the project provides a web site, mailing lists and IRC
+ * channels for your use.
+ *
+ * This program is free software, distributed under the terms of
+ * the GNU General Public License Version 2. See the LICENSE file
+ * at the top of the source tree.
+ *
+-->
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+
+
+</style>
+<script>
+
+var localajaxinit = function(){
+	top.document.title = 'Bulk Add' ;
+};
+
+var addUsers_from_CSV_field = function(){
+	var NEW_USERS = {} ;
+	var csv_text = _$('ta_ba_csv').value ;
+	var tmp_lines = csv_text.split('\n');
+	var HEADS = tmp_lines[0]; tmp_lines.splice(0, 1);
+	var tmp_Heads = HEADS.split(',');
+
+	var newusers_list = [];
+	for(var tli =0; tli< tmp_lines.length ; tli++ ){
+		var this_line = tmp_lines[tli];
+		var this_user_details = this_line.split(',');
+
+		if( this_user_details.length != tmp_Heads.length ){
+			alert('Error: Invalid Number of Fields in line ' + (tli + 1) );
+			return;
+		}
+
+		var this_user = this_user_details[0]; // User
+		if( parent.sessionData.pbxinfo.users.hasOwnProperty(this_user)  ){
+			alert('Error: User '+ this_user + '(line ' + (tli + 1) + ' in CSV text) already exists');
+			return;
+		}
+
+		newusers_list.push( this_user ) ;
+		NEW_USERS[ this_user ] = {} ;
+		for( var f = 1 ; f < tmp_Heads.length ; f++ ){
+			NEW_USERS[ this_user ][ tmp_Heads[f] ] = this_user_details[ f ] ;
+		}
+	};
+
+	// ASTGUI.debugLog( NEW_USERS , 'parse');
+	var addUser_OR_reloadGUI = function(){
+		var tmp_first_user = newusers_list[0];
+		parent.astgui_manageusers.addUser( tmp_first_user , NEW_USERS[tmp_first_user] , function(){
+			newusers_list.splice(0,1);
+			if( newusers_list.length ){
+				addUser_OR_reloadGUI();
+			}else{
+				alert( 'Users added \n Click Ok to reload GUI' );
+				top.window.location.reload();
+			}
+		});
+	};
+
+	ASTGUI.dialog.waitWhile( " Adding list of users " );
+	addUser_OR_reloadGUI();
+};
+
+
+</script>
+<body bgcolor="EFEFEF">
+	<div class="iframeTitleBar"> 
+		Bulk Add <span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+	</div>
+
+	<div class='lite_Heading'>Bulk Add</div>
+
+	<table width='98%' align=center>
+
+		<tr><td  align=center>
+			<BR>
+			<B>Enter list of users as CSV text</B><BR>
+			Heads: User<sup>1</sup>,fullname,cid_number, context, hasvoicemail, vmsecret, email, hassip, hasiax, secret
+
+		</td></tr>
+		<tr><td  align=center>
+			<textarea id='ta_ba_csv' rows=10 cols=120></textarea>
+		</td></tr>
+		<tr><td align=center>
+			<span class="guiButton" onclick="addUsers_from_CSV_field()">Add</span>
+		</td></tr>
+	</table>	
+
+</body>
