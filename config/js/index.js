@@ -253,6 +253,12 @@ var onLogInFunctions = {
 				ASTGUI.ErrorLog('Error in readcfg.UsersConf()');
 			}
 
+			try{
+				readcfg.MisdnConf();
+			}catch(er){
+				ASTGUI.ErrorLog('Error in readcfg.MisdnConf()');
+			}
+
 		}catch(err){
 			ASTGUI.ErrorLog('Error in onLogInFunctions.parseConfigFiles()');
 		}finally{

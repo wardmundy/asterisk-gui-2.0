@@ -498,6 +498,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		sessionData.pbxinfo['trunks']['sip'] = new ASTGUI.customObject;
 		sessionData.pbxinfo['trunks']['iax'] = new ASTGUI.customObject;
 		sessionData.pbxinfo['trunks']['pri'] = new ASTGUI.customObject;
+		sessionData.pbxinfo['trunks']['bri'] = new ASTGUI.customObject;
 		sessionData.pbxinfo['trunks']['providers'] = new ASTGUI.customObject;
 
 		for(var d in c){ if(c.hasOwnProperty(d)) {
@@ -556,6 +557,13 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			}
 		}}
 	}, // end of readcfg.UsersConf();
+
+	MisdnConf: function(){ // readcfg.MisdnConf();
+		var c = config2json({filename:'misdn.conf', usf:1});
+		for(var d in c){ if( c.hasOwnProperty(d) && d.beginsWith('trunk_m') ) {
+			sessionData.pbxinfo['trunks']['bri'][d] = c[d] ;
+		}}
+	},
 
 	ztScanConf: function(){ // readcfg.ztScanConf();
 		// reads ztscan.conf and updates sessionData.FXO_PORTS_DETECTED and sessionData.FXS_PORTS_DETECTED
@@ -765,7 +773,7 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 
 	listofAllTrunks : function(){
 		var x = [];
-		return x.concat( this.listOfAnalogTrunks(), this.listOfSIPTrunks(), this.listOfIAXTrunks(), this.listOfPRITrunks(), this.listOfProviderTrunks() );
+		return x.concat( this.listOfAnalogTrunks(), this.listOfSIPTrunks(), this.listOfIAXTrunks(), this.listOfPRITrunks(), this.listOfProviderTrunks() , this.listOfBRITrunks() );
 	},
 
 	listOfProviderTrunks : function(){
@@ -782,6 +790,16 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 		var list =[];
 		try{
 			for(var item in sessionData.pbxinfo.trunks.analog){ if(sessionData.pbxinfo.trunks.analog.hasOwnProperty(item)){
+				list.push(item);
+			}}
+		} catch (err) { return []; }
+		return list;
+	},
+
+	listOfBRITrunks: function(){
+		var list =[];
+		try{
+			for(var item in sessionData.pbxinfo.trunks.bri){ if( sessionData.pbxinfo.trunks.bri.hasOwnProperty(item) ){
 				list.push(item);
 			}}
 		} catch (err) { return []; }
@@ -1060,6 +1078,7 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 			if ( sessionData.pbxinfo.trunks.iax[TRUNK] ) { return 'iax' ; }
 			if ( sessionData.pbxinfo.trunks.analog[TRUNK] ) { return 'analog' ; }
 			if ( sessionData.pbxinfo.trunks.pri[TRUNK] ) { return 'pri' ; }
+			if ( sessionData.pbxinfo.trunks.bri[TRUNK] ) { return 'bri' ; }
 			if ( sessionData.pbxinfo.trunks.providers[TRUNK] ) { return 'providers' ; }
 			return null;
 		},
@@ -1078,6 +1097,13 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 			if ( r.iax[TRUNK] ) { return r.iax[TRUNK]['trunkname'] || TRUNK ; }
 			if ( r.analog[TRUNK] ) { return r.analog[TRUNK]['trunkname'] || TRUNK ; }
 			if ( r.pri[TRUNK] ) { return r.pri[TRUNK]['trunkname'] || TRUNK ; }
+			if ( r.bri[TRUNK] ) {
+				if( r.bri[TRUNK]['trunkname'] ){
+					return 'BRI - ' + r.bri[TRUNK]['trunkname'] ;
+				}else{
+					return TRUNK ;
+				}
+			}
 			if ( r.providers[TRUNK] ) { return r.providers[TRUNK]['trunkname'] || TRUNK ; }
 			return '';
 		}

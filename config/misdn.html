@@ -384,8 +384,7 @@ var delete_trunk = function(k){
 		u.new_action('delcat', 'DID_' + k , "", "");
 		u.new_action('delete', 'globals', k, '', 'mISDN/g:' + k );
 		u.callActions();
-		delete mISDNTRUNKS[k];
-		showMisdnTrunksinTable();
+		top.window.location.reload();
 	})();
 };
 
@@ -431,7 +430,6 @@ var updateTrunkInfo = function(){
 		x.callActions(function(){
 			var u = new listOfSynActions('extensions.conf') ;
 			u.new_action('newcat', "DID_"+newtrunkname, "", "");
-			u.new_action('append', "DID_"+newtrunkname, 'include', 'default');
 			u.new_action('update', 'globals', newtrunkname, 'mISDN/g:' + newtrunkname );
 			u.callActions();
 			try{
@@ -445,6 +443,8 @@ var updateTrunkInfo = function(){
 
 			}finally{
 				_$('edit_trunk').style.display = "none";
+				alert('BRI trunk created. \n Click OK to reload');
+				top.window.location.reload();
 			}
 		});
 	}else{
