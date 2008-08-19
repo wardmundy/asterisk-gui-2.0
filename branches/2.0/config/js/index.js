@@ -158,12 +158,31 @@ var onLogInFunctions = {
 
 	check_WritePermissionsFor_GUI_Folder : function(){
 		ASTGUI.dialog.waitWhile('Checking write permission for gui folder');
-		var rand = Math.round(100000*Math.random());
+		var rand_1 = Math.round(100000*Math.random());
+		var rand_2 = Math.round(100000*Math.random());
 
-		ASTGUI.systemCmdWithOutput( "echo '" + rand + "'" , function(s){
-			if( s.contains(rand) ){
-				ASTGUI.dialog.waitWhile('detecting Hardware ..');
-				ASTGUI.systemCmd( ASTGUI.apps.Ztscan, onLogInFunctions.updatePanels4Platform );
+		var tmp_check_perms_guibkps = function(){
+			ASTGUI.dialog.waitWhile('Checking write privileges on backups folder');
+
+			ASTGUI.systemCmd( "touch '"+ ASTGUI.paths['ConfigBkp'] + rand_2 + "'" , function(){
+				ASTGUI.listSystemFiles( ASTGUI.paths['ConfigBkp'], function(a){
+					a = a.join();
+					if( a.contains(rand_2) ){
+						ASTGUI.systemCmd( "rm '"+ ASTGUI.paths['ConfigBkp'] + rand_2 + "'" , function(){
+							ASTGUI.dialog.waitWhile('detecting Hardware ..');
+							ASTGUI.systemCmd( ASTGUI.apps.Ztscan, onLogInFunctions.updatePanels4Platform );
+						});
+					}else{
+						ASTGUI.dialog.alertmsg( 'missing ' + ASTGUI.paths['ConfigBkp'] + '<BR> OR Asterisk does not have write privileges on ' + ASTGUI.paths['ConfigBkp'] );
+						return;
+					}
+				});
+			});
+		};
+
+		ASTGUI.systemCmdWithOutput( "echo '" + rand_1 + "'" , function(s){
+			if( s.contains(rand_1) ){
+				tmp_check_perms_guibkps();
 			}else{
 				ASTGUI.dialog.alertmsg( 'Asterisk needs write privileges on ' + ASTGUI.paths['guiInstall'] );
 				return;
