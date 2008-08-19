@@ -102,6 +102,8 @@ poller = setInterval('localajaxinit()', 10000);
 var show_Edit_ChannelDirection = function(chan) {
 	
 	CUR_CHAN = chan;
+
+	ASTGUI.selectbox.clear('USERS');
 	var ul = parent.astgui_manageusers.listOfUsers();
 	ul.sort();
 
