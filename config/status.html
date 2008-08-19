@@ -118,6 +118,8 @@ var doTransfer = function(to) {
 
 	ASTGUI.doTransfer(CUR_CHAN, to);
 	ASTGUI.feedback({ msg:'Transfered ' + CUR_CHAN + ' to ' + to, showfor: 3, color: 'blue' });	
+	$('#div_activechannel_edit').hideWithBg();
+
 }
 
 var show_Edit_ChannelHangup = function(chan) {
