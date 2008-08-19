@@ -381,7 +381,7 @@ var localajaxinit = function(){
 		updateTrunkslisting();
 		update_needsConfiguratin_list();
 
-		ASTGUI.systemCmdWithOutput( 'uptime' , function(a){ _$('SYS_status_div').innerHTML = 'Uptime : ' + a.trim() ; } );	
+		ASTGUI.systemCmdWithOutput( 'uptime' , function(a){ document.getElementById('SYS_status_div').innerHTML = 'Uptime : ' + a.trim() ; } );	
 
 	};
 

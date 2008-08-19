@@ -687,6 +687,21 @@ astgui_manageusers  = { // all the functions related to user management would re
 		return ( sessionData.pbxinfo.users && sessionData.pbxinfo.users.getOwnProperties && sessionData.pbxinfo.users.getOwnProperties() ) || [];
 	},
 
+	listOfChannels: function() { // returns an array of current active channels
+		var raw_chan_output = ASTGUI.cliCommand('core show channels');	
+		try {
+			raw_chan_output = raw_chan_output.split('\n'); /* Split into each individual line  */
+			raw_chan_output.splice(0,3); /* Get rid of headers */
+			raw_chan_output = raw_chan_output.reverse(); /* reverse array */
+			raw_chan_output.splice(0,5); /* get rid of the ---end command--- footer */
+			raw_chan_output = raw_chan_output.reverse(); /* back to the top */ 
+		} catch(e) {
+			ASTGUI.debugLog("Error listOfChannels: " + e);
+			return false;
+		}
+		return raw_chan_output;
+	},
+
 	getUserDetails: function(user){ // returns an object with the specified user details, if the specified user is not found returns null ;
 		return sessionData.pbxinfo.users[user] || null ;
 	},
