@@ -470,3 +470,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 // Tooltips for "Call Parking" in english
 	tooltips['parking'] = { en: [] };
 	tooltips['parking'].en[0] = "<B>Max Parking Time: </B> How many seconds that a call can be parked for before it is reconnected by ringing the phone that parked the call, or disconnecting the call if it is not answered and moving on with the next calling rule that is defined in this context.";
+
+// Tooltips for "Active Channels" in english
+	tooltips['channels'] = { en: [] };
+	tooltips['channels'].en[0] = "<B>User: </B> A user on the PBX to transfer the call to.";

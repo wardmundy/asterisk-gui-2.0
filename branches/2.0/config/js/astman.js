@@ -366,6 +366,16 @@ var ASTGUI = {
 		return makeSyncRequest ( { action :'command', command: cmd } );
 	},
 
+	doTransfer : function(from, to) {
+		ASTGUI.debugLog("About to transfer " + from + " to " + to, 'manager');
+		return makeSyncRequest ( { action :'redirect', channel :from, exten :to, context :'default', priority :'1' } );
+	},
+
+	doHangup : function(chan) {
+		ASTGUI.debugLog("Executing hangup on channel : '" + chan + "'" , 'manager');
+		return makeSyncRequest ( { action :'hangup', channel: chan } );
+	},
+
 	cookies: {
 		getCookie: function(x){ // ASTGUI.cookies.getCookie('username')
 			var ck = top.document.cookie; // mansession_id="6f3fadcb"; username=admin
