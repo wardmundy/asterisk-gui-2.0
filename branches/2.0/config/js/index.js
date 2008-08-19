@@ -156,6 +156,21 @@ var onLogInFunctions = {
 		return true;
 	},
 
+	check_WritePermissionsFor_GUI_Folder : function(){
+		ASTGUI.dialog.waitWhile('Checking write permission for gui folder');
+		var rand = Math.round(100000*Math.random());
+
+		ASTGUI.systemCmdWithOutput( "echo '" + rand + "'" , function(s){ // run 'misdn-init scan'
+			if( s.contains(rand) ){
+				ASTGUI.dialog.waitWhile('detecting Hardware ..');
+				ASTGUI.systemCmd( ASTGUI.apps.Ztscan, onLogInFunctions.updatePanels4Platform );
+			}else{
+				ASTGUI.dialog.alertmsg( 'Asterisk needs write privileges on ' + ASTGUI.paths['guiInstall'] );
+				return;
+			}
+		});
+	},
+
 	checkifLoggedIn: function(){
 		var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=ping', async: false });
 		var resp = s.getResponseHeader("Server");
@@ -268,12 +283,8 @@ var onLogInFunctions = {
 			}
 
 			sessionData.finishedParsing = true;
-			ASTGUI.dialog.waitWhile('detecting Hardware ..');
-			ASTGUI.systemCmd( ASTGUI.apps.Ztscan, onLogInFunctions.updatePanels4Platform ) ;
+			onLogInFunctions.check_WritePermissionsFor_GUI_Folder();
 		}
-	},
-
-	runZtscan : function(){
 	},
 
 	updatePanels4Platform: function(){
