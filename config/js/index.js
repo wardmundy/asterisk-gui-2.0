@@ -160,7 +160,7 @@ var onLogInFunctions = {
 		ASTGUI.dialog.waitWhile('Checking write permission for gui folder');
 		var rand = Math.round(100000*Math.random());
 
-		ASTGUI.systemCmdWithOutput( "echo '" + rand + "'" , function(s){ // run 'misdn-init scan'
+		ASTGUI.systemCmdWithOutput( "echo '" + rand + "'" , function(s){
 			if( s.contains(rand) ){
 				ASTGUI.dialog.waitWhile('detecting Hardware ..');
 				ASTGUI.systemCmd( ASTGUI.apps.Ztscan, onLogInFunctions.updatePanels4Platform );
