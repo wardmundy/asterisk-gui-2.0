@@ -558,11 +558,7 @@ var ASTGUI = {
 		if(!top.sessionData.DEBUG_MODE ){ return true; }
 
 		if( typeof msg == 'object' ){
-			if( ASTGUI.isArray(msg) ){
-				msg = 'ARRAY : [' + msg.join(',') + ']' ;
-			}else{
-				msg = 'OBJECT : {' + ASTGUI.getObjectPropertiesAsString(msg) + '}' ;
-			}
+			msg = 'OBJECT : ' + ASTGUI.getObjectPropertiesAsString(msg) ;
 		}
 
 		if(!color){ color = '#324176'; }
@@ -971,11 +967,19 @@ var ASTGUI = {
 	getObjectPropertiesAsString : function(a){ // takes an object and returns all its properties, values as a string
 		var ar = [];
 		for(var d in a){
-			if(a.hasOwnProperty(d)){
-				ar.push(  d + ' : ' + a[d] );
+			if(!a.hasOwnProperty(d)){ continue; }
+
+			if( typeof a[d] == 'object' ){
+				if( ASTGUI.isArray(a[d]) ){
+					ar.push(  d + ' : [' + a[d].join(',') + ']' );
+				}else{
+					ar.push(  d + ' : ' + ASTGUI.getObjectPropertiesAsString(a[d]) );
+				}
+			}else{
+				ar.push(d + ' : '+ a[d]);
 			}
 		}
-		return ar.join(' ,');
+		return '{' + ar.join(' ,') + '}' ;
 	},
 
 	getTrunkStatus : function (registry , trunkname, ttype){ // ASTGUI.getTrunkStatus (registry, trunkname);
