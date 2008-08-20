@@ -296,6 +296,7 @@ var ASTGUI = {
 		providerUrl: 'https://gui-dl.digium.com/providers.js', // ASTGUI.globals.providerUrl
 		appname : 'Asterisk GUI',
 		lang : 'en',
+		GUI_DB : 'astgui', // name of the ASTDB database used by GUI -- ASTGUI.globals.GUI_DB
 		msg_notLoggedIn: 'Message: Authentication Required',
 		configfile : 'guipreferences.conf', // will be created if the file does not exist , ASTGUI.globals.configfile
 		hwcfgFile: 'gui_confighw.conf', // file to store configured hardware information
@@ -339,6 +340,73 @@ var ASTGUI = {
 		'AG150':' SyncActions being used for more than 5 actions'
 	},
 
+	ASTDB:{
+		updateKey : function( k ){ // ASTGUI.ASTDB.updateKey( { dbname: 'astgui', key : 'keyname', keyvalue : 'keyvalue' } );
+			// k = { dbname: 'astgui', key : 'keyname', keyvalue : 'keyvalue' } // dbname is optional, defaults to ASTGUI.globals.GUI_DB
+			if( !k.hasOwnProperty('dbname') ){
+				k.dbname = ASTGUI.globals.GUI_DB ;
+			}
+
+			var s = ASTGUI.cliCommand('database put '+ k.dbname + ' ' + k.key + ' ' + k.keyvalue );
+			if(s.contains('successfully')) return true;
+			return false;
+		},
+
+		deleteKey : function( k ){ // ASTGUI.ASTDB.deleteKey( { dbname: 'astgui', key : 'keyname' } );
+			// k = { dbname: 'astgui', key : 'keyname' } // dbname is optional, defaults to ASTGUI.globals.GUI_DB
+			if( !k.hasOwnProperty('dbname') ){
+				k.dbname = ASTGUI.globals.GUI_DB ;
+			}
+
+			var s = ASTGUI.cliCommand('database del '+ k.dbname + ' ' + k.key);
+			if(s.contains('entry removed')) return true;
+			return false;
+		},
+
+
+		getKey : function(k){  // ASTGUI.ASTDB.getKey( { dbname: 'astgui', key : 'keyname' } );
+			// k = { dbname: 'astgui', key : 'keyname' } // dbname is optional, defaults to ASTGUI.globals.GUI_DB
+			if( !k.hasOwnProperty('dbname') ){
+				k.dbname = ASTGUI.globals.GUI_DB ;
+			}
+
+			var s = ASTGUI.cliCommand('database get '+ k.dbname + ' ' + k.key);
+			if( s.contains('entry not found')) return null;
+			var op = ASTGUI.parseCLIResponse( s );
+			console.log('**');
+			console.log(op);
+			console.log('**');
+			op = op.trim();
+			op = op.withOut('Value:')
+			return op.trim();
+		},
+
+		getAllKeys : function(k){ // ASTGUI.ASTDB.getAllKeys( { dbname: 'astgui' } );
+			// k = { dbname: 'astgui' } // dbname is optional, defaults to ASTGUI.globals.GUI_DB
+			if( !k.hasOwnProperty('dbname') ){
+				k.dbname = ASTGUI.globals.GUI_DB ;
+			}
+
+			var db_keys = {};
+			var tmp_dbpath = '/' + k.dbname + '/' ;
+			var s = ASTGUI.cliCommand('database show '+ k.dbname);
+
+			if(s.contains('entry not found')) return null;
+			var op = ASTGUI.parseCLIResponse( s );
+			if( op.trim() == ''){ return {}; }
+
+			var tmp_lines = op.trim().split('\n');
+			tmp_lines.each( function(this_line){
+				var this_line = this_line.withOut(tmp_dbpath);
+				var this_key = this_line.beforeChar(':').trim();
+				var this_keyVal = this_line.afterChar(':').trim();
+				db_keys[ this_key ] =  this_keyVal ;
+			});
+
+			return db_keys;
+		}
+	},
+
 	checkRequiredFields: function( fields ){
 		for(var g=0; g < fields.length ; g++ ){
 			var field = fields[g];
@@ -361,7 +429,7 @@ var ASTGUI = {
 		return true;
 	},
 
-	cliCommand : function(cmd) {
+	cliCommand : function(cmd) { // ASTGUI.cliCommand(cmd);
 		ASTGUI.debugLog("Executing manager command : '" + cmd + "'" , 'manager');
 		return makeSyncRequest ( { action :'command', command: cmd } );
 	},
