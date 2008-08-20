@@ -93,57 +93,59 @@
 </style>
 
 <script>
-
 var CUR_CHAN;
-var poller;
-
-poller = setInterval('localajaxinit()', 10000);
+var COUNTDOWN = 10;
 
 var show_Edit_ChannelDirection = function(chan) {
-	
 	CUR_CHAN = chan;
-
-	ASTGUI.selectbox.clear('USERS');
-	var ul = parent.astgui_manageusers.listOfUsers();
-	ul.sort();
-
-	ul.each( function(user) {
-		ASTGUI.selectbox.append('USERS', user, user);	
-	});	
-	chan_miscFuncs.reset_Fields();
+	_$('USERS').selectedIndex = -1;
 	$('#div_activechannel_edit').showWithBg();
 };
 
-var doTransfer = function(to) {
-
+var doTransfer = function() {
+	var to = _$('USERS').value;
 	ASTGUI.doTransfer(CUR_CHAN, to);
 	ASTGUI.feedback({ msg:'Transfered ' + CUR_CHAN + ' to ' + to, showfor: 3, color: 'blue' });	
 	$('#div_activechannel_edit').hideWithBg();
-
-}
+};
 
 var show_Edit_ChannelHangup = function(chan) {
-	
-	chan_miscFuncs.reset_Fields();
 	if(confirm("Are you sure you want to hangup " + chan + "?")) {
 		ASTGUI.doHangup(chan);
 		ASTGUI.feedback({ msg:'Hungup Channel ' + chan, showfor: 3, color: 'blue' });	
 	}
-	localajaxinit(); /* Refresh */
+
+	updateChannels_List(); /* Refresh */
 };
 
-var chan_miscFuncs = {
+var localajaxinit = function(){
+	top.document.title = 'Monitor active calls' ;
 
-	reset_Fields : function(){ // followMe_MiscFunctions.reset_Fields()
-		ASTGUI.resetTheseFields (['USERS']);
+	var ul = parent.astgui_manageusers.listOfUsers();
+	ul.sort();
+	ul.each( function(user) {
+		ASTGUI.selectbox.append('USERS', user, user);
+	});
 
-	},
+	setInterval( function(){
+		if( COUNTDOWN == 0){
+			updateChannels_List();
+			return;
+		}
 
-}
+		_$('thisPage_COuntDown').innerHTML = 'Refreshing Active Channels in ' + COUNTDOWN + ' Seconds';
+		COUNTDOWN--;
+	}, 1100);
 
-function localajaxinit(){
+	updateChannels_List();
+};
+
+
+var updateChannels_List = function(){
+	COUNTDOWN = 10;
 	var TBL = _$('table_channel_list') ;
 	ASTGUI.domActions.clear_table(TBL);
+
 	var addCell = ASTGUI.domActions.tr_addCell;
 	/* XXX Move this function to ASTGUI */
 	var ul = parent.astgui_manageusers.listOfChannels();
@@ -189,48 +191,44 @@ function localajaxinit(){
 		addCell( newRow , { html: '<i>' + cur_app + '</i>' });
 		addCell( newRow , { html: tmp_a[0] , align:'center' });
 		addCell( newRow , { html: tmp_a[1] , align:'center' });
-	} );
+	});
 };
 
-
-function localajaxend(){
-	parent.astmanEngine.setEventCallback(null);
-	if( navigator.userAgent.indexOf("MSIE") != -1 ){ 
-		try{ purge( document.body ); } catch(e){ }	
-	}
-	clearInterval(poller);
-}
 
 </script>
 <body bgcolor="EFEFEF">
 	<div class="iframeTitleBar"> 
 		Channel Management <span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
 	</div>
-	<div class='lite_Heading' id='thisPage_lite_Heading'>Active Channels</div>
-	
+
+	<div class='top_buttons'>
+		<span class='guiButton' onclick='updateChannels_List();' style='float:left'>Refresh Now</span>
+		<div class='lite_Heading' id='thisPage_lite_Heading'>Active Channels</div>
+	</div>
+	<center><div id='thisPage_COuntDown'></div></center>
+
 	<table id='table_channel_list' cellpadding=0 cellspacing=0 border=0 align=center style='clear:both;'></table>
 
-
-<div id="div_activechannel_edit" STYLE="width:550; display:none;" class='dialog'>
-	<TABLE width="100%" cellpadding=0 cellspacing=0>
-	<TR class="dialog_title_tr">
-		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);">
-			<span id="div_activechannel_edit_title"></span></TD>
-		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
-	</TR>
-	</TABLE>
+	<div id="div_activechannel_edit" STYLE="width:550; display:none;" class='dialog'>
+		<TABLE width="100%" cellpadding=0 cellspacing=0>
+		<TR class="dialog_title_tr">
+			<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);">
+				<span id="div_activechannel_edit_title"></span></TD>
+			<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
+		</TR>
+		</TABLE>
+		
+		<TABLE	align=center cellpadding=2 cellspacing=2 border=0 width='100%'>
+			<tr>	<td align=right>User <img src="images/tooltip_info.gif" tip="en,channels,0" class='tooltipinfo'> :</td>
+				<td>	<select id='USERS' required='yes'> </td>
+			</tr>
 	
-	<TABLE	align=center cellpadding=2 cellspacing=2 border=0 width='100%'>
-		<tr>	<td align=right>User <img src="images/tooltip_info.gif" tip="en,channels,0" class='tooltipinfo'> :</td>
-			<td>	<select id='USERS' required='yes'> </td>
-		</tr>
-
-		<tr>	<td align=center valign=bottom colspan=2 style="padding:15px; background-color: #f4deb7">
-				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
-				<span class='guiButtonEdit' onclick="doTransfer(_$('USERS').value);">Transfer</span>
-			</td>
-		</tr>
-	</TABLE>
-</div>
+			<tr>	<td align=center valign=bottom colspan=2 style="padding:15px; background-color: #f4deb7">
+					<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
+					<span class='guiButtonEdit' onclick="doTransfer();">Transfer</span>
+				</td>
+			</tr>
+		</TABLE>
+	</div>
 
 </body>
