@@ -373,9 +373,6 @@ var ASTGUI = {
 			var s = ASTGUI.cliCommand('database get '+ k.dbname + ' ' + k.key);
 			if( s.contains('entry not found')) return null;
 			var op = ASTGUI.parseCLIResponse( s );
-			console.log('**');
-			console.log(op);
-			console.log('**');
 			op = op.trim();
 			op = op.withOut('Value:')
 			return op.trim();
