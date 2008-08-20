@@ -215,10 +215,15 @@ var show_Edit_Trunk = function(){
 
 var edit_VOIPTrunk_save_go = function(){
 	var topreload = false;
-	if ( !ASTGUI.checkRequiredFields(['edit_VOIPTrunk_Providername', 'edit_VOIPTrunk_Type' , 'edit_VOIPTrunk_Hostname' , 'edit_VOIPTrunk_Username' ]) ){
+	var tmp_username = ASTGUI.getFieldValue('edit_VOIPTrunk_Username');
+	if( /[^a-zA-Z_0-9\.]/.test(tmp_username) ){
+		var tmp_confirm = confirm('The Voip Username appears to contain special characters. \n Click \'OK\' to continue, \'Cancel\' to abort.');
+		if( !tmp_confirm ) return;
+	}
+
+	if ( !ASTGUI.checkRequiredFields(['edit_VOIPTrunk_Providername', 'edit_VOIPTrunk_Type' , 'edit_VOIPTrunk_Hostname']) ){
 		return ;
 	}
-	if ( !ASTGUI.validateFields([ 'edit_VOIPTrunk_Username' ]) ) return ;
 
 	if( isNewTrunk == true ) {
 	// New Trunk
