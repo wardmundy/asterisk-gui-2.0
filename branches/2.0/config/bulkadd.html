@@ -36,15 +36,19 @@ var addUsers_from_CSV_field = function(){
 	var NEW_USERS = {} ;
 	var csv_text = _$('ta_ba_csv').value ;
 	var tmp_lines = csv_text.split('\n');
-	var HEADS = tmp_lines[0]; tmp_lines.splice(0, 1);
-	var tmp_Heads = HEADS.split(',');
+	var tmp_Heads = tmp_lines[0]; tmp_lines.splice(0, 1);
+	var HEADS = tmp_Heads.split(',');
+	if( HEADS[0] != 'User' ){
+		alert('The first column should be User');
+		return;
+	}
 
 	var newusers_list = [];
 	for(var tli =0; tli< tmp_lines.length ; tli++ ){
 		var this_line = tmp_lines[tli];
+		if( this_line.trim() == '' ){ continue; }
 		var this_user_details = this_line.split(',');
-
-		if( this_user_details.length != tmp_Heads.length ){
+		if( this_user_details.length != HEADS.length ){
 			alert('Error: Invalid Number of Fields in line ' + (tli + 1) );
 			return;
 		}
@@ -57,8 +61,8 @@ var addUsers_from_CSV_field = function(){
 
 		newusers_list.push( this_user ) ;
 		NEW_USERS[ this_user ] = {} ;
-		for( var f = 1 ; f < tmp_Heads.length ; f++ ){
-			NEW_USERS[ this_user ][ tmp_Heads[f] ] = this_user_details[ f ] ;
+		for( var f = 1 ; f < HEADS.length ; f++ ){
+			NEW_USERS[ this_user ][ HEADS[f] ] = this_user_details[ f ] ;
 		}
 	};
 
@@ -94,8 +98,8 @@ var addUsers_from_CSV_field = function(){
 		<tr><td  align=center>
 			<BR>
 			<B>Enter list of users as CSV text</B><BR>
-			Heads: User<sup>1</sup>,fullname,cid_number, context, hasvoicemail, vmsecret, email, hassip, hasiax, secret
-
+			<B>Heads:</B> User<sup>1</sup>,fullname,cid_number, context, hasvoicemail, vmsecret, email, hassip, hasiax, secret<BR>
+			1. 'User' should always be the first column, the remaining fields can be in any order.
 		</td></tr>
 		<tr><td  align=center>
 			<textarea id='ta_ba_csv' rows=10 cols=120></textarea>
