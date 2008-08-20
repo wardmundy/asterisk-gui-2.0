@@ -27,13 +27,59 @@
 
 </style>
 <script>
+var newusers_list = [];
+var NEW_USERS = {} ;
 
 var localajaxinit = function(){
+	ASTGUI.selectbox.populateArray('RANGE_Number', [5,10,15,20,25,30,35,40,45,50]);
 	top.document.title = 'Bulk Add' ;
+
+	(function(){
+		var t = [{	url:'#',
+				desc:'Create New users from CSV list',
+				click_function: function(){
+					$('#table_usersFromCSV').show();
+					$('#table_usersFromRange').hide();
+				}
+			},{	url: '#',
+				desc: 'Create a Range of new users',
+				click_function: function(){
+					$('#table_usersFromCSV').hide();
+					$('#table_usersFromRange').show();
+				}
+			}];
+		ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
+	})();
+
+	$('#tabbedMenu').find('A:eq(0)').click();
 };
 
+
+
+var create_NEW_USERS = function(){
+	var addUser_OR_reloadGUI = function(){
+		var tmp_first_user = newusers_list[0];
+		parent.astgui_manageusers.addUser( tmp_first_user , NEW_USERS[tmp_first_user] , function(){
+			newusers_list.splice(0,1);
+			if( newusers_list.length ){
+				addUser_OR_reloadGUI();
+			}else{
+				alert( 'Users added \n Click Ok to reload GUI' );
+				top.window.location.reload();
+			}
+		});
+	};
+
+	ASTGUI.dialog.waitWhile( "Creating list of users ");
+	addUser_OR_reloadGUI();
+};
+
+
+
 var addUsers_from_CSV_field = function(){
-	var NEW_USERS = {} ;
+	NEW_USERS = {} ;
+	newusers_list = [];
+
 	var csv_text = _$('ta_ba_csv').value ;
 	var tmp_lines = csv_text.split('\n');
 	var tmp_Heads = tmp_lines[0]; tmp_lines.splice(0, 1);
@@ -43,7 +89,6 @@ var addUsers_from_CSV_field = function(){
 		return;
 	}
 
-	var newusers_list = [];
 	for(var tli =0; tli< tmp_lines.length ; tli++ ){
 		var this_line = tmp_lines[tli];
 		if( this_line.trim() == '' ){ continue; }
@@ -67,21 +112,40 @@ var addUsers_from_CSV_field = function(){
 	};
 
 	// ASTGUI.debugLog( NEW_USERS , 'parse');
-	var addUser_OR_reloadGUI = function(){
-		var tmp_first_user = newusers_list[0];
-		parent.astgui_manageusers.addUser( tmp_first_user , NEW_USERS[tmp_first_user] , function(){
-			newusers_list.splice(0,1);
-			if( newusers_list.length ){
-				addUser_OR_reloadGUI();
-			}else{
-				alert( 'Users added \n Click Ok to reload GUI' );
-				top.window.location.reload();
-			}
-		});
-	};
+	create_NEW_USERS();
+};
 
-	ASTGUI.dialog.waitWhile( " Adding list of users " );
-	addUser_OR_reloadGUI();
+
+var add_RangeOfUsers = function(){
+	NEW_USERS = {} ;
+	newusers_list = [];
+
+	var t = Number( ASTGUI.getFieldValue('RANGE_Number') );
+	var tmp_user = Number(ASTGUI.getFieldValue('RANGE_Start'));
+
+	while(t){
+		var tmp_nu = String(tmp_user);
+		if( parent.sessionData.pbxinfo.users.hasOwnProperty(tmp_nu)  ){
+			alert('Error: User '+ tmp_nu + ' already exists');
+			return;
+		}
+
+		newusers_list.push(tmp_nu);
+			ASTGUI.debugLog( 'adding user ' + tmp_nu , 'parse');
+			NEW_USERS[ tmp_nu ] = {} ;
+			NEW_USERS[ tmp_nu ]['fullname'] = 'User ' + tmp_nu;
+			NEW_USERS[ tmp_nu ]['cid_number'] = tmp_nu;
+			NEW_USERS[ tmp_nu ]['context'] = '';
+			NEW_USERS[ tmp_nu ]['hasvoicemail'] = 'yes';
+			NEW_USERS[ tmp_nu ]['vmsecret'] = tmp_nu;
+			NEW_USERS[ tmp_nu ]['hassip'] = 'yes';
+			NEW_USERS[ tmp_nu ]['hasiax'] = 'yes';
+			NEW_USERS[ tmp_nu ]['secret'] = tmp_nu;
+		tmp_user++ ;
+		t--;
+	}
+
+	create_NEW_USERS();
 };
 
 
@@ -93,11 +157,11 @@ var addUsers_from_CSV_field = function(){
 
 	<div class='lite_Heading'>Bulk Add</div>
 
-	<table width='98%' align=center>
+	<center><div id="tabbedMenu"></div></center>
 
+	<table width='98%' align=center id='table_usersFromCSV'>
 		<tr><td  align=center>
 			<BR>
-			<B>Enter list of users as CSV text</B><BR>
 			<B>Heads:</B> User<sup>1</sup>,fullname,cid_number, context, hasvoicemail, vmsecret, email, hassip, hasiax, secret<BR>
 			1. 'User' should always be the first column, the remaining fields can be in any order.
 		</td></tr>
@@ -107,6 +171,21 @@ var addUsers_from_CSV_field = function(){
 		<tr><td align=center>
 			<span class="guiButton" onclick="addUsers_from_CSV_field()">Add</span>
 		</td></tr>
-	</table>	
+	</table>
+
+	<table width='700' align=center id='table_usersFromRange'>
+		<tr>
+			<td  align=center>Create <select id='RANGE_Number'></select> Users Starting from Extension <input id='RANGE_Start' size=3> </td>
+		</tr>
+		<tr>	<td align=center>
+				<BR>
+				<span class="guiButton" onclick="add_RangeOfUsers()"> Create Users </span>
+			</td>
+		</tr>
+		<tr>
+			<td  align=center><BR><BR><B>Tip:</B> Use the 'Modify Selected Users' button from the Users page to edit any options for the created users.</td>
+		</tr>
+		
+	</table>
 
 </body>
