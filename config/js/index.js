@@ -694,6 +694,7 @@ var localajaxinit = function(){
 	//}
 	$.getScript( 'js/guiversion.js', function(){
 		sessionData.gui_version = gui_version ;
+		_$('parent_div_guiVersion').innerHTML = "<font color='#8d8d8d'>GUI-version : " + sessionData.gui_version + '</font>';
 	});
 	var loadGUI = function(){
 		DOM_accordion_div = _$('accordion_div');
