@@ -2651,12 +2651,21 @@ var context2json = function(params){
 		}
 		return (catfound)?cat : null ;
 	};
+
 	ASTGUI.debugLog("AJAX Request : reading '" +  params.filename + "'" , 'get');
 
-	if( parent.sessionData.PLATFORM.isAST_1_6 ){
-		var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename='+params.filename+'&category='+params.context, async: false }).responseText;
+	if( top.sessionData.FileCache.hasOwnProperty(params.filename) &&  top.sessionData.FileCache[params.filename].modified == false){ // if file is in cache and is not modified since
+		var s = top.sessionData.FileCache[params.filename].content ;
 	}else{
-		var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename='+params.filename, async: false}).responseText;
+		if( parent.sessionData.PLATFORM.isAST_1_6 ){
+			var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename='+params.filename+'&category='+params.context, async: false }).responseText;
+		}else{
+			var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename='+params.filename, async: false}).responseText;
+		}
+
+		top.sessionData.FileCache[params.filename] = {};
+		top.sessionData.FileCache[params.filename].content = s;
+		top.sessionData.FileCache[params.filename].modified = false;
 	}
 
 	if(s.contains('Response: Error') && ( s.contains('Message: Config file not found') || s.contains('Message: Permission denied') ) ){
@@ -2734,8 +2743,19 @@ var config2json = function( params ){
 	if( params.configFile_output ){
 		return toJSO( params.configFile_output );
 	};
+
 	ASTGUI.debugLog("AJAX Request : reading '" +  params.filename + "'" , 'get');
-	var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename='+params.filename, async: false }).responseText;
+
+	if( top.sessionData.FileCache.hasOwnProperty(params.filename) &&  top.sessionData.FileCache[params.filename].modified == false){ // if file is in cache and is not modified since
+		var s = top.sessionData.FileCache[params.filename].content ;
+	}else{
+		var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename='+params.filename, async: false }).responseText;
+
+		top.sessionData.FileCache[params.filename] = {};
+		top.sessionData.FileCache[params.filename].content = s;
+		top.sessionData.FileCache[params.filename].modified = false;
+	}
+
 	if( s.contains('Response: Error') && s.contains('Message: Config file not found') ){
 		// return ASTGUI.globals.fnf; // return 'file not found'
 		ASTGUI.ErrorLog( ' config file(' + params.filename +') not found ' );

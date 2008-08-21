@@ -2638,6 +2638,11 @@ jQuery.extend({
 		///// ADDED FOR ASTERISK GUI //////
 			try{
 				if( ASTGUI && s.url.contains('action=updateconfig&') ){
+						// update cache status flag for the modified file
+						var tmp_filename = ASTGUI.parseGETparam( s.url , 'srcfilename');
+						if( !top.sessionData.FileCache.hasOwnProperty(tmp_filename) ){ top.sessionData.FileCache[tmp_filename] = {}; }
+						top.sessionData.FileCache[tmp_filename].modified = true;
+
 					if( s.url.contains('&srcfilename=http.conf&') || s.url.contains( '&srcfilename=' + ASTGUI.globals.zaptelIncludeFile + '&') ){
 
 					}else{
