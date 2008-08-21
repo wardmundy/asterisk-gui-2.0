@@ -1002,6 +1002,36 @@ var ASTGUI = {
 		top.miscFunctions.setFeedback(fb);
 	},
 
+	generateGraph : function( DATA ){ // generates bar graph into table DATA.TBL for array DATA.VALS
+		// ASTGUI.generateGraph( {TBL: 'DIV_Graph', VALS: gr_vals, HEIGHT: 150, WIDTH: 9 });
+		// WIDTH is width of each cell
+		var TBL = DATA.TBL;
+		var VALS = DATA.VALS ;
+		var HEIGHT = Number(DATA.HEIGHT) || 100 ;
+		var WIDTH = DATA.WIDTH || 5 ;
+
+		var table_ofHeight = function(h, color){
+			h = Math.floor((HEIGHT * Number(h))/100) ;
+			var uh = HEIGHT - h ;
+			if(!color){ color = '#a8b6e5';}
+			return "<TABLE cellpadding=0 cellspacing=0><TR><TD bgcolor='#FFFFFF' height=" + uh + " width=" + WIDTH + "></TD></TR>"
+				+ "<TR><TD bgcolor='"+ color +"' height=" + h + " width=" + WIDTH + "></TD></TR></TABLE>" ;
+		};
+
+		if ( typeof TBL == 'string'){ TBL = _$(TBL); }
+		ASTGUI.domActions.clear_table(TBL);
+		var newRow = TBL.insertRow(-1);
+		VALS.each( function( this_val ){
+			var newcell = newRow.insertCell( newRow.cells.length );
+			newcell.align = 'center' ;
+			newcell.valign = 'bottom' ;
+			newcell.width = WIDTH + 'px' ;
+			newcell.height = HEIGHT ;
+			var clr = ((newRow.cells.length)%2==1) ? '#a8b6e5' : '#dce5f6' ;
+			newcell.innerHTML = table_ofHeight( this_val , clr );
+		});
+	},
+
 	getFieldValue : function(el){ // ASTGUI.getFieldValue(el)
 		if ( typeof el == 'string'){ el = _$(el) ; }
 		switch(el.type){
