@@ -164,31 +164,31 @@ var updateChannels_List = function(){
 		newRow.className = "frow";
 		addCell( newRow , { html:'Channel'});
 		addCell( newRow , { html:'State'});
+		addCell( newRow , { html:'Seconds'});
 		addCell( newRow , { html:'Application'});
 		addCell( newRow , { html:''});
 		addCell( newRow , { html:''});
 
 	})();
 
-	ul.each( function(chan){ // list each user in table
-		var tmpsplit = chan.split(/\s+/); /* split by whitespace */
-		var cur_chan = tmpsplit[0]; /* Unique channel ID */ 
-		var cur_location = tmpsplit[1]; /* Location of the call */
-		var cur_state = tmpsplit[2]; /* Channel status */
-		var cur_app = tmpsplit[3]; /* Current application */
-
+	ul.each( function(chan){ // list each channel in table
 		var newRow = TBL.insertRow(-1); 
 		newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
-		addCell( newRow , { html: cur_chan });
-		if ( cur_state == "Up" ){
-			addCell( newRow , { html: '<font color=green><b>' + cur_state + '</b></font>' });
+		addCell( newRow , { html: chan.Channel });
+		if ( chan.State == "Up" ){
+			addCell( newRow , { html: '<font color=green><b>Up</b></font>' });
 		}else{
-			addCell( newRow , { html: '<font color=red><b>' + cur_state + '<b></font>' });
+			addCell( newRow , { html: '<font color=red><b>' + chan.State + '<b></font>' });
 		}
+		addCell( newRow , { html: chan.Seconds });
 		var tmp_a = [];
-		tmp_a[0] = "<span class='guiButton' onclick=\"show_Edit_ChannelDirection('" + cur_chan +"')\">Transfer</span>&nbsp;" ;
-		tmp_a[1] = "<span class='guiButton' onclick=\"show_Edit_ChannelHangup('" + cur_chan +"')\">Hangup</span>&nbsp;" ;
-		addCell( newRow , { html: '<i>' + cur_app + '</i>' });
+		tmp_a[0] = "<span class='guiButton' onclick=\"show_Edit_ChannelDirection('" + chan.Channel +"')\">Transfer</span>&nbsp;" ;
+		tmp_a[1] = "<span class='guiButton' onclick=\"show_Edit_ChannelHangup('" + chan.Channel +"')\">Hangup</span>&nbsp;" ;
+
+		var tmp_app = 'PlaceHolder AppName'; // We need to figure out how to get the app name
+		// one suggestion by bkruse is that we can lookup in extensions.conf using 'chan.Extension, chan.Context, chan.Priority'
+
+		addCell( newRow , { html: '<i>' + tmp_app + '</i>' });
 		addCell( newRow , { html: tmp_a[0] , align:'center' });
 		addCell( newRow , { html: tmp_a[1] , align:'center' });
 	});
