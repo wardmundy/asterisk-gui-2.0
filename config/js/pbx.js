@@ -688,18 +688,66 @@ astgui_manageusers  = { // all the functions related to user management would re
 	},
 
 	listOfChannels: function() { // returns an array of current active channels
-		var raw_chan_output = ASTGUI.cliCommand('core show channels');	
+		var raw_chan_staus = makeSyncRequest ( { action :'status' } );
+		var to_return = [];
 		try {
-			raw_chan_output = raw_chan_output.split('\n'); /* Split into each individual line  */
-			raw_chan_output.splice(0,3); /* Get rid of headers */
-			raw_chan_output = raw_chan_output.reverse(); /* reverse array */
-			raw_chan_output.splice(0,5); /* get rid of the ---end command--- footer */
-			raw_chan_output = raw_chan_output.reverse(); /* back to the top */ 
+			raw_chan_staus = raw_chan_staus.replace(/Response: Success/, "");
+			raw_chan_staus = raw_chan_staus.replace(/Message: Channel status will follow/, "");
+			raw_chan_staus = raw_chan_staus.replace(/Event: StatusComplete/, "");
+
+			raw_chan_staus = raw_chan_staus.trim();
+			var chunks = raw_chan_staus.split('Event: Status');
+
+			chunks.each( function(this_chunk){
+				// Privilege: Call
+				// Channel: Console/dsp
+				// CallerID: <unknown>
+				// CallerIDNum: <unknown>
+				// CallerIDName: <unknown>
+				// Account: 
+				// State: Up
+				// Context: default
+				// Extension: 6050
+				// Priority: 1
+				// Seconds: 66
+				// Uniqueid: 1219466028.58
+				if( !this_chunk.contains('Channel:') ){ return; }
+				var this_chunk_lines = this_chunk.split('\n');
+				var tmp_Channel = '', tmp_state = '', tmp_application='', tmp_Location ='', tmp_context = '', tmp_extension = '', tmp_priority = '';
+
+				for ( var r =0 ; r < this_chunk_lines.length ; r++ ){
+
+					var this_chunk_line = this_chunk_lines[r];
+					//console.log(this_chunk_line);
+					if(this_chunk_line.contains('Channel:')){
+						tmp_Channel = this_chunk_line.afterStr('Channel:').trim(); continue;
+					}
+
+					if(this_chunk_line.contains('Context:')){
+						tmp_context = this_chunk_line.afterStr('Context:').trim();continue;
+					}
+
+					if(this_chunk_line.contains('Extension:')){
+						tmp_extension = this_chunk_line.afterStr('Extension:').trim();continue;
+					}
+
+					if(this_chunk_line.contains('Priority:')){
+						tmp_priority = this_chunk_line.afterStr('Priority:').trim();continue;
+					}
+					if(this_chunk_line.contains('State:')){
+						tmp_state = this_chunk_line.afterStr('State:').trim(); continue;
+					}
+				}
+
+				var tmp_line = tmp_Channel + '   ' +  tmp_extension + '@' + tmp_context + ':' + tmp_priority + '   ' + tmp_state + '   ' + 'VoiceMailMain(@default)' ;
+				to_return.push(tmp_line);
+			});
+
 		} catch(e) {
 			ASTGUI.debugLog("Error listOfChannels: " + e);
-			return false;
+			return [];
 		}
-		return raw_chan_output;
+		return to_return;
 	},
 
 	getUserDetails: function(user){ // returns an object with the specified user details, if the specified user is not found returns null ;
