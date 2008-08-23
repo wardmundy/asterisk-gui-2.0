@@ -1,4 +1,7 @@
 
+bzip/gzip support for config backups
+
+
 Andrew Latham
  
  Question:  Could the ability to turn off certain sections or change
