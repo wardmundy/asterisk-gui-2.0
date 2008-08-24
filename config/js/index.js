@@ -387,6 +387,8 @@ var miscFunctions = {
 			ASTGUI.dialog.alertmsg('The changes you made requires a restart. <BR> Your hardware might not work properly until you reboot !!');
 			ASTGUI.cookies.setCookie( 'require_restart' , 'no' );
 		}
+
+		if(cb)cb();
 	},
 
 	logoutFunction : {
