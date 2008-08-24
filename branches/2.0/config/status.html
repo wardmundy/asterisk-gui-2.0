@@ -185,9 +185,16 @@ var updateChannels_List = function(){
 		tmp_a[0] = "<span class='guiButton' onclick=\"show_Edit_ChannelDirection('" + chan.Channel +"')\">Transfer</span>&nbsp;" ;
 		tmp_a[1] = "<span class='guiButton' onclick=\"show_Edit_ChannelHangup('" + chan.Channel +"')\">Hangup</span>&nbsp;" ;
 
-		var tmp_app = 'PlaceHolder AppName'; // We need to figure out how to get the app name
-		// one suggestion by bkruse is that we can lookup in extensions.conf using 'chan.Extension, chan.Context, chan.Priority'
+		var tmp_app = '';
 
+		var tmp_dialplan_context = context2json({ filename:'extensions.conf' , context : chan.Context , usf: 0 });
+		if( ASTGUI.isArray( tmp_dialplan_context ) ){
+			var tmp_dialplan_lineIndex = tmp_dialplan_context.indexOfLike('exten='+ chan.Extension + ',' + chan.Priority +',');
+			if(tmp_dialplan_lineIndex != -1){
+				var tmp_dialplan_line = tmp_dialplan_context[tmp_dialplan_lineIndex];
+				tmp_app = ASTGUI.parseContextLine.getAppWithArgs(tmp_dialplan_line);
+			}
+		}
 		addCell( newRow , { html: '<i>' + tmp_app + '</i>' });
 		addCell( newRow , { html: tmp_a[0] , align:'center' });
 		addCell( newRow , { html: tmp_a[1] , align:'center' });
