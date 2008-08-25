@@ -86,7 +86,7 @@ CONFIGDIR:=$(ASTVARLIBDIR)/static-http/config
 
 
 HTTPHOST?=$(shell hostname)
-HTTPBINDPORT?=$(shell cat $(ASTETCDIR)/http.conf  2>/dev/null | grep -v ^\; | grep bindport | cut -f 2 -d '=')
+HTTPBINDPORT?=$(shell cat $(ASTETCDIR)/http.conf  2>/dev/null | grep -v ^\; | grep bindport | cut -f 2 -d '=' | sed 's/ //g')
 ifeq ($(HTTPBINDPORT),)
   HTTPBINDPORT:=8088
 endif
