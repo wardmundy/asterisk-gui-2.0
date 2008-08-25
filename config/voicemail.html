@@ -46,7 +46,7 @@ var localajaxinit = function( ){
 		_$('directVoiceMailDial').checked = false;
 		var r = context2json({ filename:'extensions.conf' , context : 'default' , usf:0 });
 		for( var ri = 0; ri < r.length ; ri ++ ){
-			if( r[ri].beginsWith('exten=_*') && r[ri].contains(DVD) ){
+			if( (r[ri].beginsWith('exten=_*') || r[ri].beginsWith('exten=_#') )&& r[ri].contains(DVD) ){
 				_$('directVoiceMailDial').checked = true;
 				break;
 			}
@@ -99,7 +99,7 @@ var update = function(){
 	(function(){
 		ASTGUI.miscFunctions.delete_LinesLike(
 			{ context_name : 'default' ,
-				beginsWithArr: ['exten=_*'] ,
+				beginsWithArr: ['exten=_*','exten=_#'] ,
 				filename: 'extensions.conf',
 				hasThisString: DVD,
 				cb:function(){}
@@ -107,7 +107,7 @@ var update = function(){
 		);
 
 		if( _$('directVoiceMailDial').checked && parent.sessionData.GUI_PREFERENCES.ue_start ){
-			var s = '_*' + parent.sessionData.GUI_PREFERENCES.ue_start.charAt(0) + 'X'.times( String(parent.sessionData.GUI_PREFERENCES.ue_start).length -1 ) + DVD ;
+			var s = '_#' + parent.sessionData.GUI_PREFERENCES.ue_start.charAt(0) + 'X'.times( String(parent.sessionData.GUI_PREFERENCES.ue_start).length -1 ) + DVD ;
 			var u = new listOfSynActions('extensions.conf');
 			u.new_action('append', 'default', 'exten', s);
 			u.callActions();
