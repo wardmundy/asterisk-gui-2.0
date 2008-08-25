@@ -214,13 +214,13 @@ function edit_port(p){
 	ASTGUI.selectbox.selectOption( _$('editport_option'), PORTS[p]['option'] );
 	ASTGUI.selectbox.selectOption( _$('editport_type'), PORTS[p]['portType'] );
 	_$('editport_label').innerHTML = PORTS[p]['cardno'] + "/" + PORTS[p]['card_portno'] ;
-	_$('edit_port').style.display = "";
+	$('#edit_port').showWithBg();
 	_$('edit_port')['port_editing'] = p;
 }
 
 
 function canelPortInfo(){
-	_$('edit_port').style.display = "none";
+	$('#edit_port').hideWithBg();
 }
 
 function updatePortInfo(){
@@ -355,16 +355,16 @@ var new_misdntrunk = function(){
 	isnewTrunk = true;
 	_$('edit_MTrunk_ports').value = '';
 	_$('edit_MTrunk_trunkName').value = '';
-	_$('edit_trunk').style.display = "";
+	$('#edit_trunk').showWithBg();
 };
 
 var canelTrunkInfo = function(){
-	_$('edit_trunk').style.display = "none";
+	$('#edit_trunk').hideWithBg();
 }
 
 var edit_trunk = function(k){
 	isnewTrunk = false;
-	_$('edit_trunk').style.display = "";
+	$('#edit_trunk').showWithBg();
 	_$('edit_trunk')['trunk_being_Edited'] = k;
 };
 
@@ -505,10 +505,10 @@ function localajaxinit(){
 	</center>
 </div>
 
-<div id="edit_trunk" STYLE="width:500; height:180;display:none;" class='dialog'>
+<div id="edit_trunk" STYLE="width:500; display:none;" class='dialog'>
 	<TABLE width="100%" cellpadding=0 cellspacing=0>
 	<TR class="dialog_title_tr">
-		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);"></TD>
+		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);">Add/Edit Trunk</TD>
 		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
 	</TR>
 	</TABLE>
@@ -522,7 +522,7 @@ function localajaxinit(){
 		</TD>
 	</TR>
 
-	<TR>	<TD colspan=2 align=center height=50 valign=middle>  
+	<TR>	<TD colspan=2 align=center height=30 valign=middle>
 			<span class='guiButton' onclick='updateTrunkInfo();'>Update</span>
 			<span class='guiButton' onclick='canelTrunkInfo();'>Cancel</span>
 		</TD>
