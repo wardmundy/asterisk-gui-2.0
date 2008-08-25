@@ -117,7 +117,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['voicemail'] .en[11] = "<B>Allow callers to Review:</B> Checking this option allows the caller to review their message before it is submitted as a new voicemail message.";
 	tooltips['voicemail'] .en[12] = "<B>Play Envelope:</B> Turn on/off playing introductions about each message when accessing them from the voicemail application.";
 	tooltips['voicemail'] .en[13] = "<B> Max Greeting:</B> Set the maximum number of seconds for a User's voicemail greeting.";
-	tooltips['voicemail'] .en[15] = "<B> Direct VoiceMail Dial:</B> Check this to enable direct voicemail dial. For instance, if John's extension is 6001, you would be able to directly dial into John's voicemailbox by dialing *6001 to leave him a message.";
+	tooltips['voicemail'] .en[15] = "<B> Direct VoiceMail Dial:</B> Check this to enable direct voicemail dial. For instance, if John's extension is 6001, you would be able to directly dial into John's voicemailbox by dialing #6001 to leave him a message.";
 
 
 
