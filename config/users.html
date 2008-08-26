@@ -573,8 +573,14 @@ var USERS_MISC_FUNCTIONS = {
 				tmp_obj['hasvoicemail'] = ASTGUI.getFieldValue('edit_multiple_hasvoicemail') ;
 			}
 			if( _$('edit_check_multiple_vmsecret').checked ){
-				x.new_action('update', u, 'vmsecret',  ASTGUI.getFieldValue('edit_multiple_vmsecret') );
-				tmp_obj['vmsecret'] = ASTGUI.getFieldValue('edit_multiple_vmsecret') ;
+				if( _$('edit_multiple_vmCHoice1').checked ){
+					x.new_action('update', u, 'vmsecret',  ASTGUI.getFieldValue('edit_multiple_vmsecret') );
+					tmp_obj['vmsecret'] = ASTGUI.getFieldValue('edit_multiple_vmsecret') ;
+				}
+				if( _$('edit_multiple_vmCHoice2').checked ){
+					x.new_action('update', u, 'vmsecret',  u );
+					tmp_obj['vmsecret'] = u ;
+				}
 			}
 			if( _$('edit_check_multiple_hassip').checked ){
 				x.new_action('update', u, 'hassip',  ASTGUI.getFieldValue('edit_multiple_hassip') );
