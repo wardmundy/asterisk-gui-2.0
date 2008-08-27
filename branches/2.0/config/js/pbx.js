@@ -794,6 +794,9 @@ astgui_manageusers  = { // all the functions related to user management would re
 
 
 		if(userinfo.mailbox) delete userinfo.mailbox;
+		if(userinfo.hasOwnProperty('hassip') && userinfo['hassip'].isAstTrue() ){
+			x.new_action( 'append', exten, 'host', 'dynamic' );
+		}
 		for( var d in userinfo ){ if( userinfo.hasOwnProperty(d) ) {
 			x.new_action( 'append', exten, d, userinfo[d] );
 		}}

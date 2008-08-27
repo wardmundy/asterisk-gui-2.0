@@ -109,7 +109,6 @@ var addUsers_from_CSV_field = function(){
 		for( var f = 1 ; f < HEADS.length ; f++ ){
 			NEW_USERS[ this_user ][ HEADS[f] ] = this_user_details[ f ] ;
 		}
-		NEW_USERS[ this_user ]['host'] = 'dynamic' ;
 	};
 
 	// ASTGUI.debugLog( NEW_USERS , 'parse');
@@ -142,7 +141,6 @@ var add_RangeOfUsers = function(){
 			NEW_USERS[ tmp_nu ]['hassip'] = 'yes';
 			NEW_USERS[ tmp_nu ]['hasiax'] = 'yes';
 			NEW_USERS[ tmp_nu ]['secret'] = tmp_nu;
-			NEW_USERS[ tmp_nu ]['host'] = 'dynamic';
 		tmp_user++ ;
 		t--;
 	}
