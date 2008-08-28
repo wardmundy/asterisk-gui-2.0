@@ -10,7 +10,7 @@ var whenThisFileisLoaded = function(){
 	DOM_table_SPS_list = _$('table_SPS_list');
         ASTGUI.domActions.clear_table(DOM_table_SPS_list);
         var newRow = DOM_table_SPS_list.insertRow(-1);
-	ASTGUI.domActions.tr_addCell( newRow , { html: "No Providers listed in Providers.js" } );
+	ASTGUI.domActions.tr_addCell( newRow , { html: "No Providers listed in providers.js" } );
 }
 
 loaded_external = true; // this should be the last line in the code, tells the page (that loaded this script) that the script has been loaded
