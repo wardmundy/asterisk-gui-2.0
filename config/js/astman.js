@@ -293,7 +293,7 @@ var ASTGUI = {
 	includeContexts: [], // updated below
 
 	globals: {
-		providerUrl: 'https://gui-dl.digium.com/providers.js', // ASTGUI.globals.providerUrl
+		providerUrl: './js/providers.js', // ASTGUI.globals.providerUrl
 		appname : 'Asterisk GUI',
 		lang : 'en',
 		GUI_DB : 'astgui', // name of the ASTDB database used by GUI -- ASTGUI.globals.GUI_DB
