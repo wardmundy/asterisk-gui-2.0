@@ -138,6 +138,9 @@ var localajaxinit = function(){
 		})();
 	};
 
+	
+	if( ASTGUI.globals.providerUrl.toLowerCase().beginsWith('http') ){ // if remote js file, ask for user confirmation
+
 	var gp = config2json({filename: ASTGUI.globals.configfile, usf:1});
 	if( gp.hasOwnProperty('general') && gp['general'].getProperty('warning_providers') == 'yes' ){
 		LOAD_Providers();
@@ -158,7 +161,10 @@ var localajaxinit = function(){
 			dialogHeight: 230
 		});
 	}
-
+	
+	}else{
+		LOAD_Providers();
+	}
 }
 
 </script>
