@@ -95,8 +95,8 @@ HTTPPREFIX?=$(shell echo $(HTTPPREFIXBASE) | cut -f 2 -d '=')
 ifeq ($(HTTPPREFIXBASE),)
   HTTPPREFIX:=asterisk
 endif
-HTTPURL:=http://$(HTTPHOST):$(HTTPBINDPORT)/$(HTTPPREFIX)/static/config/cfgbasic.html
-HTTPLOCALURL:=http://localhost:$(HTTPBINDPORT)/$(HTTPPREFIX)/static/config/cfgbasic.html
+HTTPURL:=http://$(HTTPHOST):$(HTTPBINDPORT)/$(HTTPPREFIX)/static/config/index.html
+HTTPLOCALURL:=http://localhost:$(HTTPBINDPORT)/$(HTTPPREFIX)/static/config/index.html
 	
 #SUBDIRS:=tools
 SUBDIRS_CLEAN:=$(SUBDIRS:%=%-clean)
