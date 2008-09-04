@@ -75,8 +75,9 @@ var check_ifNeedsDownloading_andDownload = function(){
 		};
 		var after = function(){ setTimeout( check_ifDone , 10000 ); };
 		var l = ASTGUI.getFieldValue('language')
+		var platform = (parent.sessionData.PLATFORM.isAA50) ? 'AA50' : 'none';
 		parent.ASTGUI.dialog.waitWhile(' Downloading Language ...');
-		parent.ASTGUI.systemCmd( ASTGUI.scripts.dldsoundpack + ' ' + l + ' &', after);
+		parent.ASTGUI.systemCmd( ASTGUI.scripts.dldsoundpack + ' ' + l + ' ' + platform + ' &', after);
 	};
 
  	var check_ifDownloadNeeded = function(){

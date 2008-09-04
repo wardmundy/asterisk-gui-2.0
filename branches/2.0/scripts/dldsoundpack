@@ -1,6 +1,7 @@
 #!/bin/sh
 # Grabs the latest sound files from the digium downaloads site 
 PROGRAM_VERSION=AA50-1.2
+MODE=$2
 SOUND_ARCHIVE_URL="http://downloads.digium.com/pub/telephony/sounds/releases"
 SOUNDS_CORE_VERSION=1.4.8 
 SOUNDS_EXTRA_VERSION=1.4.7
@@ -30,11 +31,13 @@ else
 	exit 1
 fi
 
-if mount | grep -q ${SOUND_BASE}; then
-	echo "Filesystem mounted on ${SOUND_BASE}"
-else
-	echo "Compact Flash is not mounted on ${SOUND_BASE}!"
-	exit 1
+if [ "$MODE" = "AA50" ]; then
+	if mount | grep -q ${SOUND_BASE}; then
+		echo "Filesystem mounted on ${SOUND_BASE}"
+	else
+		echo "Compact Flash is not mounted on ${SOUND_BASE}!"
+		exit 1
+	fi
 fi
 
 if [ ! -d $SOUND_LOC ]; then
@@ -44,9 +47,11 @@ fi
 echo "Downloading and unpacking sounds of format: ${SOUNDS_LANGUAGE}"
 cd ${SOUND_LOC}
 for formats in $SOUND_FORMATS; do
-	wget ${SOUND_ARCHIVE_URL}/asterisk-core-sounds-${SOUNDS_LANGUAGE}-${formats}-${SOUNDS_CORE_VERSION}.tar.gz -O - | gzip -dc | tar xvf -
+	# Only show Errors/Warnings (stderr) and the actual download
+	wget ${SOUND_ARCHIVE_URL}/asterisk-core-sounds-${SOUNDS_LANGUAGE}-${formats}-${SOUNDS_CORE_VERSION}.tar.gz -O - | gzip -dc | tar xvf - > /dev/null
 	if [ "yes" = "$DO_EXTRA" ]; then 
-		wget ${SOUND_ARCHIVE_URL}/asterisk-extra-sounds-${SOUNDS_LANGUAGE}-${formats}-${SOUNDS_EXTRA_VERSION}.tar.gz -O - | gzip -dc | tar xvf -
+		# Only show Errors/Warnings (stderr) and the actual download
+		wget ${SOUND_ARCHIVE_URL}/asterisk-extra-sounds-${SOUNDS_LANGUAGE}-${formats}-${SOUNDS_EXTRA_VERSION}.tar.gz -O - | gzip -dc | tar xvf - > /dev/null
 	fi
 done 
 
@@ -56,7 +61,8 @@ if [ ! -d moh ]; then
 fi
 cd moh
 for formats in $SOUND_FORMATS; do
-	wget http://downloads.digium.com/pub/telephony/sounds/asterisk-moh-freeplay-${formats}.tar.gz -O - | gzip -dc | tar xvf -
+	# Only show Errors/Warnings (stderr) and the actual download
+	wget http://downloads.digium.com/pub/telephony/sounds/asterisk-moh-freeplay-${formats}.tar.gz -O - | gzip -dc | tar xvf - > /dev/null
 done
 
 cd ${SOUND_BASE}
