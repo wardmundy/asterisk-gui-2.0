@@ -29,7 +29,16 @@
 </style>
 <script>
 var localajaxinit = function(){
-	ASTGUI.tabbedOptions( _$('tabbedMenu') , [ {url:'voicemail.html', desc:'General Settings'} , {url:'#', desc:'Email Settings for VoiceMails', selected:true } ]);
+	(function (){
+		var t = [
+			{url:'voicemail.html', desc:'General Settings'} ,
+			{url:'#', desc:'Email Settings for VoiceMails', selected:true }
+		];
+		if( parent.sessionData.PLATFORM.isAA50 ){
+			t.push( {url:'smtp_settings.html', desc:'SMTP Settings'} );
+		}
+		ASTGUI.tabbedOptions( _$('tabbedMenu') , t);
+	})();
 
 	top.document.title = 'VoiceMail Email Settings' ;
 	var c = config2json({filename:'voicemail.conf', usf:1});

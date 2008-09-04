@@ -100,9 +100,10 @@ var load_DigitalTrunksTable = function(){
 
 var localajaxinit = function(){
 	top.document.title = 'Manage PRI/BRI Trunks ' ;
+	var tmp_providersPage = ( parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ) ? 'trunks_sps.html' : 'trunks_providers.html';
 	ASTGUI.tabbedOptions( _$('tabbedMenu') , [
 		{url:'trunks_analog.html', desc:'Analog Trunks'} ,
-		{url:'trunks_sps.html', desc:'Service Providers'} ,
+		{url: tmp_providersPage, desc:'Service Providers'} ,
 		{url:'trunks_voip.html', desc:'VOIP Trunks'} ,
 		{url:'#', desc:'T1/E1/BRI Trunks', selected:true }
 	]);

@@ -32,11 +32,13 @@ var localajaxinit = function(){
 	var t = [
 		{url:'preferences.html', desc:'General Preferences' } ,
 		{url:'language.html', desc:'Language' } ,
-		{url:'password.html', desc:'Change Password'},
-		{url:'reset_defaults.html', desc: 'Reset Configuration' },
-		{url:'#', desc:'Reboot', selected:true },
-		{url:'flipadvanced.html', desc:'Advanced Options' }
+		{url:'password.html', desc:'Change Password'}
 	];
+	if( parent.sessionData.PLATFORM.isAA50 ){
+		t.push({ url:'reset_defaults.html', desc: 'Factory Reset' });
+	}
+	t.push( {url:'#', desc:'Reboot', selected:true } );
+	t.push( {url:'flipadvanced.html', desc:'Advanced Options' } );
 	ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
 };
 

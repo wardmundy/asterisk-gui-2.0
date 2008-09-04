@@ -37,20 +37,11 @@ var loadDOMelements = function(){
 
 function localajaxinit(){
 	top.document.title = "General Preferences" ;
-	var t = [
-		{url:'#', desc:'General Preferences', selected:true } ,
-		{url:'language.html', desc:'Language' } ,
-		{url:'password.html', desc:'Change Password'},
-		{url:'reset_defaults.html', desc: 'Reset Configuration' },
-		{url:'reboot.html', desc:'Reboot' },
-		{url: 'flipadvanced.html', desc:'Advanced Options' }
-	];
-
-	if( parent.sessionData.PLATFORM.isAST_1_6 ){
+	if( parent.sessionData.PLATFORM.isAST_1_6 || parent.sessionData.PLATFORM.isAA50 ){
 		$('.16_Only').show();
 		(function(){
 			var c = config2json( { filename: 'phoneprov.conf' , usf: 0 } );
-			if( c.hasOwnProperty('polycom') &&  c['polycom'].contains('setvar=IDLE_IMAGE_ACTIVE=1') ){
+			if( c.hasOwnProperty('polycom') &&  c['polycom'].contains('setvar=IDLEIMAGE_ACTIVE=1') ){
 				_$('op_polycom_idleimage').checked = true ;
 			}else{
 				_$('op_polycom_idleimage').checked = false ;
@@ -58,7 +49,19 @@ function localajaxinit(){
 		})();
 	}
 
+	var fd_text = (parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ) ? 'Factory Reset' : 'Reset Configuration' ;
+	var t = [ 	{url:'#', desc:'General Preferences', selected:true } ,
+			{url:'language.html', desc:'Language' } ,
+			{url:'password.html', desc:'Change Password'}
+		];
+	if( parent.sessionData.PLATFORM.isAA50 ) { 
+		t.push({url:'reset_defaults.html', desc: fd_text });
+	};
+	t.push( {url:'reboot.html', desc:'Reboot' } ); 
+	t.push( {url: 'flipadvanced.html', desc:'Advanced Options' } );
+
 	ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
+
 	loadDOMelements();
 	var t = parent.sessionData.pbxinfo.GLOBALS[ASTGUI.globals.obcidstr] ; 
 	DOM_obCid_input.value = (t) ? t : '' ;
@@ -163,14 +166,14 @@ var save_changes = function(){
 		u.new_action('update', 'macro-stdexten', 'exten', 's,1,Dial(${ARG2},' + _$('op_ringTimeOut_Voicemail').value +')' , STDEXTEN_RINGINTERFACE_LINE );
 	u.callActions();
 
-	if( parent.sessionData.PLATFORM.isAST_1_6 ){
+	if( parent.sessionData.PLATFORM.isAST_1_6 || parent.sessionData.PLATFORM.isAA50 ){
 		u.clearActions('phoneprov.conf');
-		u.new_action('delete', 'polycom', 'setvar','', 'IDLE_IMAGE_ACTIVE=1' );
-		u.new_action('delete', 'polycom', 'setvar','', 'IDLE_IMAGE_ACTIVE=0' );
+		u.new_action('delete', 'polycom', 'setvar','', 'IDLEIMAGE_ACTIVE=1' );
+		u.new_action('delete', 'polycom', 'setvar','', 'IDLEIMAGE_ACTIVE=0' );
 		if( _$('op_polycom_idleimage').checked ){
-			u.new_action( 'append', 'polycom', 'setvar', 'IDLE_IMAGE_ACTIVE=1' );
+			u.new_action( 'append', 'polycom', 'setvar', 'IDLEIMAGE_ACTIVE=1' );
 		}else{
-			u.new_action( 'append', 'polycom', 'setvar', 'IDLE_IMAGE_ACTIVE=0' );
+			u.new_action( 'append', 'polycom', 'setvar', 'IDLEIMAGE_ACTIVE=0' );
 		}
 		u.callActions();
 	}

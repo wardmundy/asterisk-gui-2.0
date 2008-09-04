@@ -109,7 +109,11 @@ var selectedTrunk_editOptions_form = function(w){
 	ASTGUI.updateFieldToValue( 'trunk_obcid', c.getProperty(variablename) );
 
 	$('#HIDE_OnNEW_0').show();
-	$('#HIDE_OnNEW_1').show();
+	if( parent.sessionData.PLATFORM.isAA50 ){
+		$('#HIDE_OnNEW_1').show();
+	}else{
+		$('#HIDE_OnNEW_1').hide();
+	}
 	$('#HIDE_OnNEW_2').show();
 
 	$(DOM_new_ATRNK_DIV).showWithBg();
@@ -265,15 +269,25 @@ var delete_trunk_confirm = function(a){
 };
 
 var localajaxinit = function(){
+	if( parent.sessionData.PLATFORM.AA50_SKU.contains('800') ){
+		window.location.href= 'trunks_sps.html';
+		return;
+	};
+
 	FXOS = parent.sessionData.FXO_PORTS_DETECTED ;
 	top.document.title = 'Manage Analog Trunks' ;
-	( function(){
+	(function (){
+		var tmp_providersPage = ( parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ) ? 'trunks_sps.html' : 'trunks_providers.html';
 		var t = [
 			{url:'#', desc:'Analog Trunks', selected:true } ,
-			{url:'trunks_sps.html', desc:'Service Providers'} ,
-			{url:'trunks_voip.html', desc:'VOIP Trunks'},
-			{url:'trunks_digital.html', desc:'T1/E1/BRI Trunks'}
+			{url: tmp_providersPage, desc:'Service Providers'} ,
+			{url:'trunks_voip.html', desc:'VOIP Trunks'}
 		];
+
+		if( !parent.sessionData.PLATFORM.isAA50 ){
+			t.push({url:'trunks_digital.html', desc:'T1/E1/BRI Trunks'});
+		}
+
 		ASTGUI.tabbedOptions( _$('tabbedMenu') , t);
 
 		var y = parent.astgui_manageusers.listOfUsers();
@@ -282,7 +296,7 @@ var localajaxinit = function(){
 				ASTGUI.selectbox.append('mailbox', user, user);
 			}
 		});
-	} )();
+	})();
 	loadDOMelements();
 	update_AnalogTrunksTable();
 };

@@ -92,16 +92,32 @@ var onLogInFunctions = {
 		sessionData.AsteriskVersionString = resp;
 
 		// logic for platform detection, 
-		var resp_lower = resp.toLowerCase();
-		if(  resp_lower.contains("branches/1.4")  || resp_lower.contains("asterisk/1.4") ||  resp_lower.contains("svn-branch-1.4") ) {
-			sessionData.PLATFORM.isAST_1_4 = true ;
-			sessionData.PLATFORM.isAST_1_6 = false ;
-		}else if ( resp_lower.contains("branches/1.6")  || resp_lower.contains("asterisk/1.6") ||  resp_lower.contains("svn-branch-1.6") ||  resp_lower.contains("svn-trunk-")  ){
-			sessionData.PLATFORM.isAST_1_4 = false ;
-			sessionData.PLATFORM.isAST_1_6 = true ;
-		}else {
-			sessionData.PLATFORM.isAST_1_4 = true ;
-			sessionData.PLATFORM.isAST_1_6 = false ;
+		if( sessionData.PLATFORM.isAA50 || sessionData.PLATFORM.isABE ){
+			if( sessionData.PLATFORM.isAA50 ){
+ 				sessionData.PLATFORM.isOSA = false ;
+				sessionData.PLATFORM.isAST_1_4 = false ;
+				sessionData.PLATFORM.isAST_1_6 = false ;
+				sessionData.listOfCodecs = {
+					'ulaw' : 'u-law' ,
+					'alaw' : 'a-law' ,
+					'gsm'  : 'GSM' ,
+					'g726' : 'G.726' ,
+					'g722' : 'G.722'
+				};
+			}
+			// ??
+		}else{
+			var resp_lower = resp.toLowerCase();
+			if(  resp_lower.contains("branches/1.4")  || resp_lower.contains("asterisk/1.4") ||  resp_lower.contains("svn-branch-1.4") ) {
+				sessionData.PLATFORM.isAST_1_4 = true ;
+				sessionData.PLATFORM.isAST_1_6 = false ;
+			}else if ( resp_lower.contains("branches/1.6")  || resp_lower.contains("asterisk/1.6") ||  resp_lower.contains("svn-branch-1.6") ||  resp_lower.contains("svn-trunk-")  ){
+				sessionData.PLATFORM.isAST_1_4 = false ;
+				sessionData.PLATFORM.isAST_1_6 = true ;
+			}else {
+				sessionData.PLATFORM.isAST_1_4 = true ;
+				sessionData.PLATFORM.isAST_1_6 = false ;
+			}
 		}
 	},
 
@@ -121,6 +137,43 @@ var onLogInFunctions = {
 		if( !http_conf.hasOwnProperty(rand) || !http_conf[rand].hasOwnProperty(wa) || http_conf[rand][wa] !='yes' ){
 			ASTGUI.cookies.setCookie( 'rwaccess' , 'no' );
 			return false; // no read/write access to the GUI
+		}
+
+		if( sessionData.PLATFORM.isAA50 ){ // make sure all the required upload paths are there
+			u.clearActions();
+			var pu = false;
+			if(!http_conf.hasOwnProperty('post_mappings') ){
+				u.new_action('newcat', 'post_mappings' , '', '') ;
+				http_conf.post_mappings = {};
+				pu = true;
+			}
+			if( !http_conf.post_mappings.hasOwnProperty('uploads') ){
+				u.new_action('append', 'post_mappings' , 'uploads', '/var/lib/asterisk/sounds/imageupdate' ) ;
+				pu = true;
+			}
+			if( !http_conf.post_mappings.hasOwnProperty('backups') ){
+				var tmp_cbkp = ASTGUI.paths.ConfigBkp_AA50;
+				if( tmp_cbkp.endsWith('/') ){ tmp_cbkp = tmp_cbkp.rChop('/'); }
+				u.new_action('append', 'post_mappings' , 'backups', tmp_cbkp ) ;
+				pu = true;
+			}
+			if( !http_conf.post_mappings.hasOwnProperty('moh') ){
+				var tmp_cbkp = ASTGUI.paths.MOH ;
+				if( tmp_cbkp.endsWith('/') ){ tmp_cbkp = tmp_cbkp.rChop('/'); }
+				u.new_action('append', 'post_mappings' , 'moh', tmp_cbkp ) ;
+				pu = true;
+			}
+			if( !http_conf.post_mappings.hasOwnProperty('voicemenuprompts') ){
+				var tmp_cbkp = ASTGUI.paths['menusRecord'] ;
+				if( tmp_cbkp.endsWith('/') ){ tmp_cbkp = tmp_cbkp.rChop('/'); }
+				u.new_action('append', 'post_mappings' , 'voicemenuprompts', tmp_cbkp ) ;
+				pu = true;
+			}
+			if ( pu == true ){
+				u.new_action('delcat', rand , '', '') ;
+				u.callActions();
+				return 'postmappings_updated'; // about to reload
+			}
 		}
 
 		if( sessionData.PLATFORM.isAST_1_6 ){ // make sure all the required upload paths are there
@@ -170,7 +223,12 @@ var onLogInFunctions = {
 					if( a.contains(rand_2) ){
 						ASTGUI.systemCmd( "rm '"+ ASTGUI.paths['ConfigBkp'] + rand_2 + "'" , function(){
 							ASTGUI.dialog.waitWhile('detecting Hardware ..');
-							ASTGUI.systemCmd( ASTGUI.apps.Ztscan, onLogInFunctions.updatePanels4Platform );
+							//ASTGUI.systemCmd( ASTGUI.apps.Ztscan, onLogInFunctions.updatePanels4Platform );
+							if(sessionData.PLATFORM.isAA50 ){
+								onLogInFunctions.checkForCompactFlash();
+							}else{
+								onLogInFunctions.runZtscan();
+							}
 						});
 					}else{
 						ASTGUI.dialog.alertmsg( 'missing ' + ASTGUI.paths['ConfigBkp'] + '<BR> OR Asterisk does not have write privileges on ' + ASTGUI.paths['ConfigBkp'] );
@@ -296,21 +354,65 @@ var onLogInFunctions = {
 		}catch(err){
 			ASTGUI.ErrorLog('Error in onLogInFunctions.parseConfigFiles()');
 		}finally{
-			//DOM_mainscreen.src = 'home.html';
 			if( sessionData.continueParsing == false ){
 				return;
 			}
-
 			sessionData.finishedParsing = true;
 			onLogInFunctions.check_WritePermissionsFor_GUI_Folder();
 		}
 	},
 
+	checkForCompactFlash: function(){ // onLogInFunctions.checkForCompactFlash()
+		//check for compact flash
+		ASTGUI.dialog.waitWhile('Checking for CompactFlash ..');
+		var lookfor_CF = function(output){
+			sessionData.hasCompactFlash = ( output.contains('/dev/hda1') ) ? true : false ;
+			onLogInFunctions.getAA50SKU();
+		};
+		ASTGUI.systemCmdWithOutput( 'df -k' , lookfor_CF );
+	},
+
+	getAA50SKU : function(){
+		ASTGUI.dialog.waitWhile('Getting product information ..');
+		var after = function(output){
+			var lines = output.split('\n');
+			lines.each( function(line){
+				if( line.contains('Product SKU:') ){
+					sessionData.PLATFORM.AA50_SKU = line.lChop('Product SKU:').trim();
+				}
+			});
+			if( sessionData.PLATFORM.AA50_SKU.contains('800') ){ // skip ztscan for AA50-s800 sku
+				miscFunctions.hide_panel('digital.html');
+				onLogInFunctions.updatePanels4Platform();
+			}else{
+				onLogInFunctions.runZtscan();
+			}
+		};
+		ASTGUI.systemCmdWithOutput( 's800iconfig' , after);
+	},
+
+	runZtscan : function(){ // onLogInFunctions.runZtscan()
+		ASTGUI.dialog.waitWhile('detecting Hardware ..');
+		var cb = function(){
+			onLogInFunctions.updatePanels4Platform();
+		};
+		ASTGUI.systemCmd(ASTGUI.apps.Ztscan, cb);
+	},
+
+
 	updatePanels4Platform: function(){
-		// 
-		// Place holder for Expose only those panels based upon the detected platform
-		//
+		var tmp_continue = astgui_updateConfigFromOldGui(); // update configuration form 1.x gui if needed
+		if( !tmp_continue )return;
+
 		$(".AdvancedMode").hide();
+		if(sessionData.PLATFORM.isAA50 ){
+			$(".notinAA50").remove(); 
+			$(".forAA50").show();
+			$(".copyrights")[0].innerHTML += "<div class='lite'>CompactFlash&reg; is a registered trademark of SanDisk Corporation</div>" 
+		}else{
+			$(".notinAA50").show(); 
+			$(".forAA50").remove();
+		}
 		$('div.ui-accordion-link').show(); // finally show all panels
 		$('#ptopbuttons').show();
 		if( ASTGUI.cookies.getCookie('configFilesChanged') == 'yes' ){
@@ -320,8 +422,45 @@ var onLogInFunctions = {
 		}
 		miscFunctions.resizeMainIframe();
 		ASTGUI.dialog.hide();
-		DOM_mainscreen.src = 'welcome.html?status=1';
-		readcfg.ztScanConf();
+
+		/* CUSTOM ACTIONS BASED ON GET PARAMS */
+		// GUI will be reloaded after each Custom Command
+		var this_mainURL = window.location.href ;
+
+		var tmp_enableOverLay = ASTGUI.parseGETparam( this_mainURL , 'overlay');
+		if( tmp_enableOverLay.isAstTrue() ){
+			var tmp_overlay_dir = '';
+			if( sessionData.PLATFORM.isAA50 ){
+				tmp_overlay_dir = 'mkdir -p /var/lib/asterisk/sounds/asteriskoverlay' ;
+			}
+			if( sessionData.PLATFORM.isABE ){
+				tmp_overlay_dir = 'mkdir -p /var/lib/asterisk/gui-overlay' ;
+			}
+			ASTGUI.systemCmd( tmp_overlay_dir , function(){
+				top.window.location.href = this_mainURL.withOut( 'overlay=' );
+			});
+			return;
+		}
+
+
+		if( sessionData.PLATFORM.isABE ){ // ABE-1600
+// 			ASTGUI.systemCmdWithOutput( "ls /var/lib/asterisk/" , function(a){
+// 				if( a.contains('gui-overlay') ){
+// 					$('.default_Hidden').show();
+// 				}
+// 			});
+		}
+
+
+		//if( parent.sessionData.PLATFORM.isAA50  ){
+			DOM_mainscreen.src = 'home.html?status=1';
+		//}
+
+		if( parent.sessionData.PLATFORM.isAA50 && sessionData.PLATFORM.AA50_SKU.contains('800') ){
+			// no need to parse ztscan output for s800 SKU
+		}else{
+			readcfg.ztScanConf();
+		}
 	}
 };
 
@@ -361,6 +500,9 @@ var miscFunctions = {
 					DOM_mainscreen.src = fname ;
 				}
 				$(t[p].parentNode).find("div").show();
+				if( page == 'digital.html' && sessionData.PLATFORM.isAA50 ){
+					$(t[p].parentNode).find("div")[1].innerHTML = 'Analog ports configuration';
+				}
 				return;
 			}
 		}
@@ -383,19 +525,23 @@ var miscFunctions = {
 		ASTGUI.cookies.setCookie( 'configFilesChanged' , 'no' );
 		ASTGUI.feedback({msg:'Asterisk Reloaded !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
 
+		if(sessionData.PLATFORM.isAA50 ){
+			//TODO - Save Changes
+			parent.ASTGUI.systemCmd( 'save_config', function(){ if(cb){cb();} } );
+		}else{
+			if(cb)cb();
+		}
 		if( ASTGUI.cookies.getCookie('require_restart') == 'yes'){
 			ASTGUI.dialog.alertmsg('The changes you made requires a restart. <BR> Your hardware might not work properly until you reboot !!');
 			ASTGUI.cookies.setCookie( 'require_restart' , 'no' );
 		}
-
-		if(cb)cb();
 	},
 
 	logoutFunction : {
 		// Object to store all sequence of functions that should execute on logout
 		// example if appliance - need to save changes before logout 
 		confirmlogout : function(){
-			if( ASTGUI.cookies.getCookie('configFilesChanged') == 'yes' ){
+			if( sessionData.PLATFORM.isAA50 && ASTGUI.cookies.getCookie('configFilesChanged') == 'yes' ){
 
 				parent.ASTGUI.yesOrNo({
 					msg: 'You have unsaved changes !! <BR>Do you want to apply these changes before logging out ?' ,
@@ -538,15 +684,42 @@ var miscFunctions = {
 				top.window.location.reload() ;
 			}
 		};
-		count_down(60);
+
+		var fr = ASTGUI.cookies.getCookie('firmware_reboot')
+		ASTGUI.cookies.setCookie('firmware_reboot','no');
+		if( fr == 'yes') {
+			count_down(480);
+		}else{
+			count_down(60);
+		}
 	},
 
 	reboot_pbx: function( opt ){ // miscFunctions.reboot_pbx
 		parent.ASTGUI.yesOrNo({
 			msg: (opt && opt.msg) || 'Note: Rebooting appliance will terminate any active calls.' ,
 			ifyes: function(){
+				if( sessionData.PLATFORM.isAA50 && ASTGUI.cookies.getCookie('configFilesChanged') == 'yes' ){
 					parent.ASTGUI.dialog.waitWhile('Rebooting !');
+					setTimeout( function(){
+							parent.ASTGUI.dialog.hide();
+							parent.ASTGUI.yesOrNo({
+								msg: 'You have unsaved changes !! <BR>Do you want to save these changes before rebooting ?' ,
+								ifyes: function(){
+									parent.ASTGUI.systemCmd ('save_config', function(){
+										parent.ASTGUI.systemCmd ('reboot', miscFunctions.AFTER_REBOOT_CMD );
+									});
+								},
+								ifno:function(){
+									parent.ASTGUI.systemCmd ('reboot', miscFunctions.AFTER_REBOOT_CMD );
+								},
+								title : 'Save changes before reboot ?',
+								btnYes_text :'Yes',
+								btnNo_text : 'No'
+							});
+						}, 2000 );
+				}else{
 					parent.ASTGUI.systemCmd ('reboot', miscFunctions.AFTER_REBOOT_CMD );
+				}
 			},
 			ifno:function(){
 				
@@ -698,12 +871,39 @@ var localajaxinit = function(){
 		sessionData.gui_version = gui_version ;
 		_$('parent_div_guiVersion').innerHTML = "<font color='#8d8d8d'>GUI-version : " + sessionData.gui_version + '</font>';
 	});
+
+
+	if( sessionData.PLATFORM.isAA50 ){
+		_$('mainPageLegaInfo_A').href = 'license.html';
+	}
+
+	if( sessionData.PLATFORM.isABE ){ // ABE-1600
+		try{
+			(function(){
+				var all_divs = $('div');
+				var i = 0;
+				while( all_divs[i] ){
+					var adi = all_divs[i];
+					var pg = $(adi).attr('page') ;
+					if( pg && pg == 'mohfiles.html' ){
+						adi.parentNode.removeChild(adi);
+						break;
+					}
+					i++;
+				}
+			})();
+		}catch(err){}
+	}
+
+
 	var loadGUI = function(){
 		DOM_accordion_div = _$('accordion_div');
 		DOM_mainscreen = _$('mainscreen');
 		// Accordion in a few lines :)
 			$('div.ui-accordion-link:gt(0)').hide();
 			$('div.ui-accordion-desc:gt(0)').hide();
+				$(".notinAA50").hide();
+				$(".forAA50").hide();
 			DOM_accordion_div.style.display = '';
 			var loadPanel = function(event){
 				var s = ASTGUI.events.getTarget(event);
@@ -713,6 +913,9 @@ var localajaxinit = function(){
 				var page = $(f).attr("page");
 				DOM_mainscreen.src = page ;
 				$(f).find("div").show();
+				if( page == 'digital.html' && sessionData.PLATFORM.isAA50 ){
+					$(f).find("div")[1].innerHTML = 'Analog ports configuration';
+				}
 			};
 			ASTGUI.events.add(DOM_accordion_div, 'click', loadPanel);
 		// End of Accordion

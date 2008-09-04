@@ -89,12 +89,18 @@
 
 </style>
 <script>
+var PROVIDERS_URL = 'https://gui-dl.digium.com/providers.js';
+
 loaded_external = false;
 var WARNING_MESSAGE = "The service provider information used in this product is downloaded on demand from Digium's web site. "
 + "This download occurs over a secure (SSL)"
 + "connection, ensuring that only safe, tested and supported service provider information will be used.<BR><BR>"
++ "Your web browser should not display any 'insecure connection' or 'unverified certificate' warnings "
++ "when this download occurs. If you see any messages of this type when using the"
++ "'Service Providers' page, you should not allow your browser to proceed with the information download, as the"
++ "security of your connection may have been compromised.<BR><BR>"
 + "For your convenience, this warning message will only be displayed the first time you use the 'Service Providers' page in this product. "
-+ "If you choose to continue beyond this point, the system will remember that you have seen this warning message and will not display it again."
++ "If you choose to continue beyond this point, the system will remember that you have seen this warning message and will not display it again.";
 
 
 var localajaxinit = function(){
@@ -113,33 +119,39 @@ var localajaxinit = function(){
 	})();
 	(function (){
 		var t = [ ];
-		t.push({ url: 'trunks_analog.html', desc: 'Analog Trunks' });
+		if( !parent.sessionData.PLATFORM.AA50_SKU.contains('800') ){
+			t.push({ url: 'trunks_analog.html', desc: 'Analog Trunks' });
+		};
 		t.push({url:'#', desc:'Service Providers', selected:true });
 		t.push({url:'trunks_voip.html', desc:'VOIP Trunks'});
-		t.push({url:'trunks_digital.html', desc:'T1/E1/BRI Trunks'});
+		if( !parent.sessionData.PLATFORM.isAA50 ){
+			t.push({url:'trunks_digital.html', desc:'T1/E1/BRI Trunks'});
+		}
 		ASTGUI.tabbedOptions( _$('tabbedMenu') , t);
 	})();
 
 	var LOAD_Providers = function(){
 		parent.ASTGUI.dialog.waitWhile(' Loading Providers configuration info ...');
-		$.getScript( ASTGUI.globals.providerUrl , function(){
+		$.getScript( PROVIDERS_URL , function(tmp_script_status){
+			if(tmp_script_status == 404){
+				parent.ASTGUI.dialog.hide();
+				_$('unableToLoadProviders_container').style.display = '';
+				return;
+			}
 			if(loaded_external){
 				whenThisFileisLoaded(); // this function is defined in the loaded file
 			}
 		});
 		(function (){
-			var oops = function(){ 
+			var oops = function(){
 				if(loaded_external){return;}
 				parent.ASTGUI.dialog.hide();
 				_$('unableToLoadProviders_container').style.display = '';
 				//alert("Failed loading providers configuration");
 			};
-			setTimeout( oops , 10000 ); // if not loaded with in 10 seconds - then consider as failed
+			setTimeout( oops , 30000 ); // if not loaded with in 10 seconds - then consider as failed
 		})();
 	};
-
-	
-	if( ASTGUI.globals.providerUrl.toLowerCase().beginsWith('http') ){ // if remote js file, ask for user confirmation
 
 	var gp = config2json({filename: ASTGUI.globals.configfile, usf:1});
 	if( gp.hasOwnProperty('general') && gp['general'].getProperty('warning_providers') == 'yes' ){
@@ -158,13 +170,10 @@ var localajaxinit = function(){
 			btnYes_text :'Continue',
 			btnNo_text : 'Cancel',
 			dialogWidth: 600,
-			dialogHeight: 230
+			dialogHeight: 330
 		});
 	}
-	
-	}else{
-		LOAD_Providers();
-	}
+
 }
 
 </script>

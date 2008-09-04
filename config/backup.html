@@ -27,6 +27,16 @@
 		color: #CED7EF;
 	}
 
+	#nocf {
+		font-size: 13pt;
+		border:1px solid;
+		padding : 10;
+		margin-left : 15;
+		margin-right : 15;
+		margin-top : 25;
+		text-align: center;
+	}
+
 	#thispageContent{
 		/*
 		font-size: 10pt;
@@ -46,7 +56,7 @@ Note: for opensource asterisk 1.4 (including AsteriskNOW versions with Asterisk 
       you can only download backup - there is no upload/restore
 */
 
-var bkpPath = ASTGUI.paths.ConfigBkp ;
+var bkpPath = ( parent.sessionData.PLATFORM.isAA50 ) ? ASTGUI.paths.ConfigBkp_AA50 : ASTGUI.paths.ConfigBkp ;
 var upload_Filename = ""; // will be updated by upload_form.html
 var starteduploading = 0;
 var upload_Path; // path for 'uploads' as defined in http.conf - this variable will be automatically updated from http.conf
@@ -62,6 +72,10 @@ onUploadForm_beforeUploading = function(){
 };
 
 onUploadForm_load = function(){
+	if( parent.sessionData.PLATFORM.isABE ){ // ABE-1600
+		$('#uploadForm_container').hide();
+		return;
+	}
 	if(!top.sessionData.httpConf.postmappings_defined || !top.sessionData.httpConf.uploadPaths['backups'] ){
 		ASTGUI.ErrorLog('AG102');
 		$('#uploadForm_container').hide();
@@ -86,6 +100,11 @@ onUploadForm_unload = function(){
 
 function localajaxinit() {
 	top.document.title = 'Configuration Backups';
+	if( parent.sessionData.PLATFORM.isAA50 && !parent.sessionData.hasCompactFlash ){
+		$('#nocf').show();
+		$('#thispageContent').hide();
+		return true;
+	}
 	parent.ASTGUI.dialog.waitWhile(' Loading list of Previous Backup files !');
 	parent.ASTGUI.systemCmd( "mkdir -p " + bkpPath , function(){
 		parent.ASTGUI.listSystemFiles( bkpPath , function(bkpfiles) {
@@ -139,7 +158,7 @@ function addrow_totable(filename, i ){
 
 
 function dld_bkp( filename ){
-	parent.ASTGUI.systemCmd( "/bin/rm " + ASTGUI.paths.ConfigBkp_dldPath + "* ", function(){
+	parent.ASTGUI.systemCmd( "mkdir -p "+ ASTGUI.paths.ConfigBkp_dldPath + " ; /bin/rm " + ASTGUI.paths.ConfigBkp_dldPath + "* ", function(){
 		parent.ASTGUI.systemCmd( "/bin/ln -s "+ bkpPath + filename + " " + ASTGUI.paths.ConfigBkp_dldPath + filename , function(){
 			window.location.href = "private/bkps/" + filename ;
 		});
@@ -148,18 +167,42 @@ function dld_bkp( filename ){
 
 
 function restore_bkp(filename){
-	if(confirm('All your old configuration will be replaced by this backup configuration. \n\n Are you sure you want to proceed ?')){
-		//parent.astmanEngine.run_tool("rm /etc/asterisk/* -rf ", callback=function(){  } );
-		restore_bkp_step3(bkpPath + filename);
+	if( parent.sessionData.PLATFORM.isAA50 ){
+		if(confirm('This will restart the appliance after restoring the backup configuration. \n\n Are you sure you want to proceed ?')){
+			restore_bkp_step3(bkpPath + filename);
+		}else{
+			return;
+		}
+	}else{
+		if(confirm('All your old configuration will be replaced by this backup configuration. \n\n Are you sure you want to proceed ?')){
+			//parent.astmanEngine.run_tool("rm /etc/asterisk/* -rf ", callback=function(){  } );
+			restore_bkp_step3(bkpPath + filename);
+		}
 	}
 }
 
 function restore_bkp_step3(file_fullpath){
-	parent.ASTGUI.dialog.waitWhile(' Restoring Configuration ');
-	parent.ASTGUI.systemCmd( " tar -xvf " + file_fullpath + ' -C / ', function(){
-		ASTGUI.feedback( { msg:'Configuration restored !!', showfor:2 });
-		setTimeout( function(){ window.location.reload(); } , 1000 );
-	});
+	if( parent.sessionData.PLATFORM.isAA50 ){
+		parent.ASTGUI.dialog.waitWhile(' The Sytem will reboot shortly ');
+		parent.ASTGUI.systemCmd( ASTGUI.scripts.restoreBackup + " " + file_fullpath, function(){
+			ASTGUI.feedback( { msg:'Configuration restored !!', showfor:2 });
+			parent.miscFunctions.AFTER_REBOOT_CMD();
+			/* ***************** Todo Restart ******************* */
+			//if(starteduploading){ delete_bkp2(file_fullpath); }
+		});
+	}else{
+		parent.ASTGUI.dialog.waitWhile(' Restoring Configuration ');
+		parent.ASTGUI.systemCmd( " tar -xvf " + file_fullpath + ' -C / ', function(){
+			ASTGUI.feedback( { msg:'Configuration restored !!', showfor:2 });
+
+			if(starteduploading){
+				delete_bkp2(file_fullpath);
+			}else{
+				var t = ASTGUI.cliCommand('reload') ;
+				setTimeout( function(){ top.window.location.reload(); } , 1000 );
+			}
+		});
+	}
 }
 
 function delete_bkp( filename ){
@@ -213,14 +256,20 @@ function backup_new(){
 	//var seconds =addzero(today.getSeconds());
 	var bkpfile =  _nn.value +"__" + year + month + day +".tar";
 
-
-	parent.ASTGUI.systemCmd( "tar -cf " + bkpPath + bkpfile + ' ' +  ' /etc/asterisk', function(){
-		ASTGUI.feedback( { msg:'Backup Successful', showfor:2 });
-		parent.ASTGUI.dialog.waitWhile('Reloading List of backup Files');
-		setTimeout( function(){ parent.ASTGUI.dialog.hide(); window.location.reload(); } , 2000 );
-	});
-	return ;
-
+	if( parent.sessionData.PLATFORM.isAA50  ){
+		parent.ASTGUI.systemCmd( ASTGUI.scripts.takeBackup + ' ' +  bkpPath + bkpfile , function(){
+			ASTGUI.feedback( { msg:'Backup Successful', showfor:2 });
+			window.location.reload();
+		}) ;
+		return ;
+	}else{
+		parent.ASTGUI.systemCmd( "tar -cf " + bkpPath + bkpfile + ' ' +  ' /etc/asterisk', function(){
+			ASTGUI.feedback( { msg:'Backup Successful', showfor:2 });
+			parent.ASTGUI.dialog.waitWhile('Reloading List of backup Files');
+			setTimeout( function(){ parent.ASTGUI.dialog.hide(); window.location.reload(); } , 2000 );
+		});
+		return ;
+	}
 }
 
 </script>
@@ -229,7 +278,7 @@ function backup_new(){
 	&nbsp;Backup / Restore Configurations 
 	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
 </div>
-
+<div style='display:none;' id='nocf'> You need a&nbsp;&nbsp;<b>CompactFlash&reg;</b>&nbsp;&nbsp;to use this feature </div>
 <div id='thispageContent' style='text-align:center;'>
 	<div class='lite_Heading'>Manage Configuration Backups</div>
 	<center>

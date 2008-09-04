@@ -2797,6 +2797,12 @@ jQuery.extend({
 	},
 
 	handleError: function( s, xml, status, e ) {
+		try{	// modification for ASTGUI 
+			if( s.hasOwnProperty('data') && s.data == null && s.dataType && s.dataType == 'script' && s.success && typeof s.success == 'function' ){
+				s.success(404);
+			}
+		}catch(err){}// modification for ASTGUI 
+
 		// If a local callback was specified, fire it
 		if ( s.error ) s.error( xml, status, e );
 

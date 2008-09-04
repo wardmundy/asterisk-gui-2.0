@@ -294,6 +294,7 @@ var ASTGUI = {
 
 	globals: {
 		providerUrl: './js/providers.js', // ASTGUI.globals.providerUrl
+		firmwareVersionUrl: 'https://gui-dl.digium.com/aa50/fw_version.js', // ASTGUI.globals.firmwareVersionUrl
 		appname : 'Asterisk GUI',
 		lang : 'en',
 		GUI_DB : 'astgui', // name of the ASTDB database used by GUI -- ASTGUI.globals.GUI_DB
@@ -302,11 +303,13 @@ var ASTGUI = {
 		hwcfgFile: 'gui_confighw.conf', // file to store configured hardware information
 		zaptelIncludeFile: 'zaptel_guiRead.conf', // file that will be used to read zapte.conf, ASTGUI.globals.zaptelIncludeFile
 		pingInterval : 5000,
+		app_factoryReset : '/bin/reset_config', // ASTGUI.globals.app_factoryReset
 		fnf : 'ERROR:FNF',
 		obcidstr : 'GLOBAL_OUTBOUNDCID', // ASTGUI.globals.obcidstr
 		obcidUsrPrefix : 'CID_', // ASTGUI.globals.obcidUsrPrefix
 		sbcid_1 : 's,1,ExecIf($[ "${CALLERID(num)}"="" ],SetCallerPres,unavailable)', // ASTGUI.globals.sbcid_1
 		sbcid_2 : 's,2,ExecIf($[ "${CALLERID(num)}"="" ],Set,CALLERID(all)=unknown <0000000>)',
+		timeservers: [ 'north-america.pool.ntp.org', 'asia.pool.ntp.org', 'europe.pool.ntp.org', 'oceania.pool.ntp.org', 'south-america.pool.ntp.org' ],
 		version : '2.0' // gui version
 	},
 
@@ -2240,13 +2243,20 @@ var ASTGUI = {
 
 	systemCmd: function(cmd, callbackfunction){ // ASTGUI.systemCmd(cmd, cbf);
 		ASTGUI.debugLog("Executing System Command : '" + cmd + "'" , 'system');
+		var delay_cb = function(){
+			if( parent.sessionData.PLATFORM.isAA50 ){
+				setTimeout( callbackfunction , 500 );
+			}else{
+				callbackfunction();
+			}
+		};
 		makeRequest({
 			     action : 'originate' ,
 			    channel : 'Local/executecommand@' + ASTGUI.contexts.guitools ,
 			   Variable : 'command=' + cmd ,
 			application : 'noop' ,
 			    timeout : '60000' ,
-			   callback : callbackfunction
+			   callback : delay_cb
 		});
 	},
 
@@ -2254,16 +2264,19 @@ var ASTGUI = {
 		// usage :: ASTGUI.systemCmdWithOutput( 'uptime' , callback(output){ /* do something with output */ } );
 		// Use this function when you want to execute a specific system command and read the output
 		// output will be sent as a argument to the callback function
-
-		parent.document.getElementById('ajaxstatus').style.display = '';
 		var fcmd = cmd + ' > ' + this.paths['guiInstall'] + ( this.paths['output_SysInfo'].afterChar('/') || this.paths['output_SysInfo'] ) ;
 		var after = function(){
 			parent.document.getElementById('ajaxstatus').style.display = 'none';
 			var op = ASTGUI.loadHTML( ASTGUI.paths.output_SysInfo ) ;
 			cb( op ) ;
 		};
-
-		this.systemCmd(fcmd , after);
+		var delay_cb = function(){ setTimeout(after,500); };
+		if( parent.sessionData.PLATFORM.isAA50 ){
+			parent.document.getElementById('ajaxstatus').style.display = '';
+			this.systemCmd( fcmd , delay_cb );
+		}else{
+			this.systemCmd( fcmd , after );
+		}
 	},
 
 	tabbedOptions: function(el, arr){
@@ -2535,6 +2548,7 @@ ASTGUI.paths['guiInstall'] = '/var/lib/asterisk/static-http/config/';
 ASTGUI.paths['rawman'] = '../../rawman';
 ASTGUI.paths['asteriskConfig'] = '/etc/asterisk/';
 ASTGUI.paths['ConfigBkp'] = '/var/lib/asterisk/gui_backups/';
+ASTGUI.paths['ConfigBkp_AA50'] = '/var/lib/asterisk/sounds/backups/'; // AA50 bkp path on C.F
 ASTGUI.paths['ConfigBkp_dldPath'] = ASTGUI.paths['guiInstall'] + 'private/bkps/'; // path for keeping the bkp files for download
 
 ASTGUI.paths['Sounds'] = '/var/lib/asterisk/sounds/';
@@ -2551,14 +2565,15 @@ ASTGUI.scripts['takeBackup'] = 'sh ' + ASTGUI.paths['scripts'] + 'takebackup';
 ASTGUI.scripts['restoreBackup'] = 'sh ' + ASTGUI.paths['scripts'] + 'restorebackup';
 ASTGUI.scripts['SysInfo'] = 'sh ' + ASTGUI.paths['scripts'] + 'gui_sysinfo';
 ASTGUI.scripts['ListFiles'] = 'sh ' + ASTGUI.paths['scripts'] + 'listfiles';
+ASTGUI.scripts['NetworkSettings'] = 'sh ' + ASTGUI.paths['scripts'] + 'networking.sh';
 ASTGUI.scripts['generateZaptel'] = 'sh ' + ASTGUI.paths['scripts'] + 'editzap.sh';
 ASTGUI.scripts['generatemISDN_init'] = 'sh ' + ASTGUI.paths['scripts'] + 'editmisdn.sh';
 ASTGUI.scripts['dldsoundpack'] = 'sh ' + ASTGUI.paths['scripts'] + 'dldsoundpack';
 
 ASTGUI.apps = {};
 ASTGUI.apps['Ztscan'] = 'ztscan > ' + ASTGUI.paths['asteriskConfig'] +'ztscan.conf' ;
-
 ASTGUI.apps['mISDNscan'] = 'misdn-init scan' ;
+ASTGUI.apps['flashupdate'] = 'flashupdate' ;
 
 ASTGUI.includeContexts = [ 'default' , 'parkedcalls' , ASTGUI.contexts.CONFERENCES , ASTGUI.contexts.RingGroupExtensions , ASTGUI.contexts.VoiceMenuExtensions , ASTGUI.contexts.QUEUES , ASTGUI.contexts.VoiceMailGroups , ASTGUI.contexts.Directory ] ;
 

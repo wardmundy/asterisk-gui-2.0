@@ -34,11 +34,13 @@ var localajaxinit = function(){
 	var t = [
 		{ url:'preferences.html', desc:'General Preferences' },
 		{ url:'language.html', desc:'Language' },
-		{ url:'password.html', desc:'Change Password' },
-		{ url:'reset_defaults.html', desc: 'Reset Configuration' },
-		{ url:'reboot.html', desc:'Reboot' },
-		{ url:'#', desc:'Advanced Options', selected: true }
+		{ url:'password.html', desc:'Change Password' }
 	];
+	if( parent.sessionData.PLATFORM.isAA50 ){
+		t.push({ url:'reset_defaults.html', desc: 'Factory Reset' });
+	}
+	t.push({ url:'reboot.html', desc:'Reboot' });
+	t.push({ url:'#', desc:'Advanced Options', selected: true });
 
 	ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
 	update_status();
@@ -60,19 +62,31 @@ var localajaxinit = function(){
 
 
 var update_status = function(){
+
 	if(parent.sessionData.advancedmode == true ){
 		_$('flip_button').innerHTML = 'Hide Advanced Options';
-		_$('flip_decsription').innerHTML = "Clicking the 'Hide Advanced Options' button below removes the advanced menu items on the level hand sidebar";
+		_$('flip_decsription').innerHTML = "Clicking the 'Hide Advanced Options' button below removes the advanced menu items on the left hand sidebar"
+		+ "<BR><BR><B>Notice!</B>  Digium does not provide support for the options configurable in the Advanced menu items. "
+		+ "Digium does not provide support for bugs uncovered in the Advanced menu items.  If your unit becomes inoperable "
+		+ "due to editing of the Advanced menu items, Digium Technical Support will request that you reset your unit to"
+		+ "Factory Default configuration.  Continue at your own risk." ;
 	}else{
 		_$('flip_button').innerHTML = 'Show Advanced Options';
-		_$('flip_decsription').innerHTML = "Clicking the 'Show Advanced Options' button below provides the additional menu items on the level hand sidebar";
+		_$('flip_decsription').innerHTML = "Clicking the 'Show Advanced Options' button below provides the additional menu items on the left hand sidebar"
+		+ "<BR><BR><B>Notice!</B>  Digium does not provide support for the options configurable in the Advanced menu items. "
+		+ "Digium does not provide support for bugs uncovered in the Advanced menu items.  If your unit becomes inoperable "
+		+ "due to editing of the Advanced menu items, Digium Technical Support will request that you reset your unit to"
+		+ "Factory Default configuration.  Continue at your own risk." ;
 	}
+
 };
+
 
 var flip_advOptions = function(){
 	parent.miscFunctions.flip_advancedmode();
 	update_status();
 };
+
 
 </script>
 <body bgcolor="EFEFEF">

@@ -33,8 +33,13 @@
 var sessionData = {
 	finishedParsing : false,
 	PLATFORM: {
+		isAA50 : false, // AA50
+		isABE : false, // Asterisk Business Edition
+		isOSA : false, // plain OpenSource Asterisk 
+		// also look at the 'detectPlatform' function below
+		isAA50_OEM : false, // sessionData.PLATFORM.isAA50_OEM
+		AA50_SKU : '', // sessionData.PLATFORM.AA50_SKU
 		isANOW : false, // Asterisk Now
-		isOSA : true, // plain OpenSource Asterisk
 		isAST_1_4 : true, // we assume is Asterisk 1.4 by default, sessionData.PLATFORM.isAST_1_4
 		isAST_1_6 : false
 	},
@@ -51,6 +56,7 @@ var sessionData = {
 	isLoggedIn : false,
 	continueParsing: false,
 	advancedmode: false, // sessionData.advancedmode
+	hasCompactFlash : false, // sessionData.hasCompactFlash
 	listOfCodecs: { // sessionData.listOfCodecs
 		'ulaw' : 'u-law' ,
 		'alaw' : 'a-law' ,
@@ -112,7 +118,7 @@ var sessionData = {
 			<div class="ui-accordion-link">Configure Hardware</div>
 			<div class="ui-accordion-desc">Configure your T1/E1/Analog Cards</div>
 		</div>
-		<div page='misdn.html'>
+		<div page='misdn.html' class='notinAA50'>
 			<div class="ui-accordion-link">mISDN Config</div>
 			<div class="ui-accordion-desc">mISDN configuration from the asterisk GUI</div>
 		</div>
@@ -196,15 +202,27 @@ var sessionData = {
 			<div class="ui-accordion-link">System Info</div>
 			<div class="ui-accordion-desc">System Information.</div>
 		</div>
+		<div page='networking.html' class='forAA50'>
+			<div class="ui-accordion-link">Networking</div>
+			<div class="ui-accordion-desc">Configures networking parameters.</div>
+		</div>
 		<div page='backup.html'>
 			<div class="ui-accordion-link">Backup</div>
 			<div class="ui-accordion-desc">Backup Management.</div>
+		</div>
+		<div page='flashupdate.html' class='forAA50'>
+			<div class="ui-accordion-link">Update</div>
+			<div class="ui-accordion-desc">Update Firmware installed on the appliance.</div>
+		</div>
+		<div page='upload_abe_overlay.html' class='default_Hidden' style='display:none'>
+			<div class="ui-accordion-link">Update</div>
+			<div class="ui-accordion-desc">Upload a GUI overlay file.</div>
 		</div>
 		<div page='preferences.html'>
 			<div class="ui-accordion-link">Options</div>
 			<div class="ui-accordion-desc">Admin Settings.</div>
 		</div>
-		<div page='asterisklogs.html'>
+		<div page='asterisklogs.html' class='notinAA50'>
 			<div class="ui-accordion-link">Asterisk Logs</div>
 			<div class="ui-accordion-desc">Asterisk Log messages.</div>
 		</div>
@@ -224,7 +242,7 @@ var sessionData = {
 			<div class="ui-accordion-link">SIP Settings</div>
 			<div class="ui-accordion-desc">Global SIP Settings.</div>
 		</div>
-		<!--<div page='cdr.html'>
+		<!--<div page='cdr.html'  class='notinAA50'>
 			<div class="ui-accordion-link">CDRs</div>
 			<div class="ui-accordion-desc">Access all your previous call records.</div>
 		</div>-->

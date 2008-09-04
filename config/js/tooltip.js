@@ -69,9 +69,9 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 
 	tooltips['users'] .en[95] = "<B>Codecs</B> A codec is a compression or decompression algorithm run against voice as it is moved between analog (speaking) and digital (VoIP). <B>u-law</B> A PSTN standard codec, used in North America, that provides very good voice quality and consumes 64kbit/s for each direction (receiving and transmitting) of a VoIP call.  u-law should be supported by all VoIP phones. <B>a-law</B> A PSTN standard codec, used outside of North America, that provides very good voice quality and consumes 64kbit/s for each direction (receiving and transmitting) of a VoIP call.  a-law should be supported by all VoIP phones. <B>GSM</B> A wireless standard codec, used worldwide, that provides okay voice quality and consumes 13.3kbit/s for each direction (receiving and transmitting) of a VoIP call.  GSM is supported by many VoIP phones. <B>G.726</B> A PSTN codec, used worldwide, that provides good voice quality and consumes 32kbit/s for each direction (receiving and transmitting) of a VoIP call. G.726 is supported by some VoIP phones. <B>G.722</B> A high-fidelity codec for VoIP calls that provides excellent voice quality and consumes 64kbit/s for each direction (receiving and transmitting) of a VoIP call. At present, G.722 is only supported by a limited number of VoIP phones.";
 
-	tooltips['users'] .en[96] = "Line Number – Polycom-brand VoIP phones are capable of servicing between 1 and 6 separate VoIP lines, depending on the model of the phone. If you have elected to use the Polycom Autoprovisioning feature of Asterisk 1.6, this option may be used to define which line of your phone is configured for the user / extension that is being configured.  One may, for example, define extension 6001 as the first line of a phone, and extension 6002 as the second line; thus, line one would ring when someone calls 6001, and line two would ring when 6002 is called.  More than one user/extension may not be assigned to the same line on the same telephone.";
+	tooltips['users'] .en[96] = "Line Number - Polycom-brand VoIP phones are capable of servicing between 1 and 6 separate VoIP lines, depending on the model of the phone. If you have elected to use the Polycom Autoprovisioning feature of Asterisk 1.6, this option may be used to define which line of your phone is configured for the user / extension that is being configured.  One may, for example, define extension 6001 as the first line of a phone, and extension 6002 as the second line; thus, line one would ring when someone calls 6001, and line two would ring when 6002 is called.  More than one user/extension may not be assigned to the same line on the same telephone.";
 
-	tooltips['users'] .en[97] = "Polycom Autoprovisioning – ";
+	tooltips['users'] .en[97] = "Polycom Autoprovisioning ";
 
 	tooltips['users'] .en[98] = "Need a phone, some software, or something else ? Click on the 'Where to Buy' button to get directly to products." ;
 
@@ -118,7 +118,8 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['voicemail'] .en[12] = "<B>Play Envelope:</B> Turn on/off playing introductions about each message when accessing them from the voicemail application.";
 	tooltips['voicemail'] .en[13] = "<B> Max Greeting:</B> Set the maximum number of seconds for a User's voicemail greeting.";
 	tooltips['voicemail'] .en[15] = "<B> Direct VoiceMail Dial:</B> Check this to enable direct voicemail dial. For instance, if John's extension is 6001, you would be able to directly dial into John's voicemailbox by dialing #6001 to leave him a message.";
-
+	tooltips['voicemail'] .en[16] = "<b>SMTP Server</b> The IP address or hostname of an SMTP server that the AA50 may connect to, without authentication, in order to send e-mail notifications of your voicemails; i.e. mail.yourcompany.com";
+	tooltips['voicemail'] .en[17] = "<b>Port</b> The port number on which the SMTP server is running; generally port 25.";
 
 
 // Tooltips for CallQueues (queues)
@@ -292,6 +293,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 		"</UL>\n";
 	tooltips['options'].en[8] = "The Operator Extension is the extension which will be dialed when a caller presses '0' to exit Voicemail. It is also available as a Voice Menu option.";
 	tooltips['options'].en[9] = "The Language setting allows the user to specify the default prompts language for phone to phone, inbound, and outbound calls.  If a soundpack selection is made but not already installed, then the pack will be downloaded from Digium." ;
+	tooltips['options'].en[10] = "Enables the display of a graphic on a phone's LCD display when the phone is idle." ;
 	tooltips['options'].en[11] = "Number of seconds to ring a device before sending to the user's Voicemail Box" ;
 
 

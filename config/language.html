@@ -29,20 +29,23 @@
 
 function localajaxinit(){
 	(function(){
+		var fd_text = (parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ) ? 'Factory Reset' : 'Reset Configuration' ;
 		var t = [
-			{url:'preferences.html', desc: 'General Preferences' },
-			{url:'#', desc:'Language', selected: true },
-			{url:'password.html', desc: 'Change Password' },
-			{url:'reset_defaults.html', desc: 'Reset Configuration' },
-			{url:'reboot.html', desc: 'Reboot' },
-			{url:'flipadvanced.html', desc: 'Advanced Options' }
+			{url:'preferences.html', desc:'General Preferences'} ,
+			{url:'#', desc:'Language', selected:true } ,
+			{url:'password.html', desc:'Change Password'}
 		];
+		if(parent.sessionData.PLATFORM.isAA50 ) {
+			t.push({url:'reset_defaults.html', desc: fd_text });
+		}
+		t.push( {url:'reboot.html', desc:'Reboot' } );
+		t.push( {url:'flipadvanced.html', desc:'Advanced Options' } );
 		ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
-	})();
 
+	})();
 	top.document.title = 'Language preferences' ;
-	var c = config2json( { filename: 'users.conf', usf:1 } );
-	if( c.hasOwnProperty('general') ){
+	var c = config2json({filename: 'users.conf', usf:1});
+	if(c.hasOwnProperty('general')){
 		ASTGUI.updateFieldToValue( 'language' , c['general'].getProperty('language') );
 	}
 };

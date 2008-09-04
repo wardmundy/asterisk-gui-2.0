@@ -1463,26 +1463,30 @@ astgui_manageVoiceMenus = {
 			steps:[],
 			keypressEvents: { 0:'', 1:'', 2:'', 3:'', 4:'', 5:'', 6:'', 7:'', 8:'', 9:'', '#':'' , '*':'', t:'', i: ''}
 		};
-		var TMP_STEPS = ASTGUI.sortContextByExten(cxt, true);
-		TMP_STEPS['s'].forEach( function(step){
-			return ASTGUI.parseContextLine.getAppWithArgs(step);
-		});
-		vm.steps = TMP_STEPS['s'];
-		vm.comment = vm.steps[0].getNoOp();
-		['0','1','2','3','4','5','6','7','8','9','*','#','t','i'].each( function(this_key){
-			if( TMP_STEPS.hasOwnProperty(this_key) && TMP_STEPS[this_key].length==1 ){
-				vm.keypressEvents[this_key] = ASTGUI.parseContextLine.getAppWithArgs(TMP_STEPS[this_key][0]) ;
-			}
-		});
-
-		cxt.each( function(line , cxt_index) {
-			if( line.beginsWith('include=') ){
-				vm.includes.push( line.afterChar('=') );
-				return true;
-			}
-		});
-
-		return ASTGUI.toCustomObject(vm);
+		try{
+			var TMP_STEPS = ASTGUI.sortContextByExten(cxt, true);
+			TMP_STEPS['s'].forEach( function(step){
+				return ASTGUI.parseContextLine.getAppWithArgs(step);
+			});
+			vm.steps = TMP_STEPS['s'];
+			vm.comment = vm.steps[0].getNoOp();
+			['0','1','2','3','4','5','6','7','8','9','*','#','t','i'].each( function(this_key){
+				if( TMP_STEPS.hasOwnProperty(this_key) && TMP_STEPS[this_key].length==1 ){
+					vm.keypressEvents[this_key] = ASTGUI.parseContextLine.getAppWithArgs(TMP_STEPS[this_key][0]) ;
+				}
+			});
+	
+			cxt.each( function(line , cxt_index) {
+				if( line.beginsWith('include=') ){
+					vm.includes.push( line.afterChar('=') );
+					return true;
+				}
+			});
+		}catch(err){
+			ASTGUI.debugLog('Error Parsing VoiceMenu' , 'parse');
+		}finally{
+			return ASTGUI.toCustomObject(vm);
+		}
 	},
 
 	addMenu: function(new_name, new_menu, cbf){ // Creates a New Voicemenu 'new_name' with a standard VoiceMenu structure of 'new_menu'
@@ -2006,3 +2010,372 @@ astgui_manageTimeBasedRules = {
 };
 
 
+
+astgui_updateConfigFromOldGui = function(){
+	// upgrades old GUI Configuration to New Gui
+
+	var n = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=' + ASTGUI.globals.configfile , async: false }).responseText;
+
+	var n_Lower = n.toLowerCase();
+	if( n_Lower.contains('response: error') && n_Lower.contains('message: config file not found') ){
+		parent.ASTGUI.systemCmd( 'touch ' + ASTGUI.paths['asteriskConfig'] + ASTGUI.globals.configfile , function(){
+			top.window.location.reload();
+		});
+		return false;
+	}
+
+	var guiprefs = config2json({ configFile_output: n, usf : 1 });
+	if( !guiprefs.hasOwnProperty('general') ){
+		var u = new listOfSynActions(ASTGUI.globals.configfile) ;
+		u.new_action('newcat', 'general' , '', '') ;
+		u.callActions() ;
+		guiprefs_general = {} ;
+	}else{
+		guiprefs_general = guiprefs['general'] ;
+	}
+	
+	if ( guiprefs_general.hasOwnProperty('config_upgraded') && guiprefs_general['config_upgraded'] == 'yes' ){
+		// already upgraded, DO NOTHING
+		return true;
+	}
+
+	var do_Upgrade = function(){
+		var upgrade_alert = '';
+
+		if ( sessionData.PLATFORM.isAA50 ){
+			var upgrade_alert = "Your configuration will now be upgraded to work with this version of the AA50 firmware.\n"
+			+ "An automatic backup of your old configration is created and is available from the 'Backup' panel.\n"
+			+ "If you downgrade your firmware to a previous version, you will need to restore this configuration.";
+		}else{
+			var upgrade_alert = "Your configuration will now be upgraded to work with the latest version of GUI. \n"
+			+ "An automatic backup of your old configration is available from the backups panel.";
+		}
+
+		if(upgrade_alert){
+			alert( upgrade_alert );
+		}
+
+		parent.ASTGUI.dialog.waitWhile('Upgrading Configuration files .. ');
+
+		var sa = new listOfActions('extensions.conf') ;
+		var ext_conf = config2json({ filename:'extensions.conf', usf:0 });
+	
+		if( !ext_conf.hasOwnProperty(ASTGUI.contexts.CONFERENCES) ){
+			sa.new_action('newcat', ASTGUI.contexts.CONFERENCES, '', '');
+		};
+		if( !ext_conf.hasOwnProperty(ASTGUI.contexts.RingGroupExtensions) ){
+			sa.new_action('newcat', ASTGUI.contexts.RingGroupExtensions, '', '');
+		};
+		if( !ext_conf.hasOwnProperty(ASTGUI.contexts.QUEUES) ){
+			sa.new_action('newcat', ASTGUI.contexts.QUEUES, '', '');
+		};
+		if( !ext_conf.hasOwnProperty(ASTGUI.contexts.VoiceMenuExtensions) ){
+			sa.new_action('newcat', ASTGUI.contexts.VoiceMenuExtensions, '', '');
+		};
+	
+		for ( var catname in ext_conf ){
+			if( !ext_conf.hasOwnProperty(catname) || !catname.beginsWith('ringroups-custom-') ) continue;
+			// OLD
+			//	[ringroups-custom-1]
+			//	gui_ring_groupname = SomeRG
+			//	exten = s,1,NoOp(RINGGROUP)
+			//	exten = s,n,Dial(SIP/6000,20,i)
+			//	exten = s,n,Hangup
+			// 
+			// New
+			//	[ringroups-custom-1]
+			//	exten = s,1,NoOp(SomeRG)
+			//	exten = s,n,Dial(SIP/6000,20,i)
+			//	exten = s,n,Hangup
+			var this_RG = ext_conf[catname];
+			var tmp_oldRGName = '';
+			this_RG.each( function( this_RG_line ){
+				if( this_RG_line.beginsWith('gui_ring_groupname =') ){
+					tmp_oldRGName = this_RG_line.afterChar('=');
+					sa.new_action( 'delete', catname  , 'gui_ring_groupname', '', tmp_oldRGName );
+				}
+	
+				if( tmp_oldRGName && this_RG_line.endsWith('s,1,NoOp(RINGGROUP)') ){
+					var tmp_toReplace = this_RG_line.afterChar('=');
+					sa.new_action( 'update', catname  , 'exten', tmp_toReplace.replaceXY('RINGGROUP', tmp_oldRGName) , tmp_toReplace );
+				}
+			});
+		}
+	
+		var default_Context = ext_conf['default'] ;
+		default_Context.each( function( this_line ){
+			if(!this_line.beginsWith('exten=') ){ return ; }
+			var match_str = this_line.afterChar('=');
+	
+			if ( this_line.contains('MeetMe(${EXTEN}|') ){
+			// Move any conferences into [conferences]
+				// old
+				// 	[default]
+				// 	exten => 6000,1,MeetMe(${EXTEN}|MI) // delete this line
+	
+					sa.new_action('delete', 'default' , 'exten', '', match_str );
+				// new
+				//	[conferences]
+				// 	exten => 6000,1,MeetMe(${EXTEN}|MI)
+					sa.new_action('append', ASTGUI.contexts.CONFERENCES , 'exten', match_str );
+	
+				// old
+				//	[voicemenu-custom-?] 
+				//	exten = ????,?,Goto(default|6000|1)
+				// 
+				// new
+				//	[voicemenu-custom-?] 
+				//	exten = ????,?,Goto(conferences|6000|1)
+				var tmp_exten = ASTGUI.parseContextLine.getExten(match_str);
+				var tmp_oldMM_gotoStr = 'Goto(default|' + tmp_exten + '|1)' ;
+	
+				for ( var catname in ext_conf ){
+					if( !ext_conf.hasOwnProperty(catname) ) continue;
+					if( catname.beginsWith('DID_') ){
+						if( catname.contains( '_' + ASTGUI.contexts.TimeIntervalPrefix ) || catname.endsWith(ASTGUI.contexts.TrunkDefaultSuffix) ){ continue; }
+					}else if( catname.beginsWith('voicemenu-custom-') ){
+	
+					}else{
+						continue;
+					}
+	
+					var this_menu = ext_conf[catname] ;
+					this_menu.each( function( this_menu_line ){
+						if( this_menu_line.contains( tmp_oldMM_gotoStr ) ){
+							var tmp_toReplace = this_menu_line.afterChar('=');
+							var tmp_ReplaceWith = tmp_toReplace.replaceXY(tmp_oldMM_gotoStr, 'Goto(' + ASTGUI.contexts.CONFERENCES +'|' + tmp_exten + '|1)' );
+							sa.new_action( 'update', catname , 'exten', tmp_ReplaceWith , tmp_toReplace );
+						}
+					});
+				}
+	
+				return;
+			}
+	
+			if ( this_line.contains('Goto(ringroups-custom-') ){
+				var THIS_RGNAME = this_line.betweenXY( '(' , ')' ) ;
+				// Move Any Ring groups
+					// old
+					// 	[default]
+					// 	exten = 2345,1,Goto(ringroups-custom-1|s|1)
+					sa.new_action('delete', 'default' , 'exten', '', match_str );
+	
+				// new
+				//	[ringgroups]
+				// 	exten = 2345,1,Goto(ringroups-custom-1|s|1)
+					sa.new_action('append', ASTGUI.contexts.RingGroupExtensions , 'exten', match_str );
+	
+	
+				// old
+				//	[voicemenu-custom-?] 
+				//	exten = ????,?,Goto(default|2345|1)
+				// 
+				// new
+				//	[voicemenu-custom-?] 
+				//	exten = ????,?,Goto(ringroups-custom-1|s|1)
+				var tmp_exten = ASTGUI.parseContextLine.getExten(match_str);
+				var tmp_oldRG_gotoStr = 'Goto(default|' + tmp_exten + '|1)' ;
+				for ( var catname in ext_conf ){
+					if( !ext_conf.hasOwnProperty(catname) ) continue;
+					if( catname.beginsWith('DID_') ){
+						if( catname.contains( '_' + ASTGUI.contexts.TimeIntervalPrefix ) || catname.endsWith(ASTGUI.contexts.TrunkDefaultSuffix) ){ continue; }
+					}else if( catname.beginsWith('voicemenu-custom-') ){
+	
+					}else{
+						continue;
+					}
+	
+					var this_menu = ext_conf[catname] ;
+					this_menu.each( function( this_menu_line ){
+						if( this_menu_line.contains( tmp_oldRG_gotoStr ) ){
+							var tmp_toReplace = this_menu_line.afterChar('=');
+							var tmp_ReplaceWith = tmp_toReplace.replaceXY( tmp_oldRG_gotoStr, 'Goto(' + THIS_RGNAME +'|s|1)' );
+							sa.new_action( 'update', catname , 'exten', tmp_ReplaceWith , tmp_toReplace );
+						}
+					});
+				}
+				return;
+			}
+
+			if ( this_line.contains('agentlogin') || this_line.contains('agentcallbacklogin') ){
+				sa.new_action('delete', 'default' , 'exten', '', match_str );
+				sa.new_action('append', ASTGUI.contexts.QUEUES , 'exten', match_str );
+				return;
+			}
+	
+			if ( this_line.contains('Queue(${EXTEN})') ){
+				// Move any Queues
+					// old
+					//	[default]
+					//	exten = 6003,1,Queue(${EXTEN})
+					sa.new_action('delete', 'default' , 'exten', '', match_str );
+			
+					// new
+					//	[queues]
+					//	exten = 6003,1,Queue(${EXTEN})
+					sa.new_action('append', ASTGUI.contexts.QUEUES , 'exten', match_str );
+	
+					// old
+					//	[voicemenu-custom-?] 
+					//	exten = ????,?,Goto(default|6003|1)
+					// 
+					// new
+					//	[voicemenu-custom-?] 
+					//	exten = ????,?,Goto(queues|6003|1)
+					var tmp_exten = ASTGUI.parseContextLine.getExten(match_str);
+					var tmp_oldQ_gotoStr = 'Goto(default|' + tmp_exten + '|1)' ;
+					for ( var catname in ext_conf ){
+					if( !ext_conf.hasOwnProperty(catname) ) continue;
+						if( catname.beginsWith('DID_') ){
+							if( catname.contains( '_' + ASTGUI.contexts.TimeIntervalPrefix ) || catname.endsWith(ASTGUI.contexts.TrunkDefaultSuffix) ){ continue; }
+						}else if( catname.beginsWith('voicemenu-custom-') ){
+		
+						}else{
+							continue;
+						}
+	
+						var this_menu = ext_conf[catname] ;
+						this_menu.each( function( this_menu_line ){
+							if( this_menu_line.contains( tmp_oldQ_gotoStr ) ){
+								var tmp_toReplace = this_menu_line.afterChar('=');
+								var tmp_ReplaceWith = tmp_toReplace.replaceXY(tmp_oldQ_gotoStr, 'Goto(' + ASTGUI.contexts.QUEUES +'|' + tmp_exten + '|1)' );
+								sa.new_action( 'update', catname , 'exten', tmp_ReplaceWith , tmp_toReplace );
+							}
+						});
+					}
+				return;
+			}
+	
+			if ( this_line.contains('Goto(voicemenu-custom-') ){
+				// Move any Voice Menus
+					// old
+					//	[default]
+					//	exten = 7000,1,Goto(voicemenu-custom-1|s|1)
+					sa.new_action('delete', 'default' , 'exten', '', match_str );
+	
+				// new
+				//	[voicemenus]
+				//	exten = 7000,1,Goto(voicemenu-custom-1|s|1)
+					sa.new_action('append', ASTGUI.contexts.VoiceMenuExtensions , 'exten', match_str );
+				return;
+			}
+	
+			if( this_line.endsWith(',VoiceMailMain') ){
+				// VoiceMail Main
+					// old
+					// 	[default]
+					//	exten => 6050,1,VoiceMailMain //delete
+					sa.new_action('delete', 'default' , 'exten', '', match_str );
+	
+					// new
+					// 	[default]
+					//	exten = 6050,1,VoiceMailMain(${CALLERID(num)}@default)
+					sa.new_action('append', 'default' , 'exten', match_str.replaceXY(',VoiceMailMain', ',VoiceMailMain(${CALLERID(num)}@default)' )  );
+			}
+		});
+	
+		//	for (var catname in ext_conf){
+		//		if( !ext_conf.hasOwnProperty(catname) || !catname.beginsWith('voicemenu-custom-') ) continue;
+		//	
+		//	}
+	
+		for (var catname in ext_conf){
+			// look for DID_trunk_x (ignore DID_TRUNK_timeinterval_some, ignore DID_trunk_x_default)
+			// 	if there is no DID_trunk_x_default rename DID_trunk_x to DID_trunk_x_default
+			//	create DID_TRUNK_x & include DID_trunk_x_default
+	
+			// old
+			//	[DID_trunk_x]
+			//	exten = _XXX,1,...
+			//	exten = _YYY,1,...
+	
+			// new
+			//	[DID_trunk_x_default]
+			//	exten = _XXX,1,...
+			//	exten = _YYY,1,...
+			//
+			//	[DID_trunk_x]
+			//	include = DID_trunk_x_default
+			//
+	
+			if( !ext_conf.hasOwnProperty(catname) || !catname.beginsWith('DID_') ) continue;
+			if( catname.contains( '_' + ASTGUI.contexts.TimeIntervalPrefix ) || catname.endsWith(ASTGUI.contexts.TrunkDefaultSuffix) ) continue;
+			if( !ext_conf.hasOwnProperty( catname + ASTGUI.contexts.TrunkDefaultSuffix ) ){
+				sa.new_action('renamecat', catname, '', catname + ASTGUI.contexts.TrunkDefaultSuffix );
+				sa.new_action('newcat', catname, '', '');
+				sa.new_action('append', catname , 'include', catname + ASTGUI.contexts.TrunkDefaultSuffix );
+			}
+		}
+	
+		for (var catname in ext_conf){
+			// Upgrade dialing rules and create dialplans in the new format
+			if( !ext_conf.hasOwnProperty(catname) || !catname.beginsWith('numberplan-custom-') ) continue;
+			var this_context = ext_conf[catname] ;
+	
+			(function(){
+				sa.new_action('delcat', catname , '', '');
+	
+				var callingRULES_list = [];
+				var tmp_index = this_context.indexOfLike('plancomment=') ;
+				var DP_LABEL = ( tmp_index != -1 ) ? this_context[tmp_index].afterChar('=') : catname ;
+				var DP_CONTEXT_NAME = ASTGUI.contexts.CallingPlanPrefix + DP_LABEL ;
+		
+				this_context.each(
+					function(line){
+						if( !line.beginsWith('exten=') ) return;
+						var pattern = ASTGUI.parseContextLine.getExten( line );
+						var macroargs = ASTGUI.parseContextLine.getArgs( line ); // macroname = macroargs[0] ;
+						var t1 = ASTGUI.parseContextLine.parseTrunkDialArgument( macroargs[1] ) ; // t1.name (trunkname), t1.prepend, t1.stripx
+						var tmp_index = this_context.indexOfLike( 'comment=' + pattern + ',' );
+						var clr_name = ( tmp_index == -1 ) ? pattern : this_context[tmp_index].split(',')[2] ;
+		
+						// create a new context for this callingrule
+						var newcr_Context_name = ASTGUI.contexts.CallingRulePrefix + clr_name ;
+						callingRULES_list.push( newcr_Context_name );
+						var newcr_string = pattern + ',1,Macro(' + ASTGUI.contexts.dialtrunks + ',' + macroargs[1] + ',,' + t1.name + ',)' ;
+		
+						sa.new_action('newcat', newcr_Context_name , '', '');
+						sa.new_action('append', newcr_Context_name , 'exten', newcr_string );
+					}
+				) ;
+		
+				sa.new_action('newcat', DP_CONTEXT_NAME, '', '');
+				callingRULES_list.each( function(clr){
+					sa.new_action('append', DP_CONTEXT_NAME , 'include', clr);
+				});
+				// include all local contexts for any upgraded DP_Context
+				ASTGUI.includeContexts.each( function( this_localContext ){
+					sa.new_action('append', DP_CONTEXT_NAME , 'include', this_localContext);
+				});
+			})();
+		}
+	
+		sa.callActions( function(){
+			var u = ASTGUI.updateaValue({ file: ASTGUI.globals.configfile, context: 'general', variable: 'config_upgraded', value: 'yes' }) ;
+			top.window.location.reload();
+		});
+		// create new 'OutBound Calling Rules' out of numer plans
+	};
+
+	try{
+		return false;
+	}finally {
+		if ( !sessionData.PLATFORM.isAA50 ){
+			//Upgrade_backup_of_V1.1.1__2008Jul08.tar
+			var months = ["jan", "feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+			var today=new Date();
+			var year = today.getFullYear();
+			var month = months[ today.getMonth() ];
+			var day = today.getDate().addZero();
+			var tmp_bkpFileName = 'Upgrade_backup_of_C1.x__' + year + month + day + '.tar' ;
+	
+			parent.ASTGUI.dialog.waitWhile('Taking Backup of current configuration ...');
+			ASTGUI.systemCmd( "tar -cf " + ASTGUI.paths.ConfigBkp + tmp_bkpFileName + ' ' +  ' /etc/asterisk', function(){
+				ASTGUI.feedback({ msg:'Backup Successful', showfor:2 });
+				do_Upgrade();
+			});
+		}else{
+			do_Upgrade();
+		}
+	}
+};

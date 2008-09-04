@@ -155,8 +155,17 @@ var RecordFile = function( extension ){ // uses/dials  extension to record into 
 
 
 var localajaxinit = function(){
+	if( parent.sessionData.PLATFORM.isABE ){ // ABE-1600
+		$('#uploadVoiceMenuPrompt_Button').hide();
+	}
+
 	$('#recfilesTable').hide();
 	top.document.title = 'Record a Voice Menu Prompt';
+	if( parent.sessionData.PLATFORM.isAA50 && !parent.sessionData.hasCompactFlash ){
+		$('#nocf').show();
+		$('#thispageContent').hide();
+		return true;
+	};
 	var newvmenu_ext = _$('newvmenu_ext');
 	var playVmenu_ext = _$('playVmenu_ext');
 	var _rft = _$('recfilesTable');
@@ -206,13 +215,15 @@ var localajaxinit = function(){
 	</span>
 </div>
 
+<div style='display:none;' class='nocf' id='nocf'> You need a&nbsp;&nbsp;<b>CompactFlash&reg;</b>&nbsp;&nbsp;to use this feature </div>
+
 <div id='thispageContent'>
 	<div class='lite_Heading'>
 		List of Custom Voice Menu Prompts
 	</div>
 	<div STYLE="text-align: center;">
 		<span class='guiButton' onclick='show_record_New();'>Record a new Voice Menu prompt</span>
-		<span class='guiButton' onclick='window.location.href="menuprompts_upload.html";'>Upload a Voice Menu prompt</span>
+		<span class='guiButton' onclick='window.location.href="menuprompts_upload.html";' id='uploadVoiceMenuPrompt_Button'>Upload a Voice Menu prompt</span>
 	</div>
 	<div id="recfilesTable_div" style="height:370px;width=100%; overflow :auto; padding : 0">
 		<table id="recfilesTable" cellpadding=2 cellspacing=1 border=0 align=center></table>

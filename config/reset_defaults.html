@@ -31,6 +31,20 @@ var reset_factory = function(){
 	if(!confirm("Are you sure you want to reset ?")) { return true; }
 
 	parent.ASTGUI.dialog.waitWhile(' Resetting to factory defaults ...');
+	if(parent.sessionData.PLATFORM.isAA50 ){
+		var after = function(){
+			parent.ASTGUI.dialog.hide();
+			ASTGUI.cookies.setCookie( 'configFilesChanged' , 'no' ); // ignore any previous changes -- skip calling save_config
+			parent.miscFunctions.reboot_pbx({
+				msg: 'You appliance has been reset to <i>\'factory defaults\' </i> ',
+				btnNo_text : 'Later'
+			});
+		};
+		parent.ASTGUI.systemCmd( ASTGUI.globals.app_factoryReset, after);
+		return;
+	}
+
+	// if not AA50 - manually reset all config files 
 	var files = ['extensions.conf', 'users.conf', 'agents.conf', 'meetme.conf', 'misdn.conf', 'queues.conf'];
 	files.each(function(file){
 		var c = config2json({filename:file, catlist:'yes'});
@@ -49,14 +63,15 @@ var reset_factory = function(){
 
 var localajaxinit = function(){
 	top.document.title = "Reset PBX to Default Configuration" ;
+	var fd_text = (parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ) ? 'Factory Reset' : 'Reset Configuration' ;
 	var t = [
 		{url:'preferences.html', desc:'General Preferences' } ,
 		{url:'language.html', desc:'Language' } ,
 		{url:'password.html', desc:'Change Password'},
-		{url:'#', desc: 'Reset Configuration' , selected:true },
-		{url:'reboot.html', desc:'Reboot' },
-		{url:'flipadvanced.html', desc:'Advanced Options' }
+		{url:'#', desc: fd_text , selected:true }
 	];
+	t.push( {url:'reboot.html', desc:'Reboot' } );
+	t.push( {url:'flipadvanced.html', desc:'Advanced Options' } );
 	ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
 };
 

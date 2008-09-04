@@ -107,6 +107,11 @@ onUploadForm_unload = function(){
 
 function localajaxinit() {
 	top.document.title = 'Upload a custom Voice Menu Prompt';
+	if( parent.sessionData.PLATFORM.isAA50 && !parent.sessionData.hasCompactFlash ){
+		$('#nocf').show();
+		$('#uploadForm_container').hide();
+		return true;
+	}
 
 	parent.ASTGUI.dialog.waitWhile('Loading ...');
 	parent.ASTGUI.systemCmd( "mkdir -p " + ASTGUI.paths.menusRecord , function(){
@@ -124,6 +129,8 @@ function localajaxinit() {
 	&nbsp;Upload a custom Voice Menu Prompt
 	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
 </div>
+
+<div style='display:none;' id='nocf'> You need a&nbsp;&nbsp;<b>CompactFlash&reg;</b>&nbsp;&nbsp;to use this feature </div>
 
 <div class='top_buttons'>
 	<span class='guiButton' id='BACKBUTTON' style='margin-left:200px;'> &#171 Back to 'List of Custom Voice Menu Prompts' </span>

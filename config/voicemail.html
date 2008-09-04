@@ -32,7 +32,16 @@ var TODELETE = '';
 var DVD = ',1,VoiceMail(${EXTEN:1}@default)' ; // direct voicemail dial
 
 var localajaxinit = function( ){
-	ASTGUI.tabbedOptions( _$('tabbedMenu') , [ {url:'#', desc:'General Settings', selected:true }, {url:'emailsettings.html', desc:'Email Settings for VoiceMails'} ] );
+	(function (){
+		var t = [
+			{url:'#', desc:'General Settings', selected:true } ,
+			{url:'emailsettings.html', desc:'Email Settings for VoiceMails'}
+		];
+		if(parent.sessionData.PLATFORM.isAA50 ){
+			t.push( {url:'smtp_settings.html', desc:'SMTP Settings'} );
+		}
+		ASTGUI.tabbedOptions( _$('tabbedMenu') , t);
+	})();
 	top.document.title = 'General Voice Mail Settings' ;
 
 	(function (){

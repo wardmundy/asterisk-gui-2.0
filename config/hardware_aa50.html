@@ -1,0 +1,681 @@
+<!--
+ * Asterisk-GUI	- an Asterisk configuration interface
+ *
+ * hardware configuration for AA50
+ *
+ * Copyright (C) 2008, Digium, Inc.
+ *
+ * Pari Nannapaneni <pari@digium.com>
+ *
+ * See http://www.asterisk.org for more information about
+ * the Asterisk project. Please do not directly contact
+ * any of the maintainers of this project for assistance;
+ * the project provides a web site, mailing lists and IRC
+ * channels for your use.
+ *
+ * This program is free software, distributed under the terms of
+ * the GNU General Public License Version 2. See the LICENSE file
+ * at the top of the source tree.
+ *
+ -->
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style>
+	.hidevpm{
+		display: none;
+	}
+
+	.taglist {
+		border: 1px solid #666666;
+		margin-top:10px;
+		margin-bottom:10px;
+		max-width: 745;
+	}
+
+	.taglist tr.frow {
+		background-color: #6b79a5;
+		color: #CED7EF;
+	}
+
+	.taglist tr.even {
+		background-color: #DFDFDF;
+	}
+
+	.taglist tr.odd{
+		background-color: #FFFFFF;
+	}
+
+	.taglist tr.even:hover, .taglist tr.odd:hover {
+		background-color: #a8b6e5;
+	}
+
+	#errmsg{
+		border: 1px solid #666666;
+		margin-left:50px;
+		margin-right:50px;
+		padding : 20px 10px 20px 10px;
+		font-size: 125%;
+		text-align: center;
+		background-color:#FFFFFF;
+	}
+
+	.pageheading{
+		padding : 10px 10px 4px 10px;
+		font-size: 135%;
+		text-align: center;
+		font-weight: bold;
+	}
+</style>
+<script>
+var oldLoadZone;
+var hwcfgfile = ASTGUI.globals.hwcfgFile ;
+var HAS_ANALOGHARDWARE = true; // if the user does not have any hardware - always set parent.sessionData.REQUIRE_RESTART to false
+var isREVC = false;
+
+
+var applySettings = {
+	save_opermode_settings: function(){ // applySettings.save_opermode_settings();
+		ASTGUI.dialog.waitWhile('saving...');
+		var u = new listOfSynActions(ASTGUI.globals.configfile);
+			u.new_action('update', 'general', 'opermode', ASTGUI.getFieldValue('opermode') );
+			u.new_action('update', 'general', 'alawoverride', ASTGUI.getFieldValue('alawoverride') );
+			u.new_action('update', 'general', 'fxshonormode', ASTGUI.getFieldValue('fxshonormode') );
+			u.new_action('update', 'general', 'boostringer', ASTGUI.getFieldValue('boostringer') );
+			u.callActions();
+			u.clearActions();
+	
+		u.new_action('update', 'general', 'mwimode', ASTGUI.getFieldValue('mwimode') );
+		if( ASTGUI.getFieldValue('mwimode') == 'NEON' ){
+			u.new_action('update', 'general', 'neonmwi_level', ASTGUI.getFieldValue('neonmwi_level') );
+			u.new_action('update', 'general', 'neonmwi_offlimit', ASTGUI.getFieldValue('neonmwi_offlimit') );
+		}
+		u.new_action('update', 'general', 'lowpower', ASTGUI.getFieldValue('lowpower') );
+		u.new_action('update', 'general', 'fastringer', ASTGUI.getFieldValue('fastringer') );
+		u.new_action('update', 'general', 'fwringdetect', ASTGUI.getFieldValue('fwringdetect') );
+		u.callActions();
+		u.clearActions();
+	
+		if( isREVC ){
+			u.new_action('update', 'general', 'vpmnlptype', ASTGUI.getFieldValue('vpmnlptype') );
+			u.new_action('update', 'general', 'vpmnlpthresh', ASTGUI.getFieldValue('vpmnlpthresh') );
+			u.new_action('update', 'general', 'vpmnlpmaxsupp', ASTGUI.getFieldValue('vpmnlpmaxsupp') );
+			u.callActions();
+		}
+	
+		ASTGUI.dialog.waitWhile('updating modprobe.conf ...');
+		var cmd1 = "cp /etc/asterisk/modprobe_default /etc/modprobe.conf";
+		var params = "options sx00i ";
+		var h = ASTGUI.getFieldValue('opermode') ;
+			if(h){ params += " opermode=" + h; }
+		h = ASTGUI.getFieldValue('alawoverride') ;
+			if(h){ params += " alawoverride=" + h; }
+		h = ASTGUI.getFieldValue('fxshonormode') ;
+			if(h){ params += " fxshonormode=" + h; }
+		h = ASTGUI.getFieldValue('boostringer') ;
+			if(h){ params += " boostringer=" + h; }
+		h = ASTGUI.getFieldValue('lowpower') ;
+			if(h){ params += " lowpower=" + h; }
+		h = ASTGUI.getFieldValue('fastringer') ;
+			if(h){ params += " fastringer=" + h; }
+		h = ASTGUI.getFieldValue('fwringdetect') ;
+			if(h == '1'){ params += " fwringdetect=" + h; }
+	
+		if( ASTGUI.getFieldValue('mwimode') == 'NEON'){
+			params += " neonmwi_monitor=1";
+			var h = ASTGUI.getFieldValue('neonmwi_level');
+			if(h){ params += ' neonmwi_level=' + h ; }
+			var h = ASTGUI.getFieldValue('neonmwi_offlimit');
+			if(h){ params += ' neonmwi_offlimit=' + h ; }
+		}else{
+			params += " neonmwi_monitor=0";
+		}
+
+		if( isREVC ){
+			h = ASTGUI.getFieldValue('vpmnlptype') ;
+				if(h){ params += " vpmnlptype=" + h; }
+			h = ASTGUI.getFieldValue('vpmnlpthresh') ;
+				if(h){ params += " vpmnlpthresh=" + h; }
+			h = ASTGUI.getFieldValue('vpmnlpmaxsupp');
+				if(h){ params += " vpmnlpmaxsupp=" + h; }
+		}
+	
+		var cmd2 = "echo \"" + params + "\" >> /etc/modprobe.conf ";
+	
+		var update_usersConf = function(){
+			// update MWI settings in users.conf
+			var u = new listOfSynActions('users.conf');
+			if( ASTGUI.getFieldValue('mwimode') == 'FSK'){
+				u.new_action('update', 'general' , 'mwimonitor', 'fsk');
+				u.new_action('update', 'general' , 'mwilevel', '512');
+				u.new_action('update', 'general' , 'mwimonitornotify', '__builtin__');
+			}
+			if( ASTGUI.getFieldValue('mwimode') == 'NEON'){
+				u.new_action('delete', 'general' , 'mwilevel', '','');
+				u.new_action('update', 'general' , 'mwimonitor', 'neon');
+				u.new_action('update', 'general' , 'mwimonitornotify', '__builtin__');
+			}
+			u.callActions();
+			ASTGUI.dialog.hide();
+			ASTGUI.feedback( { msg:"updated settings !!", showfor: 3 });
+			alert('New settings will be applied on reboot!'); 
+			window.location.reload();
+
+		};
+	
+		ASTGUI.systemCmd( cmd1, function(){ 
+			ASTGUI.systemCmd( cmd2, function(){ 
+				ASTGUI.dialog.waitWhile('updating Analog Trunks with MWI settings ...');
+				update_usersConf();
+			});
+		});
+	},
+
+
+	generate_zaptel: function(){
+		parent.ASTGUI.systemCmd( ASTGUI.scripts.generateZaptel + " applysettings" , function(){
+			parent.sessionData.REQUIRE_RESTART = true ;
+			parent.ASTGUI.systemCmd( "ztcfg -vv" , function(){
+				applySettings.save_opermode_settings();
+			});
+		});
+	},
+
+	updateZaptel: function(){ // applySettings.updateZaptel();
+		parent.ASTGUI.dialog.waitWhile('Saving Changes ...');
+		var context = 'general';
+		var x = new listOfActions('applyzap.conf');
+		x.new_action('delcat', context,"", "");
+		x.new_action('newcat', context, "", "");
+		// write back any actual analog ports
+		parent.sessionData.PORTS_SIGNALLING.ls = []; // reset previous signalling data
+		parent.sessionData.PORTS_SIGNALLING.ks = [];
+
+		if( parent.sessionData.FXO_PORTS_DETECTED.length){
+
+			//x.new_action('append', context, 'fxsks', parent.sessionData.FXO_PORTS_DETECTED.join(',')); // FXO ports will be fxs signalled
+			(function(){
+				var ks_fxoPorts = [];
+				var ls_fxoPorts = [];
+				var t = parent.sessionData.FXO_PORTS_DETECTED ;
+				for( var i = 0 ; i < t.length ; i++){
+					if( _$('sig_analog_port_' + t[i] ).value == 'ls' ){
+						ls_fxoPorts.push( t[i] );
+					}else{
+						ks_fxoPorts.push( t[i] );
+					}
+				}
+				if( ls_fxoPorts.length ){
+					x.new_action('append', context, 'fxsls', ls_fxoPorts.join(',')); // FXO ports will be fxs signalled
+				}
+				if( ks_fxoPorts.length ){
+					x.new_action('append', context, 'fxsks', ks_fxoPorts.join(',')); // FXO ports will be fxs signalled
+				}
+				parent.sessionData.PORTS_SIGNALLING.ls = parent.sessionData.PORTS_SIGNALLING.ls.concat(ls_fxoPorts);
+				parent.sessionData.PORTS_SIGNALLING.ks = parent.sessionData.PORTS_SIGNALLING.ks.concat(ks_fxoPorts);
+			})();
+		}
+
+		if( parent.sessionData.FXS_PORTS_DETECTED.length){
+			//x.new_action('append', context, 'fxoks', parent.sessionData.FXS_PORTS_DETECTED.join(',')); // FXS ports will be fxo signalled
+			(function(){
+				var ks_fxsPorts = [];
+				var ls_fxsPorts = [];
+				var t = parent.sessionData.FXS_PORTS_DETECTED ;
+				for( var i = 0 ; i < t.length ; i++){
+					if( _$('sig_analog_port_' + t[i] ).value == 'ls' ){
+						ls_fxsPorts.push( t[i] );
+					}else{
+						ks_fxsPorts.push( t[i] );
+					}
+				}
+				if( ls_fxsPorts.length ){
+					x.new_action('append', context, 'fxols', ls_fxsPorts.join(',')); // FXS ports will be fxo signalled
+				}
+				if( ks_fxsPorts.length ){
+					x.new_action('append', context, 'fxoks', ks_fxsPorts.join(',')); // FXS ports will be fxo signalled
+				}
+				parent.sessionData.PORTS_SIGNALLING.ls = parent.sessionData.PORTS_SIGNALLING.ls.concat(ls_fxsPorts);
+				parent.sessionData.PORTS_SIGNALLING.ks = parent.sessionData.PORTS_SIGNALLING.ks.concat(ks_fxsPorts);
+			})();
+		}
+		x.new_action('append', context, 'loadzone', _$('loadZone').value);
+		x.new_action('append', context, 'defaultzone', _$('loadZone').value);
+		x.callActions( applySettings.generate_zaptel );
+	}
+};
+
+
+
+var localajaxinit = function(){
+	ASTGUI.debugLog("Starting Loading Page hardware_aa50.html .. start function: window.onload()" , 'parse');
+	ASTGUI.dialog.waitWhile('Detecting Hardware ...');
+	top.document.title = "Analog Hardware Setup & Configuration";
+	load_currentAnalogSettings();
+	ASTGUI.debugLog("end of function: window.onload()" , 'parse');
+};
+
+
+
+
+
+var load_currentAnalogSettings = function(){
+	if(!parent.sessionData.FXS_PORTS_DETECTED.length && !parent.sessionData.FXO_PORTS_DETECTED.length ){
+		var newRow = _$('FXSFXO_ports_td').insertRow(-1) ;
+		newRow.className = 'even' ;
+		ASTGUI.domActions.tr_addCell( newRow , { html: 'No Analog Hardware detected !!' , align: 'center' } );
+		HAS_ANALOGHARDWARE = false;
+	}else{
+		ASTGUI.dialog.waitWhile('loading current hardware settings ...');
+		(function(){
+			var tbl = _$('FXSFXO_ports_td');
+			var addCell = ASTGUI.domActions.tr_addCell;
+			var newRow = tbl.insertRow(-1);
+			newRow.className = "frow";
+			addCell( newRow , { html:'<B>Type</B>', align: 'center'});
+			addCell( newRow , { html:'<B>Signalling</B>', align: 'center' });
+			addCell( newRow , { html:'<B>User/Trunk</B>', align: 'center' });
+
+			var h_2_orig = document.createElement('select');
+			ASTGUI.selectbox.append( h_2_orig, 'Kewl Start', 'ks');
+			ASTGUI.selectbox.append( h_2_orig, 'Loop Start', 'ls');
+			h_2_orig.className = 'input8';
+
+			parent.sessionData.FXS_PORTS_DETECTED.each( function( this_fxs_port ){
+				var newRow = tbl.insertRow(-1);
+				newRow.className = "even";
+				var tmp_user_str = '<font color=red>unassigned</font>';
+				var users = parent.sessionData.pbxinfo.users ;
+				for( var this_user in users ){ 
+					if( users.hasOwnProperty(this_user) ){
+						if( users[this_user].getProperty('zapchan') == this_fxs_port ){
+							tmp_user_str = this_user + ' ('+ users[this_user].getProperty('fullname') + ')';
+							break;
+						}
+					}
+				}
+				addCell( newRow , { html: '<B>FXS Port </B>', align:'center' });
+					var newcell = newRow.insertCell( newRow.cells.length );
+					var h_3 = document.createElement('span'); h_3.innerHTML = 'Port ' + this_fxs_port + ' :&nbsp;' ;
+					var h_2 = h_2_orig.cloneNode(true);
+						h_2.id = 'sig_analog_port_' + this_fxs_port ;
+						h_2.selectedIndex = ( ASTGUI.miscFunctions.ArrayContains(parent.sessionData.PORTS_SIGNALLING.ls, this_fxs_port ) ) ?  1 : 0 ;
+				newcell.appendChild( h_3 );
+				newcell.appendChild( h_2 );
+				newcell.align = 'center';
+				addCell( newRow , { html: tmp_user_str });
+
+			} );
+
+
+			parent.sessionData.FXO_PORTS_DETECTED.each( function( this_fxo_port ){
+				var newRow = tbl.insertRow(-1);
+				newRow.className = "odd";
+				var tmp_user_str = '<font color=red>unassigned</font>';
+				var atrunks = parent.sessionData.pbxinfo['trunks']['analog'] ;
+				for( var this_trunk in atrunks ){
+					if( atrunks.hasOwnProperty(this_trunk) ){
+						var tmp = atrunks[this_trunk].getProperty('zapchan').split(',') ;
+						if(  tmp.contains(this_fxo_port) ){
+							tmp_user_str = atrunks[this_trunk].getProperty('trunkname') ;
+							break;
+						}
+					}
+				}
+
+				addCell( newRow , { html: '<B>FXO Port </B>', align:'center' });
+
+					var newcell = newRow.insertCell( newRow.cells.length );
+					var h_3 = document.createElement('span'); h_3.innerHTML = 'Port ' + this_fxo_port + ' :&nbsp;' ;
+					var h_2 = h_2_orig.cloneNode(true);
+						h_2.id = 'sig_analog_port_' + this_fxo_port ;
+						h_2.selectedIndex = ( ASTGUI.miscFunctions.ArrayContains(parent.sessionData.PORTS_SIGNALLING.ls, this_fxo_port ) ) ?  1 : 0 ;
+				newcell.appendChild( h_3 );
+				newcell.appendChild( h_2 );
+				newcell.align = 'center';
+
+				addCell( newRow , { html: tmp_user_str });
+			});
+		})();
+	}
+
+	(function(){ // load tonezone/loadzone
+		// we parse zaptel.conf to get the loadzone
+		var tmp_file = ASTGUI.globals.zaptelIncludeFile;
+		var parseZaptelconf = function(zp){
+			var t = zp['general'] ; // t is an array
+			var line = '';
+			_$('loadZone').selectedIndex = 0;
+			for( var g=0; g < t.length; g++ ){
+				line = t[g];
+				try{
+					if( line.beginsWith('loadzone=')) {
+						ASTGUI.selectbox.selectOption( _$('loadZone'), line.lChop('loadzone=') );
+						return;
+					}
+				}catch(err){
+					_$('loadZone').selectedIndex = 0;
+				}
+			}
+		};
+		var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=' + tmp_file , async: false }).responseText;
+		if( s.contains('Response: Error') && s.contains('Message: Config file not found') ){
+			ASTGUI.systemCmd( "touch /etc/asterisk/" + tmp_file, function(){
+				var u = new listOfSynActions(tmp_file) ;
+				u.new_action('delcat', 'general', "", ""); 
+				u.new_action('newcat', 'general', "", ""); 
+				u.new_action('update', 'general', '#include "../zaptel.conf" ;', ' ;');
+				u.callActions();
+				var q = config2json({filename:tmp_file, usf:0});
+				parseZaptelconf(q);
+			});
+			return;
+		}else{
+			var q = config2json({ configFile_output:s , usf:0 });
+			if( q.hasOwnProperty('general') ){
+				parseZaptelconf(q);
+			}
+		}
+		ASTGUI.debugLog("end of function: loadConfigFiles.load_zaptel_conf()" , 'parse');
+	})();
+
+	(function(){ // load modprobe settings
+		ASTGUI.selectbox.populateOptions ( 'vpmnlpthresh', 50) ;
+		ASTGUI.selectbox.populateOptions ( 'vpmnlpmaxsupp', 50) ;
+		ASTGUI.selectbox.insert_before('vpmnlpmaxsupp', '0', '0', 0) ;
+	
+		var c = context2json ({ filename: ASTGUI.globals.configfile , context: 'general', usf: 1 });
+		ASTGUI.updateFieldToValue( 'opermode' , c.getProperty('opermode') );
+		ASTGUI.updateFieldToValue( 'alawoverride' , c.getProperty('alawoverride') );
+		ASTGUI.updateFieldToValue( 'fxshonormode' , c.getProperty('fxshonormode') );
+		ASTGUI.updateFieldToValue( 'boostringer' , c.getProperty('boostringer') );
+		ASTGUI.updateFieldToValue( 'lowpower' , c.getProperty('lowpower') );
+		ASTGUI.updateFieldToValue( 'fastringer' , c.getProperty('fastringer') );
+		ASTGUI.updateFieldToValue( 'fwringdetect' , c.getProperty('fwringdetect') );
+		ASTGUI.updateFieldToValue( 'neonmwi_level' , c.getProperty('neonmwi_level') || '75' );
+		ASTGUI.updateFieldToValue( 'neonmwi_offlimit' , c.getProperty('neonmwi_offlimit') || '16000' );
+		ASTGUI.updateFieldToValue( 'mwimode' , c.getProperty('mwimode') );
+
+		if(c.getProperty('mwimode') == 'NEON')$(".neon_settings").show();
+
+		ASTGUI.events.add( _$('mwimode'), 'change' , function(){
+			if( _$('mwimode').value == 'NEON'){
+				$(".neon_settings").show();
+			}else{
+				$(".neon_settings").hide();
+			}
+		}) ;
+
+		parent.ASTGUI.systemCmd( ' touch /etc/asterisk/applyzap.conf', function(){ // run ztscan and then try loading ztscan.conf
+			setTimeout( function(){ 
+				ASTGUI.systemCmdWithOutput( 'cat /proc/cmdline' , function(output){
+					ASTGUI.dialog.hide();
+					if( output.contains('boardrev=C') ){
+						$('.hidevpm').show();
+						isREVC = true;
+						ASTGUI.updateFieldToValue( 'vpmnlptype' , c.getProperty('vpmnlptype') || '4' );
+						ASTGUI.updateFieldToValue( 'vpmnlpthresh' , c.getProperty('vpmnlpthresh') || '24' );
+						ASTGUI.updateFieldToValue( 'vpmnlpmaxsupp' , c.getProperty('vpmnlpmaxsupp') || '24' );
+					}
+				});
+			} , 700); 
+		});
+		
+	})();
+
+}; // End of load_currentAnalogSettings()
+
+
+</script>
+<body bgcolor="#EFEFEF">
+<div class="iframeTitleBar">
+	<span id='iframeTitleBar_title'> Analog Hardware Setup & Configuration </span>
+	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+</div>
+
+	<div class="pageheading">Analog Hardware</div>
+	<table id="FXSFXO_ports_td" cellpadding=0 cellspacing=0 align=center border=0 class='taglist' width=480></table>
+	<div style='text-align:center; width:100%'>
+		<B>Tone Region <img src="images/tooltip_info.gif" tip="en,confighw,0" class='tooltipinfo'> : </B>
+		<select id="loadZone">
+			<option value="us">North America -- United States/Canada
+			<option value="us-old">North America -- United States Circa 1950
+			<option value="ar">Argentina</option>
+			<option value="au">Australia</option>
+			<option value="at">Austria</option>
+			<option value="be">Belgium</option>
+			<option value="br">Brazil</option>
+			<option value="bg">Bulgaria</option>
+			<option value="cl">Chile</option>
+			<option value="cn">China</option>
+			<option value="cz">Czech Republic</option>
+			<option value="dk">Denmark</option>
+			<option value="ee">Estonia</option>
+			<option value="fi">Finland</option>
+			<option value="fr">France</option>
+			<option value="de">Germany</option>
+			<option value="gr">Greece</option>
+			<option value="hu">Hungary</option>
+			<option value="in">India</option>
+			<option value="il">Israel</option>
+			<option value="it">Italy</option>
+			<option value="jp">Japan</option>
+			<option value="lt">Lithuania</option>
+			<option value="my">Malaysia</option>
+			<option value="mx">Mexico</option>
+			<option value="nl">Netherlands</option>
+			<option value="nz">New Zealand</option>
+			<option value="no">Norway</option>
+			<option value="ph">Philippines</option>
+			<option value="pl">Poland</option>
+			<option value="pt">Portugal</option>
+			<option value="ru">Russian Federation</option>
+			<option value="sg">Singapore</option>
+			<option value="za">South Africa</option>
+			<option value="es">Spain</option>
+			<option value="se">Sweden</option>
+			<option value="ch">Switzerland</option>
+			<option value="tw">Taiwan</option>
+			<option value="th">Thailand</option>
+			<option value="uk">United Kingdom</option>
+			<option value="ve">Venezuela</option>
+		</select>
+	</div>
+
+
+	<div class="pageheading">Advanced Settings</div>
+
+<table align=center>
+
+<tr><td align=right>Opermode <img src="images/tooltip_info.gif" tip="en,opermode_settings,0" class='tooltipinfo'> : </td>
+	<td>&nbsp;
+	<select id="opermode" dfalt='USA'>
+		<option value="USA">USA</option>
+		<option value="ARGENTINA">ARGENTINA</option>
+		<option value="AUSTRALIA">AUSTRALIA</option>
+		<option value="AUSTRIA">AUSTRIA</option>
+		<option value="BAHRAIN">BAHRAIN</option>
+		<option value="BELGIUM">BELGIUM</option>
+		<option value="BRAZIL">BRAZIL</option>
+		<option value="BULGARIA">BULGARIA</option>
+		<option value="CANADA">CANADA</option>
+		<option value="CHILE">CHILE</option>
+		<option value="CHINA">CHINA</option>
+		<option value="COLUMBIA">COLUMBIA</option>
+		<option value="CROATIA">CROATIA</option>
+		<option value="CYRPUS">CYRPUS</option>
+		<option value="CZECH">CZECH</option>
+		<option value="DENMARK">DENMARK</option>
+		<option value="ECUADOR">ECUADOR</option>
+		<option value="EGYPT">EGYPT</option>
+		<option value="ELSALVADOR">ELSALVADOR</option>
+		<option value="FCC">FCC</option>
+		<option value="FINLAND">FINLAND</option>
+		<option value="FRANCE">FRANCE</option>
+		<option value="GERMANY">GERMANY</option>
+		<option value="GREECE">GREECE</option>
+		<option value="GUAM">GUAM</option>
+		<option value="HONGKONG">HONGKONG</option>
+		<option value="HUNGARY">HUNGARY</option>
+		<option value="ICELAND">ICELAND</option>
+		<option value="INDIA">INDIA</option>
+		<option value="INDONESIA">INDONESIA</option>
+		<option value="IRELAND">IRELAND</option>
+		<option value="ISRAEL">ISRAEL</option>
+		<option value="ITALY">ITALY</option>
+		<option value="JAPAN">JAPAN</option>
+		<option value="JORDAN">JORDAN</option>
+		<option value="KAZAKHSTAN">KAZAKHSTAN</option>
+		<option value="KUWAIT">KUWAIT</option>
+		<option value="LATVIA">LATVIA</option>
+		<option value="LEBANON">LEBANON</option>
+		<option value="LUXEMBOURG">LUXEMBOURG</option>
+		<option value="MACAO">MACAO</option>
+		<option value="MALAYSIA">MALAYSIA</option>
+		<option value="MALTA">MALTA</option>
+		<option value="MEXICO">MEXICO</option>
+		<option value="MOROCCO">MOROCCO</option>
+		<option value="NETHERLANDS">NETHERLANDS</option>
+		<option value="NEWZEALAND">NEWZEALAND</option>
+		<option value="NIGERIA">NIGERIA</option>
+		<option value="NORWAY">NORWAY</option>
+		<option value="OMAN">OMAN</option>
+		<option value="PAKISTAN">PAKISTAN</option>
+		<option value="PERU">PERU</option>
+		<option value="PHILIPPINES">PHILIPPINES</option>
+		<option value="POLAND">POLAND</option>
+		<option value="PORTUGAL">PORTUGAL</option>
+		<option value="ROMANIA">ROMANIA</option>
+		<option value="RUSSIA">RUSSIA</option>
+		<option value="SAUDIARABIA">SAUDIARABIA</option>
+		<option value="SINGAPORE">SINGAPORE</option>
+		<option value="SLOVAKIA">SLOVAKIA</option>
+		<option value="SLOVENIA">SLOVENIA</option>
+		<option value="SOUTHAFRICA">SOUTHAFRICA</option>
+		<option value="SOUTHKOREA">SOUTHKOREA</option>
+		<option value="SPAIN">SPAIN</option>
+		<option value="SWEDEN">SWEDEN</option>
+		<option value="SWITZERLAND">SWITZERLAND</option>
+		<option value="SYRIA">SYRIA</option>
+		<option value="TAIWAN">TAIWAN</option>
+		<option value="TBR21">TBR21</option>
+		<option value="THAILAND">THAILAND</option>
+		<option value="UAE">UAE</option>
+		<option value="UK">UK</option>
+		<option value="YEMEN">YEMEN</option>
+	</select>
+	</td>
+</tr>
+
+<tr><td align=right>a-law override <img src="images/tooltip_info.gif" tip="en,opermode_settings,1" class='tooltipinfo'> : </td>
+	<td>&nbsp;
+		<select id="alawoverride" dfalt='0'>
+			<option value="0">ulaw</option>
+			<option value="1">alaw</option>
+		</select>
+	</td>
+</tr>
+<tr><td align=right>fxs honor mode <img src="images/tooltip_info.gif" tip="en,opermode_settings,2" class='tooltipinfo'> : </td>
+	<td>&nbsp;
+		<select id="fxshonormode" dfalt='0'>
+			<option value="0">apply opermode to fxo modules only </option>
+			<option value="1">apply opermode to fxs and fxo modules</option>
+		</select>
+	</td>
+</tr>
+
+<tr><td align=right>boostringer <img src="images/tooltip_info.gif" tip="en,opermode_settings,3" class='tooltipinfo'> : </td>
+	<td>&nbsp;
+		<select id="boostringer" dfalt='0'>
+			<option value="0">normal</option>
+			<option value="1">peek(89V)</option>
+		</select>
+	</td>
+</tr>
+<tr><td align=right>fastringer <img src="images/tooltip_info.gif" tip="en,opermode_settings,5" class='tooltipinfo'> : </td>
+	<td>&nbsp;
+		<select id="fastringer" dfalt='0'>
+			<option value="0">normal</option>
+			<option value="1">fast ringer (25hz) </option>
+		</select>
+	</td>
+</tr>
+<tr><td align=right>lowpower <img src="images/tooltip_info.gif" tip="en,opermode_settings,4" class='tooltipinfo'> : </td>
+	<td>&nbsp;
+		<select id="lowpower" dfalt='0'>
+			<option value="0">normal</option>
+			<option value="1">fast ringerto 50V peek</option>
+		</select>
+	</td>
+</tr>
+<tr>	<td align=right>ring detect <img src="images/tooltip_info.gif" tip="en,opermode_settings,6" class='tooltipinfo'> : </td>
+	<td>&nbsp;
+		<select id="fwringdetect" dfalt='0'>
+			<option value='0'>standard</option>
+			<option value='1'>full wave</option>
+		</select>
+	</td>
+</tr>
+<tr>	<td align=right>MWI mode <img src="images/tooltip_info.gif" tip="en,opermode_settings,7" class='tooltipinfo'> : </td>
+	<td>&nbsp;
+		<select id="mwimode" dfalt='none'>
+			<option value='none'>None</option>
+			<option value='FSK'>FSK</option>
+			<option value='NEON'>NEON</option>
+		</select>
+	</td>
+</tr>
+
+<tr class='neon_settings' style='display:none'>
+	<td align=right>Neon MWI voltage Level :</td>
+	<td>&nbsp;<input id="neonmwi_level" size=2></td>
+</tr>
+
+<tr class='neon_settings' style='display:none'>
+	<td align=right>Neon MWI off Limit (ms) :</td>
+	<td>&nbsp;<input id="neonmwi_offlimit" size=4></td>
+</tr>
+
+<tr class='hidevpm'>
+	<td></td>
+	<td height=35 valign=middle><B>&nbsp;VPM Settings:&nbsp;</B></td>
+</tr>
+<tr class='hidevpm'>
+	<td align=right>Echo Cancellation NLP Type <img src="images/tooltip_info.gif" tip="en,opermode_settings,8" class='tooltipinfo'> :</td>
+	<td>&nbsp;
+		<select id="vpmnlptype">
+			<option value='0'>None</option>
+			<option value='1'>Mute</option>
+			<option value='2'>Random Noise</option>
+			<option value='3'>Hoth Noise</option>
+			<option value='4'>Suppression NLP (default)</option>
+		</select>
+	</td>
+</tr>
+<tr class='hidevpm'>
+	<td align=right>Echo Cancellation NLP Threshold <img src="images/tooltip_info.gif" tip="en,opermode_settings,9" class='tooltipinfo'> :</td>
+	<td>&nbsp;
+		<select id="vpmnlpthresh"></select>
+	</td>
+</tr>
+<tr class='hidevpm'>
+	<td align=right>Echo Cancellation NLP Max Suppression <img src="images/tooltip_info.gif" tip="en,opermode_settings,10" class='tooltipinfo'> :</td>
+	<td>&nbsp;
+		<select id="vpmnlpmaxsupp"></select>
+	</td>
+</tr>
+
+</table>
+
+
+<div style='text-align:center; width:100%'>
+	<BR>
+	<span class='guiButtonCancel' id="cancel_b" onclick='window.location.reload();'>Cancel Changes</span>
+	<span class='guiButtonEdit' id="save_b"  onclick='applySettings.updateZaptel();'>Update Settings</span>&nbsp;&nbsp;
+</div>
+
+<div id="errmsg" style="display:none"></div>
+
+</body>
+</html>

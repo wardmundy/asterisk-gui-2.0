@@ -90,13 +90,13 @@ HTTPBINDPORT?=$(shell cat $(ASTETCDIR)/http.conf  2>/dev/null | grep -v ^\; | gr
 ifeq ($(HTTPBINDPORT),)
   HTTPBINDPORT:=8088
 endif
-HTTPPREFIXBASE?=$(shell cat $(ASTETCDIR)/http.conf  2>/dev/null | grep -v ^\; | grep prefix | sed 's/ //g')
+HTTPPREFIXBASE?=$(shell cat $(ASTETCDIR)/http.conf  2>/dev/null | grep -v ^\; | grep prefix )
 HTTPPREFIX?=$(shell echo $(HTTPPREFIXBASE) | cut -f 2 -d '=')
 ifeq ($(HTTPPREFIXBASE),)
   HTTPPREFIX:=asterisk
 endif
-HTTPURL:=http://$(HTTPHOST):$(HTTPBINDPORT)/$(HTTPPREFIX)/static/config/index.html
-HTTPLOCALURL:=http://localhost:$(HTTPBINDPORT)/$(HTTPPREFIX)/static/config/index.html
+HTTPURL:=http://$(HTTPHOST):$(HTTPBINDPORT)$(HTTPPREFIX)/static/config/cfgbasic.html
+HTTPLOCALURL:=http://localhost:$(HTTPBINDPORT)$(HTTPPREFIX)/static/config/cfgbasic.html
 	
 #SUBDIRS:=tools
 SUBDIRS_CLEAN:=$(SUBDIRS:%=%-clean)

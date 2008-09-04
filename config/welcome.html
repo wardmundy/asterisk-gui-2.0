@@ -380,9 +380,18 @@ var localajaxinit = function(){
 		updateListingsTable();
 		updateTrunkslisting();
 		update_needsConfiguratin_list();
-
-		ASTGUI.systemCmdWithOutput( 'uptime' , function(a){ document.getElementById('SYS_status_div').innerHTML = 'Uptime : ' + a.trim() ; } );	
-
+	
+		(function(){
+			if( parent.sessionData.PLATFORM.isAA50 ) {
+				ASTGUI.systemCmdWithOutput( 'firmware_version' , function(a){
+					_$('firmware_div').innerHTML = 'Firmware : v' + a.trim() ;
+				});
+			}else{
+				ASTGUI.systemCmdWithOutput( 'uptime' , function(a){
+					_$('firmware_div').innerHTML = 'Uptime : ' + a.trim() ;
+				});
+			}
+		})();	
 	};
 
 	ST = setInterval( loadIfeverythingParsed , 200 );
@@ -396,7 +405,7 @@ var localajaxinit = function(){
 </div>
 
 	<div class='lite_Heading'>System Status</div>
-	<div style='width: 100%; text-align:center;' id='SYS_status_div'></div>
+	<div style='width: 100%; text-align:center;' id='firmware_div'></div>
 
 
 	<div style='width:100%; text-align:center; margin-top:10px;'><B>Trunks</B></div>

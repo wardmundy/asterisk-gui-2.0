@@ -92,6 +92,18 @@ var onUploadForm_unload = function(){
 var localajaxinit = function() {
 	top.document.title = 'Manage Music-On-Hold Files';
 	manage_moh.load_mohClasses();
+	if( parent.sessionData.PLATFORM.isAA50 && !parent.sessionData.hasCompactFlash ){
+		$('#nocf').show();
+		$('#thispageContent').hide();
+		_$('label_selectedClass').style.display = 'none';
+		_$('moh_classes').style.display = 'none';
+		_$('mohclass_addButton').style.display = 'none';
+		_$('mohclass_deleteButton').style.display = 'none';
+		return true;
+	}
+	if( parent.sessionData.PLATFORM.isAA50 ){
+		$('#uploadForm_container legend')[0].innerHTML = '<B>&nbsp;Upload an 8 KHz Mono Music file (less than 10 Mb):&nbsp;</B>';
+	}
 	ASTGUI.events.add( 'moh_classes' , 'change' , manage_moh.select_MohClass );
 };
 
@@ -281,6 +293,8 @@ var manage_moh = {
 	Select a MOH class name to manage the files in that class. <BR>
 	You can create a new class by clicking on the 'New MOH class' button.
 </div>
+
+<div style='display:none;' id='nocf'> You need a&nbsp;&nbsp;<b>CompactFlash&reg;</b>&nbsp;&nbsp;to use this feature </div>
 
 <div id='thispageContent' style='display:none;'>
 	<fieldset style="padding: 10px; font-size: 13px; width: 745px" id='uploadForm_container'>
