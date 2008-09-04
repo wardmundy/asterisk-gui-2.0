@@ -1,0 +1,549 @@
+<!--
+ * Asterisk-GUI	- an Asterisk configuration interface
+ *
+ * Configuration for Queues
+ *
+ * Copyright (C) 2006-2008, Digium, Inc.
+ *
+ * Mark Spencer <markster@digium.com>
+ * Pari Nannapaneni <pari@digium.com>
+ *
+ * See http://www.asterisk.org for more information about
+ * the Asterisk project. Please do not directly contact
+ * any of the maintainers of this project for assistance;
+ * the project provides a web site, mailing lists and IRC
+ * channels for your use.
+ *
+ * This program is free software, distributed under the terms of
+ * the GNU General Public License Version 2. See the LICENSE file
+ * at the top of the source tree.
+ *
+-->
+<script src="js/jquery.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<script src="js/astman.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+	#table_queueslist {
+		border: 1px solid #666666;
+		margin-top: 5px;
+		margin-bottom:10px;
+		width: 96%;
+		text-align: center;
+		padding : 1px;
+	}
+
+	#table_queueslist tr.frow { background: #6b79a5; color: #CED7EF; }
+	#table_queueslist tr.frow td{ font-weight:bold; }
+	#table_queueslist tr td{ padding : 3px; }
+	#table_queueslist tr.even { background: #DFDFDF; }
+	#table_queueslist tr.odd{ background: #FFFFFF; }
+	#table_queueslist tr.even:hover, #table_queueslist tr.odd:hover {
+		background: #a8b6e5;
+		cursor: default;
+	}
+
+
+</style>
+<script>
+var isNewQueue ;
+var EDIT_Queue ;
+var ag_chkbxClass = "agents_Chkboxes";
+var QUEUES_CONF ;
+var loginsettings = { agentLogin_line: '' , agentCallbackLogin_line: ''};
+
+var QueueExistsbyThisName = function( thisName ){
+	var m = parent.sessionData.pbxinfo.queues ;
+	for( l in m ){ if( m.hasOwnProperty(l) && QUEUES_CONF.hasOwnProperty(l) ){
+		if ( isNewQueue == true && QUEUES_CONF[l].getProperty('fullname') == thisName ){
+			return true;
+		}
+		if ( isNewQueue == false && l != EDIT_Queue && QUEUES_CONF[l].getProperty('fullname') == thisName ){
+			return true;
+		}
+	}}
+	return false;
+};
+
+
+var loadDOMElements = function(){
+	DOM_table_ql = _$('table_queueslist');
+	DOM_edit_agents_chboxes = _$('edit_agents_chboxes');
+
+	DOM_edit_QueueDiv = _$('edit_QueueDiv');
+	DOM_edit_QueueDiv_title = _$('edit_QueueDiv_title');
+	DOM_Queue_Ext = _$('edit_Ext'); // text box
+	DOM_edit_label = _$('edit_label'); // text box
+	DOM_edit_strategy = _$('edit_strategy'); // select
+	DOM_edit_musicclass = _$('edit_musicclass'); // select
+	DOM_edit_timeout = _$('edit_timeout'); // text
+	DOM_edit_wrapuptime = _$('edit_wrapuptime'); // text
+	DOM_edit_maxlen = _$('edit_maxlen'); // text
+	DOM_edit_autofill = _$('edit_autofill'); // chkbox
+	DOM_edit_autopause = _$('edit_autopause'); // chkbox
+	DOM_edit_joinempty = _$('edit_joinempty'); // chkbox
+	DOM_edit_leavewhenempty = _$('edit_leavewhenempty'); // chkbox
+	DOM_edit_reportholdtime = _$('edit_reportholdtime'); // chkbox
+
+};
+
+var updateQueuesTable = function(){
+	var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
+	(function(){ // add first row
+		var newRow = DOM_table_ql.insertRow(-1);
+		newRow.className = "frow";
+		addCell( newRow , { html:'', width:'15px'} );
+		addCell( newRow , { html:'Queue'} );
+		addCell( newRow , { html:'Label'} );
+		addCell( newRow , { html:'Strategy'} );
+		addCell( newRow , { html:''} );
+	})();
+	(function(){
+		var m = parent.sessionData.pbxinfo.queues ;
+		for( l in m ){ if( m.hasOwnProperty(l) ){
+			if( m[l]['configLine'].contains(',1,agentlogin()') ){
+				loginsettings.agentLogin_line = m[l]['configLine'];
+				_$('login_exten').value = ASTGUI.parseContextLine.getExten(m[l]['configLine']) ;
+				continue;
+			}
+			if( m[l]['configLine'].contains(',1,agentcallbacklogin()') ){
+				loginsettings.agentCallbackLogin_line = m[l]['configLine'];
+				_$('login_callback_exten').value = ASTGUI.parseContextLine.getExten(m[l]['configLine']);
+				continue;
+			}
+
+			var newRow = DOM_table_ql.insertRow(-1);
+			newRow.className = ((DOM_table_ql.rows.length)%2==1)?'odd':'even';
+			var tmp = "<span class='guiButton' onclick=\"editQueue_form('" + l +"')\">Edit</span>&nbsp;"
+					+ "<span class='guiButtonDelete' onclick=\"delete_Queue_confirm('" + l +"')\">Delete</span>" ;
+			addCell( newRow , { html:''} );
+			addCell( newRow , { html: l } );
+			addCell( newRow , { html: QUEUES_CONF[l].getProperty('fullname') }); // Label
+			addCell( newRow , { html: QUEUES_CONF[l].getProperty('strategy') }); // Strategy
+			addCell( newRow , { html: tmp } ); // Edit Options
+		}}
+	})();
+	(function(){
+		if( DOM_table_ql.rows.length == 1 ){
+			ASTGUI.domActions.clear_table(DOM_table_ql);
+			var newRow = DOM_table_ql.insertRow(-1);
+			newRow.className = 'even';
+			addCell( newRow , { html:'No Call Queues defined !!'} );
+			return ;
+		}
+	})();
+
+};
+
+var delete_Queue_confirm = function(q){
+	if(!confirm("Delete Queue "+ q + " ?")) { return true; }
+	var u = new listOfSynActions('extensions.conf');
+	if( parent.sessionData.pbxinfo.queues[q].hasOwnProperty('isOLDGUI') && parent.sessionData.pbxinfo.queues[q].isOLDGUI == true ){
+		u.new_action( 'delete', 'default', 'exten', '' , parent.sessionData.pbxinfo.queues[q]['configLine'] );
+	}
+	u.new_action( 'delete', ASTGUI.contexts.QUEUES, 'exten', '' , parent.sessionData.pbxinfo.queues[q]['configLine'] );
+	u.callActions();
+	var w = new listOfSynActions('queues.conf') ;
+	w.new_action('delcat', q, '', '');
+	w.callActions();
+	delete parent.sessionData.pbxinfo.queues[q] ;
+	ASTGUI.feedback({ msg:'Queue deleted!', showfor:2 , color:'red', bgcolor:'#FFFFFF' });
+	window.location.reload();
+};
+
+
+var newQueue_form = function(){
+	isNewQueue = true ;
+	EDIT_Queue = '' ;
+	show_Queue_Form();
+};
+
+
+var editQueue_form = function(k){
+	isNewQueue = false ;
+	EDIT_Queue = k ;
+	show_Queue_Form();
+};
+
+
+var show_Queue_Form = function(){
+	if(isNewQueue == true){
+
+		ASTGUI.resetTheseFields([ DOM_Queue_Ext, DOM_edit_label ,DOM_edit_strategy , DOM_edit_musicclass , DOM_edit_timeout , DOM_edit_wrapuptime , DOM_edit_maxlen , DOM_edit_autofill , DOM_edit_autopause , DOM_edit_joinempty , DOM_edit_leavewhenempty , DOM_edit_reportholdtime ]); // reset all fields
+		ASTGUI.domActions.unCheckAll( ag_chkbxClass );
+		DOM_Queue_Ext.disabled = false;
+		var tmp_ql = parent.sessionData.pbxinfo.queues.getOwnProperties();
+		DOM_Queue_Ext.value  = tmp_ql.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('qe_start') );
+		DOM_edit_QueueDiv_title.innerHTML = 'New Queue';
+		$(DOM_edit_QueueDiv).showWithBg();
+		ASTGUI.feedback({ msg:'Create New Queue!', showfor:2 });
+		ASTGUI.updateFieldToValue(DOM_edit_musicclass, 'default' );
+		return;
+	}
+
+	DOM_Queue_Ext.value = EDIT_Queue ; DOM_Queue_Ext.disabled = true ;
+	DOM_edit_QueueDiv_title.innerHTML = 'Edit Queue ' + EDIT_Queue ;
+	// load values for all other fields
+
+	ASTGUI.updateFieldToValue(DOM_edit_label, QUEUES_CONF[EDIT_Queue].getProperty('fullname') );
+	ASTGUI.updateFieldToValue(DOM_edit_strategy, QUEUES_CONF[EDIT_Queue].getProperty('strategy') );
+	ASTGUI.updateFieldToValue(DOM_edit_musicclass, QUEUES_CONF[EDIT_Queue].getProperty('musicclass') );
+	ASTGUI.updateFieldToValue(DOM_edit_timeout, QUEUES_CONF[EDIT_Queue].getProperty('timeout') );
+	ASTGUI.updateFieldToValue(DOM_edit_wrapuptime, QUEUES_CONF[EDIT_Queue].getProperty('wrapuptime') );
+	ASTGUI.updateFieldToValue(DOM_edit_maxlen, QUEUES_CONF[EDIT_Queue].getProperty('maxlen') );
+	ASTGUI.updateFieldToValue(DOM_edit_autofill, QUEUES_CONF[EDIT_Queue].getProperty('autofill') );
+	ASTGUI.updateFieldToValue(DOM_edit_autopause, QUEUES_CONF[EDIT_Queue].getProperty('autopause') );
+	ASTGUI.updateFieldToValue(DOM_edit_joinempty, QUEUES_CONF[EDIT_Queue].getProperty('joinempty') );
+	ASTGUI.updateFieldToValue(DOM_edit_leavewhenempty, QUEUES_CONF[EDIT_Queue].getProperty('leavewhenempty') );
+	ASTGUI.updateFieldToValue(DOM_edit_reportholdtime, QUEUES_CONF[EDIT_Queue].getProperty('reportholdtime') );
+	ASTGUI.domActions.checkSelected( ag_chkbxClass, (QUEUES_CONF[EDIT_Queue].getProperty('member')) ? QUEUES_CONF[EDIT_Queue]['member'].split(',') :[] ) ;
+	ASTGUI.feedback({ msg:'Edit Queue !', showfor:2 });
+
+	ASTGUI.showbg(true);
+	DOM_edit_QueueDiv.style.display = '';
+};
+
+
+var edit_queue_apply = function(){
+	var cat = ASTGUI.getFieldValue(DOM_Queue_Ext);
+	var configLine = cat + ',1,Queue(${EXTEN})';
+	if ( !ASTGUI.checkRequiredFields([ DOM_Queue_Ext , DOM_edit_label, DOM_edit_strategy]) ){
+		return ;
+	}
+	if( !ASTGUI.validateFields(['edit_Ext', DOM_edit_label , 'edit_timeout','edit_wrapuptime','edit_maxlen']) ){
+		return ;
+	}
+
+	if( QueueExistsbyThisName( ASTGUI.getFieldValue(DOM_edit_label) ) ){
+		ASTGUI.highlightField( DOM_edit_label , 'There is another queue by this name !');
+		return;
+	}
+
+	if( isNewQueue == true ){
+		if(!ASTGUI.miscFunctions.isExtensionInRange( cat ,'qe_start','qe_end')){
+			ASTGUI.highlightField(DOM_Queue_Ext, 'Extension is not in preferred range');
+			parent.ASTGUI.dialog.hide();
+			return;
+		}
+
+		if( parent.miscFunctions.ifExtensionAlreadyExists(cat) ){
+			ASTGUI.highlightField(DOM_Queue_Ext, 'Extension already exists');
+			parent.ASTGUI.dialog.hide();
+			return;
+		}
+
+		var u = new listOfSynActions('extensions.conf') ;
+		u.new_action('append', ASTGUI.contexts.QUEUES, 'exten', configLine );
+		u.callActions();
+	}else{
+		if( parent.sessionData.pbxinfo.queues[cat].hasOwnProperty('isOLDGUI') && parent.sessionData.pbxinfo.queues[cat].isOLDGUI == true ){
+			var u = new listOfSynActions('extensions.conf');
+			u.new_action( 'delete', 'default', 'exten', '' , parent.sessionData.pbxinfo.queues[cat].configLine );
+			u.new_action( 'append', ASTGUI.contexts.QUEUES, 'exten', configLine );
+			u.callActions();
+			delete parent.sessionData.pbxinfo.queues[cat].isOLDGUI ;
+		}
+	}
+
+	var x = new listOfActions('queues.conf');
+	x.new_action('delcat', cat, '', '');
+	x.new_action('newcat', cat, '', ''); // create new context
+	x.new_action('append', cat, 'fullname', ASTGUI.getFieldValue(DOM_edit_label));
+	x.new_action('append', cat, 'strategy', ASTGUI.getFieldValue(DOM_edit_strategy));
+	x.new_action('append', cat, 'timeout', ASTGUI.getFieldValue(DOM_edit_timeout));
+	x.new_action('append', cat, 'wrapuptime', ASTGUI.getFieldValue(DOM_edit_wrapuptime));
+	x.new_action('append', cat, 'autofill', ASTGUI.getFieldValue(DOM_edit_autofill));
+	x.new_action('append', cat, 'autopause', ASTGUI.getFieldValue(DOM_edit_autopause));
+	x.new_action('append', cat, 'joinempty', ASTGUI.getFieldValue(DOM_edit_joinempty));
+	x.new_action('append', cat, 'leavewhenempty', ASTGUI.getFieldValue(DOM_edit_leavewhenempty));
+	x.new_action('append', cat, 'reportholdtime', ASTGUI.getFieldValue(DOM_edit_reportholdtime));
+	x.new_action('append', cat, 'maxlen', ASTGUI.getFieldValue(DOM_edit_maxlen));
+	x.new_action('append', cat, 'musicclass', ASTGUI.getFieldValue(DOM_edit_musicclass));
+
+	var ags = ASTGUI.domActions.get_checked(ag_chkbxClass) ;
+	ags.each( function(ag){
+		x.new_action('append', cat, 'member', ag );
+	});
+	
+	var after = function(){
+		if( isNewQueue == true ){
+			parent.sessionData.pbxinfo.queues[cat] = new ASTGUI.customObject ;
+			parent.sessionData.pbxinfo.queues[cat]['configLine'] = configLine;
+		}
+
+		ASTGUI.feedback({ msg:'Changes Saved !', showfor:2 , color:'green', bgcolor:'#FFFFFF' });
+		window.location.reload();
+	};
+	x.callActions(after);
+};
+
+
+
+var load_agents_checkboxes = function(){
+	var ul = parent.astgui_manageusers.listOfUsers();
+	var ul_agents = {};
+	var agent_count = 0 ;
+	ul.each(function(user){
+		if( parent.sessionData.pbxinfo.users[user]['hasagent'] && parent.sessionData.pbxinfo.users[user]['hasagent'].isAstTrue() ){
+			agent_count++;
+			ul_agents['Agent/' + user] = parent.sessionData.pbxinfo.users[user]['fullname'] + ' (' + user  + ')';
+		}
+	});
+
+	if(!agent_count){
+		var tmp_span = document.createElement('span');
+		tmp_span.innerHTML = 'You do not have any users defined as agents !<BR> <A href=#>click here</A> to manage users.';
+		$(DOM_edit_agents_chboxes).css( 'border', '1px solid #CDCDCD' );
+		$(DOM_edit_agents_chboxes).css( 'text-align', 'center' );
+		ASTGUI.events.add( tmp_span , 'click' , function(){
+			$(DOM_edit_QueueDiv).hideWithBg();
+			parent.miscFunctions.click_panel('users.html');
+		});
+		DOM_edit_agents_chboxes.appendChild(tmp_span);
+	}else{
+		ASTGUI.domActions.populateCheckBoxes( DOM_edit_agents_chboxes , ul_agents, ag_chkbxClass, true);
+	}
+};
+
+
+var localajaxinit = function(){
+	top.document.title = 'Manage call Queues' ;
+	if( !ASTGUI.miscFunctions.alertIfRangeisNotdefined('qe_start','qe_end', 'Queues') ){
+		$('#div_AgentLoginSettings').hide();
+		$('.top_buttons').hide();
+		return;
+	}
+	(function(){
+		var t = [
+			{url:'#', desc:'Queues', click_function: function(){ $('#div_ListOfQueues').show(); $('#div_AgentLoginSettings').hide(); }  } ,
+			{url:'#', desc:'Agent Login Settings', click_function: function(){ $('#div_ListOfQueues').hide(); $('#div_AgentLoginSettings').show();} }
+		];
+		ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
+		$('#tabbedMenu').find('A:eq(0)').click();
+
+		var mcls = config2json({filename: 'musiconhold.conf', catlist:'yes'});
+		mcls.each( function(this_class){
+			ASTGUI.selectbox.append('edit_musicclass', this_class, this_class );
+		});
+		_$('edit_musicclass').selectedIndex = -1 ;
+
+	} )();
+
+	loadDOMElements();
+	load_agents_checkboxes();
+	QUEUES_CONF = config2json({filename:'queues.conf', usf:1});
+	updateQueuesTable();
+}
+
+var save_QueueSettings = function(){
+	var u = new listOfSynActions('extensions.conf') ;
+	var le = ASTGUI.getFieldValue('login_exten') ;
+	var lce = ASTGUI.getFieldValue('login_callback_exten') ;
+	if( !ASTGUI.validateFields(['login_exten', 'login_callback_exten']) ){
+		return ;
+	}
+	if( le && le == lce ){
+		ASTGUI.highlightField('login_exten' , 'Extension already exists');
+		return;
+	}
+
+	if(loginsettings.agentLogin_line){
+		var OLD_EXT = ASTGUI.parseContextLine.getExten( loginsettings.agentLogin_line ) ;
+		if( le != OLD_EXT && parent.miscFunctions.ifExtensionAlreadyExists(le) ){
+			ASTGUI.highlightField('login_exten' , 'Extension already exists');
+			parent.ASTGUI.dialog.hide();
+			return;
+		}
+		u.new_action('delete', ASTGUI.contexts.QUEUES , 'exten', '', loginsettings.agentLogin_line );
+		if( parent.sessionData.pbxinfo.queues[OLD_EXT].hasOwnProperty('isOLDGUI') &&  parent.sessionData.pbxinfo.queues[OLD_EXT].isOLDGUI == true ){
+			u.new_action('delete', 'default' , 'exten', '', loginsettings.agentLogin_line );
+			delete parent.sessionData.pbxinfo.queues[OLD_EXT].isOLDGUI;
+		}
+ 		delete parent.sessionData.pbxinfo.queues[OLD_EXT] ;
+	}
+	if(le){
+		u.new_action('append', ASTGUI.contexts.QUEUES , 'exten',  le + ',1,agentlogin()');
+		parent.sessionData.pbxinfo.queues[le] = new ASTGUI.customObject;
+		parent.sessionData.pbxinfo.queues[le]['configLine'] = le + ',1,agentlogin()' ;
+	}
+	u.callActions();
+	u.clearActions();
+
+	if(loginsettings.agentCallbackLogin_line){
+		var OLD_EXT = ASTGUI.parseContextLine.getExten( loginsettings.agentCallbackLogin_line ) ;
+		if( lce != OLD_EXT && parent.miscFunctions.ifExtensionAlreadyExists(lce) ){
+			ASTGUI.highlightField('login_callback_exten' , 'Extension already exists');
+			parent.ASTGUI.dialog.hide();
+			return;
+		}
+		u.new_action('delete', ASTGUI.contexts.QUEUES , 'exten', '', loginsettings.agentCallbackLogin_line );
+		if( parent.sessionData.pbxinfo.queues[OLD_EXT].hasOwnProperty('isOLDGUI') &&  parent.sessionData.pbxinfo.queues[OLD_EXT].isOLDGUI == true ){
+			u.new_action('delete', 'default' , 'exten', '', loginsettings.agentCallbackLogin_line );
+			delete parent.sessionData.pbxinfo.queues[OLD_EXT].isOLDGUI;
+		}
+ 		delete parent.sessionData.pbxinfo.queues[OLD_EXT] ;
+	}
+	if(lce){
+		u.new_action('append', ASTGUI.contexts.QUEUES , 'exten', lce + ',1,agentcallbacklogin()');
+		parent.sessionData.pbxinfo.queues[lce] = new ASTGUI.customObject;
+		parent.sessionData.pbxinfo.queues[lce]['configLine'] = lce + ',1,agentcallbacklogin()' ;
+	}
+
+	u.callActions();
+	ASTGUI.feedback({msg:'Changes Saved !', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
+	//window.location.reload();
+};
+
+</script>
+<body bgcolor="#EFEFEF">
+<div class="iframeTitleBar">
+	Queues
+	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+</div>
+
+<div id="tabbedMenu"></div>
+
+<div id='div_AgentLoginSettings' style='margin-top: -10px;'>
+	<table align='left' cellpadding=2 cellspacing=1 width=700>
+	<tr>
+	<td align=center>
+		<table align='center' cellpadding=2 cellspacing=1 width=560>
+			<tr>    <td colspan=2 align=center>
+					<span class='lite_Heading'>Agent Login Settings</span>
+				</td>
+			</tr>
+			<tr>
+				<td align=right width='40%'>Agent Login Extension: </td>
+				<td><input type=text id="login_exten" size=5  field_name='Agent Login Extension' validation='numeric'> 
+					<img src="images/tooltip_info.gif" tip="en,queues,14" class='tooltipinfo'></td>
+			</tr>
+			<tr>	<td align=right>Agent Callback Login Extension: </td>
+				<td><input type=text id="login_callback_exten" size=5  field_name='Agent Callback Login Extension' validation='numeric'>
+					<img src="images/tooltip_info.gif" tip="en,queues,15" class='tooltipinfo'>
+				</td>
+			</tr>
+			<tr>    <td align=right>Agent Logout: </td>
+				<td> To logout of <b>Agent Login</b> Hangup your phone. To Logout of <b>Agent Callback Login</b> Dial the same extension used to login, specify your extension and password when prompted, and hit # when asked for your callback extension. This will successfully log you out of all queues you are a part of.
+				</td>
+			</tr>
+			<tr>    <td></td>
+				<td><span class='guiButton' onclick='save_QueueSettings();'>Save</span>	</td>
+			</tr>
+		</table>
+
+	</td>
+	</tr>
+	</table>
+
+</div>
+
+<div id='div_ListOfQueues'>
+	<div class='top_buttons' style='margin-top: -10px;'>
+		<span class='guiButtonNew' onclick='newQueue_form();'>Create New Queue</span>
+		<span class='lite_Heading' style='margin-left: 170px;'> Manage Queues </span>
+	</div>
+
+	<table id='table_queueslist' cellpadding=0 cellspacing=0 border=0 align=center></table>
+</div>
+
+<div id="edit_QueueDiv" STYLE="width:670;display:none;" class='dialog'>
+	<TABLE width="100%" cellpadding=0 cellspacing=0>
+	<TR class="dialog_title_tr">
+		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);"><span id="edit_QueueDiv_title"></span></TD>
+		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
+	</TR>
+	</TABLE>
+	<TABLE	align=center cellpadding=2 cellspacing=2 border=0 width='100%'>
+		<TR>	<TD align="right">Extension : </TD>
+			<TD><input id="edit_Ext" size=5  field_name='Queue Extension' validation='numeric' required='yes'>
+				<img src="images/tooltip_info.gif" tip="en,queues,0" class='tooltipinfo'>
+			</TD>
+			<td align=right> Name : </td>
+			<TD><input id="edit_label" size=15  field_name='Queue Name' validation='alphanumericUndSpace' required='yes'>
+				<img src="images/tooltip_info.gif" tip="en,queues,1" class='tooltipinfo'>
+			</TD>
+		</TR>
+		<TR>	<TD align=right> Strategy :</td>
+			<td>	<select id='edit_strategy' required='yes' dfalt='ringall'> 
+					<option value="ringall">ringall</option> 
+					<option value="roundrobin">roundrobin</option> 
+					<option value="leastrecent">leastrecent</option> 
+					<option value="fewestcalls">fewestcalls</option> 
+					<option value="random">random</option> 
+					<option value="rrmemory">rrmemory</option> 
+					</select>
+				<img src="images/tooltip_info.gif" tip="en,queues,2" class='tooltipinfo'>
+			</td>
+			<td align=right>Music On Hold :</td>
+			<td><select id="edit_musicclass"></select>
+				<img src="images/tooltip_info.gif" tip="en,queues,13" class='tooltipinfo'>
+			</td>
+		</TR>
+
+		<TR>	<td align=right>LeaveWhenEmpty :</td>
+			<td>	<select id='edit_leavewhenempty' dfalt='no'>
+					<option value='yes'>Yes</option>
+					<option value='no'>No</option>
+					<option value='strict'>Strict</option>
+				</select>
+				<img src="images/tooltip_info.gif" tip="en,queues,11" class='tooltipinfo'>
+			</td>
+			<td align=right>JoinEmpty :</td>
+			<td>	<select id='edit_joinempty' dfalt='yes'>
+					<option value='yes'>Yes</option>
+					<option value='no'>No</option>
+					<option value='strict'>Strict</option>
+				</select>
+				<img src="images/tooltip_info.gif" tip="en,queues,10" class='tooltipinfo'>
+			</td>
+		</TR>
+
+		<tr>	<td align="center" colspan=4>
+				<fieldset style="width: 560px;">
+					<legend>&nbsp;Queue Options:&nbsp;</legend>
+					<table align='center'>
+					<tr>	<td>TimeOut:</td>
+						<td><input size='2' id='edit_timeout'  field_name='TimeOut' validation='numeric' dfalt='15'>
+							<img src="images/tooltip_info.gif" tip="en,queues,5" class='tooltipinfo'>
+						</td>
+						<td>Wrapup Time:</td>
+						<td><input size='2' id='edit_wrapuptime'  field_name='Wrapup Time' validation='numeric' dfalt='15'>
+							<img src="images/tooltip_info.gif" tip="en,queues,6" class='tooltipinfo'>
+						</td>
+						<td>Max Len:</td>
+						<td><input size='2' id='edit_maxlen'  field_name='Max Length' validation='numeric' dfalt='0'>
+							<img src="images/tooltip_info.gif" tip="en,queues,9" class='tooltipinfo'>
+						</td>
+					</tr>
+					<tr>	<td align=right><input type=checkbox id='edit_autofill'>
+							<img src="images/tooltip_info.gif" tip="en,queues,7" class='tooltipinfo'>
+						</td>
+						<td><label for='edit_autofill'>Auto Fill</label></td>
+						<td align=right><input type=checkbox id='edit_autopause'>
+							<img src="images/tooltip_info.gif" tip="en,queues,8" class='tooltipinfo'>
+						</td>
+						<td><label for='edit_autopause'>Auto Pause</label></td>
+
+						<td align=right><input type=checkbox id='edit_reportholdtime'>
+							<img src="images/tooltip_info.gif" tip="en,queues,12" class='tooltipinfo'>
+						</td>
+						<td><label for='edit_reportholdtime'>Report Hold Time</label></td>
+					</tr>
+					</table>
+				</fieldset>
+				</td>
+		</tr>
+		<TR>	<TD align="right" valign=top>Agents: <img src="images/tooltip_info.gif" tip="en,queues,3" class='tooltipinfo'> </TD>
+				<TD colspan=3>
+					<div id='edit_agents_chboxes' style="height:140px; width: 400; border:1px solid #000000; overflow :auto;"></div>
+				</TD>
+		</TR>
+		<TR>	<TD colspan=4 align=center height=50 valign=middle>
+				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
+				<span class='guiButtonEdit' onclick='edit_queue_apply();'>Update</span>
+			</TD>
+		</TR>
+	</TABLE>
+</div>
+
+</body>

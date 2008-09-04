@@ -1,0 +1,319 @@
+<!--
+ * Asterisk-GUI	- an Asterisk configuration interface
+ *
+ * GUI General Preferences
+ *
+ * Copyright (C) 2007-2008, Digium, Inc.
+ *
+ * Pari Nannapaneni <pari@digium.com>
+ *
+ * See http://www.asterisk.org for more information about
+ * the Asterisk project. Please do not directly contact
+ * any of the maintainers of this project for assistance;
+ * the project provides a web site, mailing lists and IRC
+ * channels for your use.
+ *
+ * This program is free software, distributed under the terms of
+ * the GNU General Public License Version 2. See the LICENSE file
+ * at the top of the source tree.
+ *
+-->
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+
+</style>
+<script>
+var OPEXTENSION = '';
+var STDEXTEN_RINGINTERFACE_LINE ;
+
+var loadDOMelements = function(){
+	DOM_obCid_input = _$('obCid_input') ;
+	DOM_op_ext = _$('op_ext') ;
+};
+
+
+function localajaxinit(){
+	top.document.title = "General Preferences" ;
+	if( parent.sessionData.PLATFORM.isAST_1_6 || parent.sessionData.PLATFORM.isAA50 ){
+		$('.16_Only').show();
+		(function(){
+			var c = config2json( { filename: 'phoneprov.conf' , usf: 0 } );
+			if( c.hasOwnProperty('polycom') &&  c['polycom'].contains('setvar=IDLEIMAGE_ACTIVE=1') ){
+				_$('op_polycom_idleimage').checked = true ;
+			}else{
+				_$('op_polycom_idleimage').checked = false ;
+			}
+		})();
+	}
+
+	var fd_text = (parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ) ? 'Factory Reset' : 'Reset Configuration' ;
+	var t = [ 	{url:'#', desc:'General Preferences', selected:true } ,
+			{url:'language.html', desc:'Language' } ,
+			{url:'password.html', desc:'Change Password'}
+		];
+	if( parent.sessionData.PLATFORM.isAA50 ) { 
+		t.push({url:'reset_defaults.html', desc: fd_text });
+	};
+	t.push( {url:'reboot.html', desc:'Reboot' } ); 
+	t.push( {url: 'flipadvanced.html', desc:'Advanced Options' } );
+
+	ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
+
+	loadDOMelements();
+	var t = parent.sessionData.pbxinfo.GLOBALS[ASTGUI.globals.obcidstr] ; 
+	DOM_obCid_input.value = (t) ? t : '' ;
+	var cusers = parent.astgui_manageusers.listOfUsers();
+	var op_tmp ;
+	cusers.each(function(user){
+		op_tmp = 'Goto(default,' + user + ',1)';
+		ASTGUI.selectbox.append( DOM_op_ext , 'User ' + user , op_tmp);
+	});
+
+	try{
+		(function(){
+			var c = context2json ({ filename:'extensions.conf' , context: 'macro-stdexten', usf: 0 });
+			if( !c || !c.length ) return ;
+			if( c[0].contains('s,1,Dial(${ARG2},') ){
+				STDEXTEN_RINGINTERFACE_LINE = c[0].afterChar('=');
+				var args = ASTGUI.parseContextLine.getArgs( c[0] );
+				ASTGUI.updateFieldToValue( 'op_ringTimeOut_Voicemail', args[1] );
+			}
+		})();
+	}catch(err){}
+
+	try{
+		OPEXTENSION  = ( parent.sessionData.pbxinfo.localextensions && parent.sessionData.pbxinfo.localextensions.Operator ) ? parent.sessionData.pbxinfo.localextensions.Operator : '' ;
+	}catch(err){}
+	ASTGUI.selectbox.selectOption( DOM_op_ext , OPEXTENSION );
+	loadExtensions_ranges();
+};
+
+var loadExtensions_ranges = function(){
+	var c = context2json ({ filename: ASTGUI.globals.configfile , context: 'general', usf: 1 });
+	ASTGUI.updateFieldToValue( 'ue_start' , c.getProperty('ue_start') );
+	ASTGUI.updateFieldToValue( 'ue_end' , c.getProperty('ue_end') );
+	ASTGUI.updateFieldToValue( 'mm_start' , c.getProperty('mm_start') );
+	ASTGUI.updateFieldToValue( 'mm_end' , c.getProperty('mm_end') );
+	ASTGUI.updateFieldToValue( 'qe_start' , c.getProperty('qe_start') );
+	ASTGUI.updateFieldToValue( 'qe_end' , c.getProperty('qe_end') );
+	ASTGUI.updateFieldToValue( 'vme_start' , c.getProperty('vme_start') );
+	ASTGUI.updateFieldToValue( 'vme_end' , c.getProperty('vme_end') );
+	ASTGUI.updateFieldToValue( 'rge_start' , c.getProperty('rge_start') );
+	ASTGUI.updateFieldToValue( 'rge_end' , c.getProperty('rge_end') );
+	ASTGUI.updateFieldToValue( 'vmg_start' , c.getProperty('vmg_start') );
+	ASTGUI.updateFieldToValue( 'vmg_end' , c.getProperty('vmg_end') );
+};
+
+
+
+var verify_Ranges = function(){
+	var arrF = ['ue_start', 'ue_end', 'mm_start', 'mm_end', 'qe_start', 'qe_end', 'vme_start', 'vme_end', 'rge_start', 'rge_end', 'vmg_start', 'vmg_end' ] ;
+	var arr = [];
+	for(var i=0; i < arrF.length ; i++){
+		arr.push( _$(arrF[i]) );
+	}
+	if ( !ASTGUI.checkRequiredFields(arr) ){
+		return  false;
+	}
+	if ( !ASTGUI.validateFields(arr) ) {
+		return false;
+	}
+	for( var i=0; i < arrF.length ; i++ ){
+		var tmp = ASTGUI.getFieldValue( arrF[i] );
+		if( !tmp.length.isValueInBetween(2,5)  ){
+			_$(arrF[i]).focus();
+			_$(arrF[i]).select();
+			ASTGUI.feedback( { msg:'Extension should be 2 to 5 digits ', showfor:3 } );
+			return false;
+		}
+	}
+	for( var i=0; i < arrF.length ; i++ ){
+		var tmp = ASTGUI.getFieldValue( arrF[i] );
+		if(!arrF[i].endsWith('_start') ){ continue; }
+		var a = ASTGUI.getFieldValue(arrF[i]) ,  b = ASTGUI.getFieldValue(arrF[i+1]) ;
+		var tmp_arr = arrF.withOut( arrF[i] ).withOut( arrF[i+1] ) ;
+		for( var j =0 ; j < tmp_arr.length ; j=j+2 ){
+			var c = Number( ASTGUI.getFieldValue(tmp_arr[j]) ) ;
+			var d = Number( ASTGUI.getFieldValue(tmp_arr[j+1]) ) ;
+			if( a.isValueInBetween(c,d) ) {
+				_$(arrF[i]).focus();
+				_$(arrF[i]).select();
+				ASTGUI.feedback( { msg:'Invalid Range', showfor:2 });
+				return false;
+			}
+			if( b.isValueInBetween(c,d) ){
+				_$(arrF[i+1]).focus();
+				_$(arrF[i+1]).select();
+				ASTGUI.feedback( { msg:'Invalid Range', showfor:2 });
+				return false;
+			}
+		}
+	}
+	return true;
+};
+
+var save_changes = function(){
+	if( !verify_Ranges() ){ return; }
+	parent.sessionData.pbxinfo.GLOBALS[ASTGUI.globals.obcidstr] = DOM_obCid_input.value;
+	ASTGUI.updateaValue({file:'extensions.conf', context :'globals', variable : ASTGUI.globals.obcidstr, value : DOM_obCid_input.value }   );
+
+	var u = new listOfSynActions('extensions.conf');
+		u.new_action('delete', 'default', 'exten','' ,'o,1,' + OPEXTENSION );
+		u.new_action('append', 'default', 'exten', 'o,1,' + DOM_op_ext.value );
+		u.new_action('update', 'macro-stdexten', 'exten', 's,1,Dial(${ARG2},' + _$('op_ringTimeOut_Voicemail').value +')' , STDEXTEN_RINGINTERFACE_LINE );
+	u.callActions();
+
+	if( parent.sessionData.PLATFORM.isAST_1_6 || parent.sessionData.PLATFORM.isAA50 ){
+		u.clearActions('phoneprov.conf');
+		u.new_action('delete', 'polycom', 'setvar','', 'IDLEIMAGE_ACTIVE=1' );
+		u.new_action('delete', 'polycom', 'setvar','', 'IDLEIMAGE_ACTIVE=0' );
+		if( _$('op_polycom_idleimage').checked ){
+			u.new_action( 'append', 'polycom', 'setvar', 'IDLEIMAGE_ACTIVE=1' );
+		}else{
+			u.new_action( 'append', 'polycom', 'setvar', 'IDLEIMAGE_ACTIVE=0' );
+		}
+		u.callActions();
+	}
+
+	u.clearActions(ASTGUI.globals.configfile);
+	u.new_action('update', 'general', 'ue_start', ASTGUI.getFieldValue('ue_start') );
+	u.new_action('update', 'general', 'ue_end', ASTGUI.getFieldValue('ue_end') );
+	u.new_action('update', 'general', 'mm_start', ASTGUI.getFieldValue('mm_start') );
+	u.new_action('update', 'general', 'mm_end', ASTGUI.getFieldValue('mm_end') );
+	u.new_action('update', 'general', 'qe_start', ASTGUI.getFieldValue('qe_start') );
+	u.new_action('update', 'general', 'qe_end', ASTGUI.getFieldValue('qe_end') );
+	u.callActions();
+	u.clearActions();
+	u.new_action('update', 'general', 'vme_start', ASTGUI.getFieldValue('vme_start') );
+	u.new_action('update', 'general', 'vme_end', ASTGUI.getFieldValue('vme_end') );
+	u.new_action('update', 'general', 'rge_start', ASTGUI.getFieldValue('rge_start') );
+	u.new_action('update', 'general', 'rge_end', ASTGUI.getFieldValue('rge_end') );
+	u.new_action('update', 'general', 'vmg_start', ASTGUI.getFieldValue('vmg_start') );
+	u.new_action('update', 'general', 'vmg_end', ASTGUI.getFieldValue('vmg_end') );
+	u.callActions();
+
+	parent.sessionData.GUI_PREFERENCES.updateProperties({
+		ue_start: ASTGUI.getFieldValue('ue_start'),
+		ue_end: ASTGUI.getFieldValue('ue_end'),
+		mm_start: ASTGUI.getFieldValue('mm_start'),
+		mm_end: ASTGUI.getFieldValue('mm_end'),
+		qe_start: ASTGUI.getFieldValue('qe_start'),
+		qe_end: ASTGUI.getFieldValue('qe_end'),
+		vme_start: ASTGUI.getFieldValue('vme_start'),
+		vme_end: ASTGUI.getFieldValue('vme_end'),
+		rge_start: ASTGUI.getFieldValue('rge_start'),
+		rge_end: ASTGUI.getFieldValue('rge_end'),
+		vmg_start: ASTGUI.getFieldValue('vmg_start'),
+		vmg_end: ASTGUI.getFieldValue('vmg_end')
+	});
+
+	parent.sessionData.pbxinfo.localextensions.Operator = DOM_op_ext.value ;
+	ASTGUI.feedback({msg:' Saved !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
+	window.location.reload();
+}
+
+
+var reset_ranges_default = function(){
+	ASTGUI.updateFieldToValue('ue_start', '6000');
+	ASTGUI.updateFieldToValue('ue_end', '6299');
+	ASTGUI.updateFieldToValue('mm_start', '6300');
+	ASTGUI.updateFieldToValue('mm_end', '6399');
+	ASTGUI.updateFieldToValue('vme_start', '7000');
+	ASTGUI.updateFieldToValue('vme_end', '7100');
+	ASTGUI.updateFieldToValue('rge_start', '6400');
+	ASTGUI.updateFieldToValue('rge_end', '6499');
+	ASTGUI.updateFieldToValue('qe_start', '6500');
+	ASTGUI.updateFieldToValue('qe_end', '6599');
+	ASTGUI.updateFieldToValue('vmg_start', '6600');
+	ASTGUI.updateFieldToValue('vmg_end', '6699');
+};
+
+</script>
+<body bgcolor="EFEFEF">
+<div class="iframeTitleBar"> 
+	General Preferences 
+	<span style="cursor: pointer; cursor: hand;" onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+</div>
+
+<center><div id="tabbedMenu"></div></center>
+
+<table width=95% cellpadding=2 cellspacing=2 border=0  align=center>
+	<tr>	<td align=right>Global OutBound CID <img src="images/tooltip_info.gif" tip="en,options,7" class='tooltipinfo'> :</td>
+		<td><input id='obCid_input' size=16></td>
+	</tr>
+	<tr>	<td align=right>Operator Extension <img src="images/tooltip_info.gif" tip="en,options,8" class='tooltipinfo'> :</td>
+		<td><select id='op_ext'></select></td>
+	</tr>
+	<tr>	<td align=right>Ring Timeout <img src="images/tooltip_info.gif" tip="en,options,11" class='tooltipinfo'> :</td>
+		<td><input size=2 id='op_ringTimeOut_Voicemail'></td>
+	</tr>
+	<tr class='16_Only' style='display:none;'>
+		<td align=right>Enable Idle Image Display <img src="images/tooltip_info.gif" tip="en,options,10" class='tooltipinfo'> :</td>
+		<td><input type='checkbox' id='op_polycom_idleimage'></td>
+	</tr>
+</table>
+
+
+<table cellpadding=2 cellspacing=2 border=0  align=center width="90%">
+<tr><td align=center>
+	<fieldset style="max-width:700px;min-width:500px;">
+		<legend><B>&nbsp;Extension preferences:&nbsp;</B></legend>
+		<table cellpadding=2 cellspacing=2 border=0  align=center>
+		<tr>	<td align=right>User Extensions :</td>
+			<td><input id='ue_start' size=4 validation='numeric' required='yes'> to 
+				<input id='ue_end' size=4 validation='numeric' required='yes'> 
+				<span id='ue_label'></span>
+			</td>
+		</tr>
+		<tr>	<td align=right>Conference Extensions :</td>
+			<td><input id='mm_start' size=4 validation='numeric' required='yes'> to 
+				<input id='mm_end' size=4 validation='numeric' required='yes'> 
+				<span id='mm_label'></span>
+			</td>
+		</tr>
+		<tr>	<td align=right>VoiceMenu Extensions :</td>
+			<td><input id='vme_start' size=4 validation='numeric' required='yes'> to 
+				<input id='vme_end' size=4 validation='numeric' required='yes'> 
+				<span id='vme_label'></span>
+			</td>
+		</tr>
+		<tr>	<td align=right>RingGroup Extensions :</td>
+			<td><input id='rge_start' size=4 validation='numeric' required='yes'> to 
+				<input id='rge_end' size=4 validation='numeric' required='yes'> 
+				<span id='rge_label'></span>
+			</td>
+		</tr>
+		<tr>	<td align=right>Queue Extensions :</td>
+			<td><input id='qe_start' size=4 validation='numeric' required='yes'> to 
+				<input id='qe_end' size=4 validation='numeric' required='yes'> 
+				<span id='qe_label'></span>
+			</td>
+		</tr>
+		<tr>	<td align=right>VoiceMail Group Extensions :</td>
+			<td><input id='vmg_start' size=4 validation='numeric' required='yes'> to 
+				<input id='vmg_end' size=4 validation='numeric' required='yes'> 
+				<span id='vmg_label'></span>
+			</td>
+		</tr>
+
+		<tr>	<td colspan=2 align=center>
+				<span class='guiButton' onclick='reset_ranges_default()'>Reset to defaults</spann>
+			</td>
+		</tr>
+
+		</table>
+	</fieldset>
+</td>
+</tr>
+</table>
+
+
+<div style='text-align:center; width: 95%; margin-top:15px'>
+	<span class='guiButtonCancel' onclick='window.location.reload();'>Cancel</span>
+	<span class='guiButtonEdit' onclick='save_changes();'>Save</span>
+</div>
+
+</body>

@@ -1,0 +1,330 @@
+<!--
+ * Asterisk-GUI	- an Asterisk configuration interface
+ *
+ * Configuration for "Backup / Restore"
+ *
+ * Copyright (C) 2006-2008, Digium, Inc.
+ *
+ * Pari Nannapaneni <pari@digium.com>
+ *
+ * See http://www.asterisk.org for more information about
+ * the Asterisk project. Please do not directly contact
+ * any of the maintainers of this project for assistance;
+ * the project provides a web site, mailing lists and IRC
+ * channels for your use.
+ *
+ * This program is free software, distributed under the terms of
+ * the GNU General Public License Version 2. See the LICENSE file
+ * at the top of the source tree.
+ *
+-->
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+	#table_one tr{
+		background: #6b79a5;
+		color: #CED7EF;
+	}
+
+	#nocf {
+		font-size: 13pt;
+		border:1px solid;
+		padding : 10;
+		margin-left : 15;
+		margin-right : 15;
+		margin-top : 25;
+		text-align: center;
+	}
+
+	#thispageContent{
+		/*
+		font-size: 10pt;
+		margin-left : 15;
+		margin-top : 15;
+		*/
+	}
+</style>
+<script>
+/*
+WARNING: The 'Download bkp file' feature uses 'ln -s bkpfile /.../bkps/filename' and then points the browser to filename,
+	this is not safe as your config files might be available over the network to every one
+	depending on how your asterisk http bind address is configured.
+	May be one day we will have something like a 'basic http authentication' implemented in the asterisk webserver 
+
+Note: for opensource asterisk 1.4 (including AsteriskNOW versions with Asterisk 1.4) 
+      you can only download backup - there is no upload/restore
+*/
+
+var bkpPath = ( parent.sessionData.PLATFORM.isAA50 ) ? ASTGUI.paths.ConfigBkp_AA50 : ASTGUI.paths.ConfigBkp ;
+var upload_Filename = ""; // will be updated by upload_form.html
+var starteduploading = 0;
+var upload_Path; // path for 'uploads' as defined in http.conf - this variable will be automatically updated from http.conf
+
+onUploadForm_beforeUploading = function(){
+	if( top.sessionData.PLATFORM.isAST_1_4 ){
+		alert("File Uploads are supported in Asterisk 1.6.0/trunk");
+		return;
+	}
+	starteduploading = 1;
+	parent.ASTGUI.dialog.waitWhile('File Upload in progress, please wait ..');
+	return true;
+};
+
+onUploadForm_load = function(){
+	if( parent.sessionData.PLATFORM.isABE ){ // ABE-1600
+		$('#uploadForm_container').hide();
+		return;
+	}
+	if(!top.sessionData.httpConf.postmappings_defined || !top.sessionData.httpConf.uploadPaths['backups'] ){
+		ASTGUI.ErrorLog('AG102');
+		$('#uploadForm_container').hide();
+		return ;
+	}
+
+	upload_Path = top.sessionData.httpConf.uploadPaths['backups'] ;
+	var upload_action_path = (top.sessionData.httpConf.prefix) ? '/' + top.sessionData.httpConf.prefix + '/backups' : '/backups' ;
+	_$('uploadiframe').contentWindow.document.getElementById('form22').action =  upload_action_path ;
+	_$('uploadiframe').contentWindow.document.getElementById('UploadFORM_UPLOAD_BUTTON').value =  'Upload Backup to Unit' ;
+};
+
+
+onUploadForm_unload = function(){
+	if(!starteduploading){ return; }
+	parent.ASTGUI.dialog.waitWhile('Backup File Uploaded');
+	ASTGUI.feedback({ msg:'Backup File Uploaded !!', showfor: 3 });
+	$('#uploadForm_container').hide();
+	setTimeout( function(){ window.location.href = 'backup.html'; } , 1000 );
+	return;
+};
+
+function localajaxinit() {
+	top.document.title = 'Configuration Backups';
+	if( parent.sessionData.PLATFORM.isAA50 && !parent.sessionData.hasCompactFlash ){
+		$('#nocf').show();
+		$('#thispageContent').hide();
+		return true;
+	}
+	parent.ASTGUI.dialog.waitWhile(' Loading list of Previous Backup files !');
+	parent.ASTGUI.systemCmd( "mkdir -p " + bkpPath , function(){
+		parent.ASTGUI.listSystemFiles( bkpPath , function(bkpfiles) {
+			try{
+				ASTGUI.domActions.clear_table(_$('bkpfilesTable'))
+				for( var i =0 ; i < bkpfiles.length ; i++){
+					addrow_totable( bkpfiles[i].stripTags(), i );
+				}
+				var _bft = _$('bkpfilesTable') ;
+				if( _bft.rows.length == 0 ){
+					_$('table_one').style.display="none";
+					var newRow = _bft.insertRow(-1);
+					var newCell0 = newRow.insertCell(0);
+					newCell0 .align = "center";
+					newCell0 .innerHTML = "<BR><I> No Previous Backup configurations found !!</I> <BR><BR>" +
+						"Please click on the 'Create New Backup' button<BR> to  take a backup of the current system configuration<BR><BR>" ;
+				}
+			}finally{
+				parent.ASTGUI.dialog.hide();
+			}
+		});
+	});
+}
+
+function restore_uploadedbkpfile(){
+
+}
+
+function addrow_totable(filename, i ){
+	if(!filename.contains('__')){ return true;}
+	var fname = filename.split("__") ; // var fname[1] = 2007mar12.tar
+	var filedate = fname[1].split(".tar");
+	var day = filedate[0].substr(7);
+	var month = filedate[0].substr(4,3);
+	var year = filedate[0].substr(0,4);
+	
+	var newRow = _$('bkpfilesTable').insertRow(-1);
+	newRow.style.backgroundColor='#FFFFFF';
+	newRow.onmouseover= function(){ this.style.backgroundColor='#F9F0D1'; };
+	newRow.onmouseout=function(){ this.style.backgroundColor='#FFFFFF'; };
+
+	ASTGUI.domActions.tr_addCell( newRow , { html: _$('bkpfilesTable').rows.length , width:35, align:'center' } );
+	ASTGUI.domActions.tr_addCell( newRow , { html: fname[0] , width:180 } );
+	ASTGUI.domActions.tr_addCell( newRow , { html: month.capitalizeFirstChar()  + " " + day + ", " + year , width : 125 } );
+
+	var tmp = "<span onclick='dld_bkp(\""+ filename + "\")'class=\"guiButton\">Download from Unit</span>&nbsp;"  +
+			"<span onclick='restore_bkp(\""+ filename + "\")' class=\"guiButton\">Restore Previous Config</span>&nbsp;"  +
+			"<span onclick='delete_bkp(\""+ filename + "\")'  class=\"guiButtonDelete\">Delete</span>" ;
+	ASTGUI.domActions.tr_addCell( newRow , { html: tmp , align:'center'} );
+}
+
+
+function dld_bkp( filename ){
+	parent.ASTGUI.systemCmd( "mkdir -p "+ ASTGUI.paths.ConfigBkp_dldPath + " ; /bin/rm " + ASTGUI.paths.ConfigBkp_dldPath + "* ", function(){
+		parent.ASTGUI.systemCmd( "/bin/ln -s "+ bkpPath + filename + " " + ASTGUI.paths.ConfigBkp_dldPath + filename , function(){
+			window.location.href = "private/bkps/" + filename ;
+		});
+	});
+}
+
+
+function restore_bkp(filename){
+	if( parent.sessionData.PLATFORM.isAA50 ){
+		if(confirm('This will restart the appliance after restoring the backup configuration. \n\n Are you sure you want to proceed ?')){
+			restore_bkp_step3(bkpPath + filename);
+		}else{
+			return;
+		}
+	}else{
+		if(confirm('All your old configuration will be replaced by this backup configuration. \n\n Are you sure you want to proceed ?')){
+			//parent.astmanEngine.run_tool("rm /etc/asterisk/* -rf ", callback=function(){  } );
+			restore_bkp_step3(bkpPath + filename);
+		}
+	}
+}
+
+function restore_bkp_step3(file_fullpath){
+	if( parent.sessionData.PLATFORM.isAA50 ){
+		parent.ASTGUI.dialog.waitWhile(' The Sytem will reboot shortly ');
+		parent.ASTGUI.systemCmd( ASTGUI.scripts.restoreBackup + " " + file_fullpath, function(){
+			ASTGUI.feedback( { msg:'Configuration restored !!', showfor:2 });
+			parent.miscFunctions.AFTER_REBOOT_CMD();
+			/* ***************** Todo Restart ******************* */
+			//if(starteduploading){ delete_bkp2(file_fullpath); }
+		});
+	}else{
+		parent.ASTGUI.dialog.waitWhile(' Restoring Configuration ');
+		parent.ASTGUI.systemCmd( " tar -xvf " + file_fullpath + ' -C / ', function(){
+			ASTGUI.feedback( { msg:'Configuration restored !!', showfor:2 });
+
+			if(starteduploading){
+				delete_bkp2(file_fullpath);
+			}else{
+				var t = ASTGUI.cliCommand('reload') ;
+				setTimeout( function(){ top.window.location.reload(); } , 1000 );
+			}
+		});
+	}
+}
+
+function delete_bkp( filename ){
+	if(!confirm("Delete selected Backup Configuration ?")){ return ; }
+	delete_bkp2( bkpPath + filename );
+}
+
+function delete_bkp2( file_fullpath ){
+	parent.ASTGUI.systemCmd( "/bin/rm -f " + file_fullpath , function(){
+		ASTGUI.feedback( { msg:'Delete Request Successfull !', showfor:2 });
+		setTimeout( function(){ window.location.reload(); } , 1000 );
+	});
+}
+
+
+function take_bkp(){
+	ASTGUI.showbg(true);
+
+	var months = ["jan", "feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+	var today=new Date()
+	var year = today.getFullYear();
+	var month = months[ today.getMonth() ];
+	var day = today.getDate().addZero();
+	var hour = today.getHours().addZero() ;
+	var minute = today.getMinutes().addZero() ;
+	var seconds = today.getSeconds().addZero() ;
+	var bkpfile =  "backup_" + year + month + day + "_" + hour + minute + seconds ;
+
+	ASTGUI.updateFieldToValue( 'newbkp_name', bkpfile );
+	$('#newbkp_content').show() ;
+	_$('newbkp_name').focus();
+}
+
+function cancel_newbackup(){
+	ASTGUI.showbg(false);
+	_$('newbkp_content').style.display="none" ;
+}
+
+function backup_new(){
+	var _nn = _$('newbkp_name');
+	if ( !ASTGUI.checkRequiredFields( [_nn] ) ) return ;
+	if ( !ASTGUI.validateFields( [_nn] ) ) return ;
+
+	var months = ["jan", "feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+	var today=new Date()
+	var year = today.getFullYear();
+	var month = months[ today.getMonth() ];
+	var day = today.getDate().addZero();
+	//var hour =addzero(today.getHours());
+	//var minute =addzero(today.getMinutes());
+	//var seconds =addzero(today.getSeconds());
+	var bkpfile =  _nn.value +"__" + year + month + day +".tar";
+
+	if( parent.sessionData.PLATFORM.isAA50  ){
+		parent.ASTGUI.systemCmd( ASTGUI.scripts.takeBackup + ' ' +  bkpPath + bkpfile , function(){
+			ASTGUI.feedback( { msg:'Backup Successful', showfor:2 });
+			window.location.reload();
+		}) ;
+		return ;
+	}else{
+		parent.ASTGUI.systemCmd( "tar -cf " + bkpPath + bkpfile + ' ' +  ' /etc/asterisk', function(){
+			ASTGUI.feedback( { msg:'Backup Successful', showfor:2 });
+			parent.ASTGUI.dialog.waitWhile('Reloading List of backup Files');
+			setTimeout( function(){ parent.ASTGUI.dialog.hide(); window.location.reload(); } , 2000 );
+		});
+		return ;
+	}
+}
+
+</script>
+<body bgcolor="EFEFEF">
+<div class="iframeTitleBar">
+	&nbsp;Backup / Restore Configurations 
+	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+</div>
+<div style='display:none;' id='nocf'> You need a&nbsp;&nbsp;<b>CompactFlash&reg;</b>&nbsp;&nbsp;to use this feature </div>
+<div id='thispageContent' style='text-align:center;'>
+	<div class='lite_Heading'>Manage Configuration Backups</div>
+	<center>
+	<fieldset  style="font-size : 13px; width: 745px;" id='uploadForm_container'>
+		<legend><B>&nbsp;Upload a previous backup file :&nbsp;</B></legend>
+		<IFRAME src="upload_form.html" id="uploadiframe" width="480" height="100" frameborder="0" border="0" marginheight="0" marginwidth="0"></IFRAME>
+	</fieldset>
+
+	<div  style='margin-top:20px; margin-bottom:10px;'><span class='guiButtonNew' id="takebkp" onclick='take_bkp();'>Create New Backup</span></div>
+
+	<fieldset  style="font-size : 13px; height: 230px; width: 845px"  id="fieldset2">
+		<legend><B>&nbsp;List of Previous Configuration Backups :&nbsp;</B></legend>
+		<table id="table_one" cellpadding=3 cellspacing=1 border=0 align=center width=800>
+			<tr>	<td width=35>S.No</td>
+				<td width="180">Name</td>
+				<td width="125">Date</td>
+				<td align="center">Options</td>
+			</tr>
+		</table>
+		<div id="bkpfilesTable_div" style="height:200px;width=100%; overflow :auto; padding : 0px 0px 0px 0px;">
+			<table id="bkpfilesTable" cellpadding=2 cellspacing=1 border=0 align=center width=800></table>
+		</div>
+	</fieldset>
+	</center>
+
+</div>
+
+
+<div id="newbkp_content" STYLE="width:450; height:150;display:none;" class='dialog'>
+	<TABLE width="100%" cellpadding=0 cellspacing=0>
+	<TR class="dialog_title_tr">
+		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);">Create New Backup</TD>
+		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
+	</TR>
+	</TABLE>
+	<table cellpadding=2 cellspacing=2 border=0 width="100%" align="center">
+		<tr>	<td colspan=2 height=20 valign=middle align=center class="field_text"></td>	</tr>
+		<tr>	<td class="field_text" align="right">File Name:&nbsp;</td>
+			<td><input id='newbkp_name' size=25 class="input9" validation='alphanumericUnd' required='yes'></td>
+		</tr>
+		<tr>	<td colspan=2 align=center height=6></td>	</tr>
+		<tr>	<td colspan=2 align=center>
+				<span class='guiButtonCancel' id="cancel_a" onclick='cancel_newbackup();'>Cancel</span>
+				<span class='guiButtonEdit' id="getbackup" onclick='backup_new();'>Backup</span>
+			</td>
+		</tr>
+	</table>
+</div>
+</body>

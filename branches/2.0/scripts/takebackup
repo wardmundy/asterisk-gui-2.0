@@ -1,0 +1,4 @@
+#!/bin/sh
+/bin/tar -cf $1 /etc/asterisk
+
+

@@ -1,0 +1,28 @@
+Software License
+================
+Asterisk-GUI HTML and Javascript files, like Asterisk, are distributed under the
+GNU General Public License version 2.  Dual licensing is available through
+Digium as well.  The GPL (version 2) is included in this source tree in the 
+file COPYING.
+
+Use of Graphics and Logos
+=========================
+The images and logos included with Asterisk-GUI may only be distributed with
+unmodified versions of the toolkit and may not be used in any derivative works
+without special written permission from Digium.  
+
+License of other code used in Asterisk-GUI
+==========================================
+Asterisk-GUI uses one main component (jquery.js) which comes with 
+their own licenses, specifically:
+
+jquery.js:
+
+/*
+ * jQuery 1.2.1 - New Wave Javascript
+ *
+ * Copyright (c) 2007 John Resig (jquery.com)
+ * Dual licensed under the MIT (MIT-LICENSE.txt)
+ * and GPL (GPL-LICENSE.txt) licenses.
+ *
+*/

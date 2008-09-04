@@ -1,0 +1,84 @@
+<!--
+ * Asterisk-GUI	- an Asterisk configuration interface
+ *
+ * CallParking Preferences
+ *
+ * Copyright (C) 2007-2008, Digium, Inc.
+ *
+ * Pari Nannapaneni <pari@digium.com>
+ *
+ * See http://www.asterisk.org for more information about
+ * the Asterisk project. Please do not directly contact
+ * any of the maintainers of this project for assistance;
+ * the project provides a web site, mailing lists and IRC
+ * channels for your use.
+ *
+ * This program is free software, distributed under the terms of
+ * the GNU General Public License Version 2. See the LICENSE file
+ * at the top of the source tree.
+ *
+-->
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+
+</style>
+<script>
+var ct = 'general';
+
+function localajaxinit(){
+	top.document.title = 'Call Parking preferences' ;
+	DOM_SAVE = _$('save');
+	DOM_CANCEL = _$('cancel');
+	DOM_SAVE.disabled = true;
+	DOM_CANCEL.disabled = true;
+	(function (){
+		var y = function(){ DOM_SAVE.disabled = false; DOM_CANCEL.disabled = false; };
+		ASTGUI.events.add( _$('parkext') , 'keyup', y );
+		ASTGUI.events.add( _$('parkpos') , 'keyup', y );
+		ASTGUI.events.add( _$('parkingtime') , 'keyup', y );
+	})();
+	var c = config2json({filename:'features.conf', usf:1});
+	if(c.hasOwnProperty(ct)){
+		ASTGUI.updateFieldToValue( 'parkext' , c[ct].getProperty('parkext') );
+		ASTGUI.updateFieldToValue( 'parkpos' , c[ct].getProperty('parkpos') );
+		ASTGUI.updateFieldToValue( 'parkingtime' , c[ct].getProperty('parkingtime') );
+	}
+};
+
+function save_changes(){
+	var u = new listOfSynActions('features.conf');
+		u.new_action('update', ct , 'parkext', ASTGUI.getFieldValue('parkext') );
+		u.new_action('update', ct , 'parkpos', ASTGUI.getFieldValue('parkpos') );
+		u.new_action('update', ct , 'parkingtime', ASTGUI.getFieldValue('parkingtime') );
+	u.callActions();
+	ASTGUI.feedback({msg:' Saved !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
+	window.location.reload();
+}
+
+</script>
+<body bgcolor="EFEFEF">
+<div class="iframeTitleBar"> 
+	Call Parking Preferences
+	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+</div>
+	<div class='lite_Heading'>Call Parking Preferences</div>
+	<table align="center" cellpadding=2 cellspacing=2 border=0>
+		<tr>	<td align=right>Extension to Dial to Park a call:</td>
+			<td>&nbsp;<input size=4 type='text' id='parkext'></td>
+		</tr>
+		<tr>	<td align=right>What extensions to park calls on:</td>
+			<td>&nbsp;<input size=10 type='text' id='parkpos'> (Ex: '701-720')</td>
+		</tr>
+		<tr>	<td align=right>Number of seconds a call can be parked for <img src="images/tooltip_info.gif" tip="en,parking,0" class='tooltipinfo'> :</td>
+			<td>&nbsp;<input size=2 type='text' id='parkingtime'></td>
+		</tr>
+		<tr>	<td colspan=2 align=center height=40 valign=bottom>
+				<span class='guiButtonCancel' id='cancel' onclick='window.location.reload();'>Cancel</span>
+				<span class='guiButtonEdit' id='save' onclick='save_changes();'>Save</span>
+			</td>
+		</tr>
+	</table>
+</body>

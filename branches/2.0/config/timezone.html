@@ -1,0 +1,194 @@
+<!--
+ * Asterisk-GUI	-	an Asterisk configuration interface
+ *
+ * Upload timezone file for the AA50
+ *
+ * Copyright (C) 2007-2008, Digium, Inc.
+ *
+ * Pari Nannapaneni <pari@digium.com>
+ *
+ *
+ * All Rights Reserved.
+ *
+ * Distribution of this file is subject to the license
+ * agreement you accepted when obtained and/or activated
+ * the Digium product containing this file.
+-->
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+	#tzfilesTable {
+		border: 1px solid #666666;
+		margin-top: 5px;
+		margin-bottom:10px;
+		width: 96%;
+		text-align: center;
+		padding : 1px;
+	}
+	#tzfilesTable tr.frow { background: #6b79a5; color: #CED7EF; }
+	#tzfilesTable tr.frow td{ font-weight:bold; }
+	#tzfilesTable tr td{ padding : 3px; }
+	#tzfilesTable tr.even { background: #DFDFDF; }
+	#tzfilesTable tr.odd{ background: #FFFFFF; }
+	#tzfilesTable tr.even:hover, #tzfilesTable tr.odd:hover {
+		background: #a8b6e5;
+		cursor: default;
+	}
+
+</style>
+<script>
+var upload_Filename = ""; // will be updated by upload_form.html
+var starteduploading = 0;
+var upload_Path; // path for 'timezone' as defined in http.conf - (usually /usr/share/zoneinfo) but the value will be automatically loaded from http.conf
+var default_tz = "";
+var DOM_bft ;
+
+onUploadForm_beforeUploading = function(){
+	starteduploading = 1;
+	ASTGUI.dialog.waitWhile('File Upload in progress, please wait ..');
+	return true;
+};
+
+onUploadForm_load = function(){
+	if(!top.sessionData.httpConf.postmappings_defined || !top.sessionData.httpConf.uploadPaths['timezone'] ){
+		ASTGUI.ErrorLog('AG102');
+		$('#tdupload').hide(); //
+		return ;
+	}
+	upload_Path = top.sessionData.httpConf.uploadPaths['timezone'] + '/' ;
+	var upload_action_path = (top.sessionData.httpConf.prefix) ? '/' + top.sessionData.httpConf.prefix + '/timezone' : '/timezone' ;
+	_$('uploadiframe').contentWindow.document.getElementById('form22').action =  upload_action_path ;
+}; 
+
+onUploadForm_unload = function(){
+	if(!starteduploading){ return; }
+	ASTGUI.dialog.hide();
+	window.location.reload();
+	return;
+};
+
+function aaaa(){
+	addFROW_totable()
+	ASTGUI.dialog.waitWhile('Loading ..');
+	ASTGUI.listSystemFiles( upload_Path , function(tzfiles) {
+		for( var i =0 ; i < tzfiles.length ; i++){
+			addrow_totable( tzfiles[i].stripTags());
+		}
+		if( DOM_bft.rows.length == 1 ){
+			var newRow = DOM_bft.insertRow(-1);
+			ASTGUI.domActions.tr_addCell( newRow , { html: "<BR><I> No Previous TimeZone files found !!</I> <BR>", align: "center" }) ;
+		}
+		ASTGUI.dialog.hide();
+	});
+
+};
+
+function addFROW_totable(){
+	var newRow = DOM_bft.insertRow(-1);
+	newRow.className = 'frow';
+	ASTGUI.domActions.tr_addCell( newRow , { html: '' , align: "center", width: '35' });
+	ASTGUI.domActions.tr_addCell( newRow , { html: 'Name' });
+	ASTGUI.domActions.tr_addCell( newRow , { html: 'Options' , align: "center", width: "200px" });
+};
+
+
+function addrow_totable(filename){
+	var newRow = DOM_bft.insertRow(-1);
+	newRow.className = ((DOM_bft.rows.length)%2==1)?'odd':'even';
+// 	if(default_tz!=filename){
+// 		newRow.onmouseover= function(){ this.style.backgroundColor='#F9F0D1'; };
+// 		newRow.onmouseout=function(){ this.style.backgroundColor='#FFFFFF'; };
+// 	}
+	ASTGUI.domActions.tr_addCell( newRow , { html: DOM_bft.rows.length , align: "center", width: '35' }) ;
+	ASTGUI.domActions.tr_addCell( newRow , { html: filename, align: "left" }) ;
+	/*
+	var k_tmp = (default_tz==filename)?"Default TimeZone":"<input type=\"button\" onclick='setaslocal(\""+ filename + "\")'  value=\"Set as Default\" class=\"splbutton\">&nbsp;"  +
+	"<input type=\"button\" onclick='delete_tz(\""+ filename + "\")'  value=\"Delete\"  class=\"splbutton\">" ;
+	*/
+	var k_tmp = (default_tz==filename)?"Default TimeZone":"<input type=\"button\" onclick='setaslocal(\""+ filename + "\")'  value=\"Set as Default\" class=\"splbutton\">" ;
+	ASTGUI.domActions.tr_addCell( newRow , { html: k_tmp , align: "center", width: "200px" }) ;
+};
+
+
+function delete_tz( filename ){
+	if(!confirm("Delete selected TimeZone ?")){ return ; }
+	ASTGUI.systemCmd( "/bin/rm -f "+ upload_Path + filename  , function(){
+		ASTGUI.feedback( { msg:'Delete Request Successfull !', showfor:2 });
+		window.location.reload();
+	});
+};
+
+function setaslocal( filename ){
+	if(!confirm("Set '"+ filename +"' as the Default TimeZone ?")){ return ; }
+	ASTGUI.systemCmd( "rm /etc/localtime ; /bin/ln -s " + upload_Path + filename + " /etc/localtime" , function(){
+		ASTGUI.feedback( { msg:'Default Timezone set to '+ filename + ' !', showfor:2 });
+		ASTGUI.cookies.setCookie( 'configFilesChanged' , 'yes' );
+		parent.$('#applyChanges_Button').show();
+		alert("you have to click 'Apply Changes' and restart the appliance for this change to take effect");
+		window.location.reload();
+	});
+};
+
+
+var localajaxinit = function(){
+	top.document.title = 'Choose local TimeZone' ;
+	DOM_bft = _$('tzfilesTable') ;
+		var t = [
+			{url:'networking.html', desc:'General' },
+			{url:'networking.html?tab=wan', desc:'WAN' },
+			{url:'networking.html?tab=lan', desc:'LAN' },
+			{url:'#', desc:'TimeZone', selected:true }
+		];
+		ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
+
+	ASTGUI.systemCmdWithOutput( 'ls -l /etc/localtime ' , function(op){
+		if(op.length == 0){
+			ASTGUI.feedback( { msg:'You do not have a default TimeZone', showfor:2 });
+		}else{
+			var p = op.split("->");
+			if(p.length > 1){
+				p = p[1].strip().split(upload_Path);
+				default_tz = p[1];
+			}
+		}
+		aaaa();
+	});
+}
+
+</script>
+<body bgcolor="EFEFEF">
+
+<div class="iframeTitleBar">
+	&nbsp;Manage TimeZones
+	<span style="cursor: pointer; cursor: hand;" onclick="window.location.reload();" >
+		&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;
+	</span>
+</div>
+
+<div class='lite_Heading'>Manage TimeZones</div>
+<center><div id="tabbedMenu" style='margin-top:-10px;'></div></center>
+
+<table width="80%" align=center style='display:none'>
+	<tr><td align=center id="tdupload" height=150>
+		<fieldset>
+			<legend><B>&nbsp;Upload a Timezone file:&nbsp;</B></legend>
+		<IFRAME src="upload_form.html" id="uploadiframe" width="95%" height="130" frameborder="0" border="0" marginheight="0" marginwidth="0"></IFRAME>
+		</fieldset>
+	</td></tr>
+</table>
+
+<table width="80%" align=center>
+<tr>	<td valign="top" align="center">
+	<fieldset  style="height: 300px; "  id="fieldset2">
+		<legend>&nbsp;List of TimeZone Files&nbsp;</legend>
+		<div id="bkpfilesTable_div" style="height:260px;width=100%; overflow :auto; padding : 0px 0px 0px 0px;">
+			<table id="tzfilesTable" cellpadding=2 cellspacing=1 border=0 align=center width=500></table>
+		</div>
+		<BR>
+	</fieldset>
+	</td>
+</tr>
+</table>
+
+</body>

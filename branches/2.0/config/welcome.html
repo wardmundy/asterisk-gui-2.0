@@ -1,0 +1,430 @@
+<!--
+ * Asterisk-GUI	- an Asterisk configuration interface
+ *
+ * System overview
+ *
+ * Copyright (C) 2008, Digium, Inc.
+ *
+ * Pari Nannapaneni <pari@digium.com>
+ *
+ * See http://www.asterisk.org for more information about
+ * the Asterisk project. Please do not directly contact
+ * any of the maintainers of this project for assistance;
+ * the project provides a web site, mailing lists and IRC
+ * channels for your use.
+ *
+ * This program is free software, distributed under the terms of
+ * the GNU General Public License Version 2. See the LICENSE file
+ * at the top of the source tree.
+ *
+-->
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+
+	#table_Ext_list {
+		border: 1px solid #666666;
+		margin-top: 5px;
+		margin-bottom:10px;
+		width: 96%;
+		text-align: left;
+		padding : 1px;
+	}
+
+	#table_Ext_list tr.frow { background: #6b79a5; color: #CED7EF; }
+	#table_Ext_list tr.frow td{ font-weight:bold; }
+	#table_Ext_list tr td{ padding : 3px; }
+	#table_Ext_list tr.even { background: #DFDFDF; }
+	#table_Ext_list tr.odd{ background: #FFFFFF; }
+	#table_Ext_list tr.even:hover, #table_Ext_list tr.odd:hover {
+		background: #a8b6e5;
+		cursor: default;
+	}
+
+
+	#table_Trunks_list {
+		border: 1px solid #666666;
+		margin-top: 5px;
+		margin-bottom:10px;
+		width: 96%;
+		text-align: left;
+		padding : 1px;
+	}
+	#table_Trunks_list tr.frow { background: #6b79a5; color: #CED7EF; }
+	#table_Trunks_list tr.frow td { font-weight:bold; }
+	#table_Trunks_list tr td { padding : 3px; }
+	#table_Trunks_list tr.even { background: #DFDFDF; }
+	#table_Trunks_list tr.odd{ background: #FFFFFF; }
+	#table_Trunks_list tr.even:hover, #table_Trunks_list tr.odd:hover { background: #a8b6e5; cursor: default; }
+
+
+
+
+
+	#table_NeedConfiguration_list { border: 1px solid #666666; margin-top: 5px; margin-bottom:10px; width: 96%; text-align: left; padding : 1px; }
+	#table_NeedConfiguration_list tr.frow { background: #6b79a5; color: #CED7EF; }
+	#table_NeedConfiguration_list tr.frow td { font-weight:bold; }
+	#table_NeedConfiguration_list tr td { padding : 3px; }
+	#table_NeedConfiguration_list tr.even { background: #DFDFDF; }
+	#table_NeedConfiguration_list tr.odd{ background: #FFFFFF; }
+	#table_NeedConfiguration_list tr.even:hover, #table_NeedConfiguration_list tr.odd:hover { background: #a8b6e5; cursor: default; }
+
+</style>
+<script>
+var REGISTRY_OUTPUT = { } ;
+var EX_CF;
+
+var default_IncomingRule_trunk = function(trunk){
+	var cxt = ASTGUI.contexts.TrunkDIDPrefix + trunk + ASTGUI.contexts.TrunkDefaultSuffix ;
+	if ( !EX_CF.hasOwnProperty(cxt) ){
+		return '?';
+	}
+
+	var S3 = EX_CF[cxt].indexOfLike('exten=s,3,') ; // see if it is analog trunk
+	var ir_dest_index = (S3 == -1) ? EX_CF[cxt].indexOfLike('exten=s,1,') : S3 ;
+	if( ir_dest_index == -1 ){ return '<font color=red>Not Configured</font>';  }
+	var ir_dest_line = EX_CF[cxt][ir_dest_index] ;
+	return ASTGUI.parseContextLine.showAs(ir_dest_line);
+};
+
+var updateTrunkslisting = function(){
+	EX_CF = config2json({filename:'extensions.conf', usf:0 });
+
+	var TBL = _$('table_Trunks_list');
+	var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
+
+	(function(){
+		var newRow = TBL.insertRow(-1);
+		newRow.className = "frow";
+		addCell( newRow , { html:'Status'} );
+		addCell( newRow , { html:'Trunk'} );
+		addCell( newRow , { html:'Type'} );
+		addCell( newRow , { html:'Username'} );
+		addCell( newRow , { html:'Port/Hostname/IP'} );
+		//addCell( newRow , { html:'Incoming Calls'} );
+	})();
+
+	(function(){
+		var t = parent.ASTGUI.cliCommand('iax2 show registry') ;
+		REGISTRY_OUTPUT.iax2 = ASTGUI.parseCLIResponse(t) ;
+		t = parent.ASTGUI.cliCommand('sip show registry') ;
+		REGISTRY_OUTPUT.sip = ASTGUI.parseCLIResponse(t) ;
+	})();
+
+	( function(){
+		var d = [].concat( parent.astgui_managetrunks.listOfSIPTrunks() , parent.astgui_managetrunks.listOfIAXTrunks() );
+		d.each( function(item){
+			var ttype = parent.astgui_managetrunks.misc.getTrunkType(item) ;
+			var newRow = TBL.insertRow(-1);
+			newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
+
+			var reg = ASTGUI.getTrunkStatus(REGISTRY_OUTPUT, item, ttype) ;
+			addCell( newRow , { html: reg } );
+
+			addCell( newRow , { html: parent.sessionData.pbxinfo.trunks[ttype][item]['trunkname'] } );
+			addCell( newRow , { html: ttype } );
+			addCell( newRow , { html: parent.sessionData.pbxinfo.trunks[ttype][item]['username'] || '' } );
+			addCell( newRow , { html: parent.sessionData.pbxinfo.trunks[ttype][item]['host'] } );
+			//addCell( newRow , { html: default_IncomingRule_trunk(item) });
+		} );
+	})();
+
+	(function(){
+		var c = parent.astgui_managetrunks.listOfAnalogTrunks();
+		c.each(function(item){
+			var newRow = TBL.insertRow(-1);
+			newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
+
+			addCell( newRow , { html:''} );
+			addCell( newRow , { html: parent.sessionData.pbxinfo['trunks']['analog'][item]['trunkname'] } );
+			addCell( newRow , { html:'Analog'} );
+			addCell( newRow , { html:''} );
+			addCell( newRow , { html:'Ports ' + parent.sessionData.pbxinfo['trunks']['analog'][item]['zapchan'] } );
+// 			try{
+// 				addCell( newRow , { html: default_IncomingRule_trunk(item) });
+// 			}catch(err){
+// 				addCell( newRow , { html: '?' });
+// 			}
+		});
+	})();
+
+	( function(){
+		var d = parent.sessionData.pbxinfo.trunks.providers ;
+		for(var e in d){ if(d.hasOwnProperty(e)){
+
+				var ttype = parent.astgui_managetrunks.misc.getTrunkType(e) ;
+				var newRow = TBL.insertRow(-1) ;
+				newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
+				var reg = ASTGUI.getTrunkStatus(REGISTRY_OUTPUT, e, ttype) ;
+				addCell( newRow , { html: reg } );
+				addCell( newRow , { html: d[e]['trunkname'] } );
+				addCell( newRow , { html: ttype } );
+				addCell( newRow , { html: d[e]['username'] || '' } );
+				addCell( newRow , { html: d[e]['host'] } );
+// 				try{
+// 					addCell( newRow , { html: default_IncomingRule_trunk(e) });
+// 				}catch(err){
+// 					addCell( newRow , { html: '?' });
+// 				}
+		}}
+	})();
+
+};
+
+var updateListingsTable = function(){
+	var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
+	(function(){ // add first row
+		var newRow = DOM_table_Ext_list.insertRow(-1);
+		newRow.className = "frow";
+		addCell( newRow , { html:'', width:'15px'} );
+		addCell( newRow , { html:'Extension', width:'380px' } );
+		addCell( newRow , { html:'Name/Label', width:'320px' } );
+		addCell( newRow , { html:'Type', width:'275px'} );
+	})();
+	(function(){ // List all User Extensions
+		var ul = parent.astgui_manageusers.listOfUsers();
+		ul = ul.sortNumbers( );
+		ul.each(function(user){ // list each user in table
+			var ud = parent.sessionData.pbxinfo.users[user];
+			var newRow = DOM_table_Ext_list.insertRow(-1);
+
+			var tmp_usertype_a = [];
+
+			if( ud.getProperty('hassip').isAstTrue() ){ tmp_usertype_a.push( '&nbsp;SIP User' ) ; }
+			if( ud.getProperty('hasiax').isAstTrue() ){ tmp_usertype_a.push( '&nbsp;IAX User' ) ; }
+			if( ud.getProperty('hassip').isAstTrue() && ud.getProperty('hasiax').isAstTrue() ){ tmp_usertype_a = [ 'SIP/IAX User' ] ; }
+			if( ud.getProperty('zapchan') ){
+				tmp_usertype_a.push( 'Analog User (Port ' + ud['zapchan'] + ')' ) ;
+			}
+
+			newRow.className = ((DOM_table_Ext_list.rows.length)%2==1)?'odd':'even';
+				if( !ud.getProperty('context') || ! parent.sessionData.pbxinfo.callingPlans[ud.getProperty('context')] ){
+					var tmp_userstring = '<u>' + user + '</u> <font color=red>*No DialPlan assigned</font>' ;
+				}else{
+					var tmp_userstring = '<u>' + user + '</u>' ;
+				}
+
+				addCell( newRow , { html: '' } );
+				addCell( newRow ,
+					{	html: tmp_userstring ,
+						onclickFunction: function(){
+							parent.miscFunctions.click_panel( 'users.html', 'users.html?EXTENSION_EDIT=' + user );
+						}
+					}
+				);
+
+				addCell( newRow , { html: ud.getProperty('fullname') } );
+				addCell( newRow , { html: tmp_usertype_a.join(',&nbsp;') } );
+		});
+	})();
+
+	(function(){ // List all meetMe Extensions
+		var m = parent.sessionData.pbxinfo.conferences ;
+		for( l in m ){ if( m.hasOwnProperty(l) && l !='admin'){
+				var newRow = DOM_table_Ext_list.insertRow(-1);
+				newRow.className = ((DOM_table_Ext_list.rows.length)%2==1)?'odd':'even';
+				addCell( newRow , { html:'' });
+				addCell( newRow , { html: l });
+				addCell( newRow , { html: '' });
+				addCell( newRow , { html: 'Conference Room' });
+		}}
+	})();
+
+	(function(){ // List all Queue Extensions
+		var QUEUES_CONF = config2json({filename:'queues.conf', usf:1});
+		var m = parent.sessionData.pbxinfo.queues ;
+		for( l in m ){
+			if( m.hasOwnProperty(l) ){
+				var newRow = DOM_table_Ext_list.insertRow(-1);
+				newRow.className = ((DOM_table_Ext_list.rows.length)%2==1)?'odd':'even';
+				addCell( newRow , { html:''} );
+				addCell( newRow , { html: l } );
+				addCell( newRow , { html: QUEUES_CONF[l] && QUEUES_CONF[l]['fullname'] || '--' }); // Label
+				if( m[l]['configLine'].contains(',1,agentlogin()') ){
+					addCell( newRow , { html: '<B>Agent Login</B>' });
+				}else if( m[l]['configLine'].contains(',1,agentcallbacklogin()') ){
+					addCell( newRow , { html: '<B>Agent CallBack Login</B>' });	
+				}else{
+					addCell( newRow , { html: 'Call Queue' } );
+				}
+			}
+		}
+	})();
+
+	(function(){ // List all RingGroup Extensions
+		var c = parent.sessionData.pbxinfo.ringgroups ;
+		for(var d in c){if(c.hasOwnProperty(d)){
+			var newRow = DOM_table_Ext_list.insertRow(-1);
+			newRow.className = ((DOM_table_Ext_list.rows.length)%2==1)?'odd':'even';
+			addCell( newRow , { html: '' } );
+			addCell( newRow , { html: c[d]['extension'] || '--' } );
+			addCell( newRow , { html: c[d]['NAME'] || d } );
+			addCell( newRow , { html: 'Ring Group' } );
+		}}
+	})();
+
+	(function(){ // List all VoiceMenu Extensions
+		var c = parent.sessionData.pbxinfo.voicemenus ;
+		for(var d in c){if(c.hasOwnProperty(d)){
+			var newRow = DOM_table_Ext_list.insertRow(-1);
+			newRow.className = ((DOM_table_Ext_list.rows.length)%2==1)?'odd':'even';
+			addCell( newRow , { html: '' } );
+			addCell( newRow , { html: ASTGUI.parseContextLine.getExten(c[d].getProperty('alias_exten')) || '--' } );
+			addCell( newRow , { html: c[d]['comment'] || d } );
+			addCell( newRow , { html: 'Voice Menu' } );
+		}}
+	})();
+
+	(function(){ // List VoicemailMain
+		var tmp = '';
+		if( parent.sessionData.pbxinfo['localextensions'].hasOwnProperty('VoiceMailMain') ){
+			tmp = ASTGUI.parseContextLine.getExten( parent.sessionData.pbxinfo['localextensions']['VoiceMailMain'] ) ;
+		}
+		var newRow = DOM_table_Ext_list.insertRow(-1);
+		newRow.className = ((DOM_table_Ext_list.rows.length)%2==1)?'odd':'even';
+		addCell( newRow , { html: '' } );
+
+		if( tmp ){
+			var tmp_voicemails = '<u>' + tmp + '</u>' ;
+		}else{
+			var tmp_voicemails = '-- <font color=red>*No Extension assigned</font>' ;
+		}
+
+		addCell( newRow ,
+			{	html: tmp_voicemails ,
+				onclickFunction: function(){
+					parent.miscFunctions.click_panel( 'voicemail.html');
+				}
+			}
+		);
+		addCell( newRow , { html: '<B>Check Voicemails</B>' } );
+		addCell( newRow , { html: 'VoiceMailMain' } );
+	})();
+	(function(){ // VoiceMail Groups
+		var vmgroups = parent.sessionData.pbxinfo.vmgroups.getOwnProperties();
+		vmgroups.each(function( this_vmg_exten ){
+			var newRow = DOM_table_Ext_list.insertRow(-1);
+			newRow.className = ((DOM_table_Ext_list.rows.length)%2==1)?'odd':'even';
+			addCell( newRow , { html: '' } );
+			addCell( newRow , { html: this_vmg_exten });
+			addCell( newRow , { html: parent.sessionData.pbxinfo.vmgroups[this_vmg_exten].getProperty('label')  });
+			addCell( newRow , { html: 'VoiceMail Group' } );
+		});
+	})();
+
+	(function(){
+		var newRow = DOM_table_Ext_list.insertRow(-1);
+		newRow.className = ((DOM_table_Ext_list.rows.length)%2==1)?'odd':'even';
+		addCell( newRow , { html: '' });
+
+		var tmp = parent.sessionData.pbxinfo['localextensions'].getProperty('defaultDirectory') ;
+		if( tmp ){
+			var tmp_dirExten = '<u>' + tmp + '</u>' ;
+		}else{
+			var tmp_dirExten = '-- <font color=red>*No Extension assigned</font>' ;
+		}
+
+		addCell( newRow ,
+			{	html: tmp_dirExten ,
+				onclickFunction: function(){ parent.miscFunctions.click_panel( 'directory.html'); }
+			}
+		);
+		addCell( newRow , { html: '<B>Dial by Names</B>' } );
+		addCell( newRow , { html: 'Directory' } );
+	})();
+};
+
+
+
+var update_needsConfiguratin_list = function(){
+	var TBL = _$('table_NeedConfiguration_list');
+	var addCell = ASTGUI.domActions.tr_addCell;
+
+	(function(){
+		var c = parent.sessionData.pbxinfo.callingRules;
+		for(var d in c){ if(c.hasOwnProperty(d)){	
+			var crd = c[d];
+			var crl = d.withOut(ASTGUI.contexts.CallingRulePrefix);
+			if( crd.hasOwnProperty('macroname') && !parent.astgui_managetrunks.misc.getTrunkName(crd.firstTrunk) ){
+
+				var newRow = TBL.insertRow(-1);
+				newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
+				addCell( newRow , {
+						html: "<i><font color=red>No Trunk Assigned</font></i> for calling rule '" + crl + "'" ,
+						align: 'center',
+						onclickFunction: function(){ parent.miscFunctions.click_panel( 'callingrules.html'); }
+					}
+				);
+			}
+		}}
+	})();
+
+	if( TBL.rows.length ){
+		$('#ittnc').show();
+	}
+
+};
+
+
+
+var localajaxinit = function(){
+	var ST ;
+	var loadIfeverythingParsed = function(){
+		if ( !parent.sessionData.finishedParsing) return;
+
+		clearInterval( ST );
+		top.document.title = "System Status" ;
+		DOM_table_Ext_list = _$('table_Ext_list');
+	
+		updateListingsTable();
+		updateTrunkslisting();
+		update_needsConfiguratin_list();
+	
+		(function(){
+			if( parent.sessionData.PLATFORM.isAA50 ) {
+				ASTGUI.systemCmdWithOutput( 'firmware_version' , function(a){
+					_$('firmware_div').innerHTML = 'Firmware : v' + a.trim() ;
+				});
+			}else{
+				ASTGUI.systemCmdWithOutput( 'uptime' , function(a){
+					_$('firmware_div').innerHTML = 'Uptime : ' + a.trim() ;
+				});
+			}
+		})();	
+	};
+
+	ST = setInterval( loadIfeverythingParsed , 200 );
+};
+
+</script>
+<body bgcolor="EFEFEF">
+<div class="iframeTitleBar">
+	System Status
+	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+</div>
+
+	<div class='lite_Heading'>System Status</div>
+	<div style='width: 100%; text-align:center;' id='firmware_div'></div>
+
+
+	<div style='width:100%; text-align:center; margin-top:10px;'><B>Trunks</B></div>
+	<div style='overflow:auto; width:95%; max-height: 500px; '>
+		<table id='table_Trunks_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
+	</div>
+
+	<div style='width:100%; text-align:center; margin-top:10px;'><B>Extensions</B></div>
+	<div style='overflow:auto; width:95%; max-height: 500px;'>
+		<table id='table_Ext_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
+	</div>
+
+
+	<div id='ittnc' style='display:none;'>
+		<div style='width:100%; text-align:center; margin-top:10px;'><B>Items that need configuration</B></div>
+		<div style='overflow:auto; width:95%; max-height: 500px;'>
+			<table id='table_NeedConfiguration_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
+		</div>
+	</div>
+
+
+</body>
