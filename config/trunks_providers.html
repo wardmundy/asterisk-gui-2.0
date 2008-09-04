@@ -51,24 +51,64 @@
 
 </style>
 <script>
+var PROVIDERS = {};
 
 var localajaxinit = function(){
 	top.document.title = 'Service Providers' ;
 	(function(){
-		var tmp_providersPage = ( parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ) ? 'trunks_sps.html' : 'trunks_providers.html';
 		var t = [
 			{url:'trunks_analog.html', desc:'Analog Trunks' } ,
 			{url: '#', desc:'Service Providers', selected:true } ,
 			{url:'trunks_voip.html', desc:'VOIP Trunks'}
 		];
-
 		if( !parent.sessionData.PLATFORM.isAA50 ){
 			t.push({url:'trunks_digital.html', desc:'T1/E1/BRI Trunks'});
 		}
-
 		ASTGUI.tabbedOptions( _$('tabbedMenu') , t);
 	})();
 
+	(function(){
+
+		PROVIDERS = config2json({ filename:'providers.conf', usf:1 });
+
+		for (var this_provider in PROVIDERS ){ if(PROVIDERS.hasOwnProperty(this_provider) ){
+			ASTGUI.selectbox.append('new_SP_Provider', PROVIDERS[this_provider].providername ||  this_provider , this_provider );
+		}}
+
+
+	})();
+
+	$('#new_SP_Provider').click( function(){
+		var selectedProvider = this.options[this.selectedIndex].value ;
+		_$('TD_SP_desc').innerHTML = PROVIDERS[selectedProvider].providerdesc ;
+
+		ASTGUI.domActions.removeAllChilds ('TD_SP_Logo_container');
+		var logo_img  = document.createElement('IMG');
+		$(logo_img).attr( 'src', PROVIDERS[selectedProvider].providerlogo );
+		$(logo_img).attr('border', '0');
+		_$('TD_SP_Logo_container').appendChild(logo_img) ;
+
+	});
+};
+
+
+
+
+providers_MiscFunctions = {
+	show_NewProviderForm : function(){ // providers_MiscFunctions.show_NewProviderForm();
+		$('#new_SPTrunk_DIV').showWithBg();
+	},
+
+	createNewProvider : function(){ // providers_MiscFunctions.createNewProvider();
+		if( _$('new_SP_Provider').selectedIndex == -1 ){
+			alert('Please select a Provider');
+			return;
+		}
+
+		var selectedProvider = _$('new_SP_Provider').options[ _$('new_SP_Provider').selectedIndex ].value ;
+
+		alert('Hi, This page is work in progress.\n This functionality is not implemented yet.');
+	}
 };
 
 </script>
@@ -79,8 +119,8 @@ var localajaxinit = function(){
 
 <div id="tabbedMenu"></div>
 
-<div class='top_buttons' style="margin-top: -10px; display:none;">
-	<span id='new_SP_button' class='guiButtonNew'>New ServiceProvider</span>
+<div class='top_buttons' style="margin-top: -10px;">
+	<span id='new_SP_button' class='guiButtonNew' onclick="providers_MiscFunctions.show_NewProviderForm();">New ServiceProvider</span>
 </div>
 
 <table id='table_SPS_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
@@ -119,7 +159,7 @@ var localajaxinit = function(){
 	</TR>
 	<TR>	<TD colspan=2 align=center height=50 valign=middle>
 			<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
-			<span class='guiButtonEdit' id="new_SP_save" onclick='create_new_serviceProvider();'>Add</span>
+			<span class='guiButtonEdit' id="new_SP_save" onclick='providers_MiscFunctions.createNewProvider();();'>Add</span>
 		</TD>
 	</TR>
 	</TABLE>
