@@ -434,6 +434,27 @@ var ASTGUI = {
 		return makeSyncRequest ( { action :'command', command: cmd } );
 	},
 
+	mailboxCount : function(mbox){ // ASTGUI.mailboxCount(mox) ; --> returns the number of New/Old Messages in mbox's mailbox
+		if(!mbox.contains('@')){ mbox = mbox + '@default' ; }
+		var t = makeSyncRequest ( { action :'MailboxCount', Mailbox: mbox } );
+		var tr = { count_new:0 , count_old : 0 };
+		try{
+			var lines = t.split('\n');
+			lines.each(function( this_line){
+				if(!this_line.contains('Messages:') ) return;
+				this_line = this_line.trim();
+				if( this_line.contains('NewMessages:') ){
+					tr.count_new = Number(this_line.afterChar(':').trim());
+				}
+				if( this_line.contains('OldMessages:') ){
+					tr.count_old = Number(this_line.afterChar(':').trim());
+				}
+			});
+		}finally{
+			return tr;
+		}
+	},
+
 	doTransfer : function(from, to) {
 		ASTGUI.debugLog("About to transfer " + from + " to " + to, 'manager');
 		return makeSyncRequest ( { action :'redirect', channel :from, exten :to, context :'default', priority :'1' } );
