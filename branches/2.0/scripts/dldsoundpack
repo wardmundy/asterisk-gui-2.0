@@ -16,12 +16,12 @@ elif [ "en" = "$1" ]; then
 	echo "Updating English language ($SOUNDS_LANGUAGE)"
 elif [ "fr" = "$1" ]; then
 	SOUNDS_LANGUAGE="$1"
-	DO_EXTRA ="no"
+	DO_EXTRA="no"
 	SOUND_LOC="$SOUND_LOC/$1"
 	echo "Updating French language ($SOUNDS_LANGUAGE)"
 elif [ "es" = "$1" ]; then
 	SOUNDS_LANGUAGE="$1"
-	DO_EXTRA ="no"
+	DO_EXTRA="no"
 	SOUND_LOC="$SOUND_LOC/$1"
 	echo "Updating Spanish language ($SOUNDS_LANGUAGE)"
 else
