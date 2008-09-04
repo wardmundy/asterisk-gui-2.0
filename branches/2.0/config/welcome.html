@@ -252,8 +252,10 @@ var updateListingsTable = function(){
 				addCell( newRow , { html: l } );
 				addCell( newRow , { html: QUEUES_CONF[l] && QUEUES_CONF[l]['fullname'] || '--' }); // Label
 				if( m[l]['configLine'].contains(',1,agentlogin()') ){
+					addCell( newRow , { html: '' } );
 					addCell( newRow , { html: '<B>Agent Login</B>' });
 				}else if( m[l]['configLine'].contains(',1,agentcallbacklogin()') ){
+					addCell( newRow , { html: '' } );
 					addCell( newRow , { html: '<B>Agent CallBack Login</B>' });	
 				}else{
 					addCell( newRow , { html: '' } );

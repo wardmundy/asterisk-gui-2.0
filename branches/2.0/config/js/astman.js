@@ -1229,6 +1229,46 @@ var ASTGUI = {
 	},
 
 	miscFunctions: {
+		getChunksFromManagerOutput : function( op , usf){ // ASTGUI.miscFunctions.getChunksFromManagerOutput( output_str ) ;
+			var tmp_lines = op.split('\n');
+			if( tmp_lines[0].contains('Response: ') ) tmp_lines.removeFirst();
+			if( tmp_lines[0].contains('Message: ') ) tmp_lines.removeFirst();
+
+			var tmp_Array_chunksAsArrays = []; // each element of the array is an Array of chunk_lines
+			var tmp_Array_chunksAsObjects = []; // each element of the array is an object of chunk_lines
+
+			var tmp_chunk = (usf) ? {} : [] ;
+			var count = 0;
+
+			for( var r = 0; r < tmp_lines.length ; r++ ){
+				var this_line = tmp_lines[r];
+				if( this_line.trim() == '' ){
+					if( !count ){ continue; }
+					if( usf ){
+						tmp_Array_chunksAsObjects.push(tmp_chunk);
+						tmp_chunk = {} ;
+					}else{
+						tmp_Array_chunksAsArrays.push(tmp_chunk);
+						tmp_chunk = [] ;
+					}
+					count = 0;
+					continue;
+				}
+
+				if( !this_line.contains(': ') ){ continue;  }
+				if( usf ){
+					tmp_chunk[ this_line.beforeStr(': ').trim() ] = this_line.afterStr(': ').trim() ;
+					count++ ;
+				}else{
+					tmp_chunk.push(this_line) ;
+					count++ ;
+				}
+			}
+
+			return ( usf ) ? tmp_Array_chunksAsObjects : tmp_Array_chunksAsArrays ;
+		},
+
+
 		createConfig : function( fileName, callback){ // ASTGUI.miscFunctions.createConfig( 'filaName', function(){ } ) ;
 			if( parent.sessionData.PLATFORM.isAST_1_6 ){
 				var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=createconfig&filename='+ fileName , async: false }).responseText;
