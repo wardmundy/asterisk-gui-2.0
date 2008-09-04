@@ -290,6 +290,15 @@ var VoiceMenus_miscFunctions = {
 					_$('newstep_dial_ThisNumber').value = '';
 					_$('newstep_dial_ViaTrunk').selectedIndex = -1 ;
 					break;
+				case 'UserEvent':
+					lbl('User Event');
+					tip_chosenStep.innerHTML = 'Send an arbitrary event to the manager interface';
+					$('#newstep_UserEvent_eventname').show();
+					$('#newstep_UserEvent_body').show();
+					$('#newstep_UserEvent_body_lbl').show();
+					_$('newstep_UserEvent_eventname').value = '';
+					_$('newstep_UserEvent_body').value = '';
+					break;
 				case 'CustomApp':
 					lbl('Custom App');
 					$('#newstep_custom').show();
@@ -374,6 +383,14 @@ var VoiceMenus_miscFunctions = {
 			case 'DialViaTrunk':
 				var tmp_trunkName = ASTGUI.getFieldValue('newstep_dial_ViaTrunk');
 				newstep =  'Macro('+ ASTGUI.contexts.dialtrunks + ',${' + tmp_trunkName + '}/'+ ASTGUI.getFieldValue('newstep_dial_ThisNumber') +',,'+ tmp_trunkName + ',)' ;
+				break;
+			case 'UserEvent':
+				var tmp_EventName = ASTGUI.getFieldValue('newstep_UserEvent_eventname');
+				var tmp_EventBody = ASTGUI.getFieldValue('newstep_UserEvent_body');
+				if( tmp_EventBody.trim() ){
+					tmp_EventName = tmp_EventName + '|' + tmp_EventBody ;
+				}
+				newstep =  'UserEvent('+ tmp_EventName + ')';
 				break;
 			case 'CustomApp':
 				newstep = ASTGUI.getFieldValue('newstep_custom') ;
@@ -808,6 +825,7 @@ var update_a_keyPressEvent = function(){
 							<option value="GotoDirecotry">Goto Directory</option>
 							<option value="DialViaTrunk">Dial a Number via Trunk</option>
 							<option value="CustomApp">Custom App</option>
+							<option value="UserEvent">User Event</option>
 <!--							<option value="CheckOwnVoiceMail">Check Voicemail for Own Extension</option>-->
 							<option value="Hangup">Hangup</option>
 						</select>
@@ -830,6 +848,9 @@ var update_a_keyPressEvent = function(){
 						<input  class='class_newStep_details_td' id="newstep_custom" size=24>
 						<input class='class_newStep_details_td' id="newstep_dial_ThisNumber" size=10>
 						<select class='class_newStep_details_td' id="newstep_dial_ViaTrunk"></select>
+						<input class='class_newStep_details_td' id="newstep_UserEvent_eventname" size=5>
+						<span  class='class_newStep_details_td' id='newstep_UserEvent_body_lbl'>Body:</span>
+						<input class='class_newStep_details_td' id="newstep_UserEvent_body" size=5>
 					</td>
 					<td>
 						<span class='guiButton' onclick='VoiceMenus_miscFunctions.push_newstep();'>&uarr; Add new Step</span>
