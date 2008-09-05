@@ -434,6 +434,18 @@ var ASTGUI = {
 		return makeSyncRequest ( { action :'command', command: cmd } );
 	},
 
+	getUser_DeviceStatus : function( usr ){ // ASTGUI.getUser_DeviceStatus(usr) 
+		var t = makeSyncRequest({ action :'ExtensionState', Exten: usr }) ;
+		if( t.contains('Status: 0') ) return 'F' ; // No Device is Busy/InUse
+		if( t.contains('Status: 1') ) return 'B' ; // 1 or more devices InUse
+		if( t.contains('Status: 2') ) return 'B' ; // All Devices Busy
+		if( t.contains('Status: 4') ) return 'U' ; // All Devices Unavailable/Unregistered
+		if( t.contains('Status: 8') ) return 'R' ; // All Devices Ringing
+		if( t.contains('Status: 16') ) return 'H' ; // All Devices OnHold
+		return null;
+	},
+
+
 	mailboxCount : function(mbox){ // ASTGUI.mailboxCount(mox) ; --> returns the number of New/Old Messages in mbox's mailbox
 		if(!mbox.contains('@')){ mbox = mbox + '@default' ; }
 		var t = makeSyncRequest ( { action :'MailboxCount', Mailbox: mbox } );
