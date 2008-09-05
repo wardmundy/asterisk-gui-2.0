@@ -105,6 +105,31 @@ function localajaxinit() {
 		$('#thispageContent').hide();
 		return true;
 	}
+
+	var rand_2 = Math.round(100000*Math.random());
+	var tmp_check_perms_guibkps = function(){
+		ASTGUI.dialog.waitWhile('Checking write privileges on backups folder');
+		ASTGUI.systemCmd( "touch "+ ASTGUI.paths['ConfigBkp'] + rand_2 , function(){
+
+			ASTGUI.listSystemFiles( ASTGUI.paths['ConfigBkp'], function(a){
+				a = a.join('');
+				if( a.contains(rand_2) ){
+					ASTGUI.systemCmd( "rm '"+ ASTGUI.paths['ConfigBkp'] + rand_2 + "'" , function(){});
+				}else{
+					ASTGUI.dialog.alertmsg( 'missing ' + ASTGUI.paths['ConfigBkp'] + '<BR> OR Asterisk does not have write privileges on ' + ASTGUI.paths['ConfigBkp'] );
+					return;
+				}
+
+				localajaxinit_2();
+			});
+		});
+	};
+
+	tmp_check_perms_guibkps();
+
+}
+
+var localajaxinit_2 = function(){
 	parent.ASTGUI.dialog.waitWhile(' Loading list of Previous Backup files !');
 	parent.ASTGUI.systemCmd( "mkdir -p " + bkpPath , function(){
 		parent.ASTGUI.listSystemFiles( bkpPath , function(bkpfiles) {
