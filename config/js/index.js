@@ -911,11 +911,11 @@ var localajaxinit = function(){
 				$('div.ui-accordion-desc').hide();
 				var f = s.parentNode ;
 				var page = $(f).attr("page");
-				DOM_mainscreen.src = page ;
 				$(f).find("div").show();
 				if( page == 'digital.html' && sessionData.PLATFORM.isAA50 ){
 					$(f).find("div")[1].innerHTML = 'Analog ports configuration';
 				}
+				setTimeout( function(){DOM_mainscreen.src = page ;} , 50 );
 			};
 			ASTGUI.events.add(DOM_accordion_div, 'click', loadPanel);
 		// End of Accordion
