@@ -2362,7 +2362,17 @@ astgui_updateConfigFromOldGui = function(){
 				})();
 			})();
 		}
-	
+
+		(function(){ // add linenumber=1 for any users that does not have it set (to support new resphoneprov )
+			for ( usr in USERS_CONF ){
+				if( !USERS_CONF.hasOwnProperty(usr) || usr == 'general' ) continue;
+				if( USERS_CONF[usr].hasOwnProperty('hasexten') && USERS_CONF[usr].hasexten == 'no' ) continue; // skip any trunks
+				if( !USERS_CONF[usr].hasOwnProperty('linenumber')){
+					SU.new_action('append', usr , 'linenumber', '1');
+				}
+			}
+		})();
+
 		sa.callActions( function(){
 			SU.callActions( function(){
 				var u = ASTGUI.updateaValue({ file: ASTGUI.globals.configfile, context: 'general', variable: 'config_upgraded', value: 'yes' }) ;
