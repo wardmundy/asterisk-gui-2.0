@@ -596,20 +596,20 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			}
 		}}
 
-		if( CONFIGURED_FXOPORTS != sessionData.FXO_PORTS_DETECTED.join(',') || CONFIGURED_FXSPORTS != sessionData.FXS_PORTS_DETECTED.join(',') ){
-			var message = 'Changes detected in your Analog Hardware !! <BR><BR>'
-				+ 'You will now be redirected to the hardware configuration page';
-			ASTGUI.yesOrNo({
-				btnYes_text : 'Ok' ,
-				title: 'Hardware changes detected ! ' ,
-				msg: message ,
-				ifyes: function(){
-					miscFunctions.click_panel('digital.html');
-				},
-				ifno: function(){ } ,
-				hideNo: true
-			});
-		}
+// 		if( CONFIGURED_FXOPORTS != sessionData.FXO_PORTS_DETECTED.join(',') || CONFIGURED_FXSPORTS != sessionData.FXS_PORTS_DETECTED.join(',') ){
+// 			var message = 'Changes detected in your Analog Hardware !! <BR><BR>'
+// 				+ 'You will now be redirected to the hardware configuration page';
+// 			ASTGUI.yesOrNo({
+// 				btnYes_text : 'Ok' ,
+// 				title: 'Hardware changes detected ! ' ,
+// 				msg: message ,
+// 				ifyes: function(){
+// 					miscFunctions.click_panel('digital.html');
+// 				},
+// 				ifno: function(){ } ,
+// 				hideNo: true
+// 			});
+// 		}
 	} // end of readcfg.ztScanConf();
 }; // end of readcfg
 
