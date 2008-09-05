@@ -445,6 +445,29 @@ var ASTGUI = {
 		return null;
 	},
 
+	getUser_DeviceStatus_Image : function( usr ){ // ASTGUI.getUser_DeviceStatus_Image(usr) 
+		var s =  this.getUser_DeviceStatus(usr) ;
+		switch(s){
+			case 'F': // No Device is Busy/InUse
+				return "<img src='images/status_green.png' border=0>";
+				break ;
+			case 'B': // Busy
+				return "<img src='images/status_red.png' border=0>";
+				break ;
+			case 'U': // UnAvailable
+				return "<img src='images/status_gray.png' border=0>";
+				break ;
+			case 'R': // Ringing
+				return "<img src='images/status_orange.png' border=0>";
+				break ;
+			case 'H': // Hold
+				return "<img src='images/status_yellow.png' border=0>";
+				break ;
+			default :
+				return "<img src='images/status_gray.png' border=0>";
+				break ;
+		}
+	},
 
 	mailboxCount : function(mbox){ // ASTGUI.mailboxCount(mox) ; --> returns the number of New/Old Messages in mbox's mailbox
 		if(!mbox.contains('@')){ mbox = mbox + '@default' ; }

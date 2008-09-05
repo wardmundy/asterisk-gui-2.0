@@ -213,7 +213,7 @@ var updateListingsTable = function(){
 					var tmp_userstring = '<u>' + user + '</u>' ;
 				}
 
-				addCell( newRow , { html: '' } );
+				addCell( newRow , { html: ASTGUI.getUser_DeviceStatus_Image(user) } );
 				addCell( newRow ,
 					{	html: tmp_userstring ,
 						onclickFunction: function(){
