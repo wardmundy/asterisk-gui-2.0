@@ -2058,6 +2058,8 @@ astgui_updateConfigFromOldGui = function(){
 		parent.ASTGUI.dialog.waitWhile('Upgrading Configuration files .. ');
 
 		var sa = new listOfActions('extensions.conf') ;
+		var SU = new listOfActions('users.conf') ;
+
 		var ext_conf = config2json({ filename:'extensions.conf', usf:0 });
 	
 		if( !ext_conf.hasOwnProperty(ASTGUI.contexts.CONFERENCES) ){
@@ -2307,6 +2309,7 @@ astgui_updateConfigFromOldGui = function(){
 			}
 		}
 	
+		var USERS_CONF = config2json({ filename:'users.conf', usf:1 }) ;
 		for (var catname in ext_conf){
 			// Upgrade dialing rules and create dialplans in the new format
 			if( !ext_conf.hasOwnProperty(catname) || !catname.beginsWith('numberplan-custom-') ) continue;
@@ -2347,12 +2350,24 @@ astgui_updateConfigFromOldGui = function(){
 				ASTGUI.includeContexts.each( function( this_localContext ){
 					sa.new_action('append', DP_CONTEXT_NAME , 'include', this_localContext);
 				});
+
+				(function(){
+					// update any users with $catname as Context to $DP_CONTEXT_NAME
+					for ( usr in USERS_CONF ){
+						if( !USERS_CONF.hasOwnProperty(usr) ) continue;
+						if( USERS_CONF[usr].hasOwnProperty('context') && USERS_CONF[usr].context == catname ){
+							SU.new_action( 'update', usr , 'context', DP_CONTEXT_NAME , catname );
+						}
+					}
+				})();
 			})();
 		}
 	
 		sa.callActions( function(){
-			var u = ASTGUI.updateaValue({ file: ASTGUI.globals.configfile, context: 'general', variable: 'config_upgraded', value: 'yes' }) ;
-			top.window.location.reload();
+			SU.callActions( function(){
+				var u = ASTGUI.updateaValue({ file: ASTGUI.globals.configfile, context: 'general', variable: 'config_upgraded', value: 'yes' }) ;
+				top.window.location.reload();
+			});
 		});
 		// create new 'OutBound Calling Rules' out of numer plans
 	};
