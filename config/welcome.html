@@ -202,10 +202,10 @@ var updateListingsTable = function(){
 			}
 
 			var tmp_mails = ASTGUI.mailboxCount(user);
-			if( tmp_mails.count_new == 0 && tmp_mails.count_old == 0 ){
-				var tmp_mails_str = '<font color=#888B8D> Messages : ' + tmp_mails.count_new + '/' + tmp_mails.count_old + '</font>' ;
-			}else{
+			if( tmp_mails.count_new > 0 ){
 				var tmp_mails_str = '<font color=#888B8D> Messages : <B><font color=red>' + tmp_mails.count_new + '</font>/' + tmp_mails.count_old + '</B></font>' ;
+			}else{
+				var tmp_mails_str = '<font color=#888B8D> Messages : ' + tmp_mails.count_new + '/' + tmp_mails.count_old + '</font>' ;
 			}
 
 			newRow.className = ((DOM_table_Ext_list.rows.length)%2==1)?'odd':'even';
