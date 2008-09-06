@@ -905,6 +905,7 @@ var ASTGUI = {
 		tr_addCell: function(tr, nc){ // usage :: ASTGUI.domActions.tr_addCell( el, { html:'newCell Text' , align:'center', width:'20px' }  )
 			var ih = nc.html; delete nc.html;
 			var newcell = tr.insertCell( tr.cells.length );
+			if( nc.id ){ newcell.id = nc.id ; delete nc.id; }
 			newcell.innerHTML = ih;
 			if( nc.onclickFunction && typeof nc.onclickFunction == "function" ){
 				ASTGUI.events.add( newcell , 'click' , nc.onclickFunction ) ;

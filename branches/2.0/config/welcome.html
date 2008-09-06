@@ -74,6 +74,8 @@
 <script>
 var REGISTRY_OUTPUT = { } ;
 var EX_CF;
+var tmp_image = document.createElement('IMG');
+$(tmp_image).attr('border', '0');
 
 var default_IncomingRule_trunk = function(trunk){
 	var cxt = ASTGUI.contexts.TrunkDIDPrefix + trunk + ASTGUI.contexts.TrunkDefaultSuffix ;
@@ -213,7 +215,7 @@ var updateListingsTable = function(){
 					var tmp_userstring = '<u>' + user + '</u>' ;
 				}
 
-				addCell( newRow , { html: ASTGUI.getUser_DeviceStatus_Image(user) } );
+				addCell( newRow , { html: ASTGUI.getUser_DeviceStatus_Image(user) , id : 'TD_USER_DEVICE_STATUS_' + user } );
 				addCell( newRow ,
 					{	html: tmp_userstring ,
 						onclickFunction: function(){
@@ -385,7 +387,6 @@ var update_needsConfiguratin_list = function(){
 };
 
 
-
 var localajaxinit = function(){
 	var ST ;
 	var loadIfeverythingParsed = function(){
@@ -413,6 +414,65 @@ var localajaxinit = function(){
 	};
 
 	ST = setInterval( loadIfeverythingParsed , 200 );
+	(function(){
+		var managerEvents = {};
+		managerEvents.updateUserImage = function(user , user_status){
+			var this_td = _$('TD_USER_DEVICE_STATUS_' + user );
+			ASTGUI.domActions.removeAllChilds ( this_td );
+			switch(user_status){
+				case 'F': // No Device is Busy/InUse
+					var IMG_STATUS_GREEN = tmp_image.cloneNode(true);
+					this_td.appendChild(IMG_STATUS_GREEN) ;
+					$(IMG_STATUS_GREEN).attr( 'src', 'images/status_green.png' );
+					break ;
+				case 'B': // Busy
+					var IMG_STATUS_RED = tmp_image.cloneNode(true);
+					this_td.appendChild(IMG_STATUS_RED) ;
+					$(IMG_STATUS_RED).attr( 'src', 'images/status_red.png' );
+					break ;
+				case 'U': // UnAvailable
+					var IMG_STATUS_GRAY = tmp_image.cloneNode(true);
+					this_td.appendChild(IMG_STATUS_GRAY) ;
+					$(IMG_STATUS_GRAY).attr( 'src', 'images/status_gray.png' );
+					break ;
+				case 'R': // Ringing
+					var IMG_STATUS_ORANGE = tmp_image.cloneNode(true);
+					this_td.appendChild(IMG_STATUS_ORANGE) ;
+					$(IMG_STATUS_ORANGE).attr( 'src', 'images/status_orange.png' );
+					break ;
+				case 'H': // Hold
+					var IMG_STATUS_YELLOW = tmp_image.cloneNode(true);
+					this_td.appendChild(IMG_STATUS_YELLOW) ;
+					$(IMG_STATUS_YELLOW).attr( 'src', 'images/status_yellow.png' );
+					break ;
+				default :
+					var IMG_STATUS_GRAY = tmp_image.cloneNode(true);
+					this_td.appendChild(IMG_STATUS_GRAY) ;
+					$(IMG_STATUS_GRAY).attr( 'src', 'images/status_gray.png' );
+					break ;
+			}
+		};
+		
+		managerEvents.parseOutput = function(op){
+			var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1) ;
+			tmp_chunks.each(function(this_chunk){
+				
+				if(this_chunk.hasOwnProperty('Event') && this_chunk.Event == 'ExtensionStatus' ){
+					var tmp_user = this_chunk.Exten ;
+					var new_status = ASTGUI.getUser_DeviceStatus(tmp_user) ;
+					managerEvents.updateUserImage(tmp_user , new_status);
+				}
+			});
+			
+			this.Watch();
+		},
+		managerEvents.Watch = function(){
+			$.get( ASTGUI.paths.rawman, {action:'waitevent'}, function(op){managerEvents.parseOutput(op); } );
+		};
+		
+		setTimeout( managerEvents.Watch, 2000 );
+	})();
+	
 };
 
 </script>
@@ -421,6 +481,8 @@ var localajaxinit = function(){
 	System Status
 	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
 </div>
+
+<div id='waitevent_Log'></div>
 
 	<div class='lite_Heading'>System Status</div>
 	<div style='width: 100%; text-align:center;' id='firmware_div'></div>
