@@ -77,6 +77,69 @@ var EX_CF;
 var tmp_image = document.createElement('IMG');
 $(tmp_image).attr('border', '0');
 
+var managerEvents = {};
+
+managerEvents.updateUserImage = function(user , user_status){
+	var this_td = _$('TD_USER_DEVICE_STATUS_' + user );
+	ASTGUI.domActions.removeAllChilds ( this_td );
+	switch(user_status){
+		case 'F': // No Device is Busy/InUse
+			var IMG_STATUS_GREEN = tmp_image.cloneNode(true);
+			this_td.appendChild(IMG_STATUS_GREEN) ;
+			$(IMG_STATUS_GREEN).attr( 'src', 'images/status_green.png' );
+			break ;
+		case 'B': // Busy
+			var IMG_STATUS_RED = tmp_image.cloneNode(true);
+			this_td.appendChild(IMG_STATUS_RED) ;
+			$(IMG_STATUS_RED).attr( 'src', 'images/status_red.png' );
+			break ;
+		case 'U': // UnAvailable
+			var IMG_STATUS_GRAY = tmp_image.cloneNode(true);
+			this_td.appendChild(IMG_STATUS_GRAY) ;
+			$(IMG_STATUS_GRAY).attr( 'src', 'images/status_gray.png' );
+			break ;
+		case 'R': // Ringing
+			var IMG_STATUS_ORANGE = tmp_image.cloneNode(true);
+			this_td.appendChild(IMG_STATUS_ORANGE) ;
+			$(IMG_STATUS_ORANGE).attr( 'src', 'images/status_orange.png' );
+			break ;
+		case 'H': // Hold
+			var IMG_STATUS_YELLOW = tmp_image.cloneNode(true);
+			this_td.appendChild(IMG_STATUS_YELLOW) ;
+			$(IMG_STATUS_YELLOW).attr( 'src', 'images/status_yellow.png' );
+			break ;
+		default :
+			var IMG_STATUS_GRAY = tmp_image.cloneNode(true);
+			this_td.appendChild(IMG_STATUS_GRAY) ;
+			$(IMG_STATUS_GRAY).attr( 'src', 'images/status_gray.png' );
+			break ;
+	}
+};
+
+managerEvents.parseOutput = function(op){
+	if( parent.sessionData.DEBUG_MODE ){
+		var b = document.createElement('div');
+		b.innerHTML = '<PRE>' + op + '</PRE><HR>';
+		_$('waitevent_Log').appendChild(b);
+	}
+
+	var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1) ;
+	tmp_chunks.each(function(this_chunk){
+		
+		if(this_chunk.hasOwnProperty('Event') && this_chunk.Event == 'ExtensionStatus' ){
+			var tmp_user = this_chunk.Exten ;
+			var new_status = ASTGUI.getUser_DeviceStatus(tmp_user) ;
+			managerEvents.updateUserImage(tmp_user , new_status);
+		}
+	});
+	
+	this.Watch();
+};
+
+managerEvents.Watch = function(){
+	$.get( ASTGUI.paths.rawman, {action:'waitevent'}, function(op){managerEvents.parseOutput(op); } );
+};
+
 var default_IncomingRule_trunk = function(trunk){
 	var cxt = ASTGUI.contexts.TrunkDIDPrefix + trunk + ASTGUI.contexts.TrunkDefaultSuffix ;
 	if ( !EX_CF.hasOwnProperty(cxt) ){
@@ -386,6 +449,46 @@ var update_needsConfiguratin_list = function(){
 
 };
 
+var update_AgentsListing_Table = function(){
+	var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
+	var TBL = _$('table_Agents_list') ;
+
+	$.get( ASTGUI.paths.rawman, { action: 'Agents' }, function(op){
+		var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1) ;
+		var newRow ;
+		var td_COUNT = 0;
+		tmp_chunks.each( function(this_chunk){
+			// Event: Agents
+			// Agent: 6000
+			// Name: Some User
+			// Status: AGENT_LOGGEDOFF / AGENT_IDLE / AGENT_ONCALL / AGENT_UNKNOWN
+			// LoggedInChan: n/a
+			// LoggedInTime: 0
+			// TalkingTo: n/a
+			if(this_chunk.hasOwnProperty('Event') && this_chunk.hasOwnProperty('Status') && this_chunk.Event == 'Agents' ){
+				if(this_chunk.Status == 'AGENT_UNKNOWN'){ return; }
+				var tmp_agent = this_chunk.Agent ;
+				var tmp_agent_Status = this_chunk.Status ;
+				if( td_COUNT == 4 || td_COUNT == 0 ){
+					newRow = TBL.insertRow(-1);
+					//newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
+					td_COUNT = 0;
+				}
+				var newcell = newRow.insertCell( newRow.cells.length ); td_COUNT++ ;
+				newcell.width = 120 ;
+				newcell.align = 'center' ;
+				if(tmp_agent_Status != 'AGENT_LOGGEDOFF'){ // logged in 
+					newcell.innerHTML = "<img src='images/agent_loggedin.png' border=0><BR>" + tmp_agent 
+								+ '<BR>Logged On: ' + this_chunk.LoggedInChan ;
+				}else{
+					newcell.innerHTML = "<img src='images/agent_loggedout.png' border=0><BR>" + tmp_agent ;
+				}
+			}
+		});
+
+		if( TBL.rows.length ){ $('#table_Agents_list_container').show() ; }
+	});
+};
 
 var localajaxinit = function(){
 	var ST ;
@@ -395,8 +498,12 @@ var localajaxinit = function(){
 		clearInterval( ST );
 		top.document.title = "System Status" ;
 		DOM_table_Ext_list = _$('table_Ext_list');
-	
-		updateListingsTable();
+		try{ updateListingsTable(); }catch(err){}
+
+		setTimeout( managerEvents.Watch, 2000 );
+
+		try{ update_AgentsListing_Table(); }catch(err){}
+
 		updateTrunkslisting();
 		update_needsConfiguratin_list();
 	
@@ -414,65 +521,6 @@ var localajaxinit = function(){
 	};
 
 	ST = setInterval( loadIfeverythingParsed , 200 );
-	(function(){
-		var managerEvents = {};
-		managerEvents.updateUserImage = function(user , user_status){
-			var this_td = _$('TD_USER_DEVICE_STATUS_' + user );
-			ASTGUI.domActions.removeAllChilds ( this_td );
-			switch(user_status){
-				case 'F': // No Device is Busy/InUse
-					var IMG_STATUS_GREEN = tmp_image.cloneNode(true);
-					this_td.appendChild(IMG_STATUS_GREEN) ;
-					$(IMG_STATUS_GREEN).attr( 'src', 'images/status_green.png' );
-					break ;
-				case 'B': // Busy
-					var IMG_STATUS_RED = tmp_image.cloneNode(true);
-					this_td.appendChild(IMG_STATUS_RED) ;
-					$(IMG_STATUS_RED).attr( 'src', 'images/status_red.png' );
-					break ;
-				case 'U': // UnAvailable
-					var IMG_STATUS_GRAY = tmp_image.cloneNode(true);
-					this_td.appendChild(IMG_STATUS_GRAY) ;
-					$(IMG_STATUS_GRAY).attr( 'src', 'images/status_gray.png' );
-					break ;
-				case 'R': // Ringing
-					var IMG_STATUS_ORANGE = tmp_image.cloneNode(true);
-					this_td.appendChild(IMG_STATUS_ORANGE) ;
-					$(IMG_STATUS_ORANGE).attr( 'src', 'images/status_orange.png' );
-					break ;
-				case 'H': // Hold
-					var IMG_STATUS_YELLOW = tmp_image.cloneNode(true);
-					this_td.appendChild(IMG_STATUS_YELLOW) ;
-					$(IMG_STATUS_YELLOW).attr( 'src', 'images/status_yellow.png' );
-					break ;
-				default :
-					var IMG_STATUS_GRAY = tmp_image.cloneNode(true);
-					this_td.appendChild(IMG_STATUS_GRAY) ;
-					$(IMG_STATUS_GRAY).attr( 'src', 'images/status_gray.png' );
-					break ;
-			}
-		};
-		
-		managerEvents.parseOutput = function(op){
-			var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1) ;
-			tmp_chunks.each(function(this_chunk){
-				
-				if(this_chunk.hasOwnProperty('Event') && this_chunk.Event == 'ExtensionStatus' ){
-					var tmp_user = this_chunk.Exten ;
-					var new_status = ASTGUI.getUser_DeviceStatus(tmp_user) ;
-					managerEvents.updateUserImage(tmp_user , new_status);
-				}
-			});
-			
-			this.Watch();
-		},
-		managerEvents.Watch = function(){
-			$.get( ASTGUI.paths.rawman, {action:'waitevent'}, function(op){managerEvents.parseOutput(op); } );
-		};
-		
-		setTimeout( managerEvents.Watch, 2000 );
-	})();
-	
 };
 
 </script>
@@ -482,8 +530,6 @@ var localajaxinit = function(){
 	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
 </div>
 
-<div id='waitevent_Log'></div>
-
 	<div class='lite_Heading'>System Status</div>
 	<div style='width: 100%; text-align:center;' id='firmware_div'></div>
 
@@ -491,6 +537,16 @@ var localajaxinit = function(){
 	<div style='width:100%; text-align:center; margin-top:10px;'><B>Trunks</B></div>
 	<div style='overflow:auto; width:95%; max-height: 500px; '>
 		<table id='table_Trunks_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
+	</div>
+
+	<div style='overflow:auto; width:95%; max-height: 500px;margin-top:10px; display:none;' id='table_Agents_list_container'>
+		<table cellpadding=1 cellspacing=2 border=0 align=center style="border-width: 1px ; border-spacing: 2px; border-style: solid; border-color: #6b79a5; border-collapse: separate; background-color: white;">
+			<td valign='top' align=center width='70'><B>Agents</B></td>
+			<td align=center>
+				<table id='table_Agents_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
+			</td>
+		</table>
+		
 	</div>
 
 	<div style='width:100%; text-align:center; margin-top:10px;'><B>Extensions</B></div>
@@ -506,5 +562,5 @@ var localajaxinit = function(){
 		</div>
 	</div>
 
-
+	<div id='waitevent_Log'></div>
 </body>
