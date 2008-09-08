@@ -29,6 +29,10 @@
 var OPEXTENSION = '';
 var STDEXTEN_RINGINTERFACE_LINE ;
 
+var polycom_digitmap_string = '';
+var polycom_digitmap_timeout_string = '';
+
+
 var loadDOMelements = function(){
 	DOM_obCid_input = _$('obCid_input') ;
 	DOM_op_ext = _$('op_ext') ;
@@ -46,6 +50,21 @@ function localajaxinit(){
 			}else{
 				_$('op_polycom_idleimage').checked = false ;
 			}
+
+			if( c.hasOwnProperty('polycom') ){
+				var tmp_dm_index = c['polycom'].indexOfLike('setvar=DIGITMAP=') ;
+				if( tmp_dm_index >= 0 ){
+					polycom_digitmap_string = c['polycom'][tmp_dm_index].afterChar('=');
+					_$('op_voip_digitmap').value = polycom_digitmap_string.lChop('DIGITMAP=');
+				}
+
+				var tmp_dmto_index = c['polycom'].indexOfLike('setvar=DIGITMAPTIMEOUT=') ;
+				if( tmp_dmto_index >= 0 ){
+					polycom_digitmap_timeout_string = c['polycom'][tmp_dmto_index].afterChar('=');
+					_$('op_voip_digit_timeout').value = polycom_digitmap_timeout_string.lChop('DIGITMAPTIMEOUT=');
+				}
+			}
+
 		})();
 	}
 
@@ -175,6 +194,21 @@ var save_changes = function(){
 		}else{
 			u.new_action( 'append', 'polycom', 'setvar', 'IDLEIMAGE_ACTIVE=0' );
 		}
+
+		if( polycom_digitmap_string ){
+			u.new_action('delete', 'polycom', 'setvar', '' , polycom_digitmap_string );
+		}
+		if( _$('op_voip_digitmap').value ){
+			u.new_action( 'append', 'polycom', 'setvar', 'DIGITMAP=' + _$('op_voip_digitmap').value );
+		}
+
+		if( polycom_digitmap_timeout_string ){
+			u.new_action('delete', 'polycom', 'setvar', '' , polycom_digitmap_timeout_string );
+		}
+		if( _$('op_voip_digit_timeout').value ){
+			u.new_action( 'append', 'polycom', 'setvar', 'DIGITMAPTIMEOUT=' + _$('op_voip_digit_timeout').value );
+		}
+
 		u.callActions();
 	}
 
@@ -254,8 +288,15 @@ var reset_ranges_default = function(){
 		<td align=right>Enable Idle Image Display <img src="images/tooltip_info.gif" tip="en,options,10" class='tooltipinfo'> :</td>
 		<td><input type='checkbox' id='op_polycom_idleimage'></td>
 	</tr>
+	<tr class='16_Only' style='display:none;'>
+		<td align=right>VoIP Phone Digit Map <img src="images/tooltip_info.gif" tip="en,options,12" class='tooltipinfo'> :</td>
+		<td><input size=15 id='op_voip_digitmap'></td>
+	</tr>
+	<tr class='16_Only' style='display:none;'>
+		<td align=right>VOIP Phone Digit Timeout <img src="images/tooltip_info.gif" tip="en,options,13" class='tooltipinfo'> :</td>
+		<td><input size=1 id='op_voip_digit_timeout'></td>
+	</tr>
 </table>
-
 
 <table cellpadding=2 cellspacing=2 border=0  align=center width="90%">
 <tr><td align=center>
