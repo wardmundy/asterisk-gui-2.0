@@ -295,7 +295,18 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['options'].en[9] = "The Language setting allows the user to specify the default prompts language for phone to phone, inbound, and outbound calls.  If a soundpack selection is made but not already installed, then the pack will be downloaded from Digium." ;
 	tooltips['options'].en[10] = "Enables the display of a graphic on a phone's LCD display when the phone is idle." ;
 	tooltips['options'].en[11] = "Number of seconds to ring a device before sending to the user's Voicemail Box" ;
+	tooltips['options'].en[12] = "A digit mapping string compatible with the RFC 3435 section 2.1.5. These default is:"
+					+ "<li> [2-9]11 - Where calls beginning with digits 2-9 followed by digits 11 are dialed immediately. "
+					+ "<li> 0T - Where calls beginning with digit 0 followed by a pause equal to the \"Digit Timeout\" option."
+					+ "<li> +011xxx.T - Where calls beginning with the + character, followed by 011 digits and then at least three more digits before any arbitrary number is matched, dialed after Digit Timeout is reached."
+					+ "<li> 0[2-9]xxxxxxxxx - Where calls beginning with 0, followed by any digit from 2-9, followed further by 9 more digits are dialed immediately."
+					+ "<li> +1[2-9]xxxxxxxx - Where calls beginning with the + character, followed by 1, followed by any digit from 2-9, followed by 8 more digits are dialed immediately."
+					+ "<li> [2-9]xxxxxxxxx - Where calls beginning with any digit from 2-9, followed by 9 more digits are dialed immediately."
+					+ "<li> [2-9]xxxT - Where calls beginning with any digit from 2-9, followed by three more digits are dialed after Digit Timeout is reached."
+					+ "This is represented in the entry box as: [2-9]11|0T|+011xxx.T|0[2-9]xxxxxxxxx|+1[2-9]xxxxxxxx|[2-9]xxxxxxxxx|[2-9]xxxT"
+					+ "where each entry is separated by the | character. ";
 
+	tooltips['options'].en[13] = "The timeout variable is the number of seconds the phone will wait for each segment of a digit map expressed as an integer.";
 
 	// Tooltips for Directory
 	tooltips['directory']= new Object;
