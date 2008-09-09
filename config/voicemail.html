@@ -29,7 +29,8 @@
 </style>
 <script>
 var TODELETE = '';
-var DVD = ',1,VoiceMail(${EXTEN:1}@default)' ; // direct voicemail dial
+var OLD_DVD = '1,VoiceMail(${EXTEN:1}@default' ;
+var DVD = ',1,VoiceMail(${EXTEN:1}@default,s)' ; // direct voicemail dial
 
 var localajaxinit = function( ){
 	(function (){
@@ -110,7 +111,7 @@ var update = function(){
 			{ context_name : 'default' ,
 				beginsWithArr: ['exten=_*','exten=_#'] ,
 				filename: 'extensions.conf',
-				hasThisString: DVD,
+				hasThisString: OLD_DVD,
 				cb:function(){}
 			}
 		);
