@@ -217,7 +217,7 @@ var onLogInFunctions = {
 
 		ASTGUI.dialog.waitWhile('Checking write permission for gui folder');
 		var rand_1 = Math.round(100000*Math.random());
-		ASTGUI.systemCmdWithOutput( "echo '" + rand_1 + "'" , function(s){
+		ASTGUI.systemCmdWithOutput( 'echo ' + rand_1  , function(s){
 			if( !s.contains(rand_1) ){
 				ASTGUI.dialog.alertmsg( 'Asterisk needs write privileges on ' + ASTGUI.paths['guiInstall'] );
 			}
