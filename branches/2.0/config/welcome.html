@@ -515,6 +515,7 @@ var update_AgentsListing_Table = function(){
 				var newcell = newRow.insertCell( newRow.cells.length ); td_COUNT++ ;
 				newcell.width = 120 ;
 				newcell.align = 'center' ;
+
 				if(tmp_agent_Status != 'AGENT_LOGGEDOFF'){ // logged in 
 					newcell.innerHTML = "<img src='images/agent_loggedin.png' border=0><BR>" + tmp_agent 
 								+ '<BR>Logged On: ' + this_chunk.LoggedInChan ;
@@ -577,6 +578,7 @@ var localajaxinit = function(){
 		<table id='table_Trunks_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
 	</div>
 
+
 	<div style='overflow:auto; width:95%; max-height: 500px;margin-top:10px; display:none;' id='table_Agents_list_container'>
 		<table cellpadding=1 cellspacing=2 border=0 align=center style="border-width: 1px ; border-spacing: 2px; border-style: solid; border-color: #6b79a5; border-collapse: separate; background-color: white;">
 			<td valign='top' align=center width='70'><B>Agents</B></td>
@@ -587,7 +589,20 @@ var localajaxinit = function(){
 		
 	</div>
 
-	<div style='width:100%; text-align:center; margin-top:10px;'><B>Extensions</B></div>
+
+	<div style='width:100%; text-align:center; margin-top:15px;'>
+		<B>Extensions</B>
+		<BR>
+		<table cellpadding=0 cellspacing=0 border=0 align=center width=500 align=center>
+		<tr>
+			<td align=center><img src='images/status_green.png' border=0> Free</td>
+			<td align=center><img src='images/status_red.png' border=0> Busy</td>
+			<td align=center><img src='images/status_gray.png' border=0> UnAvailable</td>
+			<td align=center><img src='images/status_orange.png' border=0> Ringing</td>
+			<td align=center><img src='images/status_yellow.png' border=0> OnHold</td>
+		</tr>
+		</table>
+	</div>
 	<div style='overflow:auto; width:95%; max-height: 500px;'>
 		<table id='table_Ext_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
 	</div>
