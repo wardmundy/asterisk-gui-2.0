@@ -122,18 +122,30 @@ managerEvents.parseOutput = function(op){
 		b.innerHTML = '<PRE>' + op + '</PRE><HR>';
 		_$('waitevent_Log').appendChild(b);
 	}
+	var op_LC = op.toLowerCase() ;
 
-	var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1) ;
-	tmp_chunks.each(function(this_chunk){
-		
-		if(this_chunk.hasOwnProperty('Event') && this_chunk.Event == 'ExtensionStatus' ){
-			var tmp_user = this_chunk.Exten ;
-			var new_status = ASTGUI.getUser_DeviceStatus(tmp_user) ;
-			managerEvents.updateUserImage(tmp_user , new_status);
+	try{
+		if( op_LC.contains('event: queuememberstatus') ){
+
+			setTimeout( update_AgentsListing_Table , 1000 );
+
+		} else if ( op_LC.contains('event: extensionstatus') ) {
+
+			var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1) ;
+			tmp_chunks.each(function(this_chunk){
+				if(this_chunk.hasOwnProperty('Event') && this_chunk.Event == 'ExtensionStatus' ){
+					var tmp_user = this_chunk.Exten ;
+					var new_status = ASTGUI.getUser_DeviceStatus(tmp_user) ;
+					managerEvents.updateUserImage(tmp_user , new_status);
+				}
+			});
+
 		}
-	});
-	
-	this.Watch();
+
+	}finally{
+		this.Watch();
+	}
+
 };
 
 managerEvents.Watch = function(){
@@ -477,6 +489,7 @@ var update_needsConfiguratin_list = function(){
 var update_AgentsListing_Table = function(){
 	var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
 	var TBL = _$('table_Agents_list') ;
+	ASTGUI.domActions.removeAllChilds(TBL);
 
 	$.get( ASTGUI.paths.rawman, { action: 'Agents' }, function(op){
 		var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1) ;
