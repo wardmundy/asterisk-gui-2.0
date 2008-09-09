@@ -235,6 +235,31 @@ var updateTrunkslisting = function(){
 		}}
 	})();
 
+	(function (){
+		var c = parent.sessionData.pbxinfo['trunks']['pri'] ;
+		for(var d in c){if(c.hasOwnProperty(d)){
+			var newRow = TBL.insertRow(-1);
+			newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
+			addCell( newRow , { html:'' });
+			addCell( newRow , { html: c[d]['trunkname'] });
+			addCell( newRow , { html: 'Digital (' + c[d]['signalling'] + ')' }); // 
+			addCell( newRow , { html: 'Ports: ' + c[d]['zapchan'] });
+			addCell( newRow , { html:''} );
+		}}
+
+
+		var c = parent.sessionData.pbxinfo['trunks']['bri'] ;
+		for(var d in c){if(c.hasOwnProperty(d)){
+			var newRow = TBL.insertRow(-1);
+			newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
+			addCell( newRow , { html:'' });
+			addCell( newRow , { html: c[d]['trunkname'] });
+			addCell( newRow , { html: 'BRI' });
+			addCell( newRow , { html: 'Ports: ' + c[d]['ports'] });
+			addCell( newRow , { html:''} );
+		}}
+	})();
+
 };
 
 var updateListingsTable = function(){
