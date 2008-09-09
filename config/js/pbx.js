@@ -2392,7 +2392,7 @@ astgui_updateConfigFromOldGui = function(){
 			var year = today.getFullYear();
 			var month = months[ today.getMonth() ];
 			var day = today.getDate().addZero();
-			var tmp_bkpFileName = 'Upgrade_backup_of_C1.x__' + year + month + day + '.tar' ;
+			var tmp_bkpFileName = ( sessionData.PLATFORM.isABE ) ? 'Upgrade_backup_of_C1.x__' + year + month + day + '.tar' :  'Upgrade_backup_before_GUI__' + year + month + day + '.tar' ;
 	
 			parent.ASTGUI.dialog.waitWhile('Taking Backup of current configuration ...');
 			ASTGUI.systemCmd( "tar -cf " + ASTGUI.paths.ConfigBkp + tmp_bkpFileName + ' ' +  ' /etc/asterisk', function(){
