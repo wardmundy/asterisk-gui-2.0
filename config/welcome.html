@@ -117,35 +117,29 @@ managerEvents.updateUserImage = function(user , user_status){
 };
 
 managerEvents.parseOutput = function(op){
-	if( parent.sessionData.DEBUG_MODE ){
-		var b = document.createElement('div');
-		b.innerHTML = '<PRE>' + op + '</PRE><HR>';
-		_$('waitevent_Log').appendChild(b);
-	}
-	var op_LC = op.toLowerCase() ;
-
-	try{
-		if( op_LC.contains('event: queuememberstatus') ){
-
-			setTimeout( update_AgentsListing_Table , 1000 );
-
-		} else if ( op_LC.contains('event: extensionstatus') ) {
-
-			var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1) ;
-			tmp_chunks.each(function(this_chunk){
-				if(this_chunk.hasOwnProperty('Event') && this_chunk.Event == 'ExtensionStatus' ){
-					var tmp_user = this_chunk.Exten ;
-					var new_status = ASTGUI.getUser_DeviceStatus(tmp_user) ;
-					managerEvents.updateUserImage(tmp_user , new_status);
-				}
-			});
-
+	(function(){
+		if( parent.sessionData.DEBUG_MODE ){
+			var b = document.createElement('div');
+			b.innerHTML = '<PRE>' + op + '</PRE><HR>';
+			_$('waitevent_Log').appendChild(b);
 		}
-
-	}finally{
-		this.Watch();
-	}
-
+		var op_LC = op.toLowerCase() ;
+		try{
+			if( op_LC.contains('event: queuememberstatus') ){
+				setTimeout( update_AgentsListing_Table , 1000 );
+			} else if ( op_LC.contains('event: extensionstatus') ) {
+				var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1) ;
+				tmp_chunks.each(function(this_chunk){
+					if(this_chunk.hasOwnProperty('Event') && this_chunk.Event == 'ExtensionStatus' ){
+						var tmp_user = this_chunk.Exten ;
+						var new_status = ASTGUI.getUser_DeviceStatus(tmp_user) ;
+						managerEvents.updateUserImage(tmp_user , new_status);
+					}
+				});
+			}
+		}catch(err){}
+	})();
+	this.Watch();
 };
 
 managerEvents.Watch = function(){

@@ -32,6 +32,10 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			var u = new listOfSynActions('extensions.conf');
 			if( !ecnf['globals'] ){
 				u.new_action('newcat', 'globals', '', '');
+				u.new_action('append', 'globals', 'FEATURES', '');
+				u.new_action('append', 'globals', 'DIALOPTIONS', '');
+				u.new_action('append', 'globals', 'RINGTIME', '20');
+				ecnf.globals = {} ;
 			}
 			if( !ecnf['general'] ){
 				u.new_action('newcat', 'general', '', '');
@@ -45,6 +49,28 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			if( parent.sessionData.DEBUG_MODE ){
 				alert('updated general context in extensions.conf' + '\n' + 'Click OK to reload');
 			}
+			window.location.reload();
+			return;
+		}
+
+		if( !ecnf['globals'].hasOwnProperty('FEATURES') ){
+			var u = new listOfSynActions('extensions.conf');
+			u.new_action('append', 'globals', 'FEATURES', '');
+			u.callActions();
+			window.location.reload();
+			return;
+		}
+		if( !ecnf['globals'].hasOwnProperty('DIALOPTIONS') ){
+			var u = new listOfSynActions('extensions.conf');
+			u.new_action('append', 'globals', 'DIALOPTIONS', '');
+			u.callActions();
+			window.location.reload();
+			return;
+		}
+		if( !ecnf['globals'].hasOwnProperty('RINGTIME') ){
+			var u = new listOfSynActions('extensions.conf');
+			u.new_action('append', 'globals', 'RINGTIME', '20');
+			u.callActions();
 			window.location.reload();
 			return;
 		}
@@ -162,7 +188,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		}
 
 		var stdextn = 'macro-stdexten' ;
-		if( !ecnf.hasOwnProperty(stdextn) || ( ecnf.hasOwnProperty(stdextn) && !ecnf[stdextn]['exten'].contains('FOLLOWME_') ) ){ // if stdexten does not forward to followme 
+		if( !ecnf.hasOwnProperty(stdextn) || ( ecnf.hasOwnProperty(stdextn) && !ecnf[stdextn]['exten'].contains('DYNAMIC_FEATURES') ) ){ // if stdexten does not forward to followme 
 			sessionData.continueParsing = false;
 			(function(){
 				ASTGUI.dialog.waitWhile('Updating stdexten Macro in extensions.conf');
@@ -178,10 +204,11 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				var x = new listOfActions('extensions.conf');
 				x.new_action( 'delcat', stdextn , '', '');
 				x.new_action( 'newcat', stdextn , '', '');
-				x.new_action( 'append', stdextn , 'exten', 's,1,GotoIf($[${FOLLOWME_${ARG1}} = 1]?4:2)');
-				x.new_action( 'append', stdextn , 'exten', 's,2,Dial(${ARG2},20)');
-				x.new_action( 'append', stdextn , 'exten', 's,3,Goto(s-${DIALSTATUS},1)');
-				x.new_action( 'append', stdextn , 'exten', 's,4,Macro(stdexten-followme,${ARG1},${ARG2})');
+				x.new_action( 'append', stdextn , 'exten', 's,1,Set(__DYNAMIC_FEATURES=${FEATURES})');
+				x.new_action( 'append', stdextn , 'exten', 's,2,GotoIf($[${FOLLOWME_${ARG1}} = 1]?5:3)');
+				x.new_action( 'append', stdextn , 'exten', 's,3,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})');
+				x.new_action( 'append', stdextn , 'exten', 's,4,Goto(s-${DIALSTATUS},1)');
+				x.new_action( 'append', stdextn , 'exten', 's,5,Macro(stdexten-followme,${ARG1},${ARG2})');
 				x.new_action( 'append', stdextn , 'exten', 's-NOANSWER,1,Voicemail(${ARG1},u)');
 				x.new_action( 'append', stdextn , 'exten', 's-NOANSWER,2,Goto(default,s,1)');
 				x.new_action( 'append', stdextn , 'exten', 's-BUSY,1,Voicemail(${ARG1},b)');
@@ -210,9 +237,9 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 
 				var x = new listOfActions('extensions.conf');
 				x.new_action( 'newcat', fmcat , '', '');
-				x.new_action( 'append', fmcat , 'exten', 's,1,Dial(${ARG2},20)' );
+				x.new_action( 'append', fmcat , 'exten', 's,1,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})' );
 				x.new_action( 'append', fmcat , 'exten', 's,2,Followme(${ARG1},a)' );
-				x.new_action( 'append', fmcat , 'exten', 's,3,Voicemail(${ARG1},b)' );
+				x.new_action( 'append', fmcat , 'exten', 's,3,Voicemail(${ARG1},u)' );
 				x.new_action( 'append', fmcat , 'exten', 's-NOANSWER,1,Voicemail(${ARG1},u)' );
 				x.new_action( 'append', fmcat , 'exten', 's-BUSY,1,Voicemail(${ARG1},b)' );
 				x.new_action( 'append', fmcat , 'exten', 's-BUSY,2,Goto(default,s,1)' );

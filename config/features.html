@@ -1,0 +1,430 @@
+<!--
+ * Asterisk-GUI	- an Asterisk configuration interface
+ *
+ * CallParking Preferences
+ *
+ * Copyright (C) 2007-2008, Digium, Inc.
+ *
+ * Pari Nannapaneni <pari@digium.com>
+ *
+ * See http://www.asterisk.org for more information about
+ * the Asterisk project. Please do not directly contact
+ * any of the maintainers of this project for assistance;
+ * the project provides a web site, mailing lists and IRC
+ * channels for your use.
+ *
+ * This program is free software, distributed under the terms of
+ * the GNU General Public License Version 2. See the LICENSE file
+ * at the top of the source tree.
+ *
+-->
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+	#Table_applicationMap_definitions {
+		border: 1px solid #666666;
+		margin-top: 5px;
+		margin-bottom:10px;
+		width: 96%;
+		text-align: center;
+		padding : 1px;
+	}
+	#Table_applicationMap_definitions tr.frow { background: #6b79a5; color: #CED7EF; }
+	#Table_applicationMap_definitions tr.frow td{ font-weight:bold; }
+	#Table_applicationMap_definitions tr td{ padding : 3px; }
+	#Table_applicationMap_definitions tr.even { background: #DFDFDF; }
+	#Table_applicationMap_definitions tr.odd{ background: #FFFFFF; }
+	/*#Table_applicationMap_definitions tr.even:hover, #Table_applicationMap_definitions tr.odd:hover {
+		background: #a8b6e5;
+		cursor: default;
+	}*/
+
+</style>
+<script>
+var ct = 'general';
+var FM = 'featuremap';
+var AP_MAP_TRID = 'TR_APMAP_';
+var ENABLED_APPS = [];
+
+var ApplicationMap = {};
+var APPS_LIST = [ "Answer", "Background", "Busy", "Congestion", "DigitTimeout", "DISA", "ResponseTimeout", "Playback" , "Wait", "WaitExten", "Hangup" ];
+
+var do_new_ApplicationMap_row = function(){
+	var TBL = _$('Table_applicationMap_definitions');
+	create_new_AppMap_tr(TBL.rows.length, '');
+};
+
+var create_new_AppMap_tr = function( appNumber , featureName){
+	if(featureName){
+		var tmp_fields = ApplicationMap[featureName].split(',') ;
+	}else{
+		featureName = '';
+		var tmp_fields = [ '','self', '' , ''] ;
+	}
+
+	var TBL = _$('Table_applicationMap_definitions');
+	var newRow = TBL.insertRow(-1);
+	newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
+	newRow.id = AP_MAP_TRID + String(appNumber) ;
+	
+	var C1 = document.createElement('input');
+	C1.type = 'checkbox';
+	C1.className = 'textbox_feature_CheckBox' ;
+	C1.checked = ( ENABLED_APPS.contains(featureName) ) ? true : false ;
+	var newcell = newRow.insertCell( newRow.cells.length );
+	newcell.appendChild( C1 );
+	
+	var CA = document.createElement('input');
+	CA.type = 'text';
+	CA.className = 'textbox_featurename' ;
+	CA.size = 10 ;
+	ASTGUI.updateFieldToValue( CA , featureName );
+	var newcell = newRow.insertCell( newRow.cells.length );
+	newcell.appendChild( CA );
+
+	var CB = document.createElement('input');
+	CB.type = 'text';
+	CB.className = 'textbox_dialstr' ;
+	CB.size = 2 ;
+	ASTGUI.updateFieldToValue( CB , tmp_fields[0] );
+	var newcell = newRow.insertCell( newRow.cells.length );
+	newcell.appendChild( CB );
+
+	var CC = document.createElement('select');
+	CC.className = 'textbox_activeOnBy' ;
+	var newcell = newRow.insertCell( newRow.cells.length );
+	newcell.appendChild( CC );
+	ASTGUI.selectbox.populateArray(CC,[
+		{optionText:'self', optionValue:'self'}, {optionText:'peer', optionValue:'peer'} ,
+		{optionText:'self/caller', optionValue:'self/caller'}, {optionText:'peer/caller', optionValue:'peer/caller'} ,
+		{optionText:'self/callee', optionValue:'self/callee'}, {optionText:'peer/callee', optionValue:'peer/callee'} ,
+		{optionText:'self/both', optionValue:'self/both'}, {optionText:'peer/both', optionValue:'peer/both'}
+	]);
+	ASTGUI.updateFieldToValue( CC , tmp_fields[1] );
+
+	var CD = document.createElement('input');
+	CD.type = 'text';
+	CD.className = 'textbox_appName' ;
+	CD.size = 20 ;
+	ASTGUI.updateFieldToValue( CD , tmp_fields[2] );
+	ASTGUI.COMBOBOX.call( CD , APPS_LIST , 195 );
+
+	var newcell = newRow.insertCell( newRow.cells.length );
+	newcell.appendChild( CD );
+
+	var CE = document.createElement('input');
+	CE.type = 'text';
+	CE.className = 'textbox_appArgs' ;
+	CE.size = 10 ;
+	ASTGUI.updateFieldToValue( CE , tmp_fields[3] );
+	var newcell = newRow.insertCell( newRow.cells.length );
+	newcell.appendChild( CE );
+};
+
+
+var generate_applicationMap_TRs = function(){
+	var TBL = _$('Table_applicationMap_definitions');
+	var addCell = ASTGUI.domActions.tr_addCell;
+	(function(){ // add first row
+		var newRow = TBL.insertRow(-1);
+		newRow.className = "frow";
+		
+		addCell( newRow , { html:'Enabled' } );
+		addCell( newRow , { html:'Feature Name'} );
+		addCell( newRow , { html:'Digits'} );
+		addCell( newRow , { html:'ActiveOn/By'} );
+		addCell( newRow , { html:'App Name'} );
+		addCell( newRow , { html:'Arguments'} );
+	})();
+
+	var apps = 0;
+	for(var featureName in ApplicationMap){
+		if( !ApplicationMap.hasOwnProperty(featureName) ){ continue}
+		create_new_AppMap_tr( TBL.rows.length , featureName);
+	}
+};
+
+
+var load_preferences = function(){
+
+	(function(){
+		var c = context2json({ filename:'extensions.conf' , context: 'globals', usf: 1 });
+		var DIAL_OPS = ( c.hasOwnProperty('DIALOPTIONS') ) ? c['DIALOPTIONS'] : '' ;
+		if( c.hasOwnProperty('FEATURES') && c['FEATURES'].length )
+		ENABLED_APPS = c['FEATURES'].split('#');
+
+		_$('dialoptions_t').checked = (DIAL_OPS.contains('t')) ? true : false ;
+		_$('dialoptions_T').checked = (DIAL_OPS.contains('T')) ? true : false ;
+		_$('dialoptions_h').checked = (DIAL_OPS.contains('h')) ? true : false ;
+		_$('dialoptions_H').checked = (DIAL_OPS.contains('H')) ? true : false ;
+		_$('dialoptions_k').checked = (DIAL_OPS.contains('k')) ? true : false ;
+		_$('dialoptions_K').checked = (DIAL_OPS.contains('K')) ? true : false ;
+		
+	})();
+
+	var c = config2json({filename:'features.conf', usf:1});
+	if( !c.hasOwnProperty(ct) || !c.hasOwnProperty(FM) || !c.hasOwnProperty('applicationmap') ){
+		var u = new listOfSynActions('features.conf');
+		if( !c.hasOwnProperty(ct) ) {
+			u.new_action('newcat', ct, '', '');
+		}
+		if( !c.hasOwnProperty(FM) ) {
+			u.new_action('newcat', FM, '', '');
+		}
+		if( !c.hasOwnProperty('applicationmap') ) {
+			u.new_action('newcat', 'applicationmap', '', '');
+		}
+		u.callActions();
+		window.location.reload();
+		return;
+	}
+
+	ApplicationMap = c['applicationmap'] ;
+
+	ASTGUI.updateFieldToValue( 'featureMap_blindxfer' , c[FM].getProperty('blindxfer') );
+	ASTGUI.updateFieldToValue( 'featureMap_disconnect' , c[FM].getProperty('disconnect') );
+	ASTGUI.updateFieldToValue( 'featureMap_atxfer' , c[FM].getProperty('atxfer') );
+
+	ASTGUI.updateFieldToValue( 'parkext' , c[ct].getProperty('parkext') );
+	ASTGUI.updateFieldToValue( 'parkpos' , c[ct].getProperty('parkpos') );
+	ASTGUI.updateFieldToValue( 'parkingtime' , c[ct].getProperty('parkingtime') );
+
+	ASTGUI.domActions.enableDisableByCheckBox ('chk_featureMap_blindxfer',  'featureMap_blindxfer');
+	ASTGUI.domActions.enableDisableByCheckBox ('chk_featureMap_disconnect', 'featureMap_disconnect');
+	ASTGUI.domActions.enableDisableByCheckBox ('chk_featureMap_atxfer', 'featureMap_atxfer');
+
+	_$('chk_featureMap_blindxfer').checked = ( ASTGUI.getFieldValue('featureMap_blindxfer') ) ? true : false ;
+	_$('chk_featureMap_blindxfer').updateStatus();
+	_$('chk_featureMap_disconnect').checked = ( ASTGUI.getFieldValue('featureMap_disconnect') ) ? true : false ;
+	_$('chk_featureMap_disconnect').updateStatus();
+	_$('chk_featureMap_atxfer').checked = ( ASTGUI.getFieldValue('featureMap_atxfer') ) ? true : false ;
+	_$('chk_featureMap_atxfer').updateStatus();
+
+	generate_applicationMap_TRs();
+
+};
+
+var localajaxinit = function(){
+	top.document.title = 'Call Parking preferences' ;
+
+	ASTGUI.tabbedOptions( _$('tabbedMenu') , [
+		{	url: '#',
+			desc: 'Feature Codes',
+			click_function: function(){ $('.Features_tabs').hide(); $('#featurecode_settings_container').show(); }
+		},{
+			url: '#',
+			desc: 'Call Parking',
+			click_function: function(){ $('.Features_tabs').hide(); $('#callparking_settings_container').show(); }
+		},{
+			url: '#',
+			desc: 'Application Map',
+			click_function: function(){ $('.Features_tabs').hide(); $('#applicationMap_settings_container').show(); }
+		},{
+			url: '#',
+			desc: 'Dial Options',
+			click_function: function(){ $('.Features_tabs').hide(); $('#DialOptions_settings_container').show(); }
+		}
+		
+	]);
+
+	try{
+		load_preferences();
+	}catch(err){
+
+	}finally{
+		$('#tabbedMenu').find('A:eq(0)').click();
+	}
+};
+
+var save_changes = function(){
+
+	var TBL = _$('Table_applicationMap_definitions');
+	var FeatureNames = [];
+
+	var u = new listOfSynActions('features.conf');
+		u.new_action('update', ct , 'parkext', ASTGUI.getFieldValue('parkext') );
+		u.new_action('update', ct , 'parkpos', ASTGUI.getFieldValue('parkpos') );
+		u.new_action('update', ct , 'parkingtime', ASTGUI.getFieldValue('parkingtime') );
+
+		var blindxfer_map = ASTGUI.getFieldValue('featureMap_blindxfer') ;
+		if( _$('chk_featureMap_blindxfer').checked && blindxfer_map ){
+			u.new_action('update', FM , 'blindxfer', blindxfer_map );
+		}else{
+			u.new_action('delete', FM , 'blindxfer', '');
+		}
+
+		var disconnect_map = ASTGUI.getFieldValue('featureMap_disconnect') ;
+		if( _$('chk_featureMap_disconnect').checked && disconnect_map ){
+			u.new_action('update', FM , 'disconnect', disconnect_map );
+		}else{
+			u.new_action('delete', FM , 'disconnect', '');
+		}
+
+		var atxfer_map = ASTGUI.getFieldValue('featureMap_atxfer') ;
+		if( _$('chk_featureMap_atxfer').checked && atxfer_map ){
+			u.new_action('update', FM , 'atxfer', atxfer_map );
+		}else{
+			u.new_action('delete', FM , 'atxfer', '');
+		}
+
+		u.new_action( 'delcat', 'applicationmap' , '', '');
+		u.new_action( 'newcat', 'applicationmap' , '', '');
+
+		for( var R = 1, RL = TBL.rows.length ; R < RL ; R++ ){
+			var thisrow_id = '#' + AP_MAP_TRID + String(R) ;
+			var this_featureName = $(thisrow_id + ' .textbox_featurename')[0].value.trim() ;
+			if( !this_featureName )continue ;
+
+
+			var this_enabled = $(thisrow_id + ' .textbox_feature_CheckBox')[0].checked ;
+			if( this_enabled ) {
+				FeatureNames.push(this_featureName);
+			}
+			var this_digits = $(thisrow_id + ' .textbox_dialstr')[0].value.trim() ;
+			var this_activeOnBy = $(thisrow_id + ' .textbox_activeOnBy')[0].value.trim() ;
+			var this_appName = $(thisrow_id + ' .textbox_appName')[0].value.trim() ;
+			var this_args = $(thisrow_id + ' .textbox_appArgs')[0].value.trim() ;
+			var tmp_arr = [this_digits, this_activeOnBy, this_appName, this_args ];
+
+
+			u.new_action( 'append', 'applicationmap' , this_featureName , tmp_arr.join(',') );
+		}
+
+		u.callActions();
+
+	var DIAL_OPS = '' ;
+
+	if( _$('dialoptions_t').checked ) DIAL_OPS = DIAL_OPS + 't' ;
+	if( _$('dialoptions_T').checked ) DIAL_OPS = DIAL_OPS + 'T' ;
+	if( _$('dialoptions_h').checked ) DIAL_OPS = DIAL_OPS + 'h' ;
+	if( _$('dialoptions_H').checked ) DIAL_OPS = DIAL_OPS + 'H' ;
+	if( _$('dialoptions_k').checked ) DIAL_OPS = DIAL_OPS + 'k' ;
+	if( _$('dialoptions_K').checked ) DIAL_OPS = DIAL_OPS + 'K' ;
+	
+	ASTGUI.updateaValue({ file:'extensions.conf', context :'globals', variable :'DIALOPTIONS', value : DIAL_OPS });
+	ASTGUI.updateaValue({ file:'extensions.conf', context :'globals', variable :'FEATURES', value : FeatureNames.join('#') });
+
+	ASTGUI.feedback({msg:' Saved !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
+
+	window.location.reload();
+};
+
+</script>
+<body bgcolor="EFEFEF">
+<div class="iframeTitleBar"> 
+	Feature Codes & Call Parking Preferences
+	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+</div>
+
+<center>
+
+	<div id="tabbedMenu"></div>
+	
+	<div id='featurecode_settings_container' style="display: none" class='Features_tabs'>
+		<div class='lite_Heading' style="margin-top:-10px">Features Codes</div>
+		<table align="center" cellpadding=2 cellspacing=2 border=0>
+			<tr>	<td valign=top align=right> <input type=checkbox id='chk_featureMap_blindxfer'></td>
+				<td> <input size=2 id='featureMap_blindxfer'> Blind Transfer (default is #)</td>
+			</tr>
+
+			<tr><td height=10></td></tr>
+
+			<tr>	<td valign=top align=right> <input type=checkbox id='chk_featureMap_disconnect'></td>
+				<td> <input size=2 id='featureMap_disconnect'> Disconnect (default is *)</td>
+			</tr>
+
+			<tr><td height=10></td></tr>
+
+<!--			<tr>	<td valign=top align=right> <input type=checkbox id='chk_featureMap_automon'></td>
+				<td> <input size=2 id='featureMap_automon'> One Touch Record a.k.a. Touch Monitor </td>
+			</tr>-->
+
+			<tr>	<td valign=top align=right> <input type=checkbox id='chk_featureMap_atxfer'></td>
+				<td> <input size=2 id='featureMap_atxfer'> Attended transfer </td>
+			</tr>
+
+		</table>
+
+	</div>
+	
+	<div id='callparking_settings_container' style="display: none" class='Features_tabs'>
+		<div class='lite_Heading' style="margin-top:-10px">Call Parking Preferences</div>
+		<table align="center" cellpadding=2 cellspacing=2 border=0>
+			<tr>	<td align=right>Extension to Dial to Park a call:</td>
+				<td>&nbsp;<input size=4 type='text' id='parkext'></td>
+			</tr>
+			<tr>	<td align=right>What extensions to park calls on:</td>
+				<td>&nbsp;<input size=10 type='text' id='parkpos'> (Ex: '701-720')</td>
+			</tr>
+			<tr>	<td align=right>Number of seconds a call can be parked for <img src="images/tooltip_info.gif" tip="en,parking,0" class='tooltipinfo'> :</td>
+				<td>&nbsp;<input size=2 type='text' id='parkingtime'></td>
+			</tr>
+		</table>
+	</div>
+
+	<div id='applicationMap_settings_container' style="display: none" class='Features_tabs'>
+		<div class='top_buttons' style='margin-top:-10px;'>
+			<span id='new' class='guiButtonNew' onclick='do_new_ApplicationMap_row();' style='float:left'>New Application Map</span>
+			<span class='lite_Heading' style='margin-left: -150px'>Application Map</span>
+		</div>
+		<table align="center" cellpadding=0 cellspacing=2 border=0 id='Table_applicationMap_definitions'></table>
+	</div>
+
+	<div id='DialOptions_settings_container' style="display: none" class='Features_tabs'>
+		<div class='lite_Heading' style='margin-left: -150px'>Dial Options</div>
+		<table align="center" cellpadding=2 cellspacing=2 border=0>
+		<tr>	<td valign=top align=right> <input type=checkbox id='dialoptions_t'></td>
+			<td> (t) Allow the called party to transfer the calling party <BR>
+				 by sending the DTMF sequence defined in features.conf
+			</td>
+		</tr>
+
+		<tr><td height=10></td></tr>
+
+		<tr>	<td valign=top align=right> <input type=checkbox id='dialoptions_T'></td>
+			<td> (T) Allow the calling party to transfer the called party <BR>
+				 by sending the DTMF sequence defined in features.conf
+			</td>
+		</tr>
+
+		<tr><td height=10></td></tr>
+
+		<tr>	<td valign=top align=right> <input type=checkbox id='dialoptions_h'></td>
+			<td> (h) Allow the called party to hang up by sending the '*' DTMF digit.</td>
+		</tr>
+		
+		<tr><td height=10></td></tr>
+
+		<tr><td valign=top align=right> <input type=checkbox id='dialoptions_H'></td>
+			<td> (H) Allow the calling party to hang up by hitting the '*' DTMF digit.</td>
+		</tr>
+
+		<tr><td height=10></td></tr>
+
+		<tr><td valign=top align=right> <input type=checkbox id='dialoptions_k'></td>
+			<td>(k) Allow the called party to enable parking of the call by sending<BR>
+					the DTMF sequence defined for call parking in features.conf.
+			</td>
+		</tr>
+
+		<tr><td height=10></td></tr>
+
+		<tr><td valign=top align=right> <input type=checkbox id='dialoptions_K'></td>
+			<td>(K) Allow the calling party to enable parking of the call by sending<BR>
+		           the DTMF sequence defined for call parking in features.conf.
+			</td>
+		</tr>
+
+		</table>
+	</div>
+	
+	<div style="margin-top:30px">
+		<span class='guiButtonCancel' id='cancel' onclick='window.location.reload();'>Cancel</span>
+		<span class='guiButtonEdit' id='save' onclick='save_changes();'>Save</span>
+	</div>
+
+</center>
+
+</body>
