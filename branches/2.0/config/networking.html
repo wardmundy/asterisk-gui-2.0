@@ -78,13 +78,12 @@
 				var tmp = u.callActions();
 			})();
 
-			ASTGUI.dialog.waitWhile('Applying Changes');
 			parent.ASTGUI.systemCmd( cmd1, function(){ 
 				parent.ASTGUI.systemCmd( cmd2, function(){ 
 					parent.ASTGUI.systemCmd( cmd3, function(){ 
-						parent.ASTGUI.systemCmd( cmd4, function(){
-							setTimeout( function(){top.window.location.reload();}, 4000 );
-							parent.ASTGUI.systemCmd( cmd5 + ' &', function(){ });
+						parent.ASTGUI.systemCmd( cmd4, function(){ 
+							setTimeout( function(){ window.location.reload(); }, 3000 );
+							parent.ASTGUI.systemCmd( cmd5, function(){ });
 						});
 					});
 				});

@@ -27,7 +27,6 @@
 </style>
 <script>
 var OPEXTENSION = '';
-var STDEXTEN_RINGINTERFACE_LINE ;
 
 var polycom_digitmap_string = '';
 var polycom_digitmap_timeout_string = '';
@@ -91,17 +90,11 @@ function localajaxinit(){
 		ASTGUI.selectbox.append( DOM_op_ext , 'User ' + user , op_tmp);
 	});
 
-	try{
-		(function(){
-			var c = context2json ({ filename:'extensions.conf' , context: 'macro-stdexten', usf: 0 });
-			if( !c || !c.length ) return ;
-			if( c[0].contains('s,1,Dial(${ARG2},') ){
-				STDEXTEN_RINGINTERFACE_LINE = c[0].afterChar('=');
-				var args = ASTGUI.parseContextLine.getArgs( c[0] );
-				ASTGUI.updateFieldToValue( 'op_ringTimeOut_Voicemail', args[1] );
-			}
-		})();
-	}catch(err){}
+	(function(){
+		var c = context2json ({ filename:'extensions.conf' , context: 'globals', usf: 1 });
+		var ringtime = ( c.hasOwnProperty('RINGTIME') ) ? c['RINGTIME'] : '20' ;
+		ASTGUI.updateFieldToValue( 'op_ringTimeOut_Voicemail', ringtime );
+	})();
 
 	try{
 		OPEXTENSION  = ( parent.sessionData.pbxinfo.localextensions && parent.sessionData.pbxinfo.localextensions.Operator ) ? parent.sessionData.pbxinfo.localextensions.Operator : '' ;
@@ -177,11 +170,13 @@ var verify_Ranges = function(){
 var save_changes = function(){
 	if( !verify_Ranges() ){ return; }
 	parent.sessionData.pbxinfo.GLOBALS[ASTGUI.globals.obcidstr] = DOM_obCid_input.value;
-	ASTGUI.updateaValue({file:'extensions.conf', context :'globals', variable : ASTGUI.globals.obcidstr, value : DOM_obCid_input.value }   );
 
 	var u = new listOfSynActions('extensions.conf');
+		u.new_action('update', 'globals', ASTGUI.globals.obcidstr, ASTGUI.getFieldValue(DOM_obCid_input) );
+		u.new_action('update', 'globals', 'RINGTIME', ASTGUI.getFieldValue('op_ringTimeOut_Voicemail') );
+
 		u.new_action('delete', 'default', 'exten','' ,'o,1,' + OPEXTENSION );
-		u.new_action('append', 'default', 'exten', 'o,1,' + DOM_op_ext.value );
+		u.new_action('append', 'default', 'exten', 'o,1,' + ASTGUI.getFieldValue(DOM_op_ext) );
 		u.new_action('update', 'macro-stdexten', 'exten', 's,1,Dial(${ARG2},' + _$('op_ringTimeOut_Voicemail').value +')' , STDEXTEN_RINGINTERFACE_LINE );
 	u.callActions();
 
