@@ -1,0 +1,18 @@
+[someProvider]
+trunk_username = someusername ; this would be the context name in users.conf for this trunk
+allow = all
+providername = SomeProvider (Sip)
+providerlogo = images/SomeProvider.gif
+providerdesc = Some Description about your Service provider
+hasexten = no
+hasiax = no
+hassip = yes
+registeriax = no
+registersip = yes
+host = someproviderhostname.com
+; usecallerid = yes
+; nat = yes
+; port = 5060
+; insecure = invite
+regurl = http://www.someprovidersWebsite.com
+
