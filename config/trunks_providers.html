@@ -102,16 +102,22 @@ providers_MiscFunctions = {
 			return;
 		}
 
-		var selectedProvider = _$('new_SP_Provider').options[ _$('new_SP_Provider').selectedIndex ].value ;
-
-
+		var selectedProvider = _$('new_SP_Provider').value ;
 		var trunk_template_obj = PROVIDERS[selectedProvider] ;
-		var trunkname = trunk_template_obj.trunk_username ;
+		var trunkname = trunk_template_obj.hasOwnProperty('trunk_username') ?  trunk_template_obj.trunk_username : ASTGUI.getFieldValue('input_sp_uname') ;
+		if( !trunkname ){
+			trunkname = parent.astgui_managetrunks.misc.nextAvailableTrunk_x() ;
+		}
 		var ct = ASTGUI.contexts.TrunkDIDPrefix + trunkname ;
-		trunk_template_obj.username = ASTGUI.getFieldValue('input_sp_uname') ;
-		trunk_template_obj.secret = ASTGUI.getFieldValue('input_sp_password') ;
-		if( trunk_template_obj.trunkname ) = trunk_template_obj.trunkname.guiMetaData();
 
+		if(ASTGUI.getFieldValue('input_sp_uname')){
+			trunk_template_obj.username = ASTGUI.getFieldValue('input_sp_uname') ;
+		}
+		if(ASTGUI.getFieldValue('input_sp_password')){
+			trunk_template_obj.secret = ASTGUI.getFieldValue('input_sp_password') ;
+		}
+		trunk_template_obj.provider = trunk_template_obj.providername.guiMetaData();  ;
+		trunk_template_obj.trunkname = trunk_template_obj.providername + trunkname.guiMetaData();
 
 		var x = new listOfActions('users.conf');
 		x.new_action('delcat', trunkname , '', '');
@@ -140,7 +146,7 @@ providers_MiscFunctions = {
 			var h = v.callActions();
 			if( h.contains('Response: Success') ){
 				ASTGUI.dialog.waitWhile('Added New VOIP trunk<BR> Reloading GUI ... ');
-				setTimeout( function(){ top.window.reload(); } , 2000 );
+				setTimeout( function(){ top.window.location.reload(); } , 2000 );
 			}else{
 				// something failed ??
 			}
@@ -198,7 +204,7 @@ providers_MiscFunctions = {
 	</TR>
 	<TR>	<TD colspan=2 align=center height=50 valign=middle>
 			<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
-			<span class='guiButtonEdit' id="new_SP_save" onclick='providers_MiscFunctions.createNewProvider();();'>Add</span>
+			<span class='guiButtonEdit' id="new_SP_save" onclick='providers_MiscFunctions.createNewProvider();'>Add</span>
 		</TD>
 	</TR>
 	</TABLE>
