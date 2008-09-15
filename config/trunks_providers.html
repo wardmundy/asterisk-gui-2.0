@@ -167,6 +167,7 @@ providers_MiscFunctions = {
 		_$('edit_provider_details').innerHTML = '';
 		var t = config2json({filename:'users.conf', usf:0});
 		if( t.hasOwnProperty(EDIT_PROVIDER) ){
+			_$('edit_provider_details').rows = t[EDIT_PROVIDER].length + 1 ;
 			_$('edit_provider_details').innerHTML = t[EDIT_PROVIDER].join('\n');
 		}
 		_$('edit_SP_DIV_Title').innerHTML = '[' + EDIT_PROVIDER  + ']' ;
