@@ -69,12 +69,18 @@ var localajaxinit = function(){
 	})();
 
 	(function(){
-		PROVIDERS = config2json({ filename:'providers.conf', usf:1 });
-
-		for (var this_provider in PROVIDERS ){ if(PROVIDERS.hasOwnProperty(this_provider) ){
-			ASTGUI.selectbox.append('new_SP_Provider', PROVIDERS[this_provider].providername ||  this_provider , this_provider );
-		}}
+		var tmp_providers_conf = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=providers.conf', async: false }).responseText;
+		var tmp_providers_conf_lower = tmp_providers_conf.toLowerCase();
+		if( tmp_providers_conf_lower.contains('response: error') && tmp_providers_conf_lower.contains('message: config file not found') ){
+			ASTGUI.miscFunctions.createConfig( 'providers.conf', function(){ window.location.reload(); } ) ;
+			return;
+		}
+		PROVIDERS = config2json({ configFile_output: tmp_providers_conf, usf : 1 });
 	})();
+
+	for (var this_provider in PROVIDERS ){ if(PROVIDERS.hasOwnProperty(this_provider) ){
+		ASTGUI.selectbox.append('new_SP_Provider', PROVIDERS[this_provider].providername ||  this_provider , this_provider );
+	}}
 
 	$('#new_SP_Provider').click( function(){
 		var selectedProvider = this.options[this.selectedIndex].value ;
