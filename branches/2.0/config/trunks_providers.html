@@ -54,6 +54,7 @@
 var PROVIDERS = {};
 
 var localajaxinit = function(){
+	DOM_table_SPS_list = _$('table_SPS_list');
 	top.document.title = 'Service Providers' ;
 	(function(){
 		var t = [
@@ -86,12 +87,58 @@ var localajaxinit = function(){
 		_$('TD_SP_Logo_container').appendChild(logo_img) ;
 	});
 
+	providers_MiscFunctions.load_SPTrunksTable();
 };
 
 
 
 
 providers_MiscFunctions = {
+	load_SPTrunksTable: function(){ // providers_MiscFunctions.load_SPTrunksTable();
+		var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
+
+		(function(){ // add first row
+			var newRow = DOM_table_SPS_list.insertRow(-1);
+			newRow.className = "frow";
+			addCell( newRow , { html:'', width:'15px'} );
+			addCell( newRow , { html:'Trunk'} );
+			addCell( newRow , { html:'Username'} );
+			addCell( newRow , { html:'Hostname/IP'} ); // Hostname
+			addCell( newRow , { html:''} );
+		})();
+	
+		(function (){
+			var d = parent.sessionData.pbxinfo.trunks.providers ;
+			for(var e in d){
+				if(d.hasOwnProperty(e)){
+					var newRow = DOM_table_SPS_list.insertRow(-1);
+					newRow.className = ((DOM_table_SPS_list.rows.length)%2==1)?'odd':'even';
+					addCell( newRow , { html: ''} );
+					addCell( newRow , { html: d[e]['trunkname'] });
+					addCell( newRow , { html: d[e].getProperty('username') || '--' });
+					addCell( newRow , { html: d[e]['host'] });
+					tmp = "<span class='guiButton' onclick=\"providers_MiscFunctions.show_EditProviderForm('" + e +"')\">Edit</span>" + 
+						"<span class='guiButtonDelete' onclick=\"providers_MiscFunctions.delete_ProviderForm('" + e +"')\">Delete</span>" ;
+					addCell( newRow , { html: tmp} );
+				}
+			}
+		})();
+
+		if( DOM_table_SPS_list.rows.length == 1  ){
+			ASTGUI.domActions.clear_table(DOM_table_SPS_list);
+			var newRow = DOM_table_SPS_list.insertRow(-1);
+			addCell( newRow , { html: "<BR><B>No Service Providers defined</B><BR><BR>" } );
+		}
+	},
+
+	delete_ProviderForm : function(e){ // providers_MiscFunctions.delete_ProviderForm(e);
+		
+	},
+	
+	show_EditProviderForm : function(e){ // providers_MiscFunctions.show_EditProviderForm();
+		$('#new_SPTrunk_DIV').showWithBg();
+	},
+
 	show_NewProviderForm : function(){ // providers_MiscFunctions.show_NewProviderForm();
 		$('#new_SPTrunk_DIV').showWithBg();
 	},
