@@ -68,14 +68,11 @@ var localajaxinit = function(){
 	})();
 
 	(function(){
-
 		PROVIDERS = config2json({ filename:'providers.conf', usf:1 });
 
 		for (var this_provider in PROVIDERS ){ if(PROVIDERS.hasOwnProperty(this_provider) ){
 			ASTGUI.selectbox.append('new_SP_Provider', PROVIDERS[this_provider].providername ||  this_provider , this_provider );
 		}}
-
-
 	})();
 
 	$('#new_SP_Provider').click( function(){
@@ -87,8 +84,8 @@ var localajaxinit = function(){
 		$(logo_img).attr( 'src', PROVIDERS[selectedProvider].providerlogo );
 		$(logo_img).attr('border', '0');
 		_$('TD_SP_Logo_container').appendChild(logo_img) ;
-
 	});
+
 };
 
 
@@ -107,7 +104,49 @@ providers_MiscFunctions = {
 
 		var selectedProvider = _$('new_SP_Provider').options[ _$('new_SP_Provider').selectedIndex ].value ;
 
-		alert('Hi, This page is work in progress.\n This functionality is not implemented yet.');
+
+		var trunk_template_obj = PROVIDERS[selectedProvider] ;
+		var trunkname = trunk_template_obj.trunk_username ;
+		var ct = ASTGUI.contexts.TrunkDIDPrefix + trunkname ;
+		trunk_template_obj.username = ASTGUI.getFieldValue('input_sp_uname') ;
+		trunk_template_obj.secret = ASTGUI.getFieldValue('input_sp_password') ;
+		if( trunk_template_obj.trunkname ) = trunk_template_obj.trunkname.guiMetaData();
+
+
+		var x = new listOfActions('users.conf');
+		x.new_action('delcat', trunkname , '', '');
+		x.new_action('newcat', trunkname , '', '');
+		for( var d in trunk_template_obj ){
+			if( !trunk_template_obj.hasOwnProperty(d) ){ continue; }
+			x.new_action( 'append', trunkname , d, trunk_template_obj[d] );
+		}
+
+		var cb = function(){
+			var v = new listOfSynActions('extensions.conf') ;
+			v.new_action('delcat', ct, '', '');
+			v.new_action('newcat', ct, '', ''); // add context
+			v.new_action('delcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', '');
+			v.new_action('newcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', ''); // add context
+			v.new_action('append', ct , 'include', ct + ASTGUI.contexts.TrunkDefaultSuffix );
+
+			if( trunk_template_obj.hasOwnProperty('hassip') && trunk_template_obj.hassip == 'yes'){
+				 v.new_action('update', 'globals', trunkname , 'SIP/' + trunkname );
+			}
+
+			if( trunk_template_obj.hasOwnProperty('hasiax') && trunk_template_obj.hasiax == 'yes'){
+				 v.new_action('update', 'globals', trunkname , 'IAX2/' + trunkname);
+			}
+
+			var h = v.callActions();
+			if( h.contains('Response: Success') ){
+				ASTGUI.dialog.waitWhile('Added New VOIP trunk<BR> Reloading GUI ... ');
+				setTimeout( function(){ top.window.reload(); } , 2000 );
+			}else{
+				// something failed ??
+			}
+		};
+
+		x.callActions(cb);
 	}
 };
 
