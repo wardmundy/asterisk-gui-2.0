@@ -52,6 +52,7 @@
 </style>
 <script>
 var PROVIDERS = {};
+var EDIT_PROVIDER = '';
 
 var localajaxinit = function(){
 	DOM_table_SPS_list = _$('table_SPS_list');
@@ -138,11 +139,38 @@ providers_MiscFunctions = {
 	},
 
 	delete_ProviderForm : function(e){ // providers_MiscFunctions.delete_ProviderForm(e);
-		
+		if( !confirm('Are you sure you want to delete this Service Provider trunk ?') ){ return; }
+		if( parent.astgui_managetrunks.deletetrunk(e) ){ window.location.reload(); };
 	},
 	
+	updateProvider : function(){
+		var provider_lines = ASTGUI.getFieldValue('edit_provider_details') ;
+		provider_lines = provider_lines.split('\n');
+		
+		var x = new listOfActions('users.conf');
+
+		x.new_action('delcat', EDIT_PROVIDER , '', '');
+		x.new_action('newcat', EDIT_PROVIDER , '', '');
+		
+		provider_lines.each( function(this_line){
+			x.new_action( 'append', EDIT_PROVIDER , this_line.beforeChar('=') , this_line.afterChar('=') );
+		} );
+
+		x.callActions( function(){
+			ASTGUI.dialog.waitWhile('Updated Service Provider information <BR> Reloading GUI ... ');
+			setTimeout( function(){ top.window.location.reload(); } , 2000 );
+		});
+	},
+
 	show_EditProviderForm : function(e){ // providers_MiscFunctions.show_EditProviderForm();
-		$('#new_SPTrunk_DIV').showWithBg();
+		EDIT_PROVIDER = e ;
+		_$('edit_provider_details').innerHTML = '';
+		var t = config2json({filename:'users.conf', usf:0});
+		if( t.hasOwnProperty(EDIT_PROVIDER) ){
+			_$('edit_provider_details').innerHTML = t[EDIT_PROVIDER].join('\n');
+		}
+		_$('edit_SP_DIV_Title').innerHTML = '[' + EDIT_PROVIDER  + ']' ;
+		$('#edit_SPTrunk_DIV').showWithBg();
 	},
 
 	show_NewProviderForm : function(){ // providers_MiscFunctions.show_NewProviderForm();
@@ -157,7 +185,14 @@ providers_MiscFunctions = {
 
 		var selectedProvider = _$('new_SP_Provider').value ;
 		var trunk_template_obj = PROVIDERS[selectedProvider] ;
-		var trunkname = trunk_template_obj.hasOwnProperty('trunk_username') ?  trunk_template_obj.trunk_username : ASTGUI.getFieldValue('input_sp_uname') ;
+
+		if( trunk_template_obj.hasOwnProperty('trunk_username') ){
+			var trunkname =  trunk_template_obj.trunk_username ;
+			delete trunk_template_obj.trunk_username ;
+		}else{
+			var trunkname =  ASTGUI.getFieldValue('input_sp_uname') ;
+		}
+
 		if( !trunkname ){
 			trunkname = parent.astgui_managetrunks.misc.nextAvailableTrunk_x() ;
 		}
@@ -169,8 +204,19 @@ providers_MiscFunctions = {
 		if(ASTGUI.getFieldValue('input_sp_password')){
 			trunk_template_obj.secret = ASTGUI.getFieldValue('input_sp_password') ;
 		}
-		trunk_template_obj.provider = trunk_template_obj.providername.guiMetaData();  ;
+
+		if( trunk_template_obj.hasOwnProperty('providername') ){
+			trunk_template_obj.provider = trunk_template_obj.providername.guiMetaData();
+			delete trunk_template_obj.providername ;
+		}else{
+			trunk_template_obj.provider = selectedProvider ;
+		}
+
 		trunk_template_obj.trunkname = trunk_template_obj.providername + trunkname.guiMetaData();
+
+		if( trunk_template_obj.hasOwnProperty('providerlogo') ) delete trunk_template_obj.providerlogo ;
+		if( trunk_template_obj.hasOwnProperty('providerdesc') ) delete trunk_template_obj.providerdesc ;
+		if( trunk_template_obj.hasOwnProperty('regurl') ) delete trunk_template_obj.regurl ;
 
 		var x = new listOfActions('users.conf');
 		x.new_action('delcat', trunkname , '', '');
@@ -222,6 +268,34 @@ providers_MiscFunctions = {
 </div>
 
 <table id='table_SPS_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
+
+
+<div id="edit_SPTrunk_DIV" STYLE="width:650; max-height:450;display:none;" class='dialog'>
+	<TABLE width="100%" cellpadding=0 cellspacing=0>
+	<TR class="dialog_title_tr">
+		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);">
+			<span>Edit Service Provider</span>
+		</TD>
+		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
+	</TR>
+	</TABLE>
+	<TABLE	align=center cellpadding=2 cellspacing=2 border=0 width='100%'>
+		<TR>	<TD align="center">
+				<span id='edit_SP_DIV_Title'></span>
+			</TD>
+		</TR>
+		<TR>	<TD align="center">
+				<textarea id='edit_provider_details' rows=5 cols=80></textarea>
+			</TD>
+		</TR>
+		<TR>	<TD align=center height=50 valign=middle>
+				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
+				<span class='guiButtonEdit' onclick='providers_MiscFunctions.updateProvider();'>Add</span>
+			</TD>
+		</TR>
+	</TABLE>
+</div>
+
 
 <div id="new_SPTrunk_DIV" STYLE="width:650; max-height:450;display:none;" class='dialog'>
 	<TABLE width="100%" cellpadding=0 cellspacing=0>
