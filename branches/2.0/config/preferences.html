@@ -177,7 +177,6 @@ var save_changes = function(){
 
 		u.new_action('delete', 'default', 'exten','' ,'o,1,' + OPEXTENSION );
 		u.new_action('append', 'default', 'exten', 'o,1,' + ASTGUI.getFieldValue(DOM_op_ext) );
-		u.new_action('update', 'macro-stdexten', 'exten', 's,1,Dial(${ARG2},' + _$('op_ringTimeOut_Voicemail').value +')' , STDEXTEN_RINGINTERFACE_LINE );
 	u.callActions();
 
 	if( parent.sessionData.PLATFORM.isAST_1_6 || parent.sessionData.PLATFORM.isAA50 ){
