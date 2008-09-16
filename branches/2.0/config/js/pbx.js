@@ -27,231 +27,119 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		// each function would read a config file and updates the sessionData.pbxinfo
 	checkEssentials: function(){ //readcfg.checkEssentials();
 		// check whether the config files are in proper format and have every thing needed for the gui to function properly
-		var ecnf = config2json({ filename:'extensions.conf', usf:1 });
-		if( !ecnf.hasOwnProperty('general') || !ecnf.hasOwnProperty('globals') ){
-			var u = new listOfSynActions('extensions.conf');
-			if( !ecnf['globals'] ){
-				u.new_action('newcat', 'globals', '', '');
-				u.new_action('append', 'globals', 'FEATURES', '');
-				u.new_action('append', 'globals', 'DIALOPTIONS', '');
-				u.new_action('append', 'globals', 'RINGTIME', '20');
-				ecnf.globals = {} ;
-			}
-			if( !ecnf['general'] ){
-				u.new_action('newcat', 'general', '', '');
-				u.new_action('append', 'general', 'static', 'yes');
-				u.new_action('append', 'general', 'writeprotect', 'no');
-				u.new_action('append', 'general', 'clearglobalvars', 'yes');
-			}
-			sessionData.continueParsing = false ;
-			ASTGUI.dialog.waitWhile("Adding 'general' context to extensions.conf");
-			u.callActions();
-			if( parent.sessionData.DEBUG_MODE ){
-				alert('updated general context in extensions.conf' + '\n' + 'Click OK to reload');
-			}
-			window.location.reload();
-			return;
-		}
-
-		if( !ecnf['globals'].hasOwnProperty('FEATURES') ){
-			var u = new listOfSynActions('extensions.conf');
-			u.new_action('append', 'globals', 'FEATURES', '');
-			u.callActions();
-			window.location.reload();
-			return;
-		}
-		if( !ecnf['globals'].hasOwnProperty('DIALOPTIONS') ){
-			var u = new listOfSynActions('extensions.conf');
-			u.new_action('append', 'globals', 'DIALOPTIONS', '');
-			u.callActions();
-			window.location.reload();
-			return;
-		}
-		if( !ecnf['globals'].hasOwnProperty('RINGTIME') ){
-			var u = new listOfSynActions('extensions.conf');
-			u.new_action('append', 'globals', 'RINGTIME', '20');
-			u.callActions();
-			window.location.reload();
-			return;
-		}
-
-		if( ecnf.hasOwnProperty('general') && ecnf.general.getProperty('clearglobalvars') != 'yes' ){
-			var u = new listOfSynActions('extensions.conf');
-			u.new_action('update', 'general', 'clearglobalvars', 'yes');
-			u.callActions();
-			sessionData.continueParsing = false ;
-			if( parent.sessionData.DEBUG_MODE ){
-				alert('updated clearglobalvars in extensions.conf' + '\n' + 'Click OK to reload');
-			}
-			window.location.reload();
-			return;
-		}
-
-		if( !ecnf[ASTGUI.contexts.CONFERENCES] || !ecnf[ASTGUI.contexts.RingGroupExtensions] || !ecnf[ASTGUI.contexts.QUEUES] || !ecnf['default'] || !ecnf[ASTGUI.contexts.VoiceMenuExtensions] || !ecnf[ASTGUI.contexts.VoiceMailGroups] || !ecnf[ASTGUI.contexts.Directory] ){
-			var u = new listOfSynActions('extensions.conf');
-			if( !ecnf['default'] ){
-				u.new_action('newcat', 'default', '', '') ;
-			}
-			if( !ecnf[ASTGUI.contexts.CONFERENCES] ){
-				u.new_action('newcat', ASTGUI.contexts.CONFERENCES, '', '');
-			};
-			if( !ecnf[ASTGUI.contexts.RingGroupExtensions] ){
-				u.new_action('newcat', ASTGUI.contexts.RingGroupExtensions, '', '');
-			}
-			if( !ecnf[ASTGUI.contexts.QUEUES] ){
-				u.new_action('newcat', ASTGUI.contexts.QUEUES, '', '');
-			}
-			if( !ecnf[ASTGUI.contexts.VoiceMenuExtensions] ){
-				u.new_action('newcat', ASTGUI.contexts.VoiceMenuExtensions, '', '');
-			}
-			if( !ecnf[ASTGUI.contexts.VoiceMailGroups] ){
-				u.new_action('newcat', ASTGUI.contexts.VoiceMailGroups, '', '');
-			}
-			if( !ecnf[ASTGUI.contexts.Directory] ){
-				u.new_action('newcat', ASTGUI.contexts.Directory, '', '');
-			}
-			sessionData.continueParsing = false ;
-			ASTGUI.dialog.waitWhile(" Adding required contexts to extensions.conf ");
-			u.callActions();
-			if( parent.sessionData.DEBUG_MODE ){
-				alert('updated default categories in extensions.conf' + '\n' + 'Click OK to reload');
-			}
-			window.location.reload();
-			return;
-		}
-
-		if( !ecnf[ASTGUI.contexts.guitools] ){ // if No guitools context
-			sessionData.continueParsing = false;
-			(function(){
-				ASTGUI.dialog.waitWhile('Adding GUI-Tools context to extensions.conf');
-				var after = function(){
-					var rld = function(){
-						var t = ASTGUI.cliCommand('dialplan reload') ;
-						if( parent.sessionData.DEBUG_MODE ){
-							alert('updated guitools in extensions.conf' + '\n' + 'Click OK to reload');
-						}
-						top.window.location.reload();
-					};
-					setTimeout( rld , 1000 );
+				var check_For_Contexts = {
+					general : { static : 'yes', writeprotect : 'no', clearglobalvars : 'yes' },
+					globals : { FEATURES : '' , DIALOPTIONS : '' , RINGTIME: '20' },
+					default : {},
+					'macro-stdexten' : [
+						'exten=s,1,Set(__DYNAMIC_FEATURES=${FEATURES})',
+						'exten=s,2,GotoIf($[${FOLLOWME_${ARG1}} = 1]?5:3)',
+						'exten=s,3,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})',
+						'exten=s,4,Goto(s-${DIALSTATUS},1)',
+						'exten=s,5,Macro(stdexten-followme,${ARG1},${ARG2})',
+						'exten=s-NOANSWER,1,Voicemail(${ARG1},u)',
+						'exten=s-NOANSWER,2,Goto(default,s,1)',
+						'exten=s-BUSY,1,Voicemail(${ARG1},b)',
+						'exten=s-BUSY,2,Goto(default,s,1)',
+						'exten=_s-.,1,Goto(s-NOANSWER,1)',
+						'exten=a,1,VoicemailMain(${ARG1})'
+					],
+					'macro-stdexten-followme' : [
+						'exten=s,1,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})',
+						'exten=s,2,Followme(${ARG1},a)',
+						'exten=s,3,Voicemail(${ARG1},u)',
+						'exten=s-NOANSWER,1,Voicemail(${ARG1},u)',
+						'exten=s-BUSY,1,Voicemail(${ARG1},b)',
+						'exten=s-BUSY,2,Goto(default,s,1)',
+						'exten=_s-.,1,Goto(s-NOANSWER,1)',
+						'exten=a,1,VoicemailMain(${ARG1})'
+					]
 				};
-				var x = new listOfActions();
-				x.filename('extensions.conf');
-				x.new_action('newcat', ASTGUI.contexts.guitools , '', '');
-				x.new_action( 'append', ASTGUI.contexts.guitools , 'exten', 'executecommand,1,System(${command})' );
-				x.new_action( 'append', ASTGUI.contexts.guitools , 'exten', 'executecommand,n,Hangup()' );
-				x.new_action( 'append', ASTGUI.contexts.guitools , 'exten', 'record_vmenu,1,Answer' );
-				x.new_action( 'append', ASTGUI.contexts.guitools , 'exten', 'record_vmenu,n,Playback(vm-intro)' );
-				x.new_action( 'append', ASTGUI.contexts.guitools , 'exten', 'record_vmenu,n,Record(${var1})' );
-				x.new_action( 'append', ASTGUI.contexts.guitools , 'exten', 'record_vmenu,n,Playback(vm-saved)' );
-				x.new_action( 'append', ASTGUI.contexts.guitools , 'exten', 'record_vmenu,n,Playback(vm-goodbye)' );
-				x.new_action( 'append', ASTGUI.contexts.guitools , 'exten', 'record_vmenu,n,Hangup' );
-				x.new_action( 'append', ASTGUI.contexts.guitools , 'exten', 'play_file,1,Answer' );
-				x.new_action( 'append', ASTGUI.contexts.guitools , 'exten', 'play_file,n,Playback(${var1})' );
-				x.new_action( 'append', ASTGUI.contexts.guitools , 'exten', 'play_file,n,Hangup' );
-				x.callActions(after);
-			})();
-			return;
-		}
+		
+				check_For_Contexts[ASTGUI.contexts.CONFERENCES] = {} ;
+				check_For_Contexts[ASTGUI.contexts.RingGroupExtensions] = {} ;
+				check_For_Contexts[ASTGUI.contexts.QUEUES] = {} ;
+				check_For_Contexts[ASTGUI.contexts.VoiceMenuExtensions] = {} ;
+				check_For_Contexts[ASTGUI.contexts.VoiceMailGroups] = {} ;
+				check_For_Contexts[ASTGUI.contexts.Directory] = {} ;
+				check_For_Contexts[ASTGUI.contexts.guitools] = [
+					'exten=executecommand,1,System(${command})',
+					'exten=executecommand,n,Hangup()',
+					'exten=record_vmenu,1,Answer',
+					'exten=record_vmenu,n,Playback(vm-intro)',
+					'exten=record_vmenu,n,Record(${var1})',
+					'exten=record_vmenu,n,Playback(vm-saved)',
+					'exten=record_vmenu,n,Playback(vm-goodbye)',
+					'exten=record_vmenu,n,Hangup',
+					'exten=play_file,1,Answer',
+					'exten=play_file,n,Playback(${var1})',
+					'exten=play_file,n,Hangup'
+				];
+		
+				check_For_Contexts[ 'macro-' + ASTGUI.contexts.dialtrunks ] = [
+					// "; Macro by =  Brandon Kruse <bkruse@digium.com> & Matthew O'Gorman mogorman@digium.com",
+					'exten=s,1,Set(CALLERID(num)=${IF($[${LEN(${CID_${CALLERID(num)}})} > 2]?${CID_${CALLERID(num)}}:)})',
+					'exten=s,n,GotoIf($[${LEN(${CALLERID(num)})} > 6]?1-dial,1)',
+					'exten=s,n,Set(CALLERID(all)=${IF($[${LEN(${CID_${ARG3}})} > 6]?${CID_${ARG3}}:${GLOBAL_OUTBOUNDCID})})',
+					'exten=s,n,Goto(1-dial,1)',
+					'exten=1-dial,1,Dial(${ARG1})',
+					'exten=1-dial,n,Gotoif(${LEN(${ARG2})} > 0 ?1-${DIALSTATUS},1:1-out,1)',
+					'exten=1-CHANUNAVAIL,1,Dial(${ARG2})',
+					'exten=1-CHANUNAVAIL,n,Hangup()',
+					'exten=1-CONGESTION,1,Dial(${ARG2})',
+					'exten=1-CONGESTION,n,Hangup()',
+					'exten=1-out,1,Hangup()'
+				];
 
-		if( !ecnf[ 'macro-' + ASTGUI.contexts.dialtrunks] ){ // if No guitools context
-			sessionData.continueParsing = false;
-			(function(){
-				ASTGUI.dialog.waitWhile('Adding Trunkdial-Failover Macro to extensions.conf');
-				var after = function(){
-					setTimeout( function(){
-						var t = ASTGUI.cliCommand('dialplan reload') ;
-						if( parent.sessionData.DEBUG_MODE ){
-							alert('updated macro-trunkdial in extensions.conf' + '\n' + 'Click OK to reload');
-						}
-						top.window.location.reload();
-					}, 1000);
+		ASTGUI.dialog.waitWhile('Verifying Dialplan Contexts needed for GUI');
+		var EXN_CNF = config2json({ filename:'extensions.conf', usf:0 });
+
+		var UPDATES = new listOfActions('extensions.conf');
+		for( var contextName in check_For_Contexts ){
+			if( !check_For_Contexts.hasOwnProperty(contextName) ){ continue; }
+			//contextName
+			if( !EXN_CNF.hasOwnProperty(contextName) ){
+				UPDATES.new_action( 'newcat', contextName , '', '' );
+				EXN_CNF[contextName] = [];
+			}
+
+			if( ASTGUI.isArray( check_For_Contexts[contextName] )){ // compare whether the context matches the exact context
+				if( check_For_Contexts[contextName].join('::') != EXN_CNF[contextName].join('::') ){
+					UPDATES.new_action( 'delcat', contextName , '', '');
+					UPDATES.new_action( 'newcat', contextName , '', '');
+
+					var tmp_context_array = ASTGUI.cloneObject(check_For_Contexts[contextName]);
+					while( tmp_context_array.length ){
+						UPDATES.new_action( 'append', contextName , tmp_context_array[0].beforeChar('=') , tmp_context_array[0].afterChar('=') );
+						tmp_context_array.splice(0,1);
+					}
+
 				}
-				var x = new listOfActions();
-				x.filename('extensions.conf');
-				var cat = 'macro-' + ASTGUI.contexts.dialtrunks;
-				x.new_action('newcat', cat , '', '');
-				x.new_action( 'append', cat , '; Macro by', " Brandon Kruse <bkruse@digium.com> & Matthew O'Gorman mogorman@digium.com" );
-				x.new_action( 'append', cat , 'exten', 's,1,Set(CALLERID(num)=${IF($[${LEN(${CID_${CALLERID(num)}})} > 2]?${CID_${CALLERID(num)}}:)})');
-				x.new_action( 'append', cat , 'exten', 's,n,GotoIf($[${LEN(${CALLERID(num)})} > 6]?1-dial,1)');
-				x.new_action( 'append', cat , 'exten', 's,n,Set(CALLERID(all)=${IF($[${LEN(${CID_${ARG3}})} > 6]?${CID_${ARG3}}:${GLOBAL_OUTBOUNDCID})})');
-				x.new_action( 'append', cat , 'exten', 's,n,Goto(1-dial,1)');
-				x.new_action( 'append', cat , 'exten', '1-dial,1,Dial(${ARG1})');
-				x.new_action( 'append', cat , 'exten', '1-dial,n,Gotoif(${LEN(${ARG2})} > 0 ?1-${DIALSTATUS},1:1-out,1)');
-				x.new_action( 'append', cat , 'exten', '1-CHANUNAVAIL,1,Dial(${ARG2})');
-				x.new_action( 'append', cat , 'exten', '1-CHANUNAVAIL,n,Hangup()');
-				x.new_action( 'append', cat , 'exten', '1-CONGESTION,1,Dial(${ARG2})');
-				x.new_action( 'append', cat , 'exten', '1-CONGESTION,n,Hangup()');
-				x.new_action( 'append', cat , 'exten', '1-out,1,Hangup()');
-				x.callActions(after);
-			})();
-			return;
-		}
+			}else{ // see if the context has all the properties 
+				var tmp_context_obj = check_For_Contexts[contextName];
+				for( var this_prop in tmp_context_obj ){
+					if( !tmp_context_obj.hasOwnProperty(this_prop) ){ continue; }
 
-		var stdextn = 'macro-stdexten' ;
-		if( !ecnf.hasOwnProperty(stdextn) || ( ecnf.hasOwnProperty(stdextn) && !ecnf[stdextn]['exten'].contains('DYNAMIC_FEATURES') ) ){ // if stdexten does not forward to followme 
-			sessionData.continueParsing = false;
-			(function(){
-				ASTGUI.dialog.waitWhile('Updating stdexten Macro in extensions.conf');
-				var after = function(){
-					setTimeout( function(){
-						var t = ASTGUI.cliCommand('dialplan reload') ;
-						if( parent.sessionData.DEBUG_MODE ){
-							alert('updated macro-stdexten in extensions.conf' + '\n' + 'Click OK to reload');
-						}
-						top.window.location.reload();
-					}, 1000);
+					var tmp_string_index = EXN_CNF[contextName].indexOfLike(this_prop) ;
+					if( tmp_string_index != -1 ){
+						// if( EXN_CNF[contextName][tmp_string_index] == this_prop + '=' + tmp_context_obj[this_prop] ){ // do nothing
+						 	continue;
+						// }
+						// UPDATES.new_action( 'delete', contextName , this_prop, '' ,tmp_context_obj[this_prop] );
+					}
+					UPDATES.new_action( 'append', contextName , this_prop, tmp_context_obj[this_prop] );
 				}
-				var x = new listOfActions('extensions.conf');
-				x.new_action( 'delcat', stdextn , '', '');
-				x.new_action( 'newcat', stdextn , '', '');
-				x.new_action( 'append', stdextn , 'exten', 's,1,Set(__DYNAMIC_FEATURES=${FEATURES})');
-				x.new_action( 'append', stdextn , 'exten', 's,2,GotoIf($[${FOLLOWME_${ARG1}} = 1]?5:3)');
-				x.new_action( 'append', stdextn , 'exten', 's,3,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})');
-				x.new_action( 'append', stdextn , 'exten', 's,4,Goto(s-${DIALSTATUS},1)');
-				x.new_action( 'append', stdextn , 'exten', 's,5,Macro(stdexten-followme,${ARG1},${ARG2})');
-				x.new_action( 'append', stdextn , 'exten', 's-NOANSWER,1,Voicemail(${ARG1},u)');
-				x.new_action( 'append', stdextn , 'exten', 's-NOANSWER,2,Goto(default,s,1)');
-				x.new_action( 'append', stdextn , 'exten', 's-BUSY,1,Voicemail(${ARG1},b)');
-				x.new_action( 'append', stdextn , 'exten', 's-BUSY,2,Goto(default,s,1)');
-				x.new_action( 'append', stdextn , 'exten', '_s-.,1,Goto(s-NOANSWER,1)');
-				x.new_action( 'append', stdextn , 'exten', 'a,1,VoicemailMain(${ARG1})');
-				x.callActions(after);
-			})();
-			return;
+			}
 		}
 
-		var fmcat = 'macro-stdexten-followme' ;
-		if( !ecnf.hasOwnProperty(fmcat) ){ // add follow-me macro
-			sessionData.continueParsing = false;
-			(function(){
-				ASTGUI.dialog.waitWhile('Adding FollowMe Macro in extensions.conf');
-				var after = function(){
-					setTimeout( function(){
-						var t = ASTGUI.cliCommand('dialplan reload') ;
-						if( parent.sessionData.DEBUG_MODE ){
-							alert('Added FollowMe Macro to extensions.conf' + '\n' + 'Click OK to reload');
-						}
-						top.window.location.reload();
-					}, 1000);
-				}
+		if( UPDATES.current_batch == 1 && UPDATES.current_batch_actionnumber == 0 ){ // no updates to extensions.conf
 
-				var x = new listOfActions('extensions.conf');
-				x.new_action( 'newcat', fmcat , '', '');
-				x.new_action( 'append', fmcat , 'exten', 's,1,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})' );
-				x.new_action( 'append', fmcat , 'exten', 's,2,Followme(${ARG1},a)' );
-				x.new_action( 'append', fmcat , 'exten', 's,3,Voicemail(${ARG1},u)' );
-				x.new_action( 'append', fmcat , 'exten', 's-NOANSWER,1,Voicemail(${ARG1},u)' );
-				x.new_action( 'append', fmcat , 'exten', 's-BUSY,1,Voicemail(${ARG1},b)' );
-				x.new_action( 'append', fmcat , 'exten', 's-BUSY,2,Goto(default,s,1)' );
-				x.new_action( 'append', fmcat , 'exten', '_s-.,1,Goto(s-NOANSWER,1)' );
-				x.new_action( 'append', fmcat , 'exten', 'a,1,VoicemailMain(${ARG1})' );
-				x.callActions(after);
-			})();
+		}else{
+			ASTGUI.dialog.waitWhile('Updating Extensions.conf ');
+			sessionData.continueParsing = false ;
+			UPDATES.callActions( function(){ window.location.reload(); } );
 			return;
 		}
-
-
-
 
 		(function(){
 			var tmp_file = ASTGUI.globals.zaptelIncludeFile;
