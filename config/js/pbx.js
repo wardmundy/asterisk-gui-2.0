@@ -137,8 +137,11 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		}else{
 			ASTGUI.dialog.waitWhile('Updating Extensions.conf ');
 			sessionData.continueParsing = false ;
-			UPDATES.callActions( function(){ window.location.reload(); } );
-			return;
+			UPDATES.callActions( function(){
+				var t = ASTGUI.cliCommand('dialplan reload') ;
+				setTimeout( function(){ window.location.reload(); } , 500 );
+			} );
+			return ;
 		}
 
 		(function(){
