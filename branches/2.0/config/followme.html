@@ -348,7 +348,7 @@ var followMe_MiscFunctions = {
 			tmp.STEPNO = a ;
 			var sp_desc = document.createElement('span');
 				sp_desc.className = 'step_desc';
-				sp_desc.innerHTML = txt.split(',')[0] + ' (' +  txt.split(',')[1] + ' seconds)' ;
+				sp_desc.innerHTML = txt.split(',')[0].split('&').join(' <B>&</B> ') + ' (' +  txt.split(',')[1] + ' seconds)' ;
 			var sp_up = document.createElement('span');
 				sp_up.className = 'step_up';
 				sp_up.innerHTML = '&nbsp;';
@@ -371,31 +371,30 @@ var followMe_MiscFunctions = {
 	},
 
 	push_newdest: function(){ // followMe_MiscFunctions.push_newdest() ;
-
+		var tmp_seconds = ASTGUI.getFieldValue( 'FMU_newNumber_seconds' ) || '30' ;
 		if( _$('newFM_Number_radio_local').checked ){
-			if( _$('FMU_newNumber_local').selectedIndex == -1 ){ ASTGUI.feedback( { msg: ' Please select a Local Extension to Dial !', showfor: 4 }); return; }
-			if( _$('newFM_Order_radio_after').checked ){
-				var t = ASTGUI.getFieldValue('FMU_newNumber_local') + ',' + ASTGUI.getFieldValue( 'FMU_newNumber_seconds' );
-				CURRENT_DESTINATIONS.push(t);
+			if( _$('FMU_newNumber_local').selectedIndex == -1 ){ 
+				ASTGUI.highlightField( 'FMU_newNumber_local', 'Please select a Local Extension to Dial !');
+				return; 
 			}
+			var tmp_number = ASTGUI.getFieldValue('FMU_newNumber_local');
+		}
+		if( _$('newFM_Number_radio_Externals').checked ){
+			if( !ASTGUI.getFieldValue('FMU_newNumber_External') ){
+				ASTGUI.highlightField( 'FMU_newNumber_External', 'Please Enter a Number to Dial !');
+				return; 
+			}
+			var tmp_number = ASTGUI.getFieldValue('FMU_newNumber_External');
+		}
+		var tmp_dest = tmp_number + ',' + tmp_seconds;
 
-			if ( _$('newFM_Order_radio_alongWith').checked ){
-				var tmp_last = CURRENT_DESTINATIONS.lastValue();
-				CURRENT_DESTINATIONS.replaceLastWith( tmp_last.split(',')[0] + '&' + ASTGUI.getFieldValue('FMU_newNumber_local') + ',' + ASTGUI.getFieldValue( 'FMU_newNumber_seconds' ) );
-			}
+		if( _$('newFM_Order_radio_after').checked ){
+			CURRENT_DESTINATIONS.push(tmp_dest);
 		}
 
-		if( _$('newFM_Number_radio_Externals').checked ){
-			if( !ASTGUI.getFieldValue('FMU_newNumber_External') ){ ASTGUI.feedback( { msg: 'Please Enter a Number to Dial !', showfor: 4 }); return; }
-			if( _$('newFM_Order_radio_after').checked ){
-				var t = ASTGUI.getFieldValue('FMU_newNumber_External') + ',' + ASTGUI.getFieldValue( 'FMU_newNumber_seconds' );
-				CURRENT_DESTINATIONS.push(t);
-			}
-
-			if( _$('newFM_Order_radio_alongWith').checked ){
-				var tmp_last = CURRENT_DESTINATIONS.lastValue();
-				CURRENT_DESTINATIONS.replaceLastWith( tmp_last.split(',')[0] + '&' + ASTGUI.getFieldValue('FMU_newNumber_External') + ',' + ASTGUI.getFieldValue( 'FMU_newNumber_seconds' ) );
-			}
+		if ( _$('newFM_Order_radio_alongWith').checked ){
+			var tmp_last = CURRENT_DESTINATIONS.lastValue();
+			CURRENT_DESTINATIONS.replaceLastWith( tmp_last.split(',')[0] + '&' + tmp_dest );
 		}
 
 		this.refresh_allDestinations();
