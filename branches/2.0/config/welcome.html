@@ -142,7 +142,13 @@ managerEvents.parseOutput = function(op){
 		if( parent.sessionData.DEBUG_MODE ){
 			var b = document.createElement('div');
 			b.innerHTML = '<PRE>' + op + '</PRE><HR>';
-			_$('waitevent_Log').appendChild(b);
+
+			var wl = _$('waitevent_Log');
+			if( wl.childNodes.length ){
+				wl.insertBefore(b, wl.childNodes[0] );
+			}else{
+				wl.appendChild(b);
+			}
 		}
 		var op_LC = op.toLowerCase() ;
 		try{
