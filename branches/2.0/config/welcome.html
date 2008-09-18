@@ -84,13 +84,21 @@ var managerEvents = {};
 	tmp_qlogout.innerHTML = '<u>Logout</u>';
 	$(tmp_qlogout).css({ cursor : 'pointer', 'font-size': '80%', color: '#ADADAD' });
 	ASTGUI.events.add( tmp_qlogout, 'click' , function(){
-		$.ajax({ type: 'GET', url: ASTGUI.paths.rawman, data: 'action=AgentLogoff&Agent='+ agent +'&Soft=true',
-			success: function(){}
-		});
+		$.ajax({ type: 'GET', url: ASTGUI.paths.rawman, data: 'action=AgentLogoff&Agent='+ agent +'&Soft=true', success: function(){} });
 	});
 	return tmp_qlogout;
 };
 
+
+ managerEvents.agentLoginLink = function(agent){ // 
+	var tmp_qlogout = document.createElement('div');
+	tmp_qlogout.innerHTML = '<u>Login</u>';
+	$(tmp_qlogout).css({ cursor : 'pointer', 'font-size': '80%', color: '#5a7dd6' });
+	ASTGUI.events.add( tmp_qlogout, 'click' , function(){
+		$.ajax({ type: 'GET', url: ASTGUI.paths.rawman, data: 'action=AgentCallbackLogin&Agent='+ agent +'&Exten='+ agent, success: function(){} });
+	});
+	return tmp_qlogout;
+};
 
 managerEvents.updateUserImage = function(user , user_status){
 	var this_td = _$('TD_USER_DEVICE_STATUS_' + user );
@@ -530,6 +538,7 @@ var update_AgentsListing_Table = function(){
 
 				}else{
 					newcell.innerHTML = "<img src='images/agent_loggedout.png' border=0><BR>" + tmp_agent ;
+					newcell.appendChild( managerEvents.agentLoginLink(tmp_agent) );
 				}
 			}
 		});
