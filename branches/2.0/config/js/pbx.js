@@ -1962,11 +1962,11 @@ astgui_updateConfigFromOldGui = function(){
 
 		if ( sessionData.PLATFORM.isAA50 ){
 			var upgrade_alert = "Your configuration will now be upgraded to work with this version of the AA50 firmware.\n"
-			+ "An automatic backup of your old configration is created and is available from the 'Backup' panel.\n"
+			+ "An automatic backup of your old configuration is created and is available from the 'Backup' panel.\n"
 			+ "If you downgrade your firmware to a previous version, you will need to restore this configuration.";
 		}else{
 			var upgrade_alert = "Your configuration will now be upgraded to work with the latest version of GUI. \n"
-			+ "An automatic backup of your old configration is available from the backups panel.";
+			+ "An automatic backup of your old configuration is available from the backups panel.";
 		}
 
 		if(upgrade_alert){
