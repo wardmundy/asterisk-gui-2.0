@@ -2527,6 +2527,14 @@ var ASTGUI = {
 						return false;
 					}
 					break;
+				case 'numeric_plus_w':
+					// check if field's value is numeric - otherwise highlight field and return false
+					var fb_msg = (this_field_name) ? this_field_name + ' is a numeric field.<BR> Letters and Punctuation are not allowed in this field.' : 'This is a numeric field.<BR> Letters and Punctuation are not allowed in this field.';
+					if ( /[^0-9w\+]/.test(x) ){
+						ASTGUI.highlightField( field, fb_msg );
+						return false;
+					}
+					break;
 				case 'alphanumeric':
 					if ( /[^a-zA-Z0-9]/.test(x) ){
 						var fb_msg = (this_field_name) ? this_field_name + ' is a AlphaNumeric field.<BR> Punctuation and Special Characters are not allowed in this field.' : 'This is a AlphaNumeric field.<BR> Punctuation and Special Characters are not allowed in this field.';
