@@ -41,6 +41,18 @@ _$ = function(x){
 		return x;
 	};
 
+	Array.prototype.lastValue = function(){
+		// [0,1,2]
+		if( this.length )
+			return this[this.length - 1] ;
+		return null;
+	};
+
+	Array.prototype.replaceLastWith = function(a){
+		if( this.length )
+			this[this.length - 1] = a ;
+	}
+
 	Array.prototype.contains = function(str) {
 		for(var i=0, j = this.length ; i < j; i++ ){
 			if( this[i] === str )return true;

@@ -24,6 +24,7 @@
 <script src="js/jquery.tooltip.js"></script>
 <link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
 <style type="text/css">
+
 	#table_userslist {
 		border: 1px solid #666666;
 		margin-top: 5px;
@@ -156,6 +157,26 @@ var load_users_table = function(){
 
 
 var localajaxinit = function(){
+
+	ASTGUI.events.add( 'newFM_Number_radio_local', 'click' , function(){
+		$('#FMU_newNumber_local').hide();
+		$('#FMU_newNumber_External').hide();
+
+		if( _$('newFM_Number_radio_local').checked ){
+			$('#FMU_newNumber_local').show();
+		}
+	});
+
+	ASTGUI.events.add( 'newFM_Number_radio_Externals', 'click' , function(){ 
+		$('#FMU_newNumber_local').hide();
+		$('#FMU_newNumber_External').hide();
+
+		if( _$('newFM_Number_radio_Externals').checked ){
+			$('#FMU_newNumber_External').show();
+		}
+	});
+
+	followMe_MiscFunctions.load_LocalExtensionsList();
 	top.document.title = 'Follow Me' ;
 	load_users_table();
 
@@ -245,7 +266,9 @@ var show_Edit_FollowMeUser = function(u, fm_ed){
 		}
 	}
 
+	followMe_MiscFunctions.hide_FORM_newFM_Number();
 	followMe_MiscFunctions.refresh_allDestinations();
+
 	$('#div_followUser_edit').showWithBg();
 };
 
@@ -282,8 +305,37 @@ var save_FollowMeUser = function(){
 
 var followMe_MiscFunctions = {
 
+	load_LocalExtensionsList : function(){ //  followMe_MiscFunctions.load_LocalExtensionsList()
+		ASTGUI.selectbox.clear('FMU_newNumber_local');
+		var ul = parent.astgui_manageusers.listOfUsers();  ul = ul.sortNumbers( );
+		ul.each( function(user){
+			ASTGUI.selectbox.append('FMU_newNumber_local', user + ' ' + parent.sessionData.pbxinfo.users[user].getProperty('fullname') , user);
+		});
+	},
+
+	show_FORM_newFM_Number : function(){ // followMe_MiscFunctions.show_FORM_newFM_Number()
+		ASTGUI.updateFieldToValue( 'FMU_newNumber_seconds', '30' );
+		_$('newFM_Number_radio_local').checked = true;
+		_$('newFM_Number_radio_Externals').checked = false;
+		_$('newFM_Order_radio_after').checked = true;
+		_$('newFM_Order_radio_alongWith').checked = false;
+		_$('FMU_newNumber_local').selectedIndex = -1 ;
+		ASTGUI.updateFieldToValue('FMU_newNumber_External', '');
+		$('#FMU_newNumber_local').show();
+		$('#FMU_newNumber_External').hide();
+		$('.FORM_newFM_Number').show();
+		$($('.FORM_newFM_Number')[0]).hide();
+		$('#lastRow_Edit').hide();
+	},
+
+	hide_FORM_newFM_Number : function(){ // followMe_MiscFunctions.hide_FORM_newFM_Number()
+		$('.FORM_newFM_Number').hide();
+		$($('.FORM_newFM_Number')[0]).show();
+		$('#lastRow_Edit').show();
+	},
+
 	reset_Fields : function(){ // followMe_MiscFunctions.reset_Fields()
-		ASTGUI.resetTheseFields ([ 'FMU_Enable', 'FMU_Disable', 'FMU_moh', 'FMU_context','FMU_newNumber','FMU_newNumber_seconds' ]);
+		ASTGUI.resetTheseFields ([ 'FMU_Enable', 'FMU_Disable', 'FMU_moh', 'FMU_context','FMU_newNumber_local','FMU_newNumber_seconds' ]);
 		ASTGUI.domActions.removeAllChilds( 'sqDestinations' ); CURRENT_DESTINATIONS = [] ;
 
 	},
@@ -319,11 +371,36 @@ var followMe_MiscFunctions = {
 	},
 
 	push_newdest: function(){ // followMe_MiscFunctions.push_newdest() ;
-		var t = ASTGUI.getFieldValue('FMU_newNumber') + ',' + ASTGUI.getFieldValue( 'FMU_newNumber_seconds' );
 
-		CURRENT_DESTINATIONS.push(t);
+		if( _$('newFM_Number_radio_local').checked ){
+			if( _$('FMU_newNumber_local').selectedIndex == -1 ){ ASTGUI.feedback( { msg: ' Please select a Local Extension to Dial !', showfor: 4 }); return; }
+			if( _$('newFM_Order_radio_after').checked ){
+				var t = ASTGUI.getFieldValue('FMU_newNumber_local') + ',' + ASTGUI.getFieldValue( 'FMU_newNumber_seconds' );
+				CURRENT_DESTINATIONS.push(t);
+			}
+
+			if ( _$('newFM_Order_radio_alongWith').checked ){
+				var tmp_last = CURRENT_DESTINATIONS.lastValue();
+				CURRENT_DESTINATIONS.replaceLastWith( tmp_last.split(',')[0] + '&' + ASTGUI.getFieldValue('FMU_newNumber_local') + ',' + ASTGUI.getFieldValue( 'FMU_newNumber_seconds' ) );
+			}
+		}
+
+		if( _$('newFM_Number_radio_Externals').checked ){
+			if( !ASTGUI.getFieldValue('FMU_newNumber_External') ){ ASTGUI.feedback( { msg: 'Please Enter a Number to Dial !', showfor: 4 }); return; }
+			if( _$('newFM_Order_radio_after').checked ){
+				var t = ASTGUI.getFieldValue('FMU_newNumber_External') + ',' + ASTGUI.getFieldValue( 'FMU_newNumber_seconds' );
+				CURRENT_DESTINATIONS.push(t);
+			}
+
+			if( _$('newFM_Order_radio_alongWith').checked ){
+				var tmp_last = CURRENT_DESTINATIONS.lastValue();
+				CURRENT_DESTINATIONS.replaceLastWith( tmp_last.split(',')[0] + '&' + ASTGUI.getFieldValue('FMU_newNumber_External') + ',' + ASTGUI.getFieldValue( 'FMU_newNumber_seconds' ) );
+			}
+		}
+
 		this.refresh_allDestinations();
-		ASTGUI.resetTheseFields (['FMU_newNumber','FMU_newNumber_seconds' ]);
+		this.hide_FORM_newFM_Number();
+		//ASTGUI.resetTheseFields (['FMU_newNumber','FMU_newNumber_seconds' ]);
 	}
 };
 
@@ -339,7 +416,7 @@ var followMe_MiscFunctions = {
 	<table id='table_userslist' cellpadding=0 cellspacing=0 border=0 align=center style='clear:both;'></table>
 
 
-<div id="div_followUser_edit" STYLE="width:550; display:none;" class='dialog'>
+<div id="div_followUser_edit" STYLE="width:600; display:none;" class='dialog'>
 	<TABLE width="100%" cellpadding=0 cellspacing=0>
 	<TR class="dialog_title_tr">
 		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);">
@@ -362,11 +439,52 @@ var followMe_MiscFunctions = {
 			<td>	<div id='sqDestinations'></div>	</td>
 		</tr>
 
-		<tr>	<td align=right>Add FollowMe Number <img src="images/tooltip_info.gif" tip="en,followme,4" class='tooltipinfo'> :</td>
-			<td>&nbsp;try <input id='FMU_newNumber' size=10> for <input id='FMU_newNumber_seconds' size=1> Seconds <span class='guiButton' onclick="followMe_MiscFunctions.push_newdest();"> &uarr; Add</span></td>
+		<tr class='FORM_newFM_Number' >
+			<td align=right valign=top></td>
+			<td>
+				<span class='guiButton' onclick=" followMe_MiscFunctions.show_FORM_newFM_Number(); "><B>Add FollowMe Number</B></span>
+			</td>
 		</tr>
 
-		<tr>	<td align=center valign=bottom colspan=2 style="padding:15px; background-color: #f4deb7">
+		<tr class='FORM_newFM_Number'>
+			<td align=right valign=top><B>New FollowMe Number <img src="images/tooltip_info.gif" tip="en,followme,4" class='tooltipinfo'> :</B></td>
+			<td>
+				<input type=radio name='newFM_Number_radio' id='newFM_Number_radio_local'>
+					<label for='newFM_Number_radio_local'> Dial Local Extension &nbsp;&nbsp;</label>
+				<input type=radio name='newFM_Number_radio' id='newFM_Number_radio_Externals'>
+					<label for='newFM_Number_radio_Externals'> Dial External Number &nbsp;&nbsp;&nbsp;&nbsp;</label>
+			</td>
+		</tr>
+
+		<tr class='FORM_newFM_Number'>
+			<td align=right></td>
+			<td>	&nbsp;<select id='FMU_newNumber_local'></select> <input id='FMU_newNumber_External' size=10> for <input id='FMU_newNumber_seconds' size=1> Seconds</td>
+		</tr>
+
+		<tr class='FORM_newFM_Number'>
+			<td align=right valign=top>Dial Order <img src="images/tooltip_info.gif" tip="en,followme,4" class='tooltipinfo'> :</td>
+			<td>
+				<input type=radio name='newFM_Order_radio' id='newFM_Order_radio_after'>
+					<label for='newFM_Order_radio_after'>Ring after Trying previous extension/number &nbsp;&nbsp;</label><BR>
+				<input type=radio name='newFM_Order_radio' id='newFM_Order_radio_alongWith'>
+					<label for='newFM_Order_radio_alongWith'>Ring along with previous extension/number &nbsp;&nbsp;&nbsp;&nbsp;</label>
+			</td>
+		</tr>
+
+		<tr class='FORM_newFM_Number'>
+			<td align=right></td>
+			<td>
+				<span class='guiButtonCancel' onclick=" followMe_MiscFunctions.hide_FORM_newFM_Number();">Cancel</span>
+				<span class='guiButton' onclick="followMe_MiscFunctions.push_newdest();"> &uarr; Add</span>
+			</td>
+		</tr>
+
+		<tr class='FORM_newFM_Number'>
+			<td align=center valign=bottom colspan=2 height=5></td>
+		</tr>
+
+		<tr id='lastRow_Edit'>
+			<td align=center valign=bottom colspan=2 style="padding:15px; background-color: #f4deb7">
 				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
 				<span class='guiButtonEdit' onclick='save_FollowMeUser();'>Save</span>
 			</td>
