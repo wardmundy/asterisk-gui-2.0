@@ -79,6 +79,19 @@ $(tmp_image).attr('border', '0');
 
 var managerEvents = {};
 
+ managerEvents.agentLogoutLink = function(agent){
+	var tmp_qlogout = document.createElement('div');
+	tmp_qlogout.innerHTML = '<u>Logout</u>';
+	$(tmp_qlogout).css({ cursor : 'pointer', 'font-size': '80%', color: '#ADADAD' });
+	ASTGUI.events.add( tmp_qlogout, 'click' , function(){
+		$.ajax({ type: 'GET', url: ASTGUI.paths.rawman, data: 'action=AgentLogoff&Agent='+ agent +'&Soft=true',
+			success: function(){}
+		});
+	});
+	return tmp_qlogout;
+};
+
+
 managerEvents.updateUserImage = function(user , user_status){
 	var this_td = _$('TD_USER_DEVICE_STATUS_' + user );
 	ASTGUI.domActions.removeAllChilds ( this_td );
@@ -511,8 +524,10 @@ var update_AgentsListing_Table = function(){
 				newcell.align = 'center' ;
 
 				if(tmp_agent_Status != 'AGENT_LOGGEDOFF'){ // logged in 
-					newcell.innerHTML = "<img src='images/agent_loggedin.png' border=0><BR>" + tmp_agent 
-								+ '<BR>Logged On: ' + this_chunk.LoggedInChan ;
+					newcell.innerHTML = "<img src='images/agent_loggedin.png' border=0 alt='Logged On: " + this_chunk.LoggedInChan + "'><BR>" + tmp_agent ;
+
+					newcell.appendChild( managerEvents.agentLogoutLink(tmp_agent) );
+
 				}else{
 					newcell.innerHTML = "<img src='images/agent_loggedout.png' border=0><BR>" + tmp_agent ;
 				}
