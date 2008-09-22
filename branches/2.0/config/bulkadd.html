@@ -99,8 +99,8 @@ var addUsers_from_CSV_field = function(){
 		}
 
 		var this_user = this_user_details[0]; // User
-		if( parent.sessionData.pbxinfo.users.hasOwnProperty(this_user)  ){
-			alert('Error: User '+ this_user + '(line ' + (tli + 1) + ' in CSV text) already exists');
+		if( parent.miscFunctions.ifExtensionAlreadyExists(this_user) ){
+			alert('Error: Duplicate Extension \n\n '+ ' Extension ' + this_user + ' already exists \n' + ' Please change extension in line ' + (tli + 1) );
 			return;
 		}
 
@@ -125,9 +125,9 @@ var add_RangeOfUsers = function(){
 
 	while(t){
 		var tmp_nu = String(tmp_user);
-		if( parent.sessionData.pbxinfo.users.hasOwnProperty(tmp_nu)  ){
-			alert('Error: User '+ tmp_nu + ' already exists');
-			return;
+		if( parent.miscFunctions.ifExtensionAlreadyExists(tmp_nu) ){
+			tmp_user++ ;
+			continue;
 		}
 
 		newusers_list.push(tmp_nu);
