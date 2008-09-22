@@ -1706,6 +1706,10 @@ var ASTGUI = {
 				return 'Play ' + (args[0] || '???') + ' & Donot Listen for KeyPress events' ;
 			}
 
+			if( all_LC == "agi" ){
+				return (args[0])? 'Execute AGI script <b>' + args[0] + '</b>' :  'Execute AGI script <font color=red>!</font>' ;
+			}
+
 			if( all_LC == "waitexten" ){
 				return "Wait '"+ args[0] + "' sec for the user to enter an extension";
 			}
@@ -2659,7 +2663,7 @@ ASTGUI.paths['asteriskConfig'] = '/etc/asterisk/';
 ASTGUI.paths['ConfigBkp'] = '/var/lib/asterisk/gui_backups/';
 ASTGUI.paths['ConfigBkp_AA50'] = '/var/lib/asterisk/sounds/backups/'; // AA50 bkp path on C.F
 ASTGUI.paths['ConfigBkp_dldPath'] = ASTGUI.paths['guiInstall'] + 'private/bkps/'; // path for keeping the bkp files for download
-
+ASTGUI.paths['AGIBIN'] = '/var/lib/asterisk/agi-bin/';
 ASTGUI.paths['Sounds'] = '/var/lib/asterisk/sounds/';
 ASTGUI.paths['MOH'] = '/var/lib/asterisk/moh/' ; // path for music on hold files
 ASTGUI.paths['menusRecord'] = ASTGUI.paths['Sounds'] + 'record/' ;
