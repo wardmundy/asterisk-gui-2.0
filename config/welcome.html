@@ -369,10 +369,10 @@ var updateListingsTable = function(){
 
 			while( meetme_status.length ){
 				var this_line = meetme_status[0];
+				meetme_status.removeFirst();
 				if( this_line.beginsWith('Conf Num') ||  this_line.beginsWith('* Total number') ) continue;
 				var tmp_vars = this_line.split(/\s+/); // ['6302','0001','N/A','00:00:09', 'Static' ]
 				active_conferences[ tmp_vars[0] ] = String( Number(tmp_vars[1]) ) ;
-				meetme_status.removeFirst();
 			}
 		}
 
