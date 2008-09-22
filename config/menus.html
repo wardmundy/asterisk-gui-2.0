@@ -130,6 +130,7 @@ var isNewVmenu ;
 var EDIT_VMENU ;
 var CURRENT_ACTIONS = [] ;
 var LISTOFSOUNDFILES = [];
+var AGI_FILES = [];
 
 var chop_Extension = function(a){
 	if( !a ){ return ''; }
@@ -190,8 +191,17 @@ var VoiceMenus_miscFunctions = {
 					LISTOFSOUNDFILES.push(CURRENT_FILE);
 				}
 			});
-			parent.ASTGUI.dialog.hide();
 			ASTGUI.COMBOBOX.call( _$('newstep_sound') , LISTOFSOUNDFILES, 450 );
+			VoiceMenus_miscFunctions.load_aig_files();
+		});
+	},
+
+	load_aig_files : function(){
+		parent.ASTGUI.dialog.waitWhile('loading list of AIG scripts ..');
+		ASTGUI.listSystemFiles( ASTGUI.paths.AGIBIN , function(recfiles) {
+			AGI_FILES = recfiles;
+			parent.ASTGUI.dialog.hide();
+			ASTGUI.COMBOBOX.call( _$('newstep_agi') , AGI_FILES, 450 );
 		});
 	},
 
@@ -208,6 +218,17 @@ var VoiceMenus_miscFunctions = {
 				case 'Answer':
 					lbl('Answer');
 					tip_chosenStep.innerHTML = 'Answer a channel if ringing';
+					break;
+				case 'AGI':
+					lbl('AGI');
+					$('#newstep_agi').show();
+					ASTGUI.updateFieldToValue('newstep_agi','');
+					tip_chosenStep.innerHTML = 'Executes an AGI compliant application';
+					break;
+
+				case 'Ringing':
+					lbl('Ringing');
+					tip_chosenStep.innerHTML = 'Indicate ringing tone';
 					break;
 				case 'Authenticate':
 					lbl('Authenticate');
@@ -355,6 +376,9 @@ var VoiceMenus_miscFunctions = {
 			case 'Answer':
 				newstep = 'Answer()';
 				break;
+			case 'Ringing':
+				newstep = 'Ringing()';
+				break;
 			case 'Authenticate':
 				newstep = 'Authenticate(' + ASTGUI.getFieldValue('newstep_pwd') + ')';
 				break;
@@ -390,6 +414,9 @@ var VoiceMenus_miscFunctions = {
 				break;
 			case 'Wait':
 				newstep = 'Wait(' + ASTGUI.getFieldValue('newstep_seconds') + ')';
+				break;
+			case 'AGI':
+				newstep = 'AGI(' + ASTGUI.getFieldValue('newstep_agi') + ')';
 				break;
 			case 'WaitExten':
 				newstep = 'WaitExten(' + ASTGUI.getFieldValue('newstep_seconds') + ')';
@@ -846,6 +873,7 @@ var update_a_keyPressEvent = function(){
 							<option value="DISA">DISA</option>
 							<option value="ResponseTimeout">ResponseTimeout</option>
 							<option value="Playback">Playback</option>
+							<option value="Ringing">Ringing</option>
 							<option value="SetMusicOnHold">Set MusicOhHold Class</option>
 							<option value="SayAlpha">SayAlpha</option>
 							<option value="SayDigits">SayDigits</option>
@@ -856,6 +884,7 @@ var update_a_keyPressEvent = function(){
 							<option value="setLanguage">Set Language</option>
 							<option value="GotoDirecotry">Goto Directory</option>
 							<option value="DialViaTrunk">Dial a Number via Trunk</option>
+							<option value="AGI">AGI</option>
 							<option value="CustomApp">Custom App</option>
 							<option value="UserEvent">User Event</option>
 <!--							<option value="CheckOwnVoiceMail">Check Voicemail for Own Extension</option>-->
@@ -878,6 +907,7 @@ var update_a_keyPressEvent = function(){
 							<option value='fr'>French</option>
 						</select>
 						<input  class='class_newStep_details_td' id="newstep_custom" size=24>
+						<input  class='class_newStep_details_td' id="newstep_agi" size=16>
 						<input class='class_newStep_details_td' id="newstep_dial_ThisNumber" size=10>
 						<select class='class_newStep_details_td' id="newstep_dial_ViaTrunk"></select>
 						<input class='class_newStep_details_td' id="newstep_UserEvent_eventname" size=5>
