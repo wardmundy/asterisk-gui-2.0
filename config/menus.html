@@ -200,6 +200,7 @@ var VoiceMenus_miscFunctions = {
 		if(a){
 			_$('newStep_select_tr').style.display = 'none';
 			_$('newStep_details_tr').style.display = '';
+			ASTGUI.updateFieldToValue('newstep_pwd','');
 			var step_action = _$('newStep_select_action').value ;
 			$('.class_newStep_details_td').hide();
 			var lbl = function(a){ _$('newstep_comment_span').innerHTML = a ; };
@@ -213,6 +214,25 @@ var VoiceMenus_miscFunctions = {
 					$('#newstep_pwd').show();
 					tip_chosenStep.innerHTML = ' This application asks the caller to enter a given password in order to continue dialplan execution. ';
 					break;
+
+				case 'SayAlpha':
+					lbl('SayAlpha');
+					$('#newstep_pwd').show();
+					tip_chosenStep.innerHTML = ' Say each character in the string including letters, numbers and other characters, one by one ';
+					break;
+
+				case 'SayDigits':
+					lbl('SayDigits');
+					$('#newstep_pwd').show();
+					tip_chosenStep.innerHTML = 'Say the digits, one by one';
+					break;
+
+				case 'SayNumber':
+					lbl('SayNumber');
+					$('#newstep_pwd').show();
+					tip_chosenStep.innerHTML = 'Say a number (e.g. \'six thousand, five hundred and seventy two\')';
+					break;
+
 				case 'Background':
 					lbl('Background');
 					$('#newstep_sound').show();
@@ -337,6 +357,15 @@ var VoiceMenus_miscFunctions = {
 				break;
 			case 'Authenticate':
 				newstep = 'Authenticate(' + ASTGUI.getFieldValue('newstep_pwd') + ')';
+				break;
+			case 'SayAlpha':
+				newstep = 'SayAlpha(' + ASTGUI.getFieldValue('newstep_pwd') + ')';
+				break;
+			case 'SayDigits':
+				newstep = 'SayDigits(' + ASTGUI.getFieldValue('newstep_pwd') + ')';
+				break;
+			case 'SayNumber':
+				newstep = 'SayNumber(' + ASTGUI.getFieldValue('newstep_pwd') + ')';
 				break;
 			case 'Background':
 				newstep = 'Background(' + ASTGUI.getFieldValue('newstep_sound') + ')';
@@ -818,6 +847,9 @@ var update_a_keyPressEvent = function(){
 							<option value="ResponseTimeout">ResponseTimeout</option>
 							<option value="Playback">Playback</option>
 							<option value="SetMusicOnHold">Set MusicOhHold Class</option>
+							<option value="SayAlpha">SayAlpha</option>
+							<option value="SayDigits">SayDigits</option>
+							<option value="SayNumber">SayNumber</option>
 							<option value="Wait">Wait</option>
 							<option value="WaitExten">WaitExten</option>
 							<option value="toDestination">Goto Destination</option>
