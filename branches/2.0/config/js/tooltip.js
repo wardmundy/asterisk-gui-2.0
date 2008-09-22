@@ -374,6 +374,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['record'].en[0] = "<B>Record a new Voice Menu:</B> Lets you record a new voice menu using any user extension device";
 	tooltips['record'].en[1] = "<B>Filename:</B> File name under which the recorded file should be saved to. Ex: MainGreeting ";
 	tooltips['record'].en[2] = "<B>Extension used for recording:</B> Select a device through which this voice menu will be recorded.";
+	tooltips['record'].en[90] = "To help you create a customized IVR system for your business, voice prompts are available in English, French and Spanish, and are provided by Allison Smith and June Wallack. Click on the 'Where to Buy' button to get directly to the <i>IVR Voice Prompts</i> section on the Digium Store.";
 
 
 	// Tooltips for System Information  (sysinfo)

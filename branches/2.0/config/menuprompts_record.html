@@ -21,6 +21,7 @@
 -->
 <script src="js/jquery.js"></script>
 <script src="js/astman.js"></script>
+<script src="js/jquery.tooltip.js"></script>
 <link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
 <style type="text/css">
 	#recfilesTable {
@@ -183,6 +184,8 @@ var localajaxinit = function(){
 		ASTGUI.domActions.tr_addCell( newRow , { html: 'Options' } );
 	})();
 
+	$('#whereToBuy_button').tooltip({delay:0.9,showURL:false,top:15,left:-300});
+
 	ASTGUI.listSystemFiles( ASTGUI.paths.menusRecord , function(recfiles) {
 		for( var i=0 ; i < recfiles.length ; i++ ){
 			var filename = recfiles[i].stripTags();
@@ -205,6 +208,11 @@ var localajaxinit = function(){
 	});
 };
 
+var buynow_action = function(){
+	win=window.open('','myWin');
+	win.location.href='http://store.digium.com/productview.php?product_code=IVRPROMPT';
+};
+
 </script>
 <body bgcolor="EFEFEF">
 
@@ -221,11 +229,13 @@ var localajaxinit = function(){
 	<div class='lite_Heading'>
 		List of Custom Voice Menu Prompts
 	</div>
-	<div STYLE="text-align: center;">
+	<div STYLE="text-align: center;" class='top_buttons'>
 		<span class='guiButton' onclick='show_record_New();'>Record a new Voice Menu prompt</span>
 		<span class='guiButton' onclick='window.location.href="menuprompts_upload.html";' id='uploadVoiceMenuPrompt_Button'>Upload a Voice Menu prompt</span>
+		<span class='guiButton' style='margin-left:100px;' onclick='buynow_action();' id='whereToBuy_button' tip="en,record,90">Where to Buy</span>
 	</div>
-	<div id="recfilesTable_div" style="height:370px;width=100%; overflow :auto; padding : 0">
+	<BR>
+	<div id="recfilesTable_div" style="height:370px; width=100%; overflow :auto; padding : 0">
 		<table id="recfilesTable" cellpadding=2 cellspacing=1 border=0 align=center></table>
 	</div>
 </div>
