@@ -96,6 +96,7 @@
 </style>
 <script>
 var MODULE_NAME = 'wctdm24xxp';
+var DRIVERS_LIST = [ 'tor2', 'wcfxo', 'wct1xxp', 'wct4xxp', 'wctc4xxp', 'wctdm24xxp', 'wctdm', 'wcte11xp', 'wcte12xp', 'wcusb', 'xpp_usb' ];
 
 var SPANS = {};
 
@@ -1119,6 +1120,7 @@ var localajaxinit = function(){
 	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_fxshonormode', 'fxshonormode') ;
 	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_alawoverride', 'alawoverride') ;
 
+	ASTGUI.COMBOBOX.call( _$('zap_moduleName') , DRIVERS_LIST , 195 );
 
 	if( parent.sessionData.PLATFORM.isAA50 ){
 		(function(){
