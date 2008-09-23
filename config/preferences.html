@@ -135,10 +135,10 @@ var verify_Ranges = function(){
 	}
 	for( var i=0; i < arrF.length ; i++ ){
 		var tmp = ASTGUI.getFieldValue( arrF[i] );
-		if( !tmp.length.isValueInBetween(2,5)  ){
+		if( !tmp.length.isValueInBetween(2,6)  ){
 			_$(arrF[i]).focus();
 			_$(arrF[i]).select();
-			ASTGUI.feedback( { msg:'Extension should be 2 to 5 digits ', showfor:3 } );
+			ASTGUI.feedback( { msg:'Extension should be 2 to 6 digits ', showfor:3 } );
 			return false;
 		}
 	}
