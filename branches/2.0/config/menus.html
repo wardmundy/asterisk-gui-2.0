@@ -732,6 +732,9 @@ var updateVoiceMenus_Table = function(){
 
 var localajaxinit = function(){
 	top.document.title = 'Voice Menus Configuration' ;
+	if(parent.sessionData.advancedmode == true ){
+		ASTGUI.selectbox.append('newStep_select_action', 'Custom App', 'CustomApp');
+	}
 	if( !ASTGUI.miscFunctions.alertIfRangeisNotdefined('vme_start','vme_end', 'VoiceMenus') ){
 		$('.top_buttons').hide();
 		return;
@@ -885,7 +888,6 @@ var update_a_keyPressEvent = function(){
 							<option value="GotoDirecotry">Goto Directory</option>
 							<option value="DialViaTrunk">Dial a Number via Trunk</option>
 							<option value="AGI">AGI</option>
-							<option value="CustomApp">Custom App</option>
 							<option value="UserEvent">User Event</option>
 <!--							<option value="CheckOwnVoiceMail">Check Voicemail for Own Extension</option>-->
 							<option value="Hangup">Hangup</option>
