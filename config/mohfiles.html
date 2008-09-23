@@ -226,9 +226,9 @@ var manage_moh = {
 		// create entry from musiconhold.conf
 		var u = new listOfSynActions('musiconhold.conf') ;
 		u.new_action('newcat', tmp_moh_classname, '', '');
-		u.new_action('update', tmp_moh_classname , 'directory', tmp_MOH_PATH );
-		u.new_action('update', tmp_moh_classname , 'mode', 'files');
-		u.new_action('update', tmp_moh_classname , 'random', 'yes');
+		u.new_action('append', tmp_moh_classname , 'directory', tmp_MOH_PATH );
+		u.new_action('append', tmp_moh_classname , 'mode', 'files');
+		u.new_action('append', tmp_moh_classname , 'random', 'yes');
 		u.callActions();
 
 		// create entry from http.conf 
