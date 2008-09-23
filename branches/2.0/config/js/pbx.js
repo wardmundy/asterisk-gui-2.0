@@ -1652,8 +1652,8 @@ astgui_manageRingGroups = {
 
 		rg.strategy = (dialcount > 1) ? 'ringinorder':'ringall' ;
 		var lastline = cxt[cxt.length -1].toLowerCase();
-		if(! lastline.contains('dial(') && lastline.beginsWith('exten=s,n') ){
-			rg.fallback = lastline.split('=s,n,')[1] ;
+		if( (!lastline.contains('dial(')) && lastline.beginsWith('exten=s,n') ){
+			rg.fallback = cxt[cxt.length -1].split('=s,n,')[1] ;
 		}
 
 		for(var u=0, v = rgextns.length; u < v ; u++ ){
