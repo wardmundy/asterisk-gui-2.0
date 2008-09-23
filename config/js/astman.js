@@ -1927,6 +1927,16 @@ var ASTGUI = {
 			el.selectedIndex = -1;
 			if(!dest){return;}
 
+			if( dest.contains('(') && ( dest.contains(',') || dest.contains('|') ) ){
+				ASTGUI.selectbox.selectOption(el , dest);
+				return;
+			}
+
+			if( !dest.contains('(') && !dest.contains(',') && !dest.contains('|') ) {
+				ASTGUI.selectbox.selectOption(el , dest);
+				return;
+			}
+
 			if(dest.contains('(')){
 				var tmp = dest.beforeChar('(');
 				if( tmp.contains(',') ){
