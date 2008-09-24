@@ -650,33 +650,33 @@ astgui_manageusers  = { // all the functions related to user management would re
 	},
 
 	/* returns an array based on a manager packet/response */
-	responseToArray: function(resp) {
-		var msgs = new Array();
-		var inmsg = 0;
-		var msgnum = 0;
-		var x,y;
-		var s = resp;
-		var allheaders = s.split('\r\n');
-		for (x=0;x<allheaders.length;x++) {
-			if (allheaders[x].length) {
-				var fields = allheaders[x].split(': ');
-				if (!inmsg) {
-					msgs[msgnum] = new Object();
-					msgs[msgnum].headers = {};
-					msgs[msgnum].names = new Array();
-					y=0;
-				}
-				msgs[msgnum].headers[fields[0].toLowerCase()] = allheaders[x].substr(fields[0].length +2);
-				msgs[msgnum].names[y++] = fields[0].toLowerCase();
-				inmsg=1;
-			} else {
-				if (inmsg) {
-					inmsg = 0;
-					msgnum++;
-				}
-			}
-		}
-	},
+// 	responseToArray: function(resp) {
+// 		var msgs = new Array();
+// 		var inmsg = 0;
+// 		var msgnum = 0;
+// 		var x,y;
+// 		var s = resp;
+// 		var allheaders = s.split('\r\n');
+// 		for (x=0;x<allheaders.length;x++) {
+// 			if (allheaders[x].length) {
+// 				var fields = allheaders[x].split(': ');
+// 				if (!inmsg) {
+// 					msgs[msgnum] = new Object();
+// 					msgs[msgnum].headers = {};
+// 					msgs[msgnum].names = new Array();
+// 					y=0;
+// 				}
+// 				msgs[msgnum].headers[fields[0].toLowerCase()] = allheaders[x].substr(fields[0].length +2);
+// 				msgs[msgnum].names[y++] = fields[0].toLowerCase();
+// 				inmsg=1;
+// 			} else {
+// 				if (inmsg) {
+// 					inmsg = 0;
+// 					msgnum++;
+// 				}
+// 			}
+// 		}
+// 	},
 
 	getUserDetails: function(user){ // returns an object with the specified user details, if the specified user is not found returns null ;
 		return sessionData.pbxinfo.users[user] || null ;
