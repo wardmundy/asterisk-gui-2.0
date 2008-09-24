@@ -605,26 +605,6 @@ astgui_manageusers  = { // all the functions related to user management would re
 		return ( sessionData.pbxinfo.users && sessionData.pbxinfo.users.getOwnProperties && sessionData.pbxinfo.users.getOwnProperties() ) || [];
 	},
 
-	listOfChannels: function() { // returns an array of current active channels
-		var raw_chan_status = makeSyncRequest ( { action :'status' } );
-		var to_return = [];
-		try {
-			var chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput( raw_chan_status.trim().replace(/Event: StatusComplete/, "") ) ;
-			while( chunks.length ){
-				var this_chunk =  ;
-				if( chunks[0].hasOwnProperty('Channel') ){
-					to_return.push(chunks[0]);
-				}
-				chunks.removeFirst();
-			}
-
-		} catch(e) {
-			ASTGUI.debugLog("Error listOfChannels: " + e);
-			return to_return;
-		}
-		return to_return;
-	},
-
 	/* returns an array based on a manager packet/response */
 // 	responseToArray: function(resp) {
 // 		var msgs = new Array();
