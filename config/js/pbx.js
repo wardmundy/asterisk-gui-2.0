@@ -1824,108 +1824,108 @@ astgui_manageVMgroups = {
 
 
 
-astgui_manageTimeBasedRules = {
-	/*
-	// TimeBasedRule Type - by Day of Week
-		[timebasedrule-custom-1] // 'timebasedrule-custom-' is time based rule prefix
-		exten = s,1,NoOp(LabelForThisRule)
-		exten = s,n,GotoIfTime(00:00-23:59|sun-sat|*|*?voicemenu-custom-1,s,1)
-			OR
-		exten = s,n,GotoIfTime(*|sun-sat|*|*?voicemenu-custom-1,s,1)
-		exten = s,n,Goto(default,6000,1)
-
-	// TimeBasedRule Type - by a set of Dates
-		[timebasedrule-custom-2] 
-		exten = s,1,NoOp(LabelForThisRule)
-		exten = s,n,GotoIfTime( 00:00-23:59|*|25|dec?voicemenu-custom-1,s,1 ) // christmas
-		exten = s,n,GotoIfTime( 00:00-23:59|*|1|jan?voicemenu-custom-1,s,1 ) // Jan 1st
-		exten = s,n,GotoIfTime( 00:00-23:59|*|4|jul?voicemenu-custom-1,s,1 ) // July 4rth
-			OR
-		exten = s,n,GotoIfTime( *|*|4|jul?voicemenu-custom-1,s,1 ) // July 4rth
-		exten = s,n,Goto(default,6000,1)
-
-	
-		// data structure //
-		sessionData.pbxinfo['timebasedRules'][timebasedrule-custom-2] = {
-			label : 'LabelForThisRule',
-			matches : [ '00:00-23:59|*|25|dec', '00:00-23:59|*|1|jan', '00:00-23:59|*|4|jul' ], // by a set of Dates
-				OR
-			matches : [ '00:00-23:59|sun-sat|*|*'], // - by Day of Week, matches.length == 1
-			ifMatched : 'voicemenu-custom-1,s,1',
-			ifNotMatched : 'default,6000,1'
-		}
-	*/
-
-	parseContext : function(cxtname, cxt) { // parses a timebased rules context and returns a standard time based rules object 
-		// sessionData.pbxinfo['timebasedRules'][d]
-		var tbr = { label : '', matches : [] , ifMatched : '', ifNotMatched : '' } ;
-
-		if( cxt[0].contains('exten=s,1') &&  cxt[0].toLowerCase().contains('noop(')  ){
-			tbr.label = cxt[0].betweenXY( '(' , ')' );
-			cxt.splice(0,1);
-		}else{
-			tbr.label = 'TimeBased Rule ' + cxtname.withOut(ASTGUI.contexts.TimeBasedRulePrefix);
-		}
-
-		cxt.each( function(line) {
-			if( line.toLowerCase().contains('s,n,gotoiftime(') ){
-				tbr.matches.push( line.betweenXY('(','?') );
-				tbr.ifMatched = line.betweenXY('?',')') ;
-				return;
-			}
-			if( line.toLowerCase().contains('s,n,') ) {
-				tbr.ifNotMatched = line.afterStr( 's,n,' ) ;
-			}
-		});
-
-		return tbr ;
-	},
-
-	getTBRsList : function(){ // astgui_manageTimeBasedRules.getTBRsList
-		var tbrl = [] ;
-		var c = sessionData.pbxinfo['timebasedRules'];
-		for(var d in c){if(c.hasOwnProperty(d)){
-			tbrl.push(d);
-		}}
-		return tbrl;
-	},
-
-	nextAvailableTBR_x: function(){ // astgui_manageTimeBasedRules.nextAvailableTBR_x
-		var x = [], y = astgui_manageTimeBasedRules.getTBRsList() ;
-		y.each( function( item ){
-			if( item.beginsWith(ASTGUI.contexts.TimeBasedRulePrefix) ){ x.push( item.split(ASTGUI.contexts.TimeBasedRulePrefix)[1] ); }
-		} );
-		if( !x.length ){ return ASTGUI.contexts.TimeBasedRulePrefix + '1' ; }
-		return ASTGUI.contexts.TimeBasedRulePrefix + x.firstAvailable() ;
-	},
-	
-	createNewTBR: function( tbr , callback, newtb_ctname ){ // astgui_manageTimeBasedRules.createNewTBR(tbr, cb, name(optional) )
-		// tbr is new timebased rule object, callback is callback function, newtb_ctname(Optional) if you want to create with a specific name
-		// 
-		var newtb_cxt = newtb_ctname || this.nextAvailableTBR_x();
-		var x = new listOfActions();
-		x.filename('extensions.conf');
-		x.new_action('newcat', newtb_cxt , '', '');
-		x.new_action('append', newtb_cxt , 'exten', 's,1,NoOp(' + tbr.label  + ')' );
-		tbr.matches.each(function(match_time){
-			x.new_action('append', newtb_cxt , 'exten', 's,n,GotoIfTime(' + match_time + '?' + tbr.ifMatched +')' );
-		});
-		x.new_action('append', newtb_cxt , 'exten', 's,n,' +  tbr.ifNotMatched );
-		var after = function(){
-			sessionData.pbxinfo.timebasedRules[newtb_cxt] = tbr ;
-			callback();
-		};
-		x.callActions(after);
-	},
-	
-	deleteTBR : function(tbname){ // astgui_manageTimeBasedRules.deleteTBR(tbrname); 
-		var u = new listOfSynActions('extensions.conf') ;
-		u.new_action('delcat', tbname , '', '');
-		u.callActions();
-		delete sessionData.pbxinfo.timebasedRules[tbname] ;
-	}
-
-};
+// astgui_manageTimeBasedRules = {
+// 	
+// // 	// TimeBasedRule Type - by Day of Week
+// // 		[timebasedrule-custom-1] // 'timebasedrule-custom-' is time based rule prefix
+// // 		exten = s,1,NoOp(LabelForThisRule)
+// // 		exten = s,n,GotoIfTime(00:00-23:59|sun-sat|*|*?voicemenu-custom-1,s,1)
+// // 			OR
+// // 		exten = s,n,GotoIfTime(*|sun-sat|*|*?voicemenu-custom-1,s,1)
+// // 		exten = s,n,Goto(default,6000,1)
+// // 
+// // 	// TimeBasedRule Type - by a set of Dates
+// // 		[timebasedrule-custom-2] 
+// // 		exten = s,1,NoOp(LabelForThisRule)
+// // 		exten = s,n,GotoIfTime( 00:00-23:59|*|25|dec?voicemenu-custom-1,s,1 ) // christmas
+// // 		exten = s,n,GotoIfTime( 00:00-23:59|*|1|jan?voicemenu-custom-1,s,1 ) // Jan 1st
+// // 		exten = s,n,GotoIfTime( 00:00-23:59|*|4|jul?voicemenu-custom-1,s,1 ) // July 4rth
+// // 			OR
+// // 		exten = s,n,GotoIfTime( *|*|4|jul?voicemenu-custom-1,s,1 ) // July 4rth
+// // 		exten = s,n,Goto(default,6000,1)
+// // 
+// // 	
+// // 		// data structure //
+// // 		sessionData.pbxinfo['timebasedRules'][timebasedrule-custom-2] = {
+// // 			label : 'LabelForThisRule',
+// // 			matches : [ '00:00-23:59|*|25|dec', '00:00-23:59|*|1|jan', '00:00-23:59|*|4|jul' ], // by a set of Dates
+// // 				OR
+// // 			matches : [ '00:00-23:59|sun-sat|*|*'], // - by Day of Week, matches.length == 1
+// // 			ifMatched : 'voicemenu-custom-1,s,1',
+// // 			ifNotMatched : 'default,6000,1'
+// // 		}
+// // 	
+// 
+// 	parseContext : function(cxtname, cxt) { // parses a timebased rules context and returns a standard time based rules object 
+// 		// sessionData.pbxinfo['timebasedRules'][d]
+// 		var tbr = { label : '', matches : [] , ifMatched : '', ifNotMatched : '' } ;
+// 
+// 		if( cxt[0].contains('exten=s,1') &&  cxt[0].toLowerCase().contains('noop(')  ){
+// 			tbr.label = cxt[0].betweenXY( '(' , ')' );
+// 			cxt.splice(0,1);
+// 		}else{
+// 			tbr.label = 'TimeBased Rule ' + cxtname.withOut(ASTGUI.contexts.TimeBasedRulePrefix);
+// 		}
+// 
+// 		cxt.each( function(line) {
+// 			if( line.toLowerCase().contains('s,n,gotoiftime(') ){
+// 				tbr.matches.push( line.betweenXY('(','?') );
+// 				tbr.ifMatched = line.betweenXY('?',')') ;
+// 				return;
+// 			}
+// 			if( line.toLowerCase().contains('s,n,') ) {
+// 				tbr.ifNotMatched = line.afterStr( 's,n,' ) ;
+// 			}
+// 		});
+// 
+// 		return tbr ;
+// 	},
+// 
+// 	getTBRsList : function(){ // astgui_manageTimeBasedRules.getTBRsList
+// 		var tbrl = [] ;
+// 		var c = sessionData.pbxinfo['timebasedRules'];
+// 		for(var d in c){if(c.hasOwnProperty(d)){
+// 			tbrl.push(d);
+// 		}}
+// 		return tbrl;
+// 	},
+// 
+// 	nextAvailableTBR_x: function(){ // astgui_manageTimeBasedRules.nextAvailableTBR_x
+// 		var x = [], y = astgui_manageTimeBasedRules.getTBRsList() ;
+// 		y.each( function( item ){
+// 			if( item.beginsWith(ASTGUI.contexts.TimeBasedRulePrefix) ){ x.push( item.split(ASTGUI.contexts.TimeBasedRulePrefix)[1] ); }
+// 		} );
+// 		if( !x.length ){ return ASTGUI.contexts.TimeBasedRulePrefix + '1' ; }
+// 		return ASTGUI.contexts.TimeBasedRulePrefix + x.firstAvailable() ;
+// 	},
+// 	
+// 	createNewTBR: function( tbr , callback, newtb_ctname ){ // astgui_manageTimeBasedRules.createNewTBR(tbr, cb, name(optional) )
+// 		// tbr is new timebased rule object, callback is callback function, newtb_ctname(Optional) if you want to create with a specific name
+// 		// 
+// 		var newtb_cxt = newtb_ctname || this.nextAvailableTBR_x();
+// 		var x = new listOfActions();
+// 		x.filename('extensions.conf');
+// 		x.new_action('newcat', newtb_cxt , '', '');
+// 		x.new_action('append', newtb_cxt , 'exten', 's,1,NoOp(' + tbr.label  + ')' );
+// 		tbr.matches.each(function(match_time){
+// 			x.new_action('append', newtb_cxt , 'exten', 's,n,GotoIfTime(' + match_time + '?' + tbr.ifMatched +')' );
+// 		});
+// 		x.new_action('append', newtb_cxt , 'exten', 's,n,' +  tbr.ifNotMatched );
+// 		var after = function(){
+// 			sessionData.pbxinfo.timebasedRules[newtb_cxt] = tbr ;
+// 			callback();
+// 		};
+// 		x.callActions(after);
+// 	},
+// 	
+// 	deleteTBR : function(tbname){ // astgui_manageTimeBasedRules.deleteTBR(tbrname); 
+// 		var u = new listOfSynActions('extensions.conf') ;
+// 		u.new_action('delcat', tbname , '', '');
+// 		u.callActions();
+// 		delete sessionData.pbxinfo.timebasedRules[tbname] ;
+// 	}
+// 
+// };
 
 
 
