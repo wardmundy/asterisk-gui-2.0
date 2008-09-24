@@ -609,42 +609,18 @@ astgui_manageusers  = { // all the functions related to user management would re
 		var raw_chan_status = makeSyncRequest ( { action :'status' } );
 		var to_return = [];
 		try {
-			raw_chan_status = raw_chan_status.replace(/Response: Success/, "");
-			raw_chan_status = raw_chan_status.replace(/Message: Channel status will follow/, "");
-			raw_chan_status = raw_chan_status.replace(/Event: StatusComplete/, "");
-			raw_chan_status = raw_chan_status.trim();
-			var chunks = raw_chan_status.split('Event: Status');
-
-			chunks.each( function(this_chunk){
-				// Privilege: Call
-				// Channel: Console/dsp
-				// CallerID: <unknown>
-				// CallerIDNum: <unknown>
-				// CallerIDName: <unknown>
-				// Account: 
-				// State: Up
-				// Context: default
-				// Extension: 6050
-				// Priority: 1
-				// Seconds: 66
-				// Uniqueid: 1219466028.58
-				this_chunk = this_chunk.trim();
-				if( !this_chunk.contains('Channel:') ){ return; }
-				var this_chunk_lines = this_chunk.split('\n');
-
-				var this_chan_data = {};
-				for ( var r =0 ; r < this_chunk_lines.length ; r++ ){
-					var this_chunk_line = this_chunk_lines[r];
-					this_chunk_line = this_chunk_line.trim();
-					this_chan_data[this_chunk_line.beforeChar(':').trim()] = this_chunk_line.afterChar(':').trim();
+			var chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput( raw_chan_status.trim().replace(/Event: StatusComplete/, "") ) ;
+			while( chunks.length ){
+				var this_chunk =  ;
+				if( chunks[0].hasOwnProperty('Channel') ){
+					to_return.push(chunks[0]);
 				}
-
-				to_return.push(this_chan_data);
-			});
+				chunks.removeFirst();
+			}
 
 		} catch(e) {
 			ASTGUI.debugLog("Error listOfChannels: " + e);
-			return [];
+			return to_return;
 		}
 		return to_return;
 	},
