@@ -1445,7 +1445,7 @@ astgui_manageVoiceMenus = {
 		var v = new listOfSynActions('extensions.conf') ;
 		v.new_action('delcat', menu_name, '', ''); 
 		if( sessionData.pbxinfo.voicemenus[menu_name]['alias_exten'] != '' ){
-			var aext = sessionData.pbxinfo.voicemenus[menu_name]['alias_exten'] ;
+			var aext = sessionData.pbxinfo.voicemenus[menu_name]['alias_exten'].afterChar('=') ;
 			v.new_action('delete', ASTGUI.contexts.VoiceMenuExtensions , 'exten', '', aext);
 			v.new_action('delete', 'default' , 'exten', '', aext); // backward compatibility with gui 1.x
 		}
