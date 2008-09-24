@@ -148,7 +148,7 @@ var updateChannels_List = function(){
 
 	var addCell = ASTGUI.domActions.tr_addCell;
 	/* XXX Move this function to ASTGUI */
-	var ul = parent.astgui_manageusers.listOfChannels();
+	var ul = parent.miscFunctions.listOfChannels();
 	_$('thisPage_lite_Heading').innerHTML = "Active Channels - " + ul.length;
 
 	if(!ul.length){

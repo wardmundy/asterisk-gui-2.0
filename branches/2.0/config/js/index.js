@@ -445,6 +445,27 @@ var onLogInFunctions = {
 
 
 var miscFunctions = {
+
+	listOfChannels: function() { // miscFunctions.listOfChannels() -- returns an array of current active channels
+		var raw_chan_status = makeSyncRequest ( { action :'status' } );
+		var to_return = [];
+		try {
+			var chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput( raw_chan_status.trim().replace(/Event: StatusComplete/, "") ) ;
+			while( chunks.length ){
+				var this_chunk =  ;
+				if( chunks[0].hasOwnProperty('Channel') ){
+					to_return.push(chunks[0]);
+				}
+				chunks.removeFirst();
+			}
+
+		} catch(e) {
+			ASTGUI.debugLog("Error listOfChannels: " + e);
+			return to_return;
+		}
+		return to_return;
+	},
+
 	getTimeIntervals: function(){ // miscFunctions.getTimeIntervals();
 		var TI_LIST = new ASTGUI.customObject;
 		var tmp_globals = context2json({ filename: 'extensions.conf' , context : 'globals' , usf:0 });
