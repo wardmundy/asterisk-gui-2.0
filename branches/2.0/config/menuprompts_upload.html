@@ -76,7 +76,7 @@ onUploadForm_load = function(){
 
 
 onUploadForm_beforeUploading = function(){
-	if( top.sessionData.PLATFORM.isAST_1_4 ){
+	if( !parent.sessionData.PLATFORM.isAA50 && !parent.sessionData.PLATFORM.isABE  && top.sessionData.PLATFORM.isAST_1_4 ){
 		alert("File Uploads are supported in Asterisk 1.6.0/trunk");
 		return;
 	}
