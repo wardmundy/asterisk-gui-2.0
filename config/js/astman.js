@@ -674,8 +674,8 @@ var ASTGUI = {
 	},
 
 	customObject : function(){
-		// NOTE: use this as a constructor only,  EX: var something = new ASTGUI.customObject;
 		//	eliminates the need of 'hasOwnProperty' to read this objects propeties, look for this objects prototype below.
+		if ( !(this instanceof ASTGUI.customObject) ) { return new ASTGUI.customObject(); }
 	},
 
 	toCustomObject : function(a){// if a is a native object returns an ASTGUI.customObject version of a
