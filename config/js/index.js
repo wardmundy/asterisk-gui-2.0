@@ -452,7 +452,6 @@ var miscFunctions = {
 		try {
 			var chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput( raw_chan_status.trim().replace(/Event: StatusComplete/, "") ) ;
 			while( chunks.length ){
-				var this_chunk =  ;
 				if( chunks[0].hasOwnProperty('Channel') ){
 					to_return.push(chunks[0]);
 				}
