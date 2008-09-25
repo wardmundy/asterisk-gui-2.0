@@ -162,8 +162,15 @@ var add_RangeOfUsers = function(){
 	<table width='98%' align=center id='table_usersFromCSV'>
 		<tr><td  align=center>
 			<BR>
-			<B>Heads:</B> User<sup>1</sup>,fullname,cid_number, context, hasvoicemail, vmsecret, email, hassip, hasiax, secret<BR>
-			1. 'User' should always be the first column, the remaining fields can be in any order.
+			Paste your new users information as Comma Seperated Variables in the below TextArea.<BR>
+			The first column of your CSV should be the variable heads.<BR>
+			'User' should always be the first column, the remaining fields can be in any order.<BR>
+			<div style="font-size:120%;margin-left:30px;text-align:left"><pre>
+				For example your CSV text could be something like:<BR>
+				User,fullname,cid_number, hasvoicemail, vmsecret, email, hassip, hasiax, secret
+				6020,Brandon Kruse, 6020, yes, 010100, bkruse@digium.com , yes, yes, mysecret
+				</pre>
+			</div>
 		</td></tr>
 		<tr><td  align=center>
 			<textarea id='ta_ba_csv' rows=10 cols=120></textarea>
@@ -187,5 +194,4 @@ var add_RangeOfUsers = function(){
 		</tr>
 		
 	</table>
-
 </body>
