@@ -2916,6 +2916,7 @@ var listOfSynActions = function(file){
 		u.callActions(); // this is Synchronus function - these actions will be called immediately and the result will be returned
 	*/
 	//
+	if ( !(this instanceof listOfSynActions) ){ return new listOfSynActions(file) ; }
 	this.FILE_CONTENT = null ;
 	this.params = {} ;
 	this.params.action = 'updateconfig';
@@ -3001,6 +3002,8 @@ var listOfActions = function(fn){
 		x.callActions(after); // where after is the callback function
 
 	*/
+	if ( !(this instanceof listOfActions) ) { return (fn ? )new listOfActions(fn) : new listOfActions() ; }
+
 	this.FILE_CONTENT = null ;
 	this.current_batch = 1 ;
 	this.current_batch_actionnumber = 0 ;
