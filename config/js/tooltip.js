@@ -489,3 +489,14 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 // Tooltips for "Active Channels" in english
 	tooltips['channels'] = { en: [] };
 	tooltips['channels'].en[0] = "<B>User: </B> A user on the PBX to transfer the call to.";
+
+
+
+// Tooltips for "Follow Me" in english
+	tooltips['followme'] = { en: [] };
+	tooltips['followme'].en[0] = "<B>Status:</B> Enable/Disable FollowMe for this user.";
+	tooltips['followme'].en[1] = "Music On Hold class that the caller would hear while tracking the user.";
+	tooltips['followme'].en[2] = "<B>DialPlan:</B> DialPlan that would be used for dialing the FollowMe numbers. By default this would be the same dialplan as that of the user.";
+	tooltips['followme'].en[3] = "<B>Destinations:</B> List of extensions/numbers that would be dialed to reach the user during FollowMe.";
+	tooltips['followme'].en[4] = "<B>New FollowMe Number:</B> Add a new FollowMe number which could be a 'Local Extension' or an 'Outside Number'. The selected dialplan should have permissions to dial any outside numbers defined.";
+	tooltips['followme'].en[5] = "<B>Dial Order:</B> This is the order in which the FollowMe destinations are dialed to reach the user.";
