@@ -127,9 +127,9 @@ var load_users_table = function(){
 
 	if( ext_globals.hasOwnProperty('FOLLOWMEOPTIONS') ){
 		FOLLOWME_OPTIONS = ext_globals.FOLLOWMEOPTIONS ;
-		if( FOLLOWME_OPTIONS.contains('s') ){ _$('chk_fmoptions_s').checked = true; }
-		if( FOLLOWME_OPTIONS.contains('a') ){ _$('chk_fmoptions_a').checked = true; }
-		if( FOLLOWME_OPTIONS.contains('n') ){ _$('chk_fmoptions_n').checked = true; }
+		_$('chk_fmoptions_s').checked = ( FOLLOWME_OPTIONS.contains('s') ) ? true : false;
+		_$('chk_fmoptions_a').checked = ( FOLLOWME_OPTIONS.contains('a') ) ? true : false;
+		_$('chk_fmoptions_n').checked = ( FOLLOWME_OPTIONS.contains('n') ) ? true : false;
 	}
 
 	ul.each( function(user){ // list each user in table
