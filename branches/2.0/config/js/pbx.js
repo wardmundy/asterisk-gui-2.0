@@ -29,7 +29,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		// check whether the config files are in proper format and have every thing needed for the gui to function properly
 				var check_For_Contexts = {
 					general : { static : 'yes', writeprotect : 'no', clearglobalvars : 'yes' },
-					globals : { FEATURES : '' , DIALOPTIONS : '' , RINGTIME: '20' },
+					globals : { FEATURES : '' , DIALOPTIONS : '' , RINGTIME: '20', FOLLOWMEOPTIONS : '' },
 					default : {},
 					'macro-stdexten' : [
 						'exten=s,1,Set(__DYNAMIC_FEATURES=${FEATURES})',
@@ -46,7 +46,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					],
 					'macro-stdexten-followme' : [
 						'exten=s,1,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})',
-						'exten=s,2,Followme(${ARG1},a)',
+						'exten=s,2,Followme(${ARG1},${FOLLOWMEOPTIONS})',
 						'exten=s,3,Voicemail(${ARG1},u)',
 						'exten=s-NOANSWER,1,Voicemail(${ARG1},u)',
 						'exten=s-BUSY,1,Voicemail(${ARG1},b)',
