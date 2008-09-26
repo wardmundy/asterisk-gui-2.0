@@ -52,7 +52,7 @@ var onLogInFunctions = {
 						if( parent.sessionData.DEBUG_MODE ){
 							alert('PING Request: INVALID SESSION' + '\n' + 'Click OK to reload');
 						}
-						window.location.reload(); 
+						top.window.location.replace(top.window.location.href);
 						return true; 
 					}
 				},
