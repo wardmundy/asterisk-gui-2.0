@@ -854,7 +854,7 @@ var miscFunctions = {
 };
 
 
-var localajaxinit = function(){
+var after_localajaxinit = function(){
 
 	if( window.console && window.console.firebug && window.console.firebug == '1.2.0b7' ){
 		alert('This version of firebug is known to break the gui.\n'
@@ -866,10 +866,6 @@ var localajaxinit = function(){
 	//if( typeof readcfg == 'undefined' ){
 	//	alert('readcfg undefined');
 	//}
-	$.getScript( 'js/guiversion.js', function(){
-		sessionData.gui_version = gui_version ;
-		_$('parent_div_guiVersion').innerHTML = "<font color='#8d8d8d'>GUI-version : " + sessionData.gui_version + '</font>';
-	});
 
 
 	if( sessionData.PLATFORM.isAA50 ){
