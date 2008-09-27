@@ -30,7 +30,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				var check_For_Contexts = {
 					general : { static : 'yes', writeprotect : 'no', clearglobalvars : 'yes' },
 					globals : { FEATURES : '' , DIALOPTIONS : '' , RINGTIME: '20', FOLLOWMEOPTIONS : '' },
-					default : {},
+					'default' : {},
 					'macro-stdexten' : [
 						'exten=s,1,Set(__DYNAMIC_FEATURES=${FEATURES})',
 						'exten=s,2,GotoIf($[${FOLLOWME_${ARG1}} = 1]?5:3)',
@@ -2277,4 +2277,15 @@ astgui_updateConfigFromOldGui = function(){
 			do_Upgrade();
 		}
 	}
+};
+
+
+var localajaxinit = function(){
+	$.getScript( 'js/guiversion.js', function(){
+		try{
+			sessionData.gui_version = gui_version ;
+			_$('parent_div_guiVersion').innerHTML = "<font color='#8d8d8d'>GUI-version : " + sessionData.gui_version + '</font>';
+		}catch(err){}
+		after_localajaxinit();
+	});
 };
