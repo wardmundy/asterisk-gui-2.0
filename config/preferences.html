@@ -101,6 +101,13 @@ function localajaxinit(){
 	}catch(err){}
 	ASTGUI.selectbox.selectOption( DOM_op_ext , OPEXTENSION );
 	loadExtensions_ranges();
+
+
+	$("#tooltip_img_voipPhoneDigitMap").mouseover(function(){
+		ASTGUI.domActions.alignBbelowA( _$("tooltip_img_voipPhoneDigitMap"),_$('tooltip_voipPhoneDigitMap'), -120, 0);
+		$('#tooltip_voipPhoneDigitMap').show();
+	}).mouseout(function(){ $('#tooltip_voipPhoneDigitMap').hide(); });
+
 };
 
 var loadExtensions_ranges = function(){
@@ -283,11 +290,11 @@ var reset_ranges_default = function(){
 		<td><input type='checkbox' id='op_polycom_idleimage'></td>
 	</tr>
 	<tr class='16_Only' style='display:none;'>
-		<td align=right>VoIP Phone Digit Map <img src="images/tooltip_info.gif" tip="en,options,12" class='tooltipinfo'> :</td>
+		<td align=right>VoIP Phone Digit Map <img src="images/tooltip_info.gif" id="tooltip_img_voipPhoneDigitMap"> :</td>
 		<td><input size=15 id='op_voip_digitmap'></td>
 	</tr>
 	<tr class='16_Only' style='display:none;'>
-		<td align=right>VOIP Phone Digit Timeout <img src="images/tooltip_info.gif" tip="en,options,13" class='tooltipinfo'> :</td>
+		<td align=right>VoIP Phone Digit Timeout <img src="images/tooltip_info.gif" tip="en,options,13" class='tooltipinfo'> :</td>
 		<td><input size=10 id='op_voip_digit_timeout'></td>
 	</tr>
 </table>
@@ -349,6 +356,22 @@ var reset_ranges_default = function(){
 <div style='text-align:center; width: 95%; margin-top:15px'>
 	<span class='guiButtonCancel' onclick='window.location.reload();'>Cancel</span>
 	<span class='guiButtonEdit' onclick='save_changes();'>Save</span>
+</div>
+
+<div id='tooltip_voipPhoneDigitMap' style="max-width:500px; display:none; background-color : #e8c991; padding: 3px; margin:10px;">
+This option allows the administrator to define a global digit mapping string compatible with RFC 3435, section 2.1.5,
+to be used with VoIP phones provisioned by this system. There is no default setting and this option does not sync with the 
+dialplan assigned to an individual user. The following examples should assist in writing an acceptable digit mapping string.
+<li>[2-9]11 - Where calls beginning with digits 2-9 followed by digits 11 are dialed immediately.
+<li>0T - Where calls beginning with digit 0 followed by a pause equal to the "Digit Timeout" option.
+<li>+011xxx.T - Where calls beginning with the + character, followed by 011 digits and then at least three more digits before any arbitrary number is matched, dialed after Digit Timeout is reached.
+<li>0[2-9]xxxxxxxxx - Where calls beginning with 0, followed by any digit from 2-9, followed further by 9 more digits are dialed immediately.
+<li>+1[2-9]xxxxxxxx - Where calls beginning with the + character, followed by 1, followed by any digit from 2-9, followed by 8 more digits are dialed immediately.
+<li>[2-9]xxxxxxxxx - Where calls beginning with any digit from 2-9, followed by 9 more digits are dialed immediately.
+<li>[2-9]xxxT - Where calls beginning with any digit from 2-9, followed by three more digits are dialed after Digit Timeout is reached.
+These examples would be represented in this option entry box as:<BR>
+<li>[2-9]11|0T|+011xxx.T|0[2-9]xxxxxxxxx|+1[2-9]xxxxxxxx|[2-9]xxxxxxxxx|[2-9]xxxT<BR>
+where each entry is separated by the | character. For more information, please refer to RFC 3435.
 </div>
 
 </body>
