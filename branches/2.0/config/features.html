@@ -186,6 +186,7 @@ var load_preferences = function(){
 	ASTGUI.updateFieldToValue( 'featureMap_blindxfer' , c[FM].getProperty('blindxfer') );
 	ASTGUI.updateFieldToValue( 'featureMap_disconnect' , c[FM].getProperty('disconnect') );
 	ASTGUI.updateFieldToValue( 'featureMap_atxfer' , c[FM].getProperty('atxfer') );
+	ASTGUI.updateFieldToValue( 'featureMap_parkcall' , c[FM].getProperty('parkcall') );
 
 	ASTGUI.updateFieldToValue( 'parkext' , c[ct].getProperty('parkext') );
 	ASTGUI.updateFieldToValue( 'parkpos' , c[ct].getProperty('parkpos') );
@@ -194,6 +195,8 @@ var load_preferences = function(){
 	ASTGUI.domActions.enableDisableByCheckBox ('chk_featureMap_blindxfer',  'featureMap_blindxfer');
 	ASTGUI.domActions.enableDisableByCheckBox ('chk_featureMap_disconnect', 'featureMap_disconnect');
 	ASTGUI.domActions.enableDisableByCheckBox ('chk_featureMap_atxfer', 'featureMap_atxfer');
+	ASTGUI.domActions.enableDisableByCheckBox ('chk_featureMap_parkcall', 'featureMap_parkcall');
+
 
 	_$('chk_featureMap_blindxfer').checked = ( ASTGUI.getFieldValue('featureMap_blindxfer') ) ? true : false ;
 	_$('chk_featureMap_blindxfer').updateStatus();
@@ -201,6 +204,9 @@ var load_preferences = function(){
 	_$('chk_featureMap_disconnect').updateStatus();
 	_$('chk_featureMap_atxfer').checked = ( ASTGUI.getFieldValue('featureMap_atxfer') ) ? true : false ;
 	_$('chk_featureMap_atxfer').updateStatus();
+
+	_$('chk_featureMap_parkcall').checked = ( ASTGUI.getFieldValue('featureMap_parkcall') ) ? true : false ;
+	_$('chk_featureMap_parkcall').updateStatus();
 
 	generate_applicationMap_TRs();
 
@@ -268,6 +274,14 @@ var save_changes = function(){
 		}else{
 			u.new_action('delete', FM , 'atxfer', '');
 		}
+
+		var parkcall_map = ASTGUI.getFieldValue('featureMap_parkcall') ;
+		if( _$('chk_featureMap_parkcall').checked && parkcall_map ){
+			u.new_action('update', FM , 'parkcall', parkcall_map );
+		}else{
+			u.new_action('delete', FM , 'parkcall', '');
+		}
+
 
 		u.new_action( 'delcat', 'applicationmap' , '', '');
 		u.new_action( 'newcat', 'applicationmap' , '', '');
@@ -345,6 +359,10 @@ var save_changes = function(){
 				<td> <input size=2 id='featureMap_atxfer'> Attended transfer </td>
 			</tr>
 
+			<tr>	<td valign=top align=right> <input type=checkbox id='chk_featureMap_parkcall'></td>
+				<td> <input size=2 id='featureMap_parkcall'> Call Parking </td>
+			</tr>
+
 		</table>
 
 	</div>
@@ -376,45 +394,39 @@ var save_changes = function(){
 		<div class='lite_Heading' style='margin-left: -150px'>Dial Options</div>
 		<table align="center" cellpadding=2 cellspacing=2 border=0>
 		<tr>	<td valign=top align=right> <input type=checkbox id='dialoptions_t'></td>
-			<td> (t) Allow the called party to transfer the calling party <BR>
-				 by sending the DTMF sequence defined in features.conf
-			</td>
+			<td> (t-Option) Allow the called party to transfer the calling party by sending the DTMF sequence defined on the Feature Codes page.</td>
 		</tr>
 
 		<tr><td height=10></td></tr>
 
 		<tr>	<td valign=top align=right> <input type=checkbox id='dialoptions_T'></td>
-			<td> (T) Allow the calling party to transfer the called party <BR>
-				 by sending the DTMF sequence defined in features.conf
+			<td> (T-Option) Allow the calling party to transfer the called party by sending the DTMF sequence defined on the Feature Codes page.
 			</td>
 		</tr>
 
 		<tr><td height=10></td></tr>
 
 		<tr>	<td valign=top align=right> <input type=checkbox id='dialoptions_h'></td>
-			<td> (h) Allow the called party to hang up by sending the '*' DTMF digit.</td>
+			<td> (h-Option) Allow the called party to hang up by sending the DTMF sequence defined on the Feature Codes page.</td>
 		</tr>
 		
 		<tr><td height=10></td></tr>
 
 		<tr><td valign=top align=right> <input type=checkbox id='dialoptions_H'></td>
-			<td> (H) Allow the calling party to hang up by hitting the '*' DTMF digit.</td>
+			<td> (H-Option) Allow the calling party to hang up by sending the DTMF sequence defined on the Feature Codes page.</td>
 		</tr>
 
 		<tr><td height=10></td></tr>
 
 		<tr><td valign=top align=right> <input type=checkbox id='dialoptions_k'></td>
-			<td>(k) Allow the called party to enable parking of the call by sending<BR>
-					the DTMF sequence defined for call parking in features.conf.
+			<td>(k-Option) Allow the called party to enable parking of the call by sending the DTMF sequence defined on the Feature Codes page.
 			</td>
 		</tr>
 
 		<tr><td height=10></td></tr>
 
 		<tr><td valign=top align=right> <input type=checkbox id='dialoptions_K'></td>
-			<td>(K) Allow the calling party to enable parking of the call by sending<BR>
-		           the DTMF sequence defined for call parking in features.conf.
-			</td>
+			<td>(K-Option) Allow the calling party to enable parking of the call by sending the DTMF sequence defined on the Feature Codes page.</td>
 		</tr>
 
 		</table>
