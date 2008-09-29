@@ -63,12 +63,13 @@ var onLogInFunctions = {
 			this.isRetryPing = false;
 			var makePingRequest = function(){
 				var verifyPingResult = function(t) {
-					if(!t.toLowerCase().match('pong')){
+					if(!t.toLowerCase().contains('pong')){
 						ASTGUI.debugLog('PING Request: INVALID SESSION' , 'update');
 						if( parent.sessionData.DEBUG_MODE ){
 							alert('PING Request: INVALID SESSION' + '\n' + 'Click OK to reload');
 						}
-						window.location.reload(); return true; 
+						onLogInFunctions.makePings.stop();
+						top.window.location.replace(top.window.location.href); return true; 
 					}else{
 						ASTGUI.debugLog('PING Request: Success' , 'get');
 					}
