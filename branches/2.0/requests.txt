@@ -1,18 +1,29 @@
 
+
+UnixDawg: All GUI path variables should be loaded from guipreferences.conf or asterisk.conf 
+          instead of being hardcoded in astman.js
+
+
 bzip/gzip support for config backups
 
 
 Andrew Latham
- 
  Question:  Could the ability to turn off certain sections or change
  their order be an option in the future.  Some users don't need the
  hardware or mISDN sections...
 
+
 -- Graphs
+
 
 -- CDR
 
+
 -- Export extensions TO .csv file in Bulk Add
+
+
+
+
 
 ******----------------------Completed-------------------------******
 
