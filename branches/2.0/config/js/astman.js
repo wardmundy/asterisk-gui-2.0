@@ -1775,6 +1775,9 @@ var ASTGUI = {
 		parseTrunkDialArgument: function(y){ // usage ASTGUI.parseContextLine.parseTrunkDialArgument(y)
 			// expects y as  '${trunk_1}/XXX${EXTEN:X}' OR SIP/user/XXX${EXTEN:X}
 			var WhatToDial = '';
+			if (!y) {
+				return null;
+			}
 			y = y.trim();
 			if( y.beginsWith('${') && y.afterChar('}').beginsWith('/') ) {
 				var trunkname = y.betweenXY('{' , '}');
