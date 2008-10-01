@@ -2668,7 +2668,6 @@ ASTGUI.paths['guiInstall'] = '/var/lib/asterisk/static-http/config/';
 ASTGUI.paths['rawman'] = '../../rawman';
 ASTGUI.paths['asteriskConfig'] = '/etc/asterisk/';
 ASTGUI.paths['ConfigBkp'] = '/var/lib/asterisk/gui_backups/';
-ASTGUI.paths['ConfigBkp_AA50'] = '/var/lib/asterisk/sounds/backups/'; // AA50 bkp path on C.F
 ASTGUI.paths['ConfigBkp_dldPath'] = ASTGUI.paths['guiInstall'] + 'private/bkps/'; // path for keeping the bkp files for download
 ASTGUI.paths['AGIBIN'] = '/var/lib/asterisk/agi-bin/';
 ASTGUI.paths['Sounds'] = '/var/lib/asterisk/sounds/';

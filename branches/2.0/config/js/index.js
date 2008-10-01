@@ -153,7 +153,7 @@ var onLogInFunctions = {
 				pu = true;
 			}
 			if( !http_conf.post_mappings.hasOwnProperty('backups') ){
-				var tmp_cbkp = ASTGUI.paths.ConfigBkp_AA50;
+				var tmp_cbkp = ASTGUI.paths.ConfigBkp;
 				if( tmp_cbkp.endsWith('/') ){ tmp_cbkp = tmp_cbkp.rChop('/'); }
 				u.new_action('append', 'post_mappings' , 'backups', tmp_cbkp ) ;
 				pu = true;
