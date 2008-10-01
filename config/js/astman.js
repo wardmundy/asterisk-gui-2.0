@@ -453,7 +453,6 @@ var ASTGUI = {
 		if( t.contains('Status: 2') ) return 'B' ; // All Devices Busy
 		if( t.contains('Status: 4') ) return 'U' ; // All Devices Unavailable/Unregistered
 		if( t.contains('Status: 8') ) return 'R' ; // All Devices Ringing
-		if( t.contains('Status: 16') ) return 'H' ; // All Devices OnHold
 		return null;
 	},
 
@@ -468,9 +467,6 @@ var ASTGUI = {
 				break ;
 			case 'R': // Ringing
 				return "<img src='images/status_orange.png' border=0>";
-				break ;
-			case 'H': // Hold
-				return "<img src='images/status_yellow.png' border=0>";
 				break ;
 			case 'U': // UnAvailable
 			default :
