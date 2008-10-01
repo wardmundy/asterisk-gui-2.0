@@ -124,11 +124,6 @@ managerEvents.updateUserImage = function(user , user_status){
 			this_td.appendChild(IMG_STATUS_ORANGE) ;
 			$(IMG_STATUS_ORANGE).attr( 'src', 'images/status_orange.png' );
 			break ;
-		case 'H': // Hold
-			var IMG_STATUS_YELLOW = tmp_image.cloneNode(true);
-			this_td.appendChild(IMG_STATUS_YELLOW) ;
-			$(IMG_STATUS_YELLOW).attr( 'src', 'images/status_yellow.png' );
-			break ;
 		default :
 			var IMG_STATUS_GRAY = tmp_image.cloneNode(true);
 			this_td.appendChild(IMG_STATUS_GRAY) ;
