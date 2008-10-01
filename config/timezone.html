@@ -152,6 +152,7 @@ var localajaxinit = function(){
 				default_tz = p[1];
 			}
 		}
+		_$('default_tz').innerHTML = (default_tz.length > 1) ? default_tz : "None";
 		aaaa();
 	});
 }
@@ -178,6 +179,11 @@ var localajaxinit = function(){
 	</td></tr>
 </table>
 
+<tr>	<div valign="top" align="center">
+	<label align="center">&nbsp; Default Time Zone &nbsp; </label>
+		<div align="center" id="default_tz"> Loading.... </div>
+	</div>
+</tr>
 <table width="80%" align=center>
 <tr>	<td valign="top" align="center">
 	<fieldset  style="height: 300px; "  id="fieldset2">
