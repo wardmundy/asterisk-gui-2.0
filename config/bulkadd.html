@@ -162,13 +162,21 @@ var add_RangeOfUsers = function(){
 	<table width='98%' align=center id='table_usersFromCSV'>
 		<tr><td  align=center>
 			<BR>
-			Paste your new users information as Comma Seperated Variables in the below TextArea.<BR>
-			The first column of your CSV should be the variable heads.<BR>
-			'User' should always be the first column, the remaining fields can be in any order.<BR>
-			<div style="font-size:120%;margin-left:30px;text-align:left"><pre>
-				For example your CSV text could be something like:<BR>
-				User,fullname,cid_number, hasvoicemail, vmsecret, email, hassip, hasiax, secret
-				6020,Brandon Kruse, 6020, yes, 010100, bkruse@digium.com , yes, yes, mysecret
+			The below input box is for inputting configuration data for multiple Users at one time.<br>
+			<br>
+			The first line of the text input into the box should be populated by a comma separated<br>listing of the user variables,
+			beginning with the keyword "User," as such:<br>
+			<br>
+			User, fullname, cid_number, context, hasvoicemail, vmsecret, email, hassip, hasiax, secret<br>
+			<br>
+			A carriage return should follow this line.<br>
+			<br>
+			Each following line should contain the data that corresponds to each of the variables such as:<br>
+			<br>
+			<div style="font-size:120%;margin-left:30px;text-align:left">
+				<pre>
+				6020, Bob Jones, 6020, DLPN_Default_DialPlan, yes, 1234, bob@jones.null, yes, yes, mypassword
+				6021, Jane Doe, 6021, DLPN_Default_DialPlan, yes, 5678, jane@doe.null, yes, yes, otherpassword
 				</pre>
 			</div>
 		</td></tr>
