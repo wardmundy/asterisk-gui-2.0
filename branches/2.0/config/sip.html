@@ -29,7 +29,7 @@
 <script>
 // Realtime options - 'rtautoclear','rtcachefriends','rtsavesysname','rtupdate','ignoreregexpire'
 
-var fieldnames = ['allowexternaldomains' ,'allowexternalinvites' ,'allowguest' ,'allowoverlap' ,'allowsubscribe' ,'allowtransfer' ,'alwaysauthreject' ,'autodomain' ,'bindaddr' ,'bindport' ,'callevents' ,'canreinvite' ,'checkmwi' ,'compactheaders' ,'context' ,'defaultexpiry', 'domain' ,'dtmfmode' ,'dumphistory' ,'externhost' ,'externip' ,'externrefresh' ,'fromdomain' ,'g726nonstandard','jbenable' ,'jbforce' ,'jbimpl' ,'jblog' ,'jbmaxsize' ,'jbresyncthreshold' ,'language' ,'localnet' ,'maxcallbitrate' ,'maxexpiry' ,'minexpiry' ,'mohinterpret' ,'mohsuggest' ,'nat' ,'notifyringing' ,'pedantic' ,'progressinband' ,'promiscredir' ,'realm' ,'recordhistory' ,'register' ,'registerattempts' ,'registertimeout' ,'relaxdtmf' , 'rtpholdtimeout' ,'rtptimeout' ,'sendrpid' ,'sipdebug' ,'srvlookup' ,'subscribecontext' ,'t1min' ,'t38pt_udptl' ,'tos_audio' ,'tos_sip' ,'tos_video' ,'trustrpid' ,'useragent' ,'usereqphone' ,'videosupport'] ;
+var fieldnames = ['allowexternaldomains' ,'allowguest' ,'allowoverlap' ,'allowsubscribe' ,'allowtransfer' ,'alwaysauthreject' ,'autodomain' ,'bindaddr' ,'bindport' ,'callevents' ,'canreinvite' ,'checkmwi' ,'compactheaders' ,'context' ,'defaultexpiry', 'domain' ,'dtmfmode' ,'dumphistory' ,'externhost' ,'externip' ,'externrefresh' ,'fromdomain' ,'g726nonstandard','jbenable' ,'jbforce' ,'jbimpl' ,'jblog' ,'jbmaxsize' ,'jbresyncthreshold' ,'language' ,'localnet' ,'maxcallbitrate' ,'maxexpiry' ,'minexpiry' ,'mohinterpret' ,'mohsuggest' ,'nat' ,'notifyringing' ,'pedantic' ,'progressinband' ,'promiscredir' ,'realm' ,'recordhistory' ,'register' ,'registerattempts' ,'registertimeout' ,'relaxdtmf' , 'rtpholdtimeout' ,'rtptimeout' ,'sendrpid' ,'sipdebug' ,'srvlookup' ,'subscribecontext' ,'t1min' ,'t38pt_udptl' ,'tos_audio' ,'tos_sip' ,'tos_video' ,'trustrpid' ,'useragent' ,'usereqphone' ,'videosupport'] ;
 
 
 var localajaxinit = function(){
@@ -67,8 +67,18 @@ var localajaxinit = function(){
 		var val = ( c[fld] ) ? c[fld] : '';
 		AU(fld,val) ;
 	});
+	var disallowed = false;
+	var real_codecs;
 	ASTGUI.CODECSLIST.populateCodecsList(_$('allow'));
-	if( c.hasOwnProperty('allow') ){ ASTGUI.CODECSLIST.selectCodecs(_$('allow'), c['allow']); }
+	if( c.hasOwnProperty('allow') ){ real_codecs = c['array']; }
+	if( c.hasOwnProperty('disallow') ) { disallowed = c['disallow'].split(','); } 
+	var default_selected = ['ulaw','alaw','gsm'];
+	default_selected.each( function(val) {
+		if (!disallowed.contains(val)) {
+			real_codecs = real_codecs + "," + val;
+		}
+	});
+	ASTGUI.CODECSLIST.selectCodecs(_$('allow'), real_codecs);
 }
 
 var saveChanges = function(){
@@ -77,10 +87,16 @@ var saveChanges = function(){
 		parent.ASTGUI.dialog.hide();
 		ASTGUI.feedback({ msg:'Changes Saved !', showfor:2 });
 	};
+	var skip_ifempty = ['register', 'localnet', 'externhost', 'externip'];
 	var x = new listOfActions('sip.conf');
 	var AG = ASTGUI.getFieldValue;
 	fieldnames.each( function(fld){
-		var val = AG(fld) ;
+		var val = AG(fld);
+		if (skip_ifempty.contains(fld)) {
+			if (val.trim() == "") {
+				return;
+			}
+		}
 		x.new_action('update', cat , fld , val) ;
 	});
 	x.new_action('delete', cat , 'disallow', '' ) ;
@@ -107,12 +123,12 @@ var saveChanges = function(){
 <div id='sipoptions_general' style='display: none;'>
 	<table class="field_text" align="center" width="100%" cellpadding=3 cellspacing=0 border=0>
 	<tr>	<td align=right width=370>Context:</td>
-		<td>	&nbsp;<input type='text' size=10 id='context' class="input8">
+		<td>	&nbsp;<input type='text' dfalt='default' size=10 id='context' class="input8">
 			<img src="images/tooltip_info.gif" tip="en,sip_general,0" class='tooltipinfo'>
 		</td>
 	</tr>
 	<tr>	<td align=right>Realm for digest authentication:</td>
-		<td>&nbsp;<input type='text' id='realm' class="input8">
+		<td>&nbsp;<input type='text' dfalt='asterisk' id='realm' class="input8">
 			<img src="images/tooltip_info.gif" tip="en,sip_general,1" class='tooltipinfo'>
 		</td>
 	</tr>
@@ -174,16 +190,17 @@ var saveChanges = function(){
 	</tr>
 	<tr>
 		<td align=right>Allow External Domains:</td>
-		<td><input type='checkbox' id='allowexternaldomains'>
+		<td><input type='checkbox' dfalt='y' id='allowexternaldomains'>
 			<img src="images/tooltip_info.gif" tip="en,sip_general,71" class='tooltipinfo'>
 		</td>
 	</tr>
-	<tr>
+<!--	<tr>
 		<td align=right>Allow External Invites:</td>
 		<td><input type='checkbox' id='allowexternalinvites'>
 			<img src="images/tooltip_info.gif" tip="en,sip_general,72" class='tooltipinfo'>
 		</td>
 	</tr>
+-->
 	</table>
 </div>
 
@@ -191,7 +208,8 @@ var saveChanges = function(){
 <div id='sipoptions_tos' style='display: none;'>
 	<table class="field_text" align="center" width="100%" cellpadding=3 cellspacing=0 border=0>
 	<tr><td align=right>TOS for Signalling packets:</td>
-		<td>&nbsp;<select size=1 id="tos_sip" class="input8">
+		<td>&nbsp;<select size=1 dfalt='none' id="tos_sip" class="input8">
+			<option value='none'>none</option>
 			<option value='ef'>ef</option>
 			<option value='CS0'>CS0</option>
 			<option value='CS1'>CS1</option>
@@ -217,7 +235,8 @@ var saveChanges = function(){
 			<img src="images/tooltip_info.gif" tip="en,sip_general,11" class='tooltipinfo'>
 		</td>
 		<td align=right>TOS for RTP audio packets:</td>
-		<td>&nbsp;<select size=1 id="tos_audio" class="input8">
+		<td>&nbsp;<select size=1 dfalt='none' id="tos_audio" class="input8">
+			<option value='none'>none</option>
 			<option value='ef'>ef</option>
 			<option value='CS0'>CS0</option>
 			<option value='CS1'>CS1</option>
@@ -244,7 +263,8 @@ var saveChanges = function(){
 		</td>
 	</tr>
 	<tr>	<td align=right>TOS for RTP video packets:</td>
-		<td colspan=3>&nbsp;<select size=1 id="tos_video" class="input8">
+		<td colspan=3>&nbsp;<select size=1 dfalt='none' id="tos_video" class="input8">
+			<option value='none'>none</option>
 			<option value='ef'>ef</option>
 			<option value='CS0'>CS0</option>
 			<option value='CS1'>CS1</option>
@@ -271,7 +291,7 @@ var saveChanges = function(){
 		</td>
 	</tr>
 	<tr>	<td align=right tip="en,sip_general,20">Music On Hold Interpret:</td>
-		<td>&nbsp;<input type='text'  size=12 id='mohinterpret' class="input8">
+		<td>&nbsp;<input type='text'  size=12 dfalt='default' id='mohinterpret' class="input8">
 			<img src="images/tooltip_info.gif" tip="en,sip_general,20" class='tooltipinfo'>
 		</td>
 		<td align=right tip="en,sip_general,21">Music On Hold Suggest:</td>
@@ -307,7 +327,7 @@ var saveChanges = function(){
 		</td>
 	</tr>
 	<tr>	<td align=right>Generate In-Band Ringing:</td>
-		<td>&nbsp;<select id='progressinband' class="input8">
+		<td>&nbsp;<select id='progressinband' dfalt='never' class="input8">
 			<option value='never'>never</option>
 			<option value='no'>no</option>
 			<option value='yes'>yes</option>
@@ -315,7 +335,7 @@ var saveChanges = function(){
 			<img src="images/tooltip_info.gif" tip="en,sip_general,28" class='tooltipinfo'>
 		</td>
 		<td align=right>Server UserAgent:</td>
-		<td>&nbsp;<input type='text' size=12 id='useragent' class="input8">
+		<td>&nbsp;<input type='text' size=12 dfalt='Asterisk PBX' id='useragent' class="input8">
 			<img src="images/tooltip_info.gif" tip="en,sip_general,29" class='tooltipinfo'>
 		</td>
 	</tr>
@@ -353,7 +373,7 @@ var saveChanges = function(){
 		</td>
 	</tr>
 	<tr>	<td align=right> Default Incoming/Outgoing Registration Time:</td>
-		<td colspan=3>&nbsp;<input type='text'  size=4 id='defaultexpiry' pattern='^\d*$' class="input8">
+		<td colspan=3>&nbsp;<input type='text' size=4 dfalt='120' id='defaultexpiry' pattern='^\d*$' class="input8">
 			<img src="images/tooltip_info.gif" tip="en,sip_general,16" class='tooltipinfo'>
 		</td>
 	</tr>
@@ -362,7 +382,7 @@ var saveChanges = function(){
 			<img src="images/tooltip_info.gif" tip="en,sip_general,17" class='tooltipinfo'>
 		</td>
 		<td align=right>Time between MWI Checks:</td>
-		<td>&nbsp;<input type='text'  size=4 id='checkmwi' class="input8">
+		<td>&nbsp;<input type='text' dfalt='10' size=4 id='checkmwi' class="input8">
 			<img src="images/tooltip_info.gif" tip="en,sip_general,19" class='tooltipinfo'>
 		</td>
 	</tr>
@@ -411,13 +431,13 @@ var saveChanges = function(){
 	</tr>
 	<tr>
 		<td align=right>Allow Subscribe:</td>
-		<td><input type='checkbox' id='allowsubscribe'>
+		<td><input type='checkbox' dfalt='y' id='allowsubscribe'>
 			<img src="images/tooltip_info.gif" tip="en,sip_general,48" class='tooltipinfo'>
 		</td>
 	</tr>
 	<tr>
 		<td align=right>Notify on Ringing:</td>
-		<td><input type='checkbox' id='notifyringing'>
+		<td><input type='checkbox' dfalt='y' id='notifyringing'>
 			<img src="images/tooltip_info.gif" tip="en,sip_general,49" class='tooltipinfo'>
 		</td>
 	</tr>
@@ -440,7 +460,7 @@ var saveChanges = function(){
 	</tr>
 	<tr>
 		<td align=right>Extern Refresh:</td>
-		<td>&nbsp;<input size=4 type='text' id='externrefresh' class="input8">
+		<td>&nbsp;<input size=4 type='text' dfalt='10' id='externrefresh' class="input8">
 			<img src="images/tooltip_info.gif" tip="en,sip_general,57" class='tooltipinfo'>
 		</td>
 	</tr>
@@ -463,7 +483,7 @@ var saveChanges = function(){
 	</tr>
 	<tr>	
 		<td align=right>Allow RTP Reinvite:</td>
-		<td>&nbsp;<select id='canreinvite' class="input8">
+		<td>&nbsp;<select id='canreinvite' dflt='no' class="input8">
 				<option value='yes'>yes</option>
 				<option value='nonat'>nonat</option>
 				<option value='update'>update</option>
@@ -527,12 +547,12 @@ var saveChanges = function(){
 		</td>
 	</tr>
 	<tr>	<td align=right>Register TimeOut:</td>
-		<td>&nbsp;<input size=4 type='text' id='registertimeout' pattern='^\d*$' class="input8">
+		<td>&nbsp;<input size=4 type='text' dfalt='20' id='registertimeout' pattern='^\d*$' class="input8">
 			<img src="images/tooltip_info.gif" tip="en,sip_general,52" class='tooltipinfo'>
 		</td>
 	</tr>
 	<tr>	<td align=right>Register Attempts:</td>
-		<td>&nbsp;<input size=4 type='text' id='registerattempts' pattern='^\d*$' class="input8">
+		<td>&nbsp;<input size=4 type='text' dfalt='0' id='registerattempts' pattern='^\d*$' class="input8">
 			<img src="images/tooltip_info.gif" tip="en,sip_general,53" class='tooltipinfo'>
 		</td>
 	</tr>
