@@ -61,9 +61,18 @@ var localajaxinit = function(){
 		var val = ( c[fld] ) ? c[fld] : '';
 		AU(fld,val) ;
 	});
-
+	var disallowed = false;
+	var real_codecs;
 	ASTGUI.CODECSLIST.populateCodecsList(_$('allow'));
-	if( c.hasOwnProperty('allow') ){ ASTGUI.CODECSLIST.selectCodecs(_$('allow'), c['allow']); }
+	if( c.hasOwnProperty('allow') ){ real_codecs = c['array']; }
+	if( c.hasOwnProperty('disallow') ) { disallowed = c['disallow'].split(','); } 
+	var default_selected = ['ulaw','alaw','gsm'];
+	default_selected.each( function(val) {
+		if (!disallowed.contains(val)) {
+			real_codecs = real_codecs + "," + val;
+		}
+	});
+	ASTGUI.CODECSLIST.selectCodecs(_$('allow'), real_codecs);
 }
 
 
@@ -73,10 +82,16 @@ var saveChanges = function(){
 		parent.ASTGUI.dialog.hide();
 		ASTGUI.feedback({ msg:'Changes Saved !', showfor:2 });
 	};
+	var skip_ifempty = ['register', 'localnet', 'externhost', 'externip'];
 	var x = new listOfActions('iax.conf');
 	var AG = ASTGUI.getFieldValue;
 	fieldnames.each( function(fld){
 		var val = AG(fld) ;
+		if (skip_ifempty.contains(fld)) {
+			if (val.trim() == "") {
+				return;
+			}
+		}
 		x.new_action('update', cat , fld , val) ;
 	});
 	x.new_action('delete', cat , 'disallow', '' ) ;
@@ -105,25 +120,25 @@ var saveChanges = function(){
 		<div id='iaxoptions_general' style='display: none;'>
 			<table class="field_text" align="center" width="100%" cellpadding=3 cellspacing=0 border=0>
 			<tr>	<td align=right tip="en,iax_general,0" width="50%">Bind Port:</td>
-					<td>&nbsp;<input type='text' size=4 id='bindport' pattern='^\d*$' class="input8"></td>
+					<td>&nbsp;<input type='text' size=4 id='bindport' dfalt='4569' pattern='^\d*$' class="input8"></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,1">Bind Address:</td>
-					<td>&nbsp;<input type='text' size=14 id='bindaddr' class="input8"></td>
+					<td>&nbsp;<input type='text' size=14 dfalt='' id='bindaddr' class="input8"></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,2">IAX1 Compatibility:</td>
-					<td><input type='checkbox' id='iaxcompat'></td>
+					<td><input type='checkbox' id='iaxcompat' dfalt='n'></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,3">No Checksums:</td>
-					<td><input type='checkbox' id='nochecksums'></td>
+					<td><input type='checkbox' id='nochecksums' dfalt='n'></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,4">Delay Reject:</td>
-					<td><input type='checkbox' id='delayreject'></td>
+					<td><input type='checkbox' id='delayreject' dfalt='n'></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,5">ADSI:</td>
-					<td><input type='checkbox' id='adsi'></td>
+					<td><input type='checkbox' dfalt='n' id='adsi'></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,8">Music On Hold Interpret:</td>
-					<td>&nbsp;<input type='text' size=14 id='mohinterpret' class="input8"></td>
+					<td>&nbsp;<input type='text' size=14 id='mohinterpret' dfalt='default' class="input8"></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,9">Music On Hold Suggest:</td>
 					<td>&nbsp;<input type='text' size=14 id='mohsuggest' class="input8"></td>
@@ -171,13 +186,13 @@ var saveChanges = function(){
 					<td>&nbsp;<input type='text' size=4 id='dropcount' pattern='^\d*$' class="input8"></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,15">Max Jitter Buffer:</td>
-					<td>&nbsp;<input type='text' size=4 id='maxjitterbuffer' pattern='^\d*$' class="input8"></td>
+					<td>&nbsp;<input type='text' size=4 id='maxjitterbuffer' dfalt='1000' pattern='^\d*$' class="input8"></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,16">Max Interpolation Frames:</td>
-					<td>&nbsp;<input type='text' size=4 id='maxjitterinterps' pattern='^\d*$' class="input8"></td>
+					<td>&nbsp;<input type='text' size=4 id='maxjitterinterps' dfalt='10' pattern='^\d*$' class="input8"></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,17">Resync Threshold:</td>
-					<td>&nbsp;<input type='text' size=4 id='resyncthreshold' pattern='^\d*$' class="input8"></td>
+					<td>&nbsp;<input type='text' size=4 id='resyncthreshold' dfalt='1000' pattern='^\d*$' class="input8"></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,18">Max Excess Buffer:</td>
 					<td>&nbsp;<input type='text' size=4 id='maxexcessbuffer' pattern='^\d*$' class="input8"></td>
@@ -197,16 +212,16 @@ var saveChanges = function(){
 			<table class="field_text" align="center" width="100%" cellpadding=3 cellspacing=0 border=0>
 			<tr>	<td colspan=2 align=center><B>IAX Registration Options</B></td></tr>
 			<tr>	<td align=right tip="en,iax_general,23"  width="50%">Min Reg Expire:</td>
-					<td>&nbsp;<input type='text' size=4 id='minregexpire' pattern='^\d*$' class="input8"></td>
+					<td>&nbsp;<input type='text' size=4 id='minregexpire' dfalt='60'  pattern='^\d*$' class="input8"></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,24">Max Reg Expire:</td>
-					<td>&nbsp;<input type='text' size=4 id='maxregexpire' pattern='^\d*$' class="input8"></td>
+					<td>&nbsp;<input type='text' size=4 id='maxregexpire' dfalt='60' pattern='^\d*$' class="input8"></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,25">IAX ThreadCount:</td>
-					<td>&nbsp;<input type='text' size=4 id='iaxthreadcount' pattern='^\d*$' class="input8"></td>
+					<td>&nbsp;<input type='text' size=4 id='iaxthreadcount' dfalt='10' pattern='^\d*$' class="input8"></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,26">IAX Max ThreadCount:</td>
-					<td>&nbsp;<input type='text' size=4 id='iaxmaxthreadcount' pattern='^\d*$' class="input8"></td>
+					<td>&nbsp;<input type='text' size=4 id='iaxmaxthreadcount' dfalt='100' pattern='^\d*$' class="input8"></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,29">Auto Kill:</td>
 					<td>&nbsp;<input size=3 type='text' id='autokill' class="input8"></td>
@@ -216,9 +231,8 @@ var saveChanges = function(){
 					<td><input type='checkbox' id='authdebug'></td>
 			</tr>
 			<tr>	<td align=right  tip="en,iax_general,31">Codec Priority:</td>
-					<td>&nbsp;<select id="codecpriority" class="input8">
+					<td>&nbsp;<select id="codecpriority" dfalt='reqonly' class="input8">
 							<option value="caller">caller</option>
-							<option value="host">host</option>
 							<option value="disabled">disabled</option>
 							<option value="reqonly">reqonly</option>
 						</select>
@@ -252,10 +266,10 @@ var saveChanges = function(){
 			</tr>
 			<tr>	<td colspan=2 align=center><BR><B>IAX Trunking Options</B></td></tr>
 			<tr>	<td align=right tip="en,iax_general,21">Trunk Freq:</td>
-					<td>&nbsp;<input type='text' size=4 id='trunkfreq' pattern='^\d*$' class="input8"></td>
+					<td>&nbsp;<input type='text' size=4 id='trunkfreq' dfalt='20' pattern='^\d*$' class="input8"></td>
 			</tr>
 			<tr>	<td align=right tip="en,iax_general,22">Trunk Time Stamps:</td>
-					<td><input type='checkbox' id='trunktimestamps'></td>
+					<td><input type='checkbox' id='trunktimestamps' dfalt='n'></td>
 			</tr>
 			</table>
 		</div>
