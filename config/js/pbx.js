@@ -947,7 +947,12 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 
 		// add some default values for any SIPTrunk
 		tr.hasiax = 'no' ; tr.registeriax = 'no';
-		tr.hassip = 'yes' ; tr.registersip = 'yes';
+		tr.hassip = 'yes' ;
+		if ( tr.host == "dynamic" ) {
+			tr.registersip = 'no';
+		} else {
+			tr.registersip = 'yes';
+		}
 		tr.trunkstyle ='voip';
 		tr.hasexten = 'no';
 		tr.disallow ='all';
