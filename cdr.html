@@ -1,0 +1,224 @@
+<!--
+ * Asterisk-GUI	-	an Asterisk configuration interface
+ *
+ * CDR Reader - show cdr entries from Master.csv
+ *
+ * Copyright (C) 2008, Digium, Inc.
+ *
+ * Brett Bryant <bbryant@digium.com>
+ * Brandon Kruse <bkruse@digium.com>
+ *
+ * See http://www.asterisk.org for more information about
+ * the Asterisk project. Please do not directly contact
+ * any of the maintainers of this project for assistance;
+ * the project provides a web site, mailing lists and IRC
+ * channels for your use.
+ *
+ * This program is free software, distributed under the terms of
+ * the GNU General Public License Version 2. See the LICENSE file
+ * at the top of the source tree.
+ *
+-->
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+	#page_header {
+		font-size : 12px;
+		padding : 4px 6px 4px 6px;
+		border-style : solid none solid none;
+		border-top-color : #BDC7E7;
+		border-bottom-color : #182052;
+		border-width : 1px 0px 1px 0px;
+		background-color : #ef8700;
+		margin-bottom: 10px;
+		color : #ffffff;
+	}
+
+	.header {
+		color: #6b79a5;
+		font-family: Arial;
+		font-weight: bold;
+		font-size: 25px;
+	}
+
+
+	.tr0 {
+		background-color: #efaa50;
+		color: white;
+		font-weight: bold;
+	}
+
+	.tr1 {
+		background-color: #6b79a5;
+		color: white;
+		font-weight: bold
+	}
+
+	.tr2 {
+		background-color: white;
+		color: black;
+		text-decoration: underline;
+	}
+
+	.tr0 td, .tr1 td, .tr2 td {
+		font-size: xx-small;
+	}
+
+	.info {
+		font-size: small;
+		color: #6b79a5;
+	}
+</style>
+<script type="text/javascript">
+//<![CDATA[
+	var backend = "cvs";
+	var records = [];
+	var viewCount = 10;
+	var offset = 0;
+	var fields = [
+		"",
+		"Account Code", "Source", "Destination", "Dest. Context",
+		"Caller ID", "Channel", "Dest. Channel", "Last app.",
+		"Last data", "Start time", "Answer Time", "End Time",
+		"Duration", "Billable seconds", "Disposition", "AMA flags", 
+		"Unique ID", "Log userfield"
+	];
+
+	function nextPage() {
+		if (records.length > offset + viewCount)
+			offset += viewCount;
+		loadRecords();
+	}
+
+	function prevPage() {
+		if (offset) offset -= viewCount;
+		if (offset < 0) offset = 0;
+		loadRecords();
+	}
+
+	function isset(obj) {
+	if (typeof obj != "object")
+		return (typeof obj != "undefined");
+	for (var i in obj)
+		return true;
+	return false;
+	}
+
+	function loadRecords() {
+
+		try {
+		var c = viewCount;
+
+		var e = _$("cdr_content_container");
+		e.innerHTML = "";
+		var d = document.createElement("TABLE");
+		d.style.overflow = "scroll" ;
+
+		_$("info").innerHTML = "Viewing " + (offset+1) + "-" + (offset+viewCount) + " of " + records.length;
+
+		var tr = document.createElement("tr");
+		tr.className = "tr2";
+
+		for(var i=0;i<=records[offset].length;i++) {
+			var td = document.createElement("td");
+			td.appendChild(document.createTextNode(fields[i]));
+			tr.appendChild(td);
+		}
+
+		d.appendChild(tr);
+
+		for(var i=0;c--&&isset(records[i+offset]);i++) {
+			var tr = document.createElement("tr");
+			tr.className = "tr"+(i%2);
+			var r = records[i+offset];
+			
+			for(var j=-1;j<r.length;j++) {
+	
+				if(r[(j + 4)])	
+					var dest_context = (r[j + 4].toString().replace(/^[\"]{1}/, "").replace(/[\"]{1}$/, "")) ? r[j + 4].toString().replace(/^[\"]{1}/, "").replace(/[\"]{1}$/, "") : 'none';
+				if(dest_context == "asterisk_guitools") {
+					j += fields.length-3;
+					/* go to next cdr record, which is exact 21 csvs away, so count the csv field names, and subtract 3, since we only added 4, and started with -1 */
+					continue;
+				} 
+				var td = document.createElement("td");
+				if (j < 0) {
+					var l = offset+i+1;
+				} else {
+					var l = r[j].toString().replace(/^[\"]{1}/, "").replace(/[\"]{1}$/, "");
+				}
+				td.appendChild(document.createTextNode(l));
+				tr.appendChild(td);
+
+			}
+
+			d.appendChild(tr);
+		}
+
+		e.appendChild(d);
+		} catch(e) {
+			alert(e);
+		} 
+
+		parent.ASTGUI.dialog.hide();
+	}
+
+	var localajaxinit = function() {
+
+		_$('engine').innerHTML = backend;
+		prefix = '/';
+		
+		var jc = context2json({filename: "cdr.conf", context: "general", usf:1 });
+		
+		if (!ASTGUI.is_true(jc['enable'])) {
+			alert("You do not have CDR enabled. Set enabled = yes in cdr.conf");
+		}
+
+		
+		var c = context2json({ filename:'http.conf', context: 'general', usf:1 });
+
+		if (c['prefix'] != "undefined") {
+			prefix = "/" + c['prefix'] + "/";
+		}
+
+		if (!ASTGUI.is_true(c['enablestatic'].trim())) {
+			alert("You do not have static file support in http.conf. Set 'enablestatic' = yes in http.conf");
+		} 
+
+		parent.ASTGUI.dialog.waitWhile(' Grabbing your Records... ');
+
+		parent.ASTGUI.systemCmd(ASTGUI.scripts.mastercsvexists, function (){
+			var content = ASTGUI.loadHTML(prefix + "static/config/Master.csv");
+			records = content.split("\n");
+			for(var i=0;i<records.length;i++)
+				records[i] = records[i].split(",");
+			loadRecords();
+		});
+
+	}
+
+//]]>
+</script>
+<body  bgcolor="FFFFFF">
+	<div class="iframeTitleBar">
+		CDR Viewier (<span id="engine"></span>) <span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+	</div>
+  <div class="header">
+    CDR viewer
+    <a href="#" onclick="javascript: prevPage();">&lt;&lt; prev</a>
+    <a href="#" onclick="javascript: nextPage();">next &gt;&gt;</a>
+  </div>
+  <div style="float: right; font-size: medium; color: #6b79a5;">
+    View:
+    <select tip="en,cdr,0" onchange="javascript: viewCount=parseInt(this.value);loadRecords();">
+      <option value="10">10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+  </div> 
+  <!-- <div id="info" class="info"></div><div class="info"> (most recent first) <a href="cdr_conf.html" target="_self">Configure CDRs</a></div> -->
+  <div style="margin-left: 10px; overflow: auto;" id="cdr_content_container"></div>
+</body>

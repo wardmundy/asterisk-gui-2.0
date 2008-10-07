@@ -446,6 +446,17 @@ var ASTGUI = {
 		return makeSyncRequest ( { action :'command', command: cmd } );
 	},
 
+	is_true: function(str) {
+		if (typeof(str) != 'string' || str.length < 1 ) {
+			return false;
+		}
+        	return ["yes", "true", "y", "t", "1", "on"].contains(str.toLowerCase().trim());
+	},
+
+	trim: function(str) {
+	        return str.replace(/^[\s]+/, "").replace(/[\s]+$/, "");
+	},
+
 	getUser_DeviceStatus : function( usr ){ // ASTGUI.getUser_DeviceStatus(usr) 
 		var t = makeSyncRequest({ action :'ExtensionState', Exten: usr }) ;
 		if( t.contains('Status: 0') ) return 'F' ; // No Device is Busy/InUse
@@ -2684,6 +2695,7 @@ ASTGUI.scripts['NetworkSettings'] = 'sh ' + ASTGUI.paths['scripts'] + 'networkin
 ASTGUI.scripts['generateZaptel'] = 'sh ' + ASTGUI.paths['scripts'] + 'editzap.sh';
 ASTGUI.scripts['generatemISDN_init'] = 'sh ' + ASTGUI.paths['scripts'] + 'editmisdn.sh';
 ASTGUI.scripts['dldsoundpack'] = 'sh ' + ASTGUI.paths['scripts'] + 'dldsoundpack';
+ASTGUI.scripts['mastercsvexists'] = 'sh ' + ASTGUI.paths['scripts'] + 'mastercsvexists';
 
 ASTGUI.apps = {};
 ASTGUI.apps['Ztscan'] = 'ztscan > ' + ASTGUI.paths['asteriskConfig'] +'ztscan.conf' ;
