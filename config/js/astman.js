@@ -224,7 +224,7 @@ _$ = function(x){
 	};
 
 	String.prototype.isAstTrue = function () {
-		return ( this == 'yes' || this == 'true' || this == 'y' || this == 't' || this == '1' || this == 'on' ) ? true : false;
+		return ["yes", "true", "y", "t", "1", "on"].contains(this.toLowerCase().trim());
 	};
 
 	String.prototype.getNoOp = function(){
@@ -444,17 +444,6 @@ var ASTGUI = {
 	cliCommand : function(cmd) { // ASTGUI.cliCommand(cmd);
 		ASTGUI.debugLog("Executing manager command : '" + cmd + "'" , 'manager');
 		return makeSyncRequest ( { action :'command', command: cmd } );
-	},
-
-	is_true: function(str) {
-		if (typeof(str) != 'string' || str.length < 1 ) {
-			return false;
-		}
-        	return ["yes", "true", "y", "t", "1", "on"].contains(str.toLowerCase().trim());
-	},
-
-	trim: function(str) {
-	        return str.replace(/^[\s]+/, "").replace(/[\s]+$/, "");
 	},
 
 	getUser_DeviceStatus : function( usr ){ // ASTGUI.getUser_DeviceStatus(usr) 

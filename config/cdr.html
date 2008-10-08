@@ -172,10 +172,9 @@
 		
 		var jc = context2json({filename: "cdr.conf", context: "general", usf:1 });
 		
-		if (!ASTGUI.is_true(jc['enable'])) {
+		if( jc.hasOwnProperty('enable') && !jc['enable'].isAstTrue() ) {
 			alert("You do not have CDR enabled. Set enabled = yes in cdr.conf");
 		}
-
 		
 		var c = context2json({ filename:'http.conf', context: 'general', usf:1 });
 
@@ -183,9 +182,9 @@
 			prefix = "/" + c['prefix'] + "/";
 		}
 
-		if (!ASTGUI.is_true(c['enablestatic'].trim())) {
+		if( c.hasOwnProperty('enablestatic') && !c['enablestatic'].isAstTrue() ) {
 			alert("You do not have static file support in http.conf. Set 'enablestatic' = yes in http.conf");
-		} 
+		}
 
 		parent.ASTGUI.dialog.waitWhile(' Grabbing your Records... ');
 
