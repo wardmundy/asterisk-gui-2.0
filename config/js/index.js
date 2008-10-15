@@ -451,7 +451,7 @@ var miscFunctions = {
 		var raw_chan_status = makeSyncRequest ( { action :'status' } );
 		var to_return = [];
 		try {
-			var chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput( raw_chan_status.trim().replace(/Event: StatusComplete/, "") ) ;
+			var chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput( raw_chan_status.trim().replace(/Event: StatusComplete/, ""), true) ;
 			while( chunks.length ){
 				if( chunks[0].hasOwnProperty('Channel') ){
 					to_return.push(chunks[0]);
