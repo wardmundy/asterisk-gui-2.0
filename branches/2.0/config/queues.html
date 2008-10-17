@@ -235,6 +235,22 @@ var edit_queue_apply = function(){
 		var u = new listOfSynActions('extensions.conf') ;
 		u.new_action('append', ASTGUI.contexts.QUEUES, 'exten', configLine );
 		u.callActions();
+
+		var x = new listOfActions('queues.conf');
+		x.new_action('delcat', cat, '', '');
+		x.new_action('newcat', cat, '', ''); // create new context
+		x.new_action('append', cat, 'fullname', ASTGUI.getFieldValue(DOM_edit_label));
+		x.new_action('append', cat, 'strategy', ASTGUI.getFieldValue(DOM_edit_strategy));
+		x.new_action('append', cat, 'timeout', ASTGUI.getFieldValue(DOM_edit_timeout));
+		x.new_action('append', cat, 'wrapuptime', ASTGUI.getFieldValue(DOM_edit_wrapuptime));
+		x.new_action('append', cat, 'autofill', ASTGUI.getFieldValue(DOM_edit_autofill));
+		x.new_action('append', cat, 'autopause', ASTGUI.getFieldValue(DOM_edit_autopause));
+		x.new_action('append', cat, 'joinempty', ASTGUI.getFieldValue(DOM_edit_joinempty));
+		x.new_action('append', cat, 'leavewhenempty', ASTGUI.getFieldValue(DOM_edit_leavewhenempty));
+		x.new_action('append', cat, 'reportholdtime', ASTGUI.getFieldValue(DOM_edit_reportholdtime));
+		x.new_action('append', cat, 'maxlen', ASTGUI.getFieldValue(DOM_edit_maxlen));
+		x.new_action('append', cat, 'musicclass', ASTGUI.getFieldValue(DOM_edit_musicclass));
+
 	}else{
 		if( parent.sessionData.pbxinfo.queues[cat].hasOwnProperty('isOLDGUI') && parent.sessionData.pbxinfo.queues[cat].isOLDGUI == true ){
 			var u = new listOfSynActions('extensions.conf');
@@ -243,22 +259,20 @@ var edit_queue_apply = function(){
 			u.callActions();
 			delete parent.sessionData.pbxinfo.queues[cat].isOLDGUI ;
 		}
-	}
 
-	var x = new listOfActions('queues.conf');
-	x.new_action('delcat', cat, '', '');
-	x.new_action('newcat', cat, '', ''); // create new context
-	x.new_action('append', cat, 'fullname', ASTGUI.getFieldValue(DOM_edit_label));
-	x.new_action('append', cat, 'strategy', ASTGUI.getFieldValue(DOM_edit_strategy));
-	x.new_action('append', cat, 'timeout', ASTGUI.getFieldValue(DOM_edit_timeout));
-	x.new_action('append', cat, 'wrapuptime', ASTGUI.getFieldValue(DOM_edit_wrapuptime));
-	x.new_action('append', cat, 'autofill', ASTGUI.getFieldValue(DOM_edit_autofill));
-	x.new_action('append', cat, 'autopause', ASTGUI.getFieldValue(DOM_edit_autopause));
-	x.new_action('append', cat, 'joinempty', ASTGUI.getFieldValue(DOM_edit_joinempty));
-	x.new_action('append', cat, 'leavewhenempty', ASTGUI.getFieldValue(DOM_edit_leavewhenempty));
-	x.new_action('append', cat, 'reportholdtime', ASTGUI.getFieldValue(DOM_edit_reportholdtime));
-	x.new_action('append', cat, 'maxlen', ASTGUI.getFieldValue(DOM_edit_maxlen));
-	x.new_action('append', cat, 'musicclass', ASTGUI.getFieldValue(DOM_edit_musicclass));
+		var x = new listOfActions('queues.conf');
+		x.new_action('update', cat, 'fullname', ASTGUI.getFieldValue(DOM_edit_label));
+		x.new_action('update', cat, 'strategy', ASTGUI.getFieldValue(DOM_edit_strategy));
+		x.new_action('update', cat, 'timeout', ASTGUI.getFieldValue(DOM_edit_timeout));
+		x.new_action('update', cat, 'wrapuptime', ASTGUI.getFieldValue(DOM_edit_wrapuptime));
+		x.new_action('update', cat, 'autofill', ASTGUI.getFieldValue(DOM_edit_autofill));
+		x.new_action('update', cat, 'autopause', ASTGUI.getFieldValue(DOM_edit_autopause));
+		x.new_action('update', cat, 'joinempty', ASTGUI.getFieldValue(DOM_edit_joinempty));
+		x.new_action('update', cat, 'leavewhenempty', ASTGUI.getFieldValue(DOM_edit_leavewhenempty));
+		x.new_action('update', cat, 'reportholdtime', ASTGUI.getFieldValue(DOM_edit_reportholdtime));
+		x.new_action('update', cat, 'maxlen', ASTGUI.getFieldValue(DOM_edit_maxlen));
+		x.new_action('update', cat, 'musicclass', ASTGUI.getFieldValue(DOM_edit_musicclass));
+	}
 
 	var ags = ASTGUI.domActions.get_checked(ag_chkbxClass) ;
 	ags.each( function(ag){
