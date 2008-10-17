@@ -143,6 +143,48 @@ var chop_Extension = function(a){
 }
 
 var VoiceMenus_miscFunctions = {
+
+	show_VMenuEdit_normal : function(){ // VoiceMenus_miscFunctions.show_VMenuEdit_normal();
+		$('#edit_VM_Advanced_DIV').hideWithBg();
+		$('#div_vmenu_edit').showWithBg();
+	},
+
+	show_VMenuEdit_Advanced : function(){
+		$('#edit_VM_Advanced_DIV').showWithBg();
+		$('#div_vmenu_edit').hideWithBg();
+		_$('edit_VM_Advanced_DIV_Title').innerHTML = '[' + EDIT_VMENU + ']' ;
+
+		_$('edit_VM_Advanced_details').innerHTML = '';
+		var t = config2json({filename:'extensions.conf', usf:0});
+		if( t.hasOwnProperty(EDIT_VMENU) ){
+			_$('edit_VM_Advanced_details').rows = t[EDIT_VMENU].length + 1 ;
+			_$('edit_VM_Advanced_details').innerHTML = t[EDIT_VMENU].join('\n');
+		}
+	},
+
+	save_VMenu_Advanced : function(){ // VoiceMenus_miscFunctions.save_VMenu_Advanced();
+		parent.ASTGUI.dialog.waitWhile('Saving ..') ;
+
+		try{
+			ASTGUI.miscFunctions.empty_context({ filename:'extensions.conf', context : EDIT_VMENU, cb : function(){
+				var x = new listOfActions('extensions.conf');
+		
+				var vmenu_lines = ASTGUI.getFieldValue('edit_VM_Advanced_details') ;
+				vmenu_lines = vmenu_lines.split('\n');
+				vmenu_lines.each( function(this_line){
+					x.new_action( 'append', EDIT_VMENU , this_line.beforeChar('=') , this_line.afterChar('=') );
+				});
+				x.callActions( function(){
+					ASTGUI.dialog.waitWhile('Updated VoiceMenu information <BR> Reloading GUI ... ');
+					setTimeout( function(){ top.window.location.reload(); } , 2000 );
+				});
+			}});
+		}catch(err){
+			alert("Error saving VoiceMenu");
+			top.window.location.reload();
+		}
+	},
+
 	anotherMenuExistbyThisName: function( thisName ){		//	VoiceMenus_miscFunctions.anotherMenuExistbyThisName(a)
 		var m = parent.sessionData.pbxinfo.voicemenus ;
 		for( l in m ){ if( m.hasOwnProperty(l) ){
@@ -839,6 +881,7 @@ var update_a_keyPressEvent = function(){
 		<tr>	<td align=right width=100>Name:</td>
 			<td>	<input id='vmenu_name' size=32  field_name='Menu Name' validation='alphanumericUndSpace' required='yes'>
 				<img src="images/tooltip_info.gif" tip="en,menus,0" class='tooltipinfo'>
+				<span class='guiButton' onclick='VoiceMenus_miscFunctions.show_VMenuEdit_Advanced();' style='margin-left: 150px'>Advanced Edit</span>
 			</td>
 		</tr>
 
@@ -987,6 +1030,33 @@ var update_a_keyPressEvent = function(){
 		</tr>
 	</table>
 </div>
+
+<div id="edit_VM_Advanced_DIV" STYLE="width:650; max-height:450;display:none;" class='dialog'>
+	<TABLE width="100%" cellpadding=0 cellspacing=0>
+	<TR class="dialog_title_tr">
+		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);">
+			<span>Edit VoiceMenu - Advanced</span>
+		</TD>
+		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
+	</TR>
+	</TABLE>
+	<TABLE	align=center cellpadding=2 cellspacing=2 border=0 width='100%'>
+		<TR>	<TD align="center">
+				<span id='edit_VM_Advanced_DIV_Title'></span>
+			</TD>
+		</TR>
+		<TR>	<TD align="center">
+				<textarea id='edit_VM_Advanced_details' rows=5 cols=80></textarea>
+			</TD>
+		</TR>
+		<TR>	<TD align=center height=50 valign=middle>
+				<span class='guiButtonCancel' onclick='VoiceMenus_miscFunctions.show_VMenuEdit_normal();'>Cancel</span>
+				<span class='guiButtonEdit' onclick='VoiceMenus_miscFunctions.save_VMenu_Advanced();'>Update</span>
+			</TD>
+		</TR>
+	</TABLE>
+</div>
+
 
 
 <div id='div_vmenu_keyPressActions_edit' style='display:none'>
