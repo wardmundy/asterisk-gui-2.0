@@ -1064,8 +1064,7 @@ var ASTGUI = {
 	},
 
 	FirebugLog: function( msg ){ // ASTGUI.FirebugLog( object );
-		if( !(window.console && window.console.firebug) )return;
-		console.log ( msg ) ;
+		if( window.console && window.console.firebug ) console.log ( msg );
 	},
 
 	feedback : function( fb ){
