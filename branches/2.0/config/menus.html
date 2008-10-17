@@ -150,16 +150,19 @@ var VoiceMenus_miscFunctions = {
 	},
 
 	show_VMenuEdit_Advanced : function(){
+		parent.ASTGUI.dialog.waitWhile('Loading ..') ;
 		$('#edit_VM_Advanced_DIV').showWithBg();
 		$('#div_vmenu_edit').hideWithBg();
 		_$('edit_VM_Advanced_DIV_Title').innerHTML = '[' + EDIT_VMENU + ']' ;
 
-		_$('edit_VM_Advanced_details').innerHTML = '';
+		_$('edit_VM_Advanced_details').value = '';
 		var t = config2json({filename:'extensions.conf', usf:0});
 		if( t.hasOwnProperty(EDIT_VMENU) ){
 			_$('edit_VM_Advanced_details').rows = t[EDIT_VMENU].length + 1 ;
-			_$('edit_VM_Advanced_details').innerHTML = t[EDIT_VMENU].join('\n');
+			_$('edit_VM_Advanced_details').value = t[EDIT_VMENU].join('\n');
 		}
+
+		parent.ASTGUI.dialog.hide() ;
 	},
 
 	save_VMenu_Advanced : function(){ // VoiceMenus_miscFunctions.save_VMenu_Advanced();
