@@ -301,8 +301,6 @@ var show_Edit_FollowMeUser = function(u, fm_ed){
 
 
 var save_FollowMeUser = function(){
- // we do not have seperate edit/new cases here, we just have to save the chosen preferences
-
 	// update follow me status of the user in extensions.conf
 	// update followme.conf with all other chosen preferences
 	// reload the page
@@ -320,6 +318,13 @@ var save_FollowMeUser = function(){
 	for( var t=0; t < CURRENT_DESTINATIONS.length ; t++ ){
 		u.new_action( 'append', EDIT_USER , 'number', CURRENT_DESTINATIONS[t] );
 	}
+
+	var uinfo = parent.sessionData.pbxinfo.users[EDIT_USER];
+	if( !uinfo.getProperty('hasvoicemail').isAstTrue() ){
+		ASTGUI.updateaValue({file:'users.conf', context : EDIT_USER, variable :'hasvoicemail', value :'yes'});
+		parent.sessionData.pbxinfo.users[EDIT_USER].hasvoicemail = 'yes';
+	}
+
 	u.callActions( function(){
 		window.location.reload();
 	});
