@@ -1063,6 +1063,11 @@ var ASTGUI = {
 		}
 	},
 
+	FirebugLog: function( msg ){ // ASTGUI.FirebugLog( object );
+		if( !(window.console && window.console.firebug) )return;
+		console.log ( msg ) ;
+	},
+
 	feedback : function( fb ){
 		// usage  ::  ASTGUI.feedback( { msg:'your message here', showfor:2, color:'#000000', bgcolor:'#FFFFFF' } );
 		top.miscFunctions.setFeedback(fb);
