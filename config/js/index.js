@@ -24,7 +24,7 @@ var onLogInFunctions = {
 	makePings: {
 		noServer: function(){
 			try{
-				ASTGUI.debugLog("PING Request: REQUEST FAILED " , 'update');
+				ASTGUI.Log.Debug("PING Request: REQUEST FAILED ");
 				if( onLogInFunctions.makePings.isRetryPing ){
 					alert("No Response !");
 				}else{
@@ -48,7 +48,7 @@ var onLogInFunctions = {
 						//ASTGUI.dialog.hide();
 						$('#mainscreen').show();
 					}else{
-						ASTGUI.debugLog('PING Request: INVALID SESSION' , 'update');
+						ASTGUI.Log.Debug('PING Request: INVALID SESSION');
 						if( parent.sessionData.DEBUG_MODE ){
 							alert('PING Request: INVALID SESSION' + '\n' + 'Click OK to reload');
 						}
@@ -64,14 +64,14 @@ var onLogInFunctions = {
 			var makePingRequest = function(){
 				var verifyPingResult = function(t) {
 					if(!t.toLowerCase().contains('pong')){
-						ASTGUI.debugLog('PING Request: INVALID SESSION' , 'update');
+						ASTGUI.Log.Debug('PING Request: INVALID SESSION');
 						if( parent.sessionData.DEBUG_MODE ){
 							alert('PING Request: INVALID SESSION' + '\n' + 'Click OK to reload');
 						}
 						onLogInFunctions.makePings.stop();
 						top.window.location.replace(top.window.location.href); return true; 
 					}else{
-						ASTGUI.debugLog('PING Request: Success' , 'get');
+						ASTGUI.Log.Debug('PING Request: Success');
 					}
 				};
 				$.ajax({
@@ -235,7 +235,7 @@ var onLogInFunctions = {
 		onLogInFunctions.detectPlatform(resp); // <-- PLATFORM Detection
 
 		if(s.responseText.toLowerCase().match('pong')){
-			ASTGUI.debugLog('Got PONG , session is active');
+			ASTGUI.Log.Debug('Got PONG , session is active');
 
 			$('div.ui-accordion-link:eq(0)')[0].innerHTML = 'System Status';
 			$('div.ui-accordion-desc:eq(0)')[0].innerHTML = 'Please click on a panel to manage related features';
@@ -265,8 +265,8 @@ var onLogInFunctions = {
 			ASTGUI.dialog.waitWhile('Parsing Config Files ..');
 			onLogInFunctions.parseConfigFiles();
 		}else{
-			ASTGUI.ErrorLog('NO active session : show login page');
-			ASTGUI.debugLog('s.responseText is "' + s.responseText + '"' );
+			ASTGUI.Log.Error('NO active session : show login page');
+			ASTGUI.Log.Debug('s.responseText is "' + s.responseText + '"' );
 			$('div.ui-accordion-desc:eq(0)')[0].innerHTML = 'Please login ';
 			sessionData.isLoggedIn = false;
 			ASTGUI.dialog.hide();
@@ -284,55 +284,55 @@ var onLogInFunctions = {
 				// check extensions.conf (macro trunkdial, guitools , other required contexts etc), check [general] in users.conf etc
 				if( sessionData.continueParsing == false )return;
 			}catch(er){
-				ASTGUI.ErrorLog('Error in readcfg.checkEssentials()' + '<BR>error msg: ' + er.description );
+				ASTGUI.Log.Error('Error in readcfg.checkEssentials()' + '<BR>error msg: ' + er.description );
 			}
 
 			try{
 				readcfg.ExtensionsConf();
 				if( sessionData.continueParsing == false )return;
 			}catch(er){
-				ASTGUI.ErrorLog('Error in readcfg.ExtensionsConf()');
+				ASTGUI.Log.Error('Error in readcfg.ExtensionsConf()');
 			}
 
 			try{
 				readcfg.guiPreferencesConf();
 				if( sessionData.continueParsing == false )return;
 			}catch(er){
-				ASTGUI.ErrorLog('Error in readcfg.guiPreferencesConf()');
+				ASTGUI.Log.Error('Error in readcfg.guiPreferencesConf()');
 			}
 
 			try{
 				readcfg.httpConf();
 			}catch(er){
-				ASTGUI.ErrorLog('Error in readcfg.httpConf()');
+				ASTGUI.Log.Error('Error in readcfg.httpConf()');
 			}
 
 			try{
 				astgui_manageConferences.loadMeetMeRooms();
 			}catch(er){
-				ASTGUI.ErrorLog('Error in astgui_manageConferences.loadMeetMeRooms()');
+				ASTGUI.Log.Error('Error in astgui_manageConferences.loadMeetMeRooms()');
 			}
 
 			try{
 				astgui_manageQueues.loadQueues();
 			}catch(er){
-				ASTGUI.ErrorLog('Error in astgui_manageQueues.loadQueues()');
+				ASTGUI.Log.Error('Error in astgui_manageQueues.loadQueues()');
 			}
 
 			try{
 				readcfg.UsersConf();
 			}catch(er){
-				ASTGUI.ErrorLog('Error in readcfg.UsersConf()');
+				ASTGUI.Log.Error('Error in readcfg.UsersConf()');
 			}
 
 			try{
 				readcfg.MisdnConf();
 			}catch(er){
-				ASTGUI.ErrorLog('Error in readcfg.MisdnConf()');
+				ASTGUI.Log.Error('Error in readcfg.MisdnConf()');
 			}
 
 		}catch(err){
-			ASTGUI.ErrorLog('Error in onLogInFunctions.parseConfigFiles()');
+			ASTGUI.Log.Error('Error in onLogInFunctions.parseConfigFiles()');
 		}finally{
 			if( sessionData.continueParsing == false ){
 				return;
@@ -462,7 +462,7 @@ var miscFunctions = {
 			}
 
 		} catch(e) {
-			ASTGUI.debugLog("Error listOfChannels: " + e);
+			ASTGUI.Log.Debug("Error listOfChannels: " + e);
 			return to_return;
 		}
 		return to_return;
@@ -875,7 +875,7 @@ var after_localajaxinit = function(){
 		return;
 	}
 
-	ASTGUI.debugLog('Start localAjaxinit in Parent window', 'parse');
+	ASTGUI.Log.Debug('Start localAjaxinit in Parent window');
 	//if( typeof readcfg == 'undefined' ){
 	//	alert('readcfg undefined');
 	//}
@@ -932,7 +932,7 @@ var after_localajaxinit = function(){
 		DOM_mainscreen.style.top = DOM_accordion_div.offsetTop ;
 		miscFunctions.resizeMainIframe();
 		window.onresize = miscFunctions.resizeMainIframe;
-		ASTGUI.debugLog('calling onLogInFunctions.checkifLoggedIn()', 'parse');
+		ASTGUI.Log.Debug('calling onLogInFunctions.checkifLoggedIn()');
 		onLogInFunctions.checkifLoggedIn();
 		if(sessionData.DEBUG_MODE){
 			miscFunctions.DEBUG_START();

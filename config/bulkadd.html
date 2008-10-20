@@ -111,7 +111,6 @@ var addUsers_from_CSV_field = function(){
 		}
 	};
 
-	// ASTGUI.debugLog( NEW_USERS , 'parse');
 	create_NEW_USERS();
 };
 
@@ -131,7 +130,7 @@ var add_RangeOfUsers = function(){
 		}
 
 		newusers_list.push(tmp_nu);
-			ASTGUI.debugLog( 'adding user ' + tmp_nu , 'parse');
+			ASTGUI.Log.Debug( 'adding user ' + tmp_nu);
 			NEW_USERS[ tmp_nu ] = {} ;
 			NEW_USERS[ tmp_nu ]['fullname'] = 'User ' + tmp_nu;
 			NEW_USERS[ tmp_nu ]['cid_number'] = tmp_nu;

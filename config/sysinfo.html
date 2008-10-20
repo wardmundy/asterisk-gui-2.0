@@ -103,7 +103,7 @@ var localajaxinit = function(){
 							try{
 								percentage_usage(output);
 							}catch(err){
-								ASTGUI.debugLog( '<B>Error Trying to calculate CF usage %');
+								ASTGUI.Log.Debug( '<B>Error Trying to calculate CF usage %');
 							}
 						}
 						$('.hideall').hide();

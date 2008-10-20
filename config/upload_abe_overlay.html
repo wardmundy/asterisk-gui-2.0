@@ -25,7 +25,7 @@ var localajaxinit = function(){
 
 var onUploadForm_load = function(){
 	if(!top.sessionData.httpConf.postmappings_defined || !top.sessionData.httpConf.uploadPaths['backups'] ){
-		ASTGUI.ErrorLog('AG102');
+		ASTGUI.Log.Error('AG102');
 		$('#uploadOVERLAY_iframe_container').hide();
 		return ;
 	}

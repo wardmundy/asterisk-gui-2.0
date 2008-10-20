@@ -442,7 +442,7 @@ var ASTGUI = {
 	},
 
 	cliCommand : function(cmd) { // ASTGUI.cliCommand(cmd);
-		ASTGUI.debugLog("Executing manager command : '" + cmd + "'" , 'manager');
+		ASTGUI.Log.Debug("Executing manager command : '" + cmd + "'");
 		return makeSyncRequest ( { action :'command', command: cmd } );
 	},
 
@@ -497,12 +497,12 @@ var ASTGUI = {
 	},
 
 	doTransfer : function(from, to) {
-		ASTGUI.debugLog("About to transfer " + from + " to " + to, 'manager');
+		ASTGUI.Log.Debug("About to transfer " + from + " to " + to);
 		return makeSyncRequest ( { action :'redirect', channel :from, exten :to, context :'default', priority :'1' } );
 	},
 
 	doHangup : function(chan) {
-		ASTGUI.debugLog("Executing hangup on channel : '" + chan + "'" , 'manager');
+		ASTGUI.Log.Debug("Executing hangup on channel : '" + chan + "'");
 		return makeSyncRequest ( { action :'hangup', channel: chan } );
 	},
 
@@ -688,38 +688,48 @@ var ASTGUI = {
 		return b;
 	},
 
-	debugLog: function(msg, color){ // Ex:		ASTGUI.debugLog('Some debug message', 'get');
-		if(!top.sessionData.DEBUG_MODE ){ return true; }
+	Log: {
+		doLog: function(msg, color){
+			if(!top.sessionData.DEBUG_MODE ){ return true; }
+			if( typeof msg == 'object' ){
+				msg = 'OBJECT : ' + ASTGUI.getObjectPropertiesAsString(msg) ;
+			}
 
-		if( typeof msg == 'object' ){
-			msg = 'OBJECT : ' + ASTGUI.getObjectPropertiesAsString(msg) ;
-		}
+			var now = new Date();
+			var h = now.getHours().addZero() + ':' + now.getMinutes().addZero() + ':' + now.getSeconds().addZero() ;
+			if( top.sessionData.DEBUG_LOG.length > 250 ){
+				top.sessionData.DEBUG_LOG = top.sessionData.DEBUG_LOG.slice(0,50);
+			}
+			top.sessionData.DEBUG_LOG.unshift( h + ' <font color='+ color +'>' + msg + '</font>' );
+		},
 
-		if(!color){ color = '#324176'; }
-		switch(color){
-			case 'get':	// for getconfig and reading html files
-				color = '#9A9A9A';
-				break;
-			case 'update': // for updateconfig messages
-				color = '#CC0066';
-				break;
-			case 'manager': // for manager commands
-				color = '#2B6C36';
-				break;
-			case 'system': // for system commands
-				color = '#F47A00';
-				break;
-			case 'parse': // for logging parse errors
-				color = '#4C9996';
-				//msg = '<b>' + msg + '</b>' ;
-				break;
+		Ajax: function(msg){ // ASTGUI.Log.Ajax(msg);
+			this.doLog( msg , '#96997C' );
+		},
+
+		Debug: function( msg ){ // ASTGUI.Log.Debug();
+			this.doLog( msg , '#4C9996' );
+		},
+
+		Error: function( msg ){ // ASTGUI.Log.Error();
+			if( msg.length <=5 && ASTGUI.errorCodes[msg] ){
+				this.doLog( '<B>' + ASTGUI.errorCodes[msg] + '</B>' , '#992b23' );
+			}else{
+				this.doLog( '<B>' + msg + '</B>' , '#992b23' );
+			}
+		},
+
+		Console: function( msg ){ // ASTGUI.Log.Console();
+			if( window.console && window.console.firebug ) console.log ( msg );
+		},
+
+		Info: function( msg ){ // ASTGUI.Log.Info(msg);
+			this.doLog( msg , '#9A9A9A' );
+		},
+
+		Warn: function( msg ){ // ASTGUI.Log.Warn( msg );
+			this.doLog( msg , '#F47A00' );
 		}
-		var now = new Date();
-		var h = now.getHours().addZero() + ':' + now.getMinutes().addZero() + ':' + now.getSeconds().addZero() ;
-		if( top.sessionData.DEBUG_LOG.length > 250){
-			top.sessionData.DEBUG_LOG = top.sessionData.DEBUG_LOG.slice(0,50);
-		}
-		top.sessionData.DEBUG_LOG.unshift( h + ' <font color='+ color +'>' + msg + '</font>' );
 	},
 
 	dialog : {
@@ -1057,18 +1067,6 @@ var ASTGUI = {
 			}
 			a['on'+b] = null ;
 		}
-	},
-
-	ErrorLog: function( Code ){// Ex: ASTGUI.ErrorLog('AG102');
-		if( Code.length <=5 && ASTGUI.errorCodes[Code] ){
-			ASTGUI.debugLog( '<B>' + ASTGUI.errorCodes[Code] + '</B>' , '#990033' );
-		}else{
-			ASTGUI.debugLog( '<B>' + Code + '</B>' , '#990033' );
-		}
-	},
-
-	FirebugLog: function( msg ){ // ASTGUI.FirebugLog( object );
-		if( window.console && window.console.firebug ) console.log ( msg );
 	},
 
 	feedback : function( fb ){
@@ -1574,7 +1572,7 @@ var ASTGUI = {
 					return q.substring(l+1);
 				}
 			}
-			ASTGUI.ErrorLog( "ASTGUI.parseContextLine.getAppWithArgs() could not parse \"" + q + "\" " );
+			ASTGUI.Log.Error( "ASTGUI.parseContextLine.getAppWithArgs() could not parse \"" + q + "\" " );
 			return '';
 		},
 
@@ -1592,7 +1590,7 @@ var ASTGUI = {
 
 			q = q.trim();
 			if ( !q.endsWith(')') || !q.contains('(') ){
-				ASTGUI.ErrorLog( "ASTGUI.parseContextLine.getArgs() - No Argument found for \"" + q + "\" " );
+				ASTGUI.Log.Error( "ASTGUI.parseContextLine.getArgs() - No Argument found for \"" + q + "\" " );
 				return [];
 			}
 			var y = ASTGUI.parseContextLine.getAppWithArgs(q);
@@ -1861,23 +1859,6 @@ var ASTGUI = {
 			return cr;
 		}
 	},
-
-// 	profiling : {
-// 		start: function(){
-// 			if(!top.sessionData.DEBUG_MODE ){ return true; }
-// 			var now = new Date();
-// 			top.sessionData.DEBUG_PROFILER_BEGIN = now.getTime() ;
-// 		},
-// 
-// 		snapShot: function(a){
-// 			if(!top.sessionData.DEBUG_MODE ){ return true; }
-// 			if ( !a || (typeof a != 'string') ){ a = ''; }
-// 			var now = new Date();
-// 			var diff = now.getTime() - top.sessionData.DEBUG_PROFILER_BEGIN ;
-// 			ASTGUI.debugLog( '<B> Profiler Time : '+ diff +' ms</B> ' + a , '#990033');
-// 			top.sessionData.DEBUG_PROFILER_BEGIN = now.getTime() ;
-// 		}
-// 	},
 
 	resetTheseFields : function( flds ){ // ASTGUI.resetTheseFields(arr) , flds = [ el1, el2 , el_3 ] ; - sets each element to blank value
 		if(!ASTGUI.isArray(flds)){ return; }
@@ -2358,7 +2339,7 @@ var ASTGUI = {
 	},
 
 	systemCmd: function(cmd, callbackfunction){ // ASTGUI.systemCmd(cmd, cbf);
-		ASTGUI.debugLog("Executing System Command : '" + cmd + "'" , 'system');
+		ASTGUI.Log.Debug("Executing System Command : '" + cmd + "'");
 		var delay_cb = function(){
 			if( parent.sessionData.PLATFORM.isAA50 ){
 				setTimeout( callbackfunction , 500 );
@@ -2492,7 +2473,7 @@ var ASTGUI = {
 				}
 				break;
 			case 'radio':
-				ASTGUI.ErrorLog('You are on your own with Radio Buttons');
+				ASTGUI.Log.Error('You are on your own with Radio Buttons');
 				break ;
 			case 'select-one':
 				ASTGUI.selectbox.selectOption(el, val);
@@ -2729,10 +2710,10 @@ var makeRequest = function( params){ // for making Asynchronus requests
 	if( params.action == "updateconfig" ){
 		params.srcfilename = params.filename;
 		params.dstfilename = params.filename;
-		if(top.sessionData.DEBUG_MODE ){ASTGUI.debugLog("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'" , 'update');}
+		if(top.sessionData.DEBUG_MODE ){ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
 		delete params.filename;
 	}else{
-		if(top.sessionData.DEBUG_MODE ){ASTGUI.debugLog("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'" , 'get');}
+		if(top.sessionData.DEBUG_MODE ){ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
 	}
 
 	$.get(ASTGUI.paths.rawman, params, cb);
@@ -2740,7 +2721,7 @@ var makeRequest = function( params){ // for making Asynchronus requests
 
 var makeSyncRequest = function( params){ // for making synchronus requests
 	// usage ::  makeSyncRequest ( { action :'getconfig', filename: 'something.conf' } ) // no need for call back function
-	if(top.sessionData.DEBUG_MODE ){ASTGUI.debugLog("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'" , 'update');}
+	if(top.sessionData.DEBUG_MODE ){ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
 	var s = $.ajax({ url: ASTGUI.paths.rawman, data: params , async: false });
 	return s.responseText;
 };
@@ -2791,7 +2772,7 @@ var context2json = function(params){
 		return (catfound)?cat : null ;
 	};
 
-	ASTGUI.debugLog("AJAX Request : reading '" +  params.filename + "'" , 'get');
+	ASTGUI.Log.Ajax("AJAX Request : reading '" +  params.filename + "'");
 
 	if( top.sessionData.FileCache.hasOwnProperty(params.filename) &&  top.sessionData.FileCache[params.filename].modified == false){ // if file is in cache and is not modified since
 		var s = top.sessionData.FileCache[params.filename].content ;
@@ -2810,9 +2791,9 @@ var context2json = function(params){
 	if(s.contains('Response: Error') && ( s.contains('Message: Config file not found') || s.contains('Message: Permission denied') ) ){
 		// return ASTGUI.globals.fnf; // return 'file not found'
 		if(s.contains('Message: Config file not found'))
-			ASTGUI.ErrorLog( ' config file(' + params.filename +') not found ' );	
+			ASTGUI.Log.Error( ' config file(' + params.filename +') not found ' );	
 		if(s.contains('Message: Permission denied'))
-			ASTGUI.ErrorLog('permission denied for reading file ' + params.filename );
+			ASTGUI.Log.Error('permission denied for reading file ' + params.filename );
 
 		return (params.usf) ? new ASTGUI.customObject : [] ;
 	}
@@ -2883,7 +2864,7 @@ var config2json = function( params ){
 		return toJSO( params.configFile_output );
 	};
 
-	ASTGUI.debugLog("AJAX Request : reading '" +  params.filename + "'" , 'get');
+	ASTGUI.Log.Ajax("AJAX Request : reading '" +  params.filename + "'");
 
 	if( top.sessionData.FileCache.hasOwnProperty(params.filename) &&  top.sessionData.FileCache[params.filename].modified == false){ // if file is in cache and is not modified since
 		var s = top.sessionData.FileCache[params.filename].content ;
@@ -2897,11 +2878,11 @@ var config2json = function( params ){
 
 	if( s.contains('Response: Error') && s.contains('Message: Config file not found') ){
 		// return ASTGUI.globals.fnf; // return 'file not found'
-		ASTGUI.ErrorLog( ' config file(' + params.filename +') not found ' );
+		ASTGUI.Log.Error( ' config file(' + params.filename +') not found ' );
 		return new ASTGUI.customObject;
 	}
 	if( s.contains('Response: Error') && s.contains('Message: Permission denied') ){
-		ASTGUI.ErrorLog('permission denied for reading file ' + params.filename );
+		ASTGUI.Log.Error('permission denied for reading file ' + params.filename );
 		return new ASTGUI.customObject;
 	}
 
@@ -2964,7 +2945,7 @@ listOfSynActions.prototype = {
 
 		var cnt = "" + this.actionCount;
 		if(this.actionCount > 5){
-			ASTGUI.ErrorLog('AG150'); // alert to developer
+			ASTGUI.Log.Error('AG150'); // alert to developer
 		}
 		while(cnt.length < 6){ cnt = "0" + cnt; }
 		this.params['Action-' + cnt] = action; // jquery takes care of encodeURIComponent(action) 
@@ -2987,7 +2968,7 @@ listOfSynActions.prototype = {
 	callActions: function(){
 		if(!this.actionCount){ return 'Response: Success'; }
 		if(top.sessionData.DEBUG_MODE ){
-			ASTGUI.debugLog("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(this.params) + "'" , 'update'); 
+			ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(this.params) + "'"); 
 		}
 		var s = $.ajax({ url: ASTGUI.paths.rawman, data: this.params , async: false });
 		return s.responseText;
@@ -3103,7 +3084,7 @@ listOfActions.prototype = {
 		var start_sqreqs = function(st){
 			var f = treq[ 'act_' + st ];
 			if(f){
-				ASTGUI.debugLog("AJAX Request : '" + pre_uri + f + "'" , 'update');
+				ASTGUI.Log.Ajax("AJAX Request : '" + pre_uri + f + "'");
 				$.ajax({ type: "GET", url: ASTGUI.paths.rawman, data: pre_uri + f , success: function(msg){start_sqreqs(st+1);} });
 			}else{
 				setTimeout( function(){ ajxs.style.display = 'none'; callback(); }, 500 ) ;
@@ -3118,7 +3099,7 @@ listOfActions.prototype = {
 	var onload_doThese = function(){
 		window.onerror = function(err, url, errcode ){ // Log any errors on this page
 			var msg = 'ErrorCode / LineNumber : ' + errcode  + '<BR> Error : ' + err + '<BR> Location: ' + url ;
-			ASTGUI.ErrorLog(msg);
+			ASTGUI.Log.Error(msg);
 			ASTGUI.dialog.hide();
 			if( parent.sessionData.DEBUG_MODE ){ // show alerts only in debug mode
 				var alertmsg = 'ErrorCode / LineNumber : ' + errcode  + '\n Error : ' + err + '\n Location: ' + url ;

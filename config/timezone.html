@@ -52,7 +52,7 @@ onUploadForm_beforeUploading = function(){
 
 onUploadForm_load = function(){
 	if(!top.sessionData.httpConf.postmappings_defined || !top.sessionData.httpConf.uploadPaths['timezone'] ){
-		ASTGUI.ErrorLog('AG102');
+		ASTGUI.Log.Error('AG102');
 		$('#tdupload').hide(); //
 		return ;
 	}
