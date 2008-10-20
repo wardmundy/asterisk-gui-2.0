@@ -136,7 +136,7 @@ var onLogInFunctions = {
 
 		var http_conf = config2json({ filename:'http.conf', usf:1 });
 		if( !http_conf.hasOwnProperty(rand) || !http_conf[rand].hasOwnProperty(wa) || http_conf[rand][wa] !='yes' ){
-			ASTGUI.cookies.setCookie( 'rwaccess' , 'no' );
+			ASTGUI.cookies.removeCookie('rwaccess');
 			return false; // no read/write access to the GUI
 		}
 
@@ -521,9 +521,8 @@ var miscFunctions = {
 
 	flip_advancedmode: function(){
 		var am = ASTGUI.cookies.getCookie('advancedmode');
-		ASTGUI.FirebugLog( am );
 		if( am && am == 'yes' ){
-			ASTGUI.cookies.setCookie( 'advancedmode' , 'no' );
+			ASTGUI.cookies.removeCookie('advancedmode');
 			$(".AdvancedMode").hide();
 		}else{
 			ASTGUI.cookies.setCookie( 'advancedmode' , 'yes' );
@@ -535,7 +534,7 @@ var miscFunctions = {
 		var t = ASTGUI.cliCommand('reload') ;
 		var u = _$('applyChanges_Button');
 		u.style.display = 'none';
-		ASTGUI.cookies.setCookie( 'configFilesChanged' , 'no' );
+		ASTGUI.cookies.removeCookie('configFilesChanged');
 		ASTGUI.feedback({msg:'Asterisk Reloaded !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
 
 		if(sessionData.PLATFORM.isAA50 ){
@@ -546,7 +545,7 @@ var miscFunctions = {
 		}
 		if( ASTGUI.cookies.getCookie('require_restart') == 'yes'){
 			ASTGUI.dialog.alertmsg('The changes you made requires a restart. <BR> Your hardware might not work properly until you reboot !!');
-			ASTGUI.cookies.setCookie( 'require_restart' , 'no' );
+			ASTGUI.cookies.removeCookie('require_restart');
 		}
 	},
 
@@ -699,7 +698,7 @@ var miscFunctions = {
 		};
 
 		var fr = ASTGUI.cookies.getCookie('firmware_reboot')
-		ASTGUI.cookies.setCookie('firmware_reboot','no');
+		ASTGUI.cookies.removeCookie('firmware_reboot');
 		if( fr == 'yes') {
 			count_down(480);
 		}else{
