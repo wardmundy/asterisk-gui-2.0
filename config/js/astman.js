@@ -527,6 +527,10 @@ var ASTGUI = {
 			top.document.cookie = tmp;
 		},
 
+		removeCookie: function(x){
+			top.document.cookie = x + '=somevalue; expires=Fri, 22 Oct 1999 00:00:00 UTC; path=/' ;
+		},
+
 		clearCookies: function(){  // ASTGUI.cookies.clearCookies()
 			top.document.cookie = '';
 		}
