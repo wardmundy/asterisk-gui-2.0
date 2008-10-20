@@ -630,22 +630,22 @@ var miscFunctions = {
 		aaaaa();
 
 		_$('debugWindow_which_Ajax').checked = sessionData.DEBUG_WHICH.Ajax ;
-		$('#debugWindow_which_Ajax').click(function(){ sessionData.DEBUG_WHICH.Ajax =  (this.checked) ? true : false ; });
+		$('#debugWindow_which_Ajax').click(function(){ sessionData.DEBUG_WHICH.Ajax =  this.checked ; });
 
 		_$('debugWindow_which_Debug').checked = sessionData.DEBUG_WHICH.Debug ;
-		$('#debugWindow_which_Debug').click(function(){ sessionData.DEBUG_WHICH.Debug =  (this.checked) ? true : false ; });
+		$('#debugWindow_which_Debug').click(function(){ sessionData.DEBUG_WHICH.Debug = this.checked ; });
 
 		_$('debugWindow_which_Error').checked = sessionData.DEBUG_WHICH.Error ;
-		$('#debugWindow_which_Error').click(function(){ sessionData.DEBUG_WHICH.Error =  (this.checked) ? true : false ; });
+		$('#debugWindow_which_Error').click(function(){ sessionData.DEBUG_WHICH.Error = this.checked ; });
 
 		_$('debugWindow_which_Console').checked = sessionData.DEBUG_WHICH.Console ;
-		$('#debugWindow_which_Console').click(function(){ sessionData.DEBUG_WHICH.Console =  (this.checked) ? true : false ; });
+		$('#debugWindow_which_Console').click(function(){ sessionData.DEBUG_WHICH.Console = this.checked ; });
 
 		_$('debugWindow_which_Info').checked = sessionData.DEBUG_WHICH.Info ;
-		$('#debugWindow_which_Info').click(function(){ sessionData.DEBUG_WHICH.Info =  (this.checked) ? true : false ; });
+		$('#debugWindow_which_Info').click(function(){ sessionData.DEBUG_WHICH.Info = this.checked ; });
 
 		_$('debugWindow_which_Warnings').checked = sessionData.DEBUG_WHICH.Warn ;
-		$('#debugWindow_which_Warnings').click(function(){ sessionData.DEBUG_WHICH.Warn =  (this.checked) ? true : false ; });
+		$('#debugWindow_which_Warnings').click(function(){ sessionData.DEBUG_WHICH.Warn = this.checked ; });
 
 	},
 	
