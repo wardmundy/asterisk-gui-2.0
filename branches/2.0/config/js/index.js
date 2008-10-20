@@ -524,12 +524,11 @@ var miscFunctions = {
 		if( am && am == 'yes' ){
 			ASTGUI.cookies.removeCookie('advancedmode');
 			$(".AdvancedMode").hide();
-			miscFunctions.resizeMainIframe();
 		}else{
 			ASTGUI.cookies.setCookie( 'advancedmode' , 'yes' );
 			$(".AdvancedMode").show();
-			miscFunctions.resizeMainIframe();
 		}
+		miscFunctions.resizeMainIframe();
 	},
 
 	applyChanges : function(cb){
