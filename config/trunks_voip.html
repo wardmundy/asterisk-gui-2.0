@@ -228,10 +228,10 @@ var edit_VOIPTrunk_save_go = function(){
 	if( isNewTrunk == true ) {
 	// New Trunk
 		var tmp_ttype = parent.astgui_managetrunks.misc.getTrunkType( DOM_edit_VOIPTrunk_Username.value );
-		if( tmp_ttype ){
-			ASTGUI.highlightField( DOM_edit_VOIPTrunk_Username , "Another trunk exists with this name !!" );
-			return;
-		}
+		//if( tmp_ttype ){
+		//	ASTGUI.highlightField( DOM_edit_VOIPTrunk_Username , "Another trunk exists with this name !!" );
+		//	return;
+		//}
 
 		var ttv = DOM_edit_VOIPTrunk_Type.value;
 		var trp = {
