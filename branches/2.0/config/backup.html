@@ -67,7 +67,7 @@ onUploadForm_load = function(){
 		return;
 	}
 	if(!top.sessionData.httpConf.postmappings_defined || !top.sessionData.httpConf.uploadPaths['backups'] ){
-		ASTGUI.ErrorLog('AG102');
+		ASTGUI.Log.Error('AG102');
 		$('#uploadForm_container').hide();
 		return ;
 	}

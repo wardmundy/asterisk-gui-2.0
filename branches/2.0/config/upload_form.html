@@ -14,7 +14,7 @@ function localinit(){
 
 function beforeupload(){
 	if(!frm.action){
-		parent.ASTGUI.ErrorLog('AG101');
+		parent.ASTGUI.Log.Error('AG101');
 		alert('Aborting Upload : Error Code  AG101');
 		return;
 	}

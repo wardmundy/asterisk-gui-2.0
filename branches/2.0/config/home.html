@@ -57,7 +57,7 @@ function doLogin(){
 	var f = makeSyncRequest({ action :'login', username: DOM_username.value, secret: DOM_secret.value });
 	f = f.toLowerCase();
 	if(f.match('authentication accepted')){
-		ASTGUI.debugLog("Login Success result: " + f , 'update');
+		ASTGUI.Log.Debug("Login Success result: " + f);
 		setLoggedIn( { welcome_redirect: false } );
 		DOM_secret.blur();
 		parent.ASTGUI.dialog.waitWhile(' <font color=#005119><b>Login Success</b></font>');
@@ -77,7 +77,7 @@ function doLogin(){
 		}
 		return;
 	}else if(f.match('authentication failed') ) {
-		ASTGUI.debugLog("Login failure result: " + f , 'update');
+		ASTGUI.Log.Debug("Login failure result: " + f);
 		ASTGUI.feedback({msg:'Invalid Username or Password', showfor: 4, color:'#c42421'}) ;
 		DOM_secret.focus();
 		DOM_secret.select();

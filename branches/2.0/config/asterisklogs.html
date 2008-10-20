@@ -38,7 +38,7 @@ var load_tmp_logs = function(){
 	var lm = sel_date.split(' ')[1]; lm = lm.trim();
 	var tmp_cmd = "/bin/grep /var/log/asterisk/messages -e '" + lm + space + ld + " ' " ;
 	parent.ASTGUI.dialog.waitWhile(' Loading Asterisk Logs ...');
-	ASTGUI.debugLog(tmp_cmd);
+	ASTGUI.Log.Debug(tmp_cmd);
 	ASTGUI.systemCmdWithOutput( tmp_cmd , function(output){
 		parent.ASTGUI.dialog.hide();
 		_$('todaylog').innerHTML = (output) ? "<PRE>" + output.escapeHTML() + "</PRE>" : "No log messages found on this Day" ;
