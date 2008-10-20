@@ -400,7 +400,6 @@ var onLogInFunctions = {
 		}else{
 			$('#applyChanges_Button').hide();
 		}
-		miscFunctions.resizeMainIframe();
 		ASTGUI.dialog.hide();
 
 		/* CUSTOM ACTIONS BASED ON GET PARAMS */
@@ -517,6 +516,7 @@ var miscFunctions = {
 		}else{
 			$(".AdvancedMode").hide();
 		}
+		miscFunctions.resizeMainIframe();
 	},
 
 	flip_advancedmode: function(){
