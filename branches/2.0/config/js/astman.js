@@ -704,14 +704,15 @@ var ASTGUI = {
 		},
 
 		Ajax: function(msg){ // ASTGUI.Log.Ajax(msg);
-			this.doLog( msg , '#96997C' );
+			if ( parent.sessionData.DEBUG_WHICH.Ajax == true ) this.doLog( msg , '#96997C' );
 		},
 
 		Debug: function( msg ){ // ASTGUI.Log.Debug();
-			this.doLog( msg , '#4C9996' );
+			if ( parent.sessionData.DEBUG_WHICH.Debug == true ) this.doLog( msg , '#4C9996' );
 		},
 
 		Error: function( msg ){ // ASTGUI.Log.Error();
+			if( !parent.sessionData.DEBUG_WHICH.Error == true ) return;
 			if( msg.length <=5 && ASTGUI.errorCodes[msg] ){
 				this.doLog( '<B>' + ASTGUI.errorCodes[msg] + '</B>' , '#992b23' );
 			}else{
@@ -720,15 +721,15 @@ var ASTGUI = {
 		},
 
 		Console: function( msg ){ // ASTGUI.Log.Console();
-			if( window.console && window.console.firebug ) console.log ( msg );
+			if( parent.sessionData.DEBUG_WHICH.Console == true && window.console && window.console.firebug ) console.log ( msg );
 		},
 
 		Info: function( msg ){ // ASTGUI.Log.Info(msg);
-			this.doLog( msg , '#9A9A9A' );
+			if( parent.sessionData.DEBUG_WHICH.Info == true ) this.doLog( msg , '#9A9A9A' );
 		},
 
 		Warn: function( msg ){ // ASTGUI.Log.Warn( msg );
-			this.doLog( msg , '#F47A00' );
+			if( parent.sessionData.DEBUG_WHICH.Warn == true ) this.doLog( msg , '#F47A00' );
 		}
 	},
 

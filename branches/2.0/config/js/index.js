@@ -595,6 +595,8 @@ var miscFunctions = {
 	},
 
 	DEBUG_START : function(){
+		if ( sessionData.DEBUG_PROFILER_BEGIN ) return ; // we want to call DEBUG_START only once during a gui session
+
 		var m = _$('debug_messages');
 		var aaaaa = function(){
 			if(sessionData.DEBUG_MODE && sessionData.DEBUG_LOG.length){
@@ -626,6 +628,25 @@ var miscFunctions = {
 		});
 
 		aaaaa();
+
+		_$('debugWindow_which_Ajax').checked = sessionData.DEBUG_WHICH.Ajax ;
+		$('#debugWindow_which_Ajax').click(function(){ sessionData.DEBUG_WHICH.Ajax =  (this.checked) ? true : false ; });
+
+		_$('debugWindow_which_Debug').checked = sessionData.DEBUG_WHICH.Debug ;
+		$('#debugWindow_which_Debug').click(function(){ sessionData.DEBUG_WHICH.Debug =  (this.checked) ? true : false ; });
+
+		_$('debugWindow_which_Error').checked = sessionData.DEBUG_WHICH.Error ;
+		$('#debugWindow_which_Error').click(function(){ sessionData.DEBUG_WHICH.Error =  (this.checked) ? true : false ; });
+
+		_$('debugWindow_which_Console').checked = sessionData.DEBUG_WHICH.Console ;
+		$('#debugWindow_which_Console').click(function(){ sessionData.DEBUG_WHICH.Console =  (this.checked) ? true : false ; });
+
+		_$('debugWindow_which_Info').checked = sessionData.DEBUG_WHICH.Info ;
+		$('#debugWindow_which_Info').click(function(){ sessionData.DEBUG_WHICH.Info =  (this.checked) ? true : false ; });
+
+		_$('debugWindow_which_Warnings').checked = sessionData.DEBUG_WHICH.Warn ;
+		$('#debugWindow_which_Warnings').click(function(){ sessionData.DEBUG_WHICH.Warn =  (this.checked) ? true : false ; });
+
 	},
 	
 	DEBUG_CLEAR : function(){

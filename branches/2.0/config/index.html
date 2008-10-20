@@ -76,7 +76,7 @@ var sessionData = {
 				// and NOT the channels on a digital span with FXS or FXO signalling
 	DEBUG_LOG : [], // all the debug log messages will be stored in this array (If debug mode is enabled)
 	DEBUG_MODE : false, // set to true when debugging -- parent.sessionData.DEBUG_MODE
-	DEBUG_PROFILER_BEGIN : 0 , // store the timestamp when you start profiling
+	DEBUG_WHICH: { Ajax: true, Debug: true, Error: true, Console: true, Info: true, Warn: true } , // parent.sessionData.DEBUG_WHICH.Ajax/Debug/Error/Console/Info/Warn
 	REQUIRE_RESTART : false, // this flag is used to know if there are any updates in zapchan settings
 				// like if a FXS is assigned to a user or an analog trunk is created or something 
 				// if this flag is true - we want to throw alert 'on ApplySettings' saying that a restart is required
@@ -274,6 +274,24 @@ var sessionData = {
 				<span id="dbw_flip" class='dbw_flip_show'>Hide debug messages</span>
 			</td>
 			<td align=right>
+				<input type='checkbox' id='debugWindow_which_Ajax'> 
+				<label for='debugWindow_which_Ajax'> Ajax Requests </label>
+
+				<input type='checkbox' id='debugWindow_which_Debug'> 
+				<label for='debugWindow_which_Debug'> Debug  </label>
+
+				<input type='checkbox' id='debugWindow_which_Error'> 
+				<label for='debugWindow_which_Error'> Error </label>
+
+				<input type='checkbox' id='debugWindow_which_Console'> 
+				<label for='debugWindow_which_Console'> Console </label>
+
+				<input type='checkbox' id='debugWindow_which_Info'> 
+				<label for='debugWindow_which_Info'> Info </label>
+
+				<input type='checkbox' id='debugWindow_which_Warnings'> 
+				<label for='debugWindow_which_Warnings'> Warnings </label>
+
 				<span class='guiButton' onclick='miscFunctions.DEBUG_CLEAR();'>Clear</span>
 			</td>
 		</tr>
