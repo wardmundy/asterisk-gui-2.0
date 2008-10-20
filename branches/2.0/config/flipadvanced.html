@@ -63,7 +63,8 @@ var localajaxinit = function(){
 
 var update_status = function(){
 
-	if(parent.sessionData.advancedmode == true ){
+	var am = ASTGUI.cookies.getCookie('advancedmode');
+	if( am && am == 'yes' ){
 		_$('flip_button').innerHTML = 'Hide Advanced Options';
 		_$('flip_decsription').innerHTML = "Clicking the 'Hide Advanced Options' button below removes the advanced menu items on the left hand sidebar"
 		+ "<BR><BR><B>Notice!</B>  Digium does not provide support for the options configurable in the Advanced menu items. "

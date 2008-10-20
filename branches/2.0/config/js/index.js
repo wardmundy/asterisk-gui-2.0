@@ -441,6 +441,8 @@ var onLogInFunctions = {
 		}else{
 			readcfg.ztScanConf();
 		}
+
+		miscFunctions.show_advancedMode();
 	}
 };
 
@@ -508,13 +510,24 @@ var miscFunctions = {
 		}
 	},
 
-	flip_advancedmode: function(){
-		if(sessionData.advancedmode == true ){
-			$(".AdvancedMode").hide();
-			sessionData.advancedmode = false;
-		}else{
+	show_advancedMode : function(){
+		var am = ASTGUI.cookies.getCookie('advancedmode');
+		if( am && am == 'yes' ){
 			$(".AdvancedMode").show();
-			sessionData.advancedmode = true;
+		}else{
+			$(".AdvancedMode").hide();
+		}
+	},
+
+	flip_advancedmode: function(){
+		var am = ASTGUI.cookies.getCookie('advancedmode');
+		ASTGUI.FirebugLog( am );
+		if( am && am == 'yes' ){
+			ASTGUI.cookies.setCookie( 'advancedmode' , 'no' );
+			$(".AdvancedMode").hide();
+		}else{
+			ASTGUI.cookies.setCookie( 'advancedmode' , 'yes' );
+			$(".AdvancedMode").show();
 		}
 	},
 
