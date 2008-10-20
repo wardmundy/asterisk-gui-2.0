@@ -891,7 +891,9 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 
 		// add some default values for any IAXTrunk
 //		var trunk = astgui_managetrunks.misc.nextAvailableTrunk_x();
-		var trunk = tr.username ;
+		var tmp_trunksList = astgui_managetrunks.listofAllTrunks();
+		var trunk = ( tmp_trunksList.contains(tr.username) ) ? astgui_managetrunks.misc.nextAvailableTrunk_x() : tr.username ;
+
 		sessionData.pbxinfo.trunks.iax[trunk] = new ASTGUI.customObject; // add new/reset iax trunk info in sessionData
 
 		tr.hasiax = 'yes' ;
@@ -959,7 +961,9 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 		tr.allow = 'all';
 
 		//var trunk = astgui_managetrunks.misc.nextAvailableTrunk_x();
-		var trunk = tr.username ;
+		var tmp_trunksList = astgui_managetrunks.listofAllTrunks();
+		var trunk = ( tmp_trunksList.contains(tr.username) ) ? astgui_managetrunks.misc.nextAvailableTrunk_x() : tr.username ;
+
 		var ct = ASTGUI.contexts.TrunkDIDPrefix + trunk;
 		var x = new listOfActions();
 
