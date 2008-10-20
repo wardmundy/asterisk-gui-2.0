@@ -886,7 +886,7 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 	},
 
 	addIAXTrunk: function( tr , cbf ){  // 
-		// usage:: astgui_managetrunks.addIAXTrunk( {'host':'iaxtel.com' , username:'my_username', secret:'my_secret', (required)fallback: '6001'  ....}, cbf ) ;
+		// usage:: astgui_managetrunks.addIAXTrunk( {'host':'iaxtel.com' , username:'my_username', secret:'my_secret', ....}, cbf ) ;
 		if( !tr.hasOwnProperty('host')|| !tr.hasOwnProperty('username') || !tr.hasOwnProperty('secret') ){ return false; } //check for required parameters
 
 		// add some default values for any IAXTrunk
