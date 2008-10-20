@@ -390,6 +390,11 @@ var VoiceMenus_miscFunctions = {
 					$('#newstep_custom').show();
 					tip_chosenStep.innerHTML = 'Add a <i>Custom Step</i> to the VoiceMenu';
 					break;
+				case 'Macro':
+					lbl('Macro');
+					$('#newstep_custom').show();
+					tip_chosenStep.innerHTML = "macroname|arg1|arg2 .... Executes a macro using the context 'macro-&lt;macroname&gt;'";
+					break;
 				default:
 					break;
 			}
@@ -495,6 +500,9 @@ var VoiceMenus_miscFunctions = {
 				break;
 			case 'CustomApp':
 				newstep = ASTGUI.getFieldValue('newstep_custom') ;
+				break;
+			case 'Macro':
+				newstep = 'Macro(' + ASTGUI.getFieldValue('newstep_custom') + ')' ;
 				break;
 			default:
 				break;
@@ -921,6 +929,7 @@ var update_a_keyPressEvent = function(){
 							<option value="DigitTimeout">DigitTimeout</option>
 							<option value="DISA">DISA</option>
 							<option value="ResponseTimeout">ResponseTimeout</option>
+							<option value="Macro">Macro</option>
 							<option value="Playback">Playback</option>
 							<option value="Ringing">Ringing</option>
 							<option value="SetMusicOnHold">Set MusicOhHold Class</option>
