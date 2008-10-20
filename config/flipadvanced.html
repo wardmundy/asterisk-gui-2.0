@@ -52,9 +52,7 @@ var localajaxinit = function(){
 			parent.$(".debugWindow").hide();
 		}else{
 			parent.sessionData.DEBUG_MODE = true;
-			if ( !parent.sessionData.DEBUG_PROFILER_BEGIN ){
-				parent.miscFunctions.DEBUG_START();
-			}
+			parent.miscFunctions.DEBUG_START();
 			parent.$(".debugWindow").show();
 		}
 	});
