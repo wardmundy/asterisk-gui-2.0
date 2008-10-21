@@ -22,10 +22,9 @@
 
 _$ = function(x){
 	if ( typeof x != 'string' ){ return null ;}
-	if(document.getElementById(x)){
+	try{
 		return document.getElementById(x); 
-	}
-	return null;
+	}catch(err){ return null; }
 };
 
 // Some custom methods to Array Objects
