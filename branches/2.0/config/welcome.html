@@ -149,6 +149,8 @@ managerEvents.parseOutput = function(op){
 		try{
 			if( op_LC.contains('event: queuememberstatus') ){
 				setTimeout( update_AgentsListing_Table , 1000 );
+			}else if( op_LC.contains('event: meetmeleave') ||  op_LC.contains('event: meetmejoin') ){
+				setTimeout( update_Conferences_Table , 1000 );
 			} else if ( op_LC.contains('event: extensionstatus') ) {
 				var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1) ;
 				tmp_chunks.each(function(this_chunk){
@@ -347,48 +349,8 @@ var updateListingsTable = function(){
 	})();
 
 	(function(){ // List all meetMe Extensions
-		var active_conferences = {};
-		(function(){
-			var meetme_status = ASTGUI.cliCommand('meetme');
-			meetme_status = parent.ASTGUI.parseCLIResponse(meetme_status);
-			if ( meetme_status.contains('No active MeetMe conferences') ){
-				// No active MeetMe conferences.
-			}else{
-				// sx00i*CLI> meetme
-				// Conf Num       Parties        Marked     Activity  Creation
-				// 6302           0001           N/A        00:00:09  Static
-				// 6300           0001           N/A        00:02:51  Static
-				// * Total number of MeetMe users: 2
-				meetme_status = meetme_status.split('\n');
-				while( meetme_status.length ){
-					var this_line = meetme_status[0];
-					meetme_status.removeFirst();
-					this_line = this_line.trim();
-					if( !this_line || this_line.beginsWith('Conf Num') ||  this_line.beginsWith('* Total number') ) { continue; }
-					var tmp_vars = this_line.split(/\s+/); // ['6302','0001','N/A','00:00:09', 'Static' ]
-					active_conferences[ tmp_vars[0] ] = {} ;
-					active_conferences[ tmp_vars[0] ]['count'] = tmp_vars[1] ;
-					active_conferences[ tmp_vars[0] ]['duration'] = tmp_vars[3] ;
-				}
-			}
-		})();
 
-		var m = parent.sessionData.pbxinfo.conferences ;
-		for( l in m ){ if( m.hasOwnProperty(l) && l !='admin'){
-				var newRow = DOM_table_Ext_list.insertRow(-1);
-				newRow.className = ((DOM_table_Ext_list.rows.length)%2==1)?'odd':'even';
-				addCell( newRow , { html:'' });
-				addCell( newRow , { html: l });
-				addCell( newRow , { html: '<b>Conference Room</b>' });
-
-				if( active_conferences.hasOwnProperty(l) ){
-					addCell( newRow , { html: '<font color=red>' + Number(active_conferences[l].count) + ' Users</font> - ' + active_conferences[l].duration });
-				}else{
-					addCell( newRow , { html: '<font color=green>Not in use</font>' });
-				}
-				addCell( newRow , { html: 'MeetMe' });
-		}}
-
+		update_Conferences_Table();
 
 	})();
 
@@ -535,6 +497,61 @@ var update_needsConfiguratin_list = function(){
 
 };
 
+var update_Conferences_Table = function(){
+	var addCell = ASTGUI.domActions.tr_addCell;
+	var TBL = _$('table_Meetmes_list');
+	ASTGUI.domActions.removeAllChilds(TBL);
+
+	var active_conferences = {};
+	(function(){
+		var meetme_status = ASTGUI.cliCommand('meetme');
+		meetme_status = parent.ASTGUI.parseCLIResponse(meetme_status);
+		if ( meetme_status.contains('No active MeetMe conferences') ){
+			// No active MeetMe conferences.
+		}else{
+			// sx00i*CLI> meetme
+			// Conf Num       Parties        Marked     Activity  Creation
+			// 6302           0001           N/A        00:00:09  Static
+			// 6300           0001           N/A        00:02:51  Static
+			// * Total number of MeetMe users: 2
+			meetme_status = meetme_status.split('\n');
+			while( meetme_status.length ){
+				var this_line = meetme_status[0];
+				meetme_status.removeFirst();
+				this_line = this_line.trim();
+				if( !this_line || this_line.beginsWith('Conf Num') ||  this_line.beginsWith('* Total number') ) { continue; }
+				var tmp_vars = this_line.split(/\s+/); // ['6302','0001','N/A','00:00:09', 'Static' ]
+				active_conferences[ tmp_vars[0] ] = {} ;
+				active_conferences[ tmp_vars[0] ]['count'] = tmp_vars[1] ;
+				active_conferences[ tmp_vars[0] ]['duration'] = tmp_vars[3] ;
+			}
+		}
+	})();
+
+	var td_COUNT = 0, m = parent.sessionData.pbxinfo.conferences ;
+	for( l in m ){ if( m.hasOwnProperty(l) && l !='admin'){
+
+		if( td_COUNT == 3 || td_COUNT == 0 ){
+			newRow = TBL.insertRow(-1);
+			//newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
+			td_COUNT = 0;
+		}
+
+		var newcell = newRow.insertCell( newRow.cells.length ); td_COUNT++ ;
+		newcell.width = 120 ;
+		newcell.align = 'center' ;
+
+		if( active_conferences.hasOwnProperty(l) ){
+			newcell.innerHTML =  l + '<BR><font color=red>' + Number(active_conferences[l].count) + ' Users</font> - ' + active_conferences[l].duration ;
+		}else{
+			newcell.innerHTML =  l + '<BR><font color=green>Not in use</font>' ;
+		}
+	}}
+
+	if( TBL.rows.length ){ $('#table_Meetmes_list_container').show() ; }
+};
+
+
 var update_AgentsListing_Table = function(){
 	var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
 	var TBL = _$('table_Agents_list') ;
@@ -641,6 +658,20 @@ var localajaxinit = function(){
 		
 	</div>
 
+	<div style='overflow:auto; width:95%; max-height: 500px;margin-top:10px; display:none;' id='table_Meetmes_list_container'>
+		
+		<table cellpadding=1 cellspacing=2 border=0 align=center style="border-width: 1px ; border-spacing: 2px; border-style: solid; border-color: #6b79a5; border-collapse: separate; background-color: white;">
+			<tr>
+				<td valign='top' align=center><B>Conference Rooms</B> <span class='refresh_icon' onclick="update_Conferences_Table();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span></td>
+			</tr>
+			<tr>
+				<td align=center>
+					<table id='table_Meetmes_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
+				</td>
+			</tr>
+		</table>
+		
+	</div>
 
 	<div style='width:100%; text-align:center; margin-top:15px;'>
 		<B>Extensions</B>
