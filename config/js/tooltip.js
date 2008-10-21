@@ -143,6 +143,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['queues'] .en[14] = "<B>Agent Login Extension:</B> Extension to be dialed for the Agents to Login to the Specific Queue. <br> This is an extension that all the Agents can Call to Login to their specified Queues. ";
 	tooltips['queues'] .en[15] = "<B>Agent Callback Login Extension:</B> Extension to be dialed for the Agents to Login to the Queues they are apart of.<br> Same as Agent Login Extension, except you do not have to remain on the line. ";
 	tooltips['queues'] .en[16] = "<B>Agent Logout</B>";
+	tooltips['queues'] .en[17] = "<B>KeyPress Events:</B> If a caller presses a key while waiting in the queue, this setting selects which voice menu should process the key press.";
 
 // Tooltips for SIP_General (sip_general)
 	tooltips['sip_general']= new Object;
