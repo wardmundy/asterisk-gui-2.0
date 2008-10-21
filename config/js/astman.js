@@ -42,9 +42,7 @@ _$ = function(x){
 
 	Array.prototype.lastValue = function(){
 		// [0,1,2]
-		if( this.length )
-			return this[this.length - 1] ;
-		return null;
+		return (this.length)? this[this.length - 1] : null;
 	};
 
 	Array.prototype.replaceLastWith = function(a){
@@ -53,10 +51,7 @@ _$ = function(x){
 	}
 
 	Array.prototype.contains = function(str) {
-		for(var i=0, j = this.length ; i < j; i++ ){
-			if( this[i] === str )return true;
-		}
-		return false;
+		return this.indexOf(str) != -1 ;
 	};
 
 	Array.prototype.containsLike = function(str) {
@@ -70,7 +65,8 @@ _$ = function(x){
 	};
 
 	Array.prototype.forEach = function(iterator) { // call a function on each element and update the element with the returned value
-		for(var i=0 , j = this.length; i < j ; i++ ){
+		var i = this.length;
+		while (i--) {
 			this[i] = iterator(this[i] , i);
 		}
 	};
@@ -91,7 +87,8 @@ _$ = function(x){
 	
 	if(!Array.indexOf){
 		Array.prototype.indexOf = function(a){
-			for(var i=0; i<this.length; i++){
+			var i = this.length;
+			while (i--) {
 				if( this[i] === a ){
 					return i;
 				}
@@ -107,10 +104,12 @@ _$ = function(x){
 	};
 
 	Array.prototype.lastIndexOfLike = function( searchString ){
-		var lastindex = -1;
-		if(!searchString.length){ return lastindex; }
-		for(var i=0; i < this.length; i++ ){ if( this[i].beginsWith(searchString) ){ lastindex = i; } }
-		return lastindex ;
+		if(!searchString.length){ return -1;}
+		var i = this.length;
+		while (i--) {
+			if( typeof this[i] == 'string' && this[i].beginsWith(searchString) ){ return i; }
+		}
+		return -1 ;
 	};
 
 	Array.prototype.push_IfNotPresent = function( a ){
