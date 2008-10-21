@@ -887,12 +887,12 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 
 	addIAXTrunk: function( tr , cbf ){  // 
 		// usage:: astgui_managetrunks.addIAXTrunk( {'host':'iaxtel.com' , username:'my_username', secret:'my_secret', ....}, cbf ) ;
-		if( !tr.hasOwnProperty('host')|| !tr.hasOwnProperty('username') || !tr.hasOwnProperty('secret') ){ return false; } //check for required parameters
+		if( !tr.hasOwnProperty('host') ){ return false; } //check for required parameters
 
 		// add some default values for any IAXTrunk
 //		var trunk = astgui_managetrunks.misc.nextAvailableTrunk_x();
 		var tmp_trunksList = astgui_managetrunks.listofAllTrunks();
-		var trunk = ( tmp_trunksList.contains(tr.username) ) ? astgui_managetrunks.misc.nextAvailableTrunk_x() : tr.username ;
+		var trunk = ( !tr.username || tmp_trunksList.contains(tr.username) ) ? astgui_managetrunks.misc.nextAvailableTrunk_x() : tr.username ;
 
 		sessionData.pbxinfo.trunks.iax[trunk] = new ASTGUI.customObject; // add new/reset iax trunk info in sessionData
 
@@ -945,7 +945,7 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 
 	addSIPTrunk: function(tr,cbf){ // 
 		// usage:: astgui_managetrunks.addSIPTrunk( {'host':'sip_test.digium.com' , username:'my_username', secret:'my_secret',(required)fallback: '6001' ....}, cbf ) ;
-		if( !tr.hasOwnProperty('host')|| !tr.hasOwnProperty('username') || !tr.hasOwnProperty('secret') ){ return false; } //check for required parameters
+		if( !tr.hasOwnProperty('host') ){ return false; } //check for required parameters
 
 		// add some default values for any SIPTrunk
 		tr.hasiax = 'no' ; tr.registeriax = 'no';
@@ -962,7 +962,7 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 
 		//var trunk = astgui_managetrunks.misc.nextAvailableTrunk_x();
 		var tmp_trunksList = astgui_managetrunks.listofAllTrunks();
-		var trunk = ( tmp_trunksList.contains(tr.username) ) ? astgui_managetrunks.misc.nextAvailableTrunk_x() : tr.username ;
+		var trunk = ( !tr.username || tmp_trunksList.contains(tr.username) ) ? astgui_managetrunks.misc.nextAvailableTrunk_x() : tr.username ;
 
 		var ct = ASTGUI.contexts.TrunkDIDPrefix + trunk;
 		var x = new listOfActions();
