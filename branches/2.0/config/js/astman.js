@@ -704,15 +704,15 @@ var ASTGUI = {
 		},
 
 		Ajax: function(msg){ // ASTGUI.Log.Ajax(msg);
-			if ( parent.sessionData.DEBUG_WHICH.Ajax == true ) this.doLog( msg , '#96997C' );
+			if ( top.sessionData.DEBUG_WHICH.Ajax == true ) this.doLog( msg , '#96997C' );
 		},
 
 		Debug: function( msg ){ // ASTGUI.Log.Debug();
-			if ( parent.sessionData.DEBUG_WHICH.Debug == true ) this.doLog( msg , '#4C9996' );
+			if ( top.sessionData.DEBUG_WHICH.Debug == true ) this.doLog( msg , '#4C9996' );
 		},
 
 		Error: function( msg ){ // ASTGUI.Log.Error();
-			if( !parent.sessionData.DEBUG_WHICH.Error == true ) return;
+			if( !top.sessionData || !top.sessionData.DEBUG_WHICH.Error ) return;
 			if( msg.length <=5 && ASTGUI.errorCodes[msg] ){
 				this.doLog( '<B>' + ASTGUI.errorCodes[msg] + '</B>' , '#992b23' );
 			}else{
@@ -721,15 +721,15 @@ var ASTGUI = {
 		},
 
 		Console: function( msg ){ // ASTGUI.Log.Console();
-			if( parent.sessionData.DEBUG_WHICH.Console == true && window.console && window.console.firebug ) console.log ( msg );
+			if( top.sessionData.DEBUG_WHICH.Console == true && window.console && window.console.firebug ) console.log ( msg );
 		},
 
 		Info: function( msg ){ // ASTGUI.Log.Info(msg);
-			if( parent.sessionData.DEBUG_WHICH.Info == true ) this.doLog( msg , '#9A9A9A' );
+			if( top.sessionData.DEBUG_WHICH.Info == true ) this.doLog( msg , '#9A9A9A' );
 		},
 
 		Warn: function( msg ){ // ASTGUI.Log.Warn( msg );
-			if( parent.sessionData.DEBUG_WHICH.Warn == true ) this.doLog( msg , '#F47A00' );
+			if( top.sessionData.DEBUG_WHICH.Warn == true ) this.doLog( msg , '#F47A00' );
 		}
 	},
 
@@ -3102,7 +3102,7 @@ listOfActions.prototype = {
 			var msg = 'ErrorCode / LineNumber : ' + errcode  + '<BR> Error : ' + err + '<BR> Location: ' + url ;
 			ASTGUI.Log.Error(msg);
 			ASTGUI.dialog.hide();
-			if( parent.sessionData.DEBUG_MODE ){ // show alerts only in debug mode
+			if( top.sessionData && top.sessionData.DEBUG_MODE ){ // show alerts only in debug mode
 				var alertmsg = 'ErrorCode / LineNumber : ' + errcode  + '\n Error : ' + err + '\n Location: ' + url ;
 				alert(alertmsg);
 			}else{
