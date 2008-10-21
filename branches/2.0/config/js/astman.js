@@ -3105,11 +3105,11 @@ listOfActions.prototype = {
 			if( top.sessionData && top.sessionData.DEBUG_MODE ){ // show alerts only in debug mode
 				var alertmsg = 'ErrorCode / LineNumber : ' + errcode  + '\n Error : ' + err + '\n Location: ' + url ;
 				alert(alertmsg);
-			}else{
-				if ( jQuery.browser.msie ){ // If critical error in IE , reload entire GUI
-					top.window.reload();
-				}
 			}
+			if ( jQuery.browser.msie ){ // If critical error in IE , reload entire GUI
+				top.window.reload();
+			}
+
 
 			return true;
 		};
