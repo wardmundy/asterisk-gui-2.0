@@ -325,7 +325,6 @@ var new_crl_save_go = function(){
 			return ;
 		}
 
-		var tmp_checkThis = ( DOM_new_crl_fotr_stripx.value.beginsWith('_') ) ?  DOM_new_crl_fotr_stripx.value.length -1 :  DOM_new_crl_fotr_stripx.value.length ;
 		if( DOM_new_crl_foChkbx.checked &&  Number(tmp_fotr_stripx) > tmp_checkThis ){
 			ASTGUI.feedback( { msg:'You can not strip more digits than in the pattern !', showfor: 3, color:'red' });
 			DOM_new_crl_fotr_stripx.focus();
