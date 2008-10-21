@@ -235,11 +235,15 @@ var edit_VOIPTrunk_save_go = function(){
 
 		var ttv = DOM_edit_VOIPTrunk_Type.value;
 		var trp = {
-			host: 	  DOM_edit_VOIPTrunk_Hostname.value ,
-			username: DOM_edit_VOIPTrunk_Username.value ,
-			secret:   DOM_edit_VOIPTrunk_Password.value ,
+			host: DOM_edit_VOIPTrunk_Hostname.value ,
 			trunkname: ASTGUI.getFieldValue('edit_VOIPTrunk_Providername')
 		};
+
+		if( DOM_edit_VOIPTrunk_Username.value ){
+			trp.username = ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Username) ;
+			trp.secret = ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Password) ;
+		}
+
 		var cbf = function(){
 			ASTGUI.feedback({msg:'Created New ' + ttv+ ' trunk !', showfor: 3 , color: 'green', bgcolor: '#FFFFFF'}) ;
 			window.location.reload();
@@ -407,7 +411,7 @@ var load_VOIPTrunksTable = function (){
 			addCell( newRow , { html: parent.sessionData.pbxinfo.trunks[ttype][item]['trunkname'] } );
 			addCell( newRow , { html: ttype.toUpperCase() }); // sip/iax
 			addCell( newRow , { html: parent.sessionData.pbxinfo.trunks[ttype][item]['host'] });
-			addCell( newRow , { html: parent.sessionData.pbxinfo.trunks[ttype][item]['username'] });
+			addCell( newRow , { html: parent.sessionData.pbxinfo.trunks[ttype][item]['username'] || '' });
 
 			var tmp_editString = "<span class='guiButton' onclick=\"edit_trunk_form('" + item +"')\">Edit</span>&nbsp;"
 						+ "<span class='guiButtonDelete' onclick=\"delete_trunk_confirm('" + item +"')\">Delete</span>" ;
