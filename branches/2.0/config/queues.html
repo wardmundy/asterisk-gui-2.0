@@ -84,6 +84,7 @@ var loadDOMElements = function(){
 	DOM_edit_joinempty = _$('edit_joinempty'); // chkbox
 	DOM_edit_leavewhenempty = _$('edit_leavewhenempty'); // chkbox
 	DOM_edit_reportholdtime = _$('edit_reportholdtime'); // chkbox
+	DOM_edit_voicemenuclass = _$('edit_voicemenuclass'); // select
 
 };
 
@@ -169,7 +170,7 @@ var editQueue_form = function(k){
 var show_Queue_Form = function(){
 	if(isNewQueue == true){
 
-		ASTGUI.resetTheseFields([ DOM_Queue_Ext, DOM_edit_label ,DOM_edit_strategy , DOM_edit_musicclass , DOM_edit_timeout , DOM_edit_wrapuptime , DOM_edit_maxlen , DOM_edit_autofill , DOM_edit_autopause , DOM_edit_joinempty , DOM_edit_leavewhenempty , DOM_edit_reportholdtime ]); // reset all fields
+		ASTGUI.resetTheseFields([ DOM_Queue_Ext, DOM_edit_label ,DOM_edit_strategy , DOM_edit_musicclass , DOM_edit_timeout , DOM_edit_wrapuptime , DOM_edit_maxlen , DOM_edit_autofill , DOM_edit_autopause , DOM_edit_joinempty , DOM_edit_leavewhenempty , DOM_edit_reportholdtime, DOM_edit_voicemenuclass  ]); /* reset all fields */
 		ASTGUI.domActions.unCheckAll( ag_chkbxClass );
 		DOM_Queue_Ext.disabled = false;
 		var tmp_ql = parent.sessionData.pbxinfo.queues.getOwnProperties();
@@ -178,6 +179,7 @@ var show_Queue_Form = function(){
 		$(DOM_edit_QueueDiv).showWithBg();
 		ASTGUI.feedback({ msg:'Create New Queue!', showfor:2 });
 		ASTGUI.updateFieldToValue(DOM_edit_musicclass, 'default' );
+		ASTGUI.updateFieldToValue(DOM_edit_voicemenuclass, '' );
 		return;
 	}
 
@@ -196,6 +198,7 @@ var show_Queue_Form = function(){
 	ASTGUI.updateFieldToValue(DOM_edit_joinempty, QUEUES_CONF[EDIT_Queue].getProperty('joinempty') );
 	ASTGUI.updateFieldToValue(DOM_edit_leavewhenempty, QUEUES_CONF[EDIT_Queue].getProperty('leavewhenempty') );
 	ASTGUI.updateFieldToValue(DOM_edit_reportholdtime, QUEUES_CONF[EDIT_Queue].getProperty('reportholdtime') );
+	ASTGUI.updateFieldToValue(DOM_edit_voicemenuclass, QUEUES_CONF[EDIT_Queue].getProperty('context') );
 	ASTGUI.domActions.checkSelected( ag_chkbxClass, (QUEUES_CONF[EDIT_Queue].getProperty('member')) ? QUEUES_CONF[EDIT_Queue]['member'].split(',') :[] ) ;
 	ASTGUI.feedback({ msg:'Edit Queue !', showfor:2 });
 
@@ -250,6 +253,8 @@ var edit_queue_apply = function(){
 		x.new_action('append', cat, 'reportholdtime', ASTGUI.getFieldValue(DOM_edit_reportholdtime));
 		x.new_action('append', cat, 'maxlen', ASTGUI.getFieldValue(DOM_edit_maxlen));
 		x.new_action('append', cat, 'musicclass', ASTGUI.getFieldValue(DOM_edit_musicclass));
+		var s = ASTGUI.getFieldValue(DOM_edit_voicemenuclass); 
+		if (s != '') x.new_action('append', cat, 'context', s);
 
 	}else{
 		if( parent.sessionData.pbxinfo.queues[cat].hasOwnProperty('isOLDGUI') && parent.sessionData.pbxinfo.queues[cat].isOLDGUI == true ){
@@ -272,6 +277,9 @@ var edit_queue_apply = function(){
 		x.new_action('update', cat, 'reportholdtime', ASTGUI.getFieldValue(DOM_edit_reportholdtime));
 		x.new_action('update', cat, 'maxlen', ASTGUI.getFieldValue(DOM_edit_maxlen));
 		x.new_action('update', cat, 'musicclass', ASTGUI.getFieldValue(DOM_edit_musicclass));
+		var s = ASTGUI.getFieldValue(DOM_edit_voicemenuclass);
+		if (s != '') x.new_action('update', cat, 'context', s);
+		else x.new_action('delete', cat, 'context');
 	}
 
 	var ags = ASTGUI.domActions.get_checked(ag_chkbxClass) ;
@@ -340,7 +348,14 @@ var localajaxinit = function(){
 			ASTGUI.selectbox.append('edit_musicclass', this_class, this_class );
 		});
 		_$('edit_musicclass').selectedIndex = -1 ;
-
+/* Need to add list of voicemenus */
+		ASTGUI.selectbox.append('edit_voicemenuclass', 'None', '' );
+		var vmcls = parent.sessionData.pbxinfo.voicemenus.getOwnProperties();
+		vmcls.each(function(vmenu){
+			var vm_name = parent.sessionData.pbxinfo.voicemenus[vmenu].comment || vmenu ;
+			ASTGUI.selectbox.append('edit_voicemenuclass', 'VoiceMenu -- ' + vm_name, vmenu );
+		});
+/* end */
 	} )();
 
 	loadDOMElements();
@@ -542,6 +557,11 @@ var save_QueueSettings = function(){
 							<img src="images/tooltip_info.gif" tip="en,queues,12" class='tooltipinfo'>
 						</td>
 						<td><label for='edit_reportholdtime'>Report Hold Time</label></td>
+					</tr>
+					<tr>	<td colspan=2 align=right>KeyPress Events :</td>
+						<td colspan=2><select id="edit_voicemenuclass"></select>
+							<img src="images/tooltip_info.gif" tip="en,queues,17" class='tooltipinfo'>
+						</td>
 					</tr>
 					</table>
 				</fieldset>
