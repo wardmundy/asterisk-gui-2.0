@@ -53,10 +53,10 @@ var APPS_LIST = [ "Answer", "Background", "Busy", "Congestion", "DigitTimeout", 
 
 var do_new_ApplicationMap_row = function(){
 	var TBL = _$('Table_applicationMap_definitions');
-	create_new_AppMap_tr(TBL.rows.length, '');
+	create_new_AppMap_tr('');
 };
 
-var create_new_AppMap_tr = function( appNumber , featureName){
+var create_new_AppMap_tr = function( featureName){
 	if(featureName){
 		var tmp_fields = ApplicationMap[featureName].split(',') ;
 	}else{
@@ -65,9 +65,24 @@ var create_new_AppMap_tr = function( appNumber , featureName){
 	}
 
 	var TBL = _$('Table_applicationMap_definitions');
+
+	if( !TBL.rows.length || (TBL.rows.length && TBL.rows[0].className == 'noapps') ){
+		ASTGUI.domActions.removeAllChilds(TBL);
+		var addCell = ASTGUI.domActions.tr_addCell;
+		var newRow = TBL.insertRow(-1);
+		newRow.className = "frow";
+		addCell( newRow , { html:'Enabled' } );
+		addCell( newRow , { html:'Feature Name'} );
+		addCell( newRow , { html:'Digits'} );
+		addCell( newRow , { html:'ActiveOn/By'} );
+		addCell( newRow , { html:'App Name'} );
+		addCell( newRow , { html:'Arguments'} );
+		addCell( newRow , { html:''} );
+	}
+
 	var newRow = TBL.insertRow(-1);
 	newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
-	newRow.id = AP_MAP_TRID + String(appNumber) ;
+	newRow.id = AP_MAP_TRID + String(  Math.round(10000 * Math.random())  )  ;
 	
 	var C1 = document.createElement('input');
 	C1.type = 'checkbox';
@@ -121,28 +136,32 @@ var create_new_AppMap_tr = function( appNumber , featureName){
 	ASTGUI.updateFieldToValue( CE , tmp_fields[3] );
 	var newcell = newRow.insertCell( newRow.cells.length );
 	newcell.appendChild( CE );
+
+	var DB = document.createElement('span'); DB.innerHTML = 'Delete' ; DB.className = 'guiButton';
+	var newcell = newRow.insertCell( newRow.cells.length );
+	ASTGUI.events.add( DB , 'click' , function(){
+		newRow.parentNode.removeChild(newRow);
+	});
+	newcell.appendChild( DB );
+
 };
 
 
 var generate_applicationMap_TRs = function(){
 	var TBL = _$('Table_applicationMap_definitions');
-	var addCell = ASTGUI.domActions.tr_addCell;
-	(function(){ // add first row
-		var newRow = TBL.insertRow(-1);
-		newRow.className = "frow";
-		
-		addCell( newRow , { html:'Enabled' } );
-		addCell( newRow , { html:'Feature Name'} );
-		addCell( newRow , { html:'Digits'} );
-		addCell( newRow , { html:'ActiveOn/By'} );
-		addCell( newRow , { html:'App Name'} );
-		addCell( newRow , { html:'Arguments'} );
-	})();
 
 	var apps = 0;
 	for(var featureName in ApplicationMap){
 		if( !ApplicationMap.hasOwnProperty(featureName) ){ continue}
-		create_new_AppMap_tr( TBL.rows.length , featureName);
+		create_new_AppMap_tr( featureName);
+	}
+
+	if( !TBL.rows.length ){
+		ASTGUI.domActions.removeAllChilds(TBL);
+		newRow = TBL.insertRow(-1);
+		newRow.className = 'noapps';
+		var newcell = newRow.insertCell( newRow.cells.length );
+		newcell.innerHTML = "No Applicaiton Maps defined !";
 	}
 };
 
@@ -282,15 +301,16 @@ var save_changes = function(){
 			u.new_action('delete', FM , 'parkcall', '');
 		}
 
-
 		u.new_action( 'delcat', 'applicationmap' , '', '');
 		u.new_action( 'newcat', 'applicationmap' , '', '');
 
-		for( var R = 1, RL = TBL.rows.length ; R < RL ; R++ ){
-			var thisrow_id = '#' + AP_MAP_TRID + String(R) ;
-			var this_featureName = $(thisrow_id + ' .textbox_featurename')[0].value.trim() ;
-			if( !this_featureName )continue ;
+		for( var R = 0, RL = TBL.rows.length ; R < RL ; R++ ){
 
+			if( TBL.rows[R].className == 'noapps' || TBL.rows[R].className == 'frow' ){ continue; }
+			var thisrow_id = '#' + String(TBL.rows[R].id) ;
+
+			var this_featureName = $( thisrow_id + ' .textbox_featurename')[0].value.trim() ;
+			if( !this_featureName )continue ;
 
 			var this_enabled = $(thisrow_id + ' .textbox_feature_CheckBox')[0].checked ;
 			if( this_enabled ) {
@@ -302,11 +322,10 @@ var save_changes = function(){
 			var this_args = $(thisrow_id + ' .textbox_appArgs')[0].value.trim() ;
 			var tmp_arr = [this_digits, this_activeOnBy, this_appName, this_args ];
 
-
 			u.new_action( 'append', 'applicationmap' , this_featureName , tmp_arr.join(',') );
 		}
 
-		u.callActions();
+	u.callActions();
 
 	var DIAL_OPS = '' ;
 
