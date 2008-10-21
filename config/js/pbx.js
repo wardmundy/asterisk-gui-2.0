@@ -184,7 +184,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			sessionData.continueParsing = false ;
 			ASTGUI.dialog.waitWhile(" Creating a config file to store GUI Preferences");
 			ASTGUI.miscFunctions.createConfig( ASTGUI.globals.configfile, function(){
-				if( parent.sessionData.DEBUG_MODE ){
+				if( sessionData.DEBUG_MODE ){
 					alert('created config file ' + ASTGUI.globals.configfile + '\n' + 'Click OK to reload');
 				}
 				window.location.reload();
@@ -857,7 +857,7 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 
 		// zap_channels
 		zap_channels.each( function(channel){
-			var temp_ls_List = ASTGUI.cloneObject( parent.sessionData.PORTS_SIGNALLING.ls ) ;
+			var temp_ls_List = ASTGUI.cloneObject( sessionData.PORTS_SIGNALLING.ls ) ;
 			var sg = ( temp_ls_List.contains(channel) ) ? 'fxs_ls':'fxs_ks' ;
 			x.new_action('append', trunk, 'signalling', sg);
 			x.new_action( 'append', trunk , 'channel', channel );

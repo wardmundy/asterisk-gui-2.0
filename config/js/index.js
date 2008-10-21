@@ -49,7 +49,7 @@ var onLogInFunctions = {
 						$('#mainscreen').show();
 					}else{
 						ASTGUI.Log.Debug('PING Request: INVALID SESSION');
-						if( parent.sessionData.DEBUG_MODE ){
+						if( sessionData.DEBUG_MODE ){
 							alert('PING Request: INVALID SESSION' + '\n' + 'Click OK to reload');
 						}
 						top.window.location.replace(top.window.location.href);
@@ -65,7 +65,7 @@ var onLogInFunctions = {
 				var verifyPingResult = function(t) {
 					if(!t.toLowerCase().contains('pong')){
 						ASTGUI.Log.Debug('PING Request: INVALID SESSION');
-						if( parent.sessionData.DEBUG_MODE ){
+						if( sessionData.DEBUG_MODE ){
 							alert('PING Request: INVALID SESSION' + '\n' + 'Click OK to reload');
 						}
 						onLogInFunctions.makePings.stop();
@@ -250,7 +250,7 @@ var onLogInFunctions = {
 				parent.ASTGUI.dialog.waitWhile(' reloading asterisk ... ');
 				var t = ASTGUI.cliCommand('reload') ;
 				setTimeout( function(){ 
-					if( parent.sessionData.DEBUG_MODE ){
+					if( sessionData.DEBUG_MODE ){
 						alert('postmappings updated in http.conf' + '\n' + 'Click OK to reload');
 					}
 					top.window.location.reload(); 
@@ -431,11 +431,11 @@ var onLogInFunctions = {
 		}
 
 
-		//if( parent.sessionData.PLATFORM.isAA50  ){
+		//if( sessionData.PLATFORM.isAA50  ){
 			DOM_mainscreen.src = 'home.html?status=1';
 		//}
 
-		if( parent.sessionData.PLATFORM.isAA50 && sessionData.PLATFORM.AA50_SKU.contains('800') ){
+		if( sessionData.PLATFORM.isAA50 && sessionData.PLATFORM.AA50_SKU.contains('800') ){
 			// no need to parse ztscan output for s800 SKU
 		}else{
 			readcfg.ztScanConf();
@@ -712,7 +712,7 @@ var miscFunctions = {
 
 				parent.ASTGUI.dialog.waitWhile(tmp_msg) ;
 			}else{
-				if( parent.sessionData.DEBUG_MODE ){
+				if( sessionData.DEBUG_MODE ){
 					alert('CountDown complete' + '\n' + 'Click OK to reload');
 				}
 				top.window.location.reload() ;
