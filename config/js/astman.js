@@ -1073,36 +1073,6 @@ var ASTGUI = {
 		top.miscFunctions.setFeedback(fb);
 	},
 
-// 	generateGraph : function( DATA ){ // generates bar graph into table DATA.TBL for array DATA.VALS
-// 		// ASTGUI.generateGraph( {TBL: 'DIV_Graph', VALS: gr_vals, HEIGHT: 150, WIDTH: 9 });
-// 		// WIDTH is width of each cell
-// 		var TBL = DATA.TBL;
-// 		var VALS = DATA.VALS ;
-// 		var HEIGHT = Number(DATA.HEIGHT) || 100 ;
-// 		var WIDTH = DATA.WIDTH || 5 ;
-// 
-// 		var table_ofHeight = function(h, color){
-// 			h = Math.floor((HEIGHT * Number(h))/100) ;
-// 			var uh = HEIGHT - h ;
-// 			if(!color){ color = '#a8b6e5';}
-// 			return "<TABLE cellpadding=0 cellspacing=0><TR><TD bgcolor='#FFFFFF' height=" + uh + " width=" + WIDTH + "></TD></TR>"
-// 				+ "<TR><TD bgcolor='"+ color +"' height=" + h + " width=" + WIDTH + "></TD></TR></TABLE>" ;
-// 		};
-// 
-// 		if ( typeof TBL == 'string'){ TBL = _$(TBL); }
-// 		ASTGUI.domActions.clear_table(TBL);
-// 		var newRow = TBL.insertRow(-1);
-// 		VALS.each( function( this_val ){
-// 			var newcell = newRow.insertCell( newRow.cells.length );
-// 			newcell.align = 'center' ;
-// 			newcell.valign = 'bottom' ;
-// 			newcell.width = WIDTH + 'px' ;
-// 			newcell.height = HEIGHT ;
-// 			var clr = ((newRow.cells.length)%2==1) ? '#a8b6e5' : '#dce5f6' ;
-// 			newcell.innerHTML = table_ofHeight( this_val , clr );
-// 		});
-// 	},
-
 	getFieldValue : function(el){ // ASTGUI.getFieldValue(el)
 		if ( typeof el == 'string'){ el = _$(el) ; }
 		switch(el.type){
@@ -2053,127 +2023,6 @@ var ASTGUI = {
 		}
 	}, // { selectbox }
 
-// 	selectRange_populate : function(g , els){
-// 		/* 	TODO
-// 			The 'selectRange_populate function' is right now a bit heavy, ugly and relies extensively on closures.
-// 			this function should in future be replaced with a prototype based object
-// 		*/
-// 		if(typeof g == 'string'){ g = _$(g); }
-// 		g.startRange = '';
-// 		g.stopRange = '';
-// 		var range_documentCatch = function(){
-// 			try{
-// 				var children = g.childNodes;
-// 				for (var i = 0; i < children.length; i++) {
-// 					var tmp = children[i] ;
-// 					ASTGUI.events.remove( tmp , 'mousemove' , update_range ) ;
-// 				};
-// 			}catch(err){
-// 			
-// 			}finally{
-// 				ASTGUI.events.remove( document , 'mouseup' , range_documentCatch ) ;
-// 			}
-// 		};
-// 		var range_start = function(event){
-// 			g.startRange = g.stopRange = this.innerHTML;
-// 			//console.log( 'Range is : ' + g.startRange + ' to ' + g.stopRange );
-// 			if($.browser.msie){
-// 				event.returnValue = false;
-// 			} else{
-// 				event.preventDefault();
-// 			}
-// 	
-// 			var children = g.childNodes ;
-// 			for (var i = 0; i < children.length; i++) {
-// 				var tmp = children[i] ;
-// 				ASTGUI.events.add( tmp , 'mousemove' , update_range ) ;
-// 				//$(tmp).css({backgroundColor : '#FFFFFF' });
-// 				tmp.className = 'selectRange_notselected';
-// 			};
-// 			ASTGUI.events.add( document , 'mouseup' , range_documentCatch ) ;
-// 			//$(this).css({backgroundColor :'#EFEFEF' });
-// 			$(this).addClass('selectRange_selected');
-// 		};
-// 		var update_range = function(event){
-// 			if($.browser.msie){
-// 				event.returnValue = false;
-// 			} else{
-// 				event.preventDefault();
-// 			}
-// 			try{
-// 				g.stopRange = this.innerHTML;
-// 			}catch(err){
-// 				var p = ASTGUI.events.getTarget(event) ;
-// 				g.stopRange = p.innerHTML;
-// 			}
-// 			//console.log( 'Range is : ' + g.startRange + ' to ' + g.stopRange );
-// 			var x = els.indexOf(g.startRange) ;
-// 			var y = els.indexOf(g.stopRange) ; 
-// 			var start_index = Math.min(x,y);
-// 			var stop_index = Math.max(x,y);
-// 	
-// 			var children = g.childNodes;
-// 			for (var i = 0; i < children.length; i++) {
-// 				var tmp = children[i] ;
-// 				var tmp_html = tmp.innerHTML;
-// 				var tmp_index = els.indexOf(tmp_html) ;
-// 				tmp.className = ( tmp_index <= stop_index && tmp_index >= start_index ) ? 'selectRange_selected' : 'selectRange_notselected' ;
-// 				//$(tmp).css({backgroundColor : ( tmp_index <= stop_index && tmp_index >= start_index ) ? '#EFEFEF' : '#FFFFFF' });
-// 			};
-// 		};
-// 		var range_stop = function(){
-// 			//console.log( 'Range is : ' + g.startRange + ' to ' + g.stopRange );
-// 			var x = els.indexOf(g.startRange) ;
-// 			var y = els.indexOf(g.stopRange) ; 
-// 			var start_index = Math.min(x,y);
-// 			var stop_index = Math.max(x,y);
-// 			g.startRange = els[start_index];
-// 			g.stopRange = els[stop_index];
-// 	
-// 			var children = g.childNodes;
-// 			for (var i = 0; i < children.length; i++) {
-// 				var tmp = children[i] ;
-// 				var tmp_html = tmp.innerHTML;
-// 				var tmp_index = els.indexOf(tmp_html) ;
-// 				ASTGUI.events.remove( tmp , 'mousemove' , update_range ) ;
-// 				//$(tmp).css({backgroundColor : ( tmp_index <= stop_index && tmp_index >= start_index ) ? '#EFEFEF' : '#FFFFFF' });
-// 				tmp.className = ( tmp_index <= stop_index && tmp_index >= start_index ) ? 'selectRange_selected' : 'selectRange_notselected' ;
-// 			};
-// 			ASTGUI.events.remove( document , 'mouseup' , range_documentCatch ) ;
-// 		};
-// 	
-// 		els.each(function(elm){
-// 			var tmp = document.createElement('SPAN'); 
-// 			tmp.innerHTML = elm ;
-// 			tmp.className = 'selectRange_notselected';
-// 			$(tmp).mousedown( range_start );
-// 			$(tmp).mouseup( range_stop );
-// 			g.appendChild( tmp );
-// 		});
-// 	
-// 		$(g).css({cursor:'pointer'});
-// 
-// 		g.reset_range = function(){
-// 			g.startRange = g.stopRange = '';
-// 			var children = g.childNodes;
-// 			for ( var i = 0; i < children.length; i++ ) { children[i].className = 'selectRange_notselected' ; }
-// 		};
-// 
-// 		g.set_range = function(a,b){
-// 			var x = els.indexOf(a) ;
-// 			var y = els.indexOf(b) ; 
-// 			g.startRange = Math.min(x,y) ;
-// 			g.stopRange = Math.max(x,y);
-// 			var children = g.childNodes;
-// 			for ( var i = 0; i < children.length; i++ ) {
-// 				var tmp = children[i] ;
-// 				var tmp_html = tmp.innerHTML;
-// 				var tmp_index = els.indexOf(tmp_html) ;
-// 				children[i].className = ( tmp_index <= g.stopRange && tmp_index >= g.startRange ) ? 'selectRange_selected' : 'selectRange_notselected' ;
-// 			}
-// 		};
-// 	}, // End of selectRange_populate
-
 	showbg: function(t){ // show/hide a transparent bg layer - ASTGUI.showbg(true);
 		try{
 		if(t){
@@ -3107,8 +2956,6 @@ listOfActions.prototype = {
 			if ( jQuery.browser.msie ){ // If critical error in IE , reload entire GUI
 				top.window.reload();
 			}
-
-
 			return true;
 		};
 
