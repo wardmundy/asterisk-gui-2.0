@@ -78,6 +78,7 @@ var tmp_image = document.createElement('IMG');
 $(tmp_image).attr('border', '0');
 
 var managerEvents = {};
+var manager_timers = {};
 
  managerEvents.agentLogoutLink = function(agent){
 	var tmp_qlogout = document.createElement('div');
@@ -152,7 +153,10 @@ managerEvents.parseOutput = function(op){
 			}else if( op_LC.contains('event: meetmeleave') ||  op_LC.contains('event: meetmejoin') ){
 				setTimeout( update_Conferences_Table , 1000 );
 			}else if( op_LC.contains('event: link') ||  op_LC.contains('event: unlink') ){
-				update_parkedCalls_Table();
+
+				if(manager_timers.parkedCalls){ clearTimeout ( manager_timers.parkedCalls ) } ;
+				manager_timers.parkedCalls = setTimeout ( update_parkedCalls_Table , 2000 ) ;
+
 			} else if ( op_LC.contains('event: extensionstatus') ) {
 				var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1) ;
 				tmp_chunks.each(function(this_chunk){
@@ -162,7 +166,10 @@ managerEvents.parseOutput = function(op){
 						managerEvents.updateUserImage(tmp_user , new_status);
 					}
 				});
-				update_parkedCalls_Table();
+
+				if(manager_timers.parkedCalls){ clearTimeout ( manager_timers.parkedCalls ) } ;
+				manager_timers.parkedCalls = setTimeout ( update_parkedCalls_Table , 2000 ) ;
+
 			}
 		}catch(err){}
 	})();
@@ -513,13 +520,14 @@ var update_parkedCalls_Table = function(){
 			var newcell = newRow.insertCell( newRow.cells.length );
 			newcell.innerHTML =  this_chunk.CallerID + ' (' + this_chunk.Channel + ') is Parked on ' + this_chunk.Exten ; // this_chunk.Timeout
 		});
-	});
-	if( !TBL.rows.length ){ 
+
+		if( !TBL.rows.length ){
 			newRow = TBL.insertRow(-1);
 			var newcell = newRow.insertCell( newRow.cells.length );
 			newcell.align =  'center' ;
 			newcell.innerHTML =  'No Parked Calls' ;
-	}
+		}
+	});
 };
 
 var update_Conferences_Table = function(){
