@@ -151,6 +151,8 @@ managerEvents.parseOutput = function(op){
 				setTimeout( update_AgentsListing_Table , 1000 );
 			}else if( op_LC.contains('event: meetmeleave') ||  op_LC.contains('event: meetmejoin') ){
 				setTimeout( update_Conferences_Table , 1000 );
+			}else if( op_LC.contains('event: link') ||  op_LC.contains('event: unlink') ){
+				update_parkedCalls_Table();
 			} else if ( op_LC.contains('event: extensionstatus') ) {
 				var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1) ;
 				tmp_chunks.each(function(this_chunk){
@@ -160,6 +162,7 @@ managerEvents.parseOutput = function(op){
 						managerEvents.updateUserImage(tmp_user , new_status);
 					}
 				});
+				update_parkedCalls_Table();
 			}
 		}catch(err){}
 	})();
