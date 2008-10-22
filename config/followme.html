@@ -415,6 +415,7 @@ var followMe_MiscFunctions = {
 			}
 			var tmp_number = ASTGUI.getFieldValue('FMU_newNumber_External');
 		}
+		if( tmp_number.contains('-') ) tmp_number = tmp_number.withOut('-');
 		var tmp_dest = tmp_number + ',' + tmp_seconds;
 
 		if( _$('newFM_Order_radio_after').checked ){
