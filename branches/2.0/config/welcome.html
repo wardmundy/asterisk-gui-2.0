@@ -351,7 +351,7 @@ var updateListingsTable = function(){
 	(function(){ // List all meetMe Extensions
 
 		update_Conferences_Table();
-
+		update_parkedCalls_Table();
 	})();
 
 	(function(){ // List all Queue Extensions
@@ -495,6 +495,22 @@ var update_needsConfiguratin_list = function(){
 		$('#ittnc').show();
 	}
 
+};
+
+var update_parkedCalls_Table = function(){
+	var addCell = ASTGUI.domActions.tr_addCell;
+	var TBL = _$('table_ParkedCalls_list');
+	ASTGUI.domActions.removeAllChilds(TBL);
+
+	$.get( ASTGUI.paths.rawman, { action: 'ParkedCalls' }, function(op){
+		var tmp_chunks = ASTGUI.miscFunctions.getChunksFromManagerOutput(op, 1);
+		tmp_chunks.each( function( this_chunk ){
+			if( !this_chunk.hasOwnProperty('Event') || !this_chunk.hasOwnProperty('Exten') ) return ;
+			newRow = TBL.insertRow(-1);
+			var newcell = newRow.insertCell( newRow.cells.length );
+			newcell.innerHTML =  this_chunk.CallerID + ' (' + this_chunk.Channel + ') is Parked on ' + this_chunk.Exten ; // this_chunk.Timeout
+		});
+	});
 };
 
 var update_Conferences_Table = function(){
@@ -659,18 +675,22 @@ var localajaxinit = function(){
 	</div>
 
 	<div style='overflow:auto; width:95%; max-height: 500px;margin-top:10px; display:none;' id='table_Meetmes_list_container'>
-		
 		<table cellpadding=1 cellspacing=2 border=0 align=center style="border-width: 1px ; border-spacing: 2px; border-style: solid; border-color: #6b79a5; border-collapse: separate; background-color: white;">
 			<tr>
 				<td valign='top' align=center><B>Conference Rooms</B> <span class='refresh_icon' onclick="update_Conferences_Table();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span></td>
+				<td width=150></td>
+				<td valign='top' align=center><B>Parked Calls</B> <span class='refresh_icon' onclick="update_parkedCalls_Table();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span></td>
 			</tr>
 			<tr>
 				<td align=center>
 					<table id='table_Meetmes_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
 				</td>
+				<td width=150></td>
+				<td align=center>
+					<table id='table_ParkedCalls_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
+				</td>
 			</tr>
 		</table>
-		
 	</div>
 
 	<div style='width:100%; text-align:center; margin-top:15px;'>
