@@ -167,7 +167,7 @@ var localajaxinit = function (){
 	var c = config2json({filename:'http.conf', usf:1});
 	_$('tdupload').style.display = ( c.hasOwnProperty('post_mappings') && c['post_mappings'].hasOwnProperty('uploads') && c['post_mappings']['uploads'] == uImage_uploadpath) ? '' : 'none';
 
-	ASTGUI.systemCmdWithOutput( "ls /var/lib/asterisk/sounds/asteris*" , function(a){
+	ASTGUI.systemCmdWithOutput( "ls /var/lib/asterisk/sounds/a*" , function(a){
 		if( a.contains('/var/lib/asterisk/sounds/asteriskoverlay') ){
 			_$('uploadOVERLAY_iframe').src = "upload_form.html" ;
 			$("#overlayUpload_TR").show();
