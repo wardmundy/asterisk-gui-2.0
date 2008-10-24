@@ -1954,7 +1954,13 @@ var ASTGUI = {
 			// dest could be 'context|extention|priority' or 'context,etension,priority' or 'goto(context,etension,priority)' or 's,n,goto(context,etension,priority)'
 			//console.log('We are looking for "' + dest + ' " in the selectbox');
 			var args = [];
-			if ( typeof el == 'string'){ el = _$(el) ; }
+			if ( typeof el == 'string'){
+				el = _$(el) ;
+				if( !el ){
+					ASTGUI.Log.Error( 'No Element by that id ' );
+					return;
+				}
+			}
 			el.selectedIndex = -1;
 			if(!dest){return;}
 
@@ -1988,13 +1994,7 @@ var ASTGUI = {
 			var dest_args_v = 'Goto('+ args.join('|') + ')';
 			var dest_args_c = 'Goto('+ args.join(',') + ')' ;
 
-			for( var i=0; i< el.options.length ; i++ ){
-				//console.log(' **** ');
-				//console.log(' OPTION vale is *' + el.options[i].value + '*');
-				//console.log(' dest_args_c is *' + dest_args_c+ '*');
-				//console.log(' dest_args_v is *' + dest_args_v+ '*');
-				//console.log(' args_v is *' + args_v+ '*');
-				//console.log(' args_c is *' + args_c+ '*');
+			for( var i=0, j = el.options.length ; i < j ; i++ ){
 				if( (el.options[i].value == dest_args_v) || (el.options[i].value == dest_args_c) || (el.options[i].value == args_v) || (el.options[i].value == args_c )){
 					// the select box option vale could be 'goto(context,exten,priority)' or 'Hangup' or just 'context,exten,priority'
 					el.selectedIndex = i;
