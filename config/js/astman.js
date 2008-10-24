@@ -1556,6 +1556,7 @@ var ASTGUI = {
 	parseContextLine: {
 		read: function(q){ // ASTGUI.parseContextLine.read();
 			// expects q as 'blah=foo' and returns ['blah','foo']
+			if (typeof q != 'string') return [];
 			var v = q.indexOf("=");
 			if( v == -1){ return []; }
 			return  [q.substring(0,v), q.substr(v+1)];
@@ -1565,6 +1566,7 @@ var ASTGUI = {
 			// use this when you want to get the pattern from a calling rule
 			// expects q as 'exten=_X.,1,foo' or '_X.,1,foo'
 			//	and returns _X.
+			if (typeof q != 'string') return '';
 			if( !q || !q.contains(',') ) { return ''; }
 			if( q.match('exten=') ){
 				return q.split('exten=')[1].split(',')[0];
@@ -1575,6 +1577,7 @@ var ASTGUI = {
 
 		getPriority: function(q){ // ASTGUI.parseContextLine.getPriority();
 			// expects  q  as 'exten=s,2,foo' OR 's,2,foo'   and   returns 2
+			if (typeof q != 'string') return '';
 			if( q.match('exten=') ){
 				return q.split('exten=')[1].split(',')[1].trim();
 			}else{
@@ -1585,7 +1588,7 @@ var ASTGUI = {
 		getAppWithArgs: function(q){ // ASTGUI.parseContextLine.getAppWithArgs();
 			// expects  q  as 'exten=s,2,foo(ssssssss,ssdsd,assd)' OR 's,2,foo(ssssssss,ssdsd,assd)' OR even 'foo(ssssssss,ssdsd,assd)'
 			//	and   returns 'foo(ssssssss,ssdsd,assd)' ;  app with arguments(if any)
-
+			if (typeof q != 'string') return '';
 			if( !q.contains('(') ){ // if q == something like 's,n,Hangup' return 'Hangup'
 				var l = q.lastIndexOf(',');
 				return q.substring(l+1);
@@ -1605,6 +1608,7 @@ var ASTGUI = {
 		getApp: function(q){ // ASTGUI.parseContextLine.getApp();
 			// expects  q  as 'exten=s,2,foo(ssssssss,ssdsd,assd)' OR 's,2,foo(ssssssss,ssdsd,assd)'   
 			//	and   returns 'foo' ;// appname -- without arguments
+			if (typeof q != 'string') return '';
 			var y = ASTGUI.parseContextLine.getAppWithArgs(q);
 			return ( y.contains('(') ) ? y.split('(')[0].trim() : y.trim() ;
 		},
@@ -1613,7 +1617,7 @@ var ASTGUI = {
 			// expects  q  as 'exten=s,2,foo(ssssssss,ssdsd,assd)' OR 's,2,foo(ssssssss,ssdsd,assd)' OR 's,2,foo(ssssssss|ssdsd|assd)'
 			// OR 's,1,Answer' OR 's,n,Hangup'
 			// and   returns [ssssssss,ssdsd,assd] or [] // arguments as an array 
-
+			if (typeof q != 'string') return [];
 			q = q.trim();
 			if ( !q.endsWith(')') || !q.contains('(') ){
 				ASTGUI.Log.Error( "ASTGUI.parseContextLine.getArgs() - No Argument found for \"" + q + "\" " );
@@ -1626,6 +1630,7 @@ var ASTGUI = {
 		},
 
 		getArgsArrayFromArgsString: function(x){ // expects x as 'context,exten,pri' or 'context|exten|pri'
+			if (typeof x != 'string') return [];
 			if(x.contains('|') ){
 				return x.split('|');
 			}
@@ -1637,6 +1642,7 @@ var ASTGUI = {
 
 		getArgsArrayFrom_AppWithArgs_String: function(x){ // expects x as 'goto(context,exten,pri)' or 'goto(context|exten|pri)'
 			// usage : ASTGUI.parseContextLine.getArgsArrayFrom_AppWithArgs_String(x)
+			if (typeof x != 'string') return [];
 			if( !x.contains('(') ) {
 				return this.getArgsArrayFromArgsString(y);
 			}
@@ -1647,6 +1653,7 @@ var ASTGUI = {
 
 		toKnownContext: function(args){  // usage ASTGUI.parseContextLine.toKnownContext(y)
 			// converts args to a readable format - ex: default|6000|1 to 'user 6000'
+			try{
 			if(typeof args == 'string'){
 				args = this.getArgsArrayFromArgsString(args);
 			}
@@ -1686,6 +1693,10 @@ var ASTGUI = {
 				return 'Goto VoiceMail Group -- ' + (( t[args[1]] && t[args[1]]['label']) || args[1] ) ;
 			}
 			return 'Goto ' + args.join() ;
+			}catch(err){
+				ASTGUI.Log.Error(err.description);
+				return 'Goto ' + args.join() ;
+			}
 		},
 
 		showAs : function(q){ // ASTGUI.parseContextLine.showAs(line)
@@ -1693,7 +1704,10 @@ var ASTGUI = {
 			// or 'extensions,priority,Hangup'
 			// returns - "User extension" or 'VoiceMenu extension' or 'Hangup' or 'Busy' or some string - depends on q.
 			// use this when you want to represent the action to the user
-
+			if (typeof q != 'string') {
+				ASTGUI.Log.Error('ASTGUI.parseContextLine.showAs: expecting q as string');
+				return '??';
+			}
 			var app = ASTGUI.parseContextLine.getApp(q) ;
 			var args = ASTGUI.parseContextLine.getArgs(q) ;
 			var q_LC = q.toLowerCase();
@@ -1802,6 +1816,10 @@ var ASTGUI = {
 
 		parseTrunkDialArgument: function(y){ // usage ASTGUI.parseContextLine.parseTrunkDialArgument(y)
 			// expects y as  '${trunk_1}/XXX${EXTEN:X}' OR SIP/user/XXX${EXTEN:X}
+			if (typeof y != 'string') {
+				ASTGUI.Log.Error('ASTGUI.parseContextLine.parseTrunkDialArgument: expecting y as string');
+				return null;
+			}
 			var WhatToDial = '';
 			if (!y) {
 				return null;
@@ -1857,6 +1875,10 @@ var ASTGUI = {
 						stripdigits_secondTrunk : 2
 					}
 			*/
+			if (typeof str != 'string') {
+				ASTGUI.Log.Error('ASTGUI.parseContextLine.obCallingRule: expecting str as string');
+				return null;
+			}
 
 			var cr = { };
 			cr.actualString = str ;
@@ -1887,6 +1909,7 @@ var ASTGUI = {
 	},
 
 	resetTheseFields : function( flds ){ // ASTGUI.resetTheseFields(arr) , flds = [ el1, el2 , el_3 ] ; - sets each element to blank value
+		if( typeof flds == 'string' ){ flds = [flds]; }
 		if(!ASTGUI.isArray(flds)){ return; }
 		var reset_el = function(el){
 			var tmp_dfalt = $(el).attr('dfalt');
