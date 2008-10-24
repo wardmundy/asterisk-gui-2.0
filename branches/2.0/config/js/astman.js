@@ -440,11 +440,20 @@ var ASTGUI = {
 	},
 
 	cliCommand : function(cmd) { // ASTGUI.cliCommand(cmd);
+		if( typeof cmd != 'string' ) {
+			ASTGUI.Log.Warn( 'cliCommand: Expecting cmd as String' );
+			return '';
+		}
 		ASTGUI.Log.Debug("Executing manager command : '" + cmd + "'");
 		return makeSyncRequest ( { action :'command', command: cmd } );
 	},
 
 	getUser_DeviceStatus : function( usr ){ // ASTGUI.getUser_DeviceStatus(usr) 
+		if( typeof usr == 'number' ) usr = String(usr);
+		if( typeof usr != 'string' ){
+			ASTGUI.Log.Warn( 'getUser_DeviceStatus: Expecting usr as String' );
+			return 'U';
+		}
 		var t = makeSyncRequest({ action :'ExtensionState', Exten: usr }) ;
 		if( t.contains('Status: 0') ) return 'F' ; // No Device is Busy/InUse
 		if( t.contains('Status: 1') ) return 'B' ; // 1 or more devices InUse
@@ -474,9 +483,14 @@ var ASTGUI = {
 	},
 
 	mailboxCount : function(mbox){ // ASTGUI.mailboxCount(mox) ; --> returns the number of New/Old Messages in mbox's mailbox
+		var tr = { count_new:0 , count_old : 0 };
+		if( typeof mbox == 'number' ) mbox = String(mbox);
+		if( typeof mbox != 'string' ){
+			ASTGUI.Log.Warn( 'mailboxCount: Expecting mbox as String' );
+			return tr;
+		}
 		if(!mbox.contains('@')){ mbox = mbox + '@default' ; }
 		var t = makeSyncRequest ( { action :'MailboxCount', Mailbox: mbox } );
-		var tr = { count_new:0 , count_old : 0 };
 		try{
 			var lines = t.split('\n');
 			lines.each(function( this_line){
@@ -618,7 +632,7 @@ var ASTGUI = {
 						y.blur();
 					}
 				}catch(err){
-
+					ASTGUI.Log.Error(err.description);
 				}
 			};
 			setTimeout( sf, 150 );
@@ -785,6 +799,7 @@ var ASTGUI = {
 
 	domActions: {
 		alignBbelowA: function(a,b, offsetLeft, offsetTop ){
+			try{
 			if ( typeof a == 'string'){ a = _$(a) ; }
 			if ( typeof b == 'string'){ b = _$(a) ; }
 			b.style.position = 'absolute';
@@ -799,6 +814,9 @@ var ASTGUI = {
 			}
 			b.style.left = tmp_left + ( offsetLeft || 0 );
 			b.style.top = tmp_top + (offsetTop || 1);
+			}catch(err){
+				ASTGUI.Log.Error(err.description);
+			}
 		},
 
 		alignBontopofA: function(a,b){ // ASTGUI.domActions.alignBontopofA();
@@ -808,7 +826,7 @@ var ASTGUI = {
 				ASTGUI.domActions.alignBbelowA(a,b);
 				b.style.top = b.style.top - a.offsetHeight ;
 			}catch(err){
-
+				ASTGUI.Log.Error(err.description);
 			}
 		},
 
@@ -922,6 +940,7 @@ var ASTGUI = {
 		},
 
 		tr_addCell: function(tr, nc){ // usage :: ASTGUI.domActions.tr_addCell( el, { html:'newCell Text' , align:'center', width:'20px' }  )
+			try{
 			var ih = nc.html; delete nc.html;
 			var newcell = tr.insertCell( tr.cells.length );
 			if( nc.id ){ newcell.id = nc.id ; delete nc.id; }
@@ -940,7 +959,9 @@ var ASTGUI = {
 					}
 				}
 			}
-
+			}catch(err){
+				ASTGUI.Log.Error(err.description);
+			}
 		},
 
 		unCheckAll: function(x){ // uncheck all checkboxes of class x
@@ -953,6 +974,7 @@ var ASTGUI = {
 		populateCheckBoxes: function( div, values, ofclass, withBR){ // ASTGUI.domActions.populateCheckBoxes(div, values, ofclass);
 			// represent 'array values' OR 'Object values' as a list of checkboxes of class 'ofclass' as childnodes of element 'div'
 			// Ex: values = { '1':'One', '1':'Two' } or values = [1,2]
+			try{
 			var c = {};
 			if(ASTGUI.isArray(values)){
 				values.each( function(tv){ c[tv] = tv; } );
@@ -979,6 +1001,9 @@ var ASTGUI = {
 					nbr.appendChild(lbl) ;
 					div.appendChild( nbr ) ;
 				}
+			}
+			}catch(err){
+				ASTGUI.Log.Error(err.description);
 			}
 		},
 
@@ -1122,6 +1147,7 @@ var ASTGUI = {
 		*/
 		// trunkname == trunkname as trunk_x 
 		//var ttype = parent.astgui_managetrunks.misc.getTrunkType(trunkname) ;
+		try{
 		var this_IP = '';
 		if(!ttype || ( ttype != 'sip' && ttype != 'iax' && ttype != 'providers' ) ){ return '--'; }
 		if( ttype == 'providers' ){
@@ -1188,6 +1214,9 @@ var ASTGUI = {
 			}
 		}
 		return '<font color=red>Unregistered</font>';
+		}catch(err){
+			ASTGUI.Log.Error(err.description);
+		}
 	},
 
 	parseGETparam : function(url_string, getparam ){ // ASTGUI.parseGETparam( url , 'EXTENSION_EDIT');
@@ -1227,6 +1256,7 @@ var ASTGUI = {
 	},
 
 	listSystemFiles : function( dir , cb ){
+		try{
 		this.systemCmd( this.scripts.ListFiles + ' ' +  dir , function(){
 			var op = ASTGUI.loadHTML( ASTGUI.paths.output_SysInfo );
 			var tmp_files = op.split('\n');
@@ -1239,10 +1269,15 @@ var ASTGUI = {
 			}
 			cb(files);
 		});
+		}catch(err){
+			ASTGUI.Log.Error(err.description);
+			cb([]);
+		}
 	},
 
 	miscFunctions: {
 		getChunksFromManagerOutput : function( op , usf){ // ASTGUI.miscFunctions.getChunksFromManagerOutput( output_str ) ;
+			try{
 			var tr_Array = [];
 			var tmp_chunk = (usf) ? {} : [] ;
 			var count = 0;
@@ -1271,6 +1306,10 @@ var ASTGUI = {
 			}
 
 			return tr_Array ;
+			}catch(err){
+				ASTGUI.Log.Error(err.description);
+				return [] ;
+			}
 		},
 
 
@@ -1293,6 +1332,7 @@ var ASTGUI = {
 		},
 			
 		moveUpDown_In_context: function(context, line , updown , cbf ){ 	// ASTGUI.miscFunctions.moveUpDown_In_context( ct , line , bool , cbf ) // bool = 0 for Down , 1 for Up 
+			try{
 			updown = Number(updown);
 			var t = context2json({ filename:'extensions.conf' , context : context , usf: 0 });
 	
@@ -1322,9 +1362,13 @@ var ASTGUI = {
 					cbf(t);
 				});
 			}});
+			}catch(err){
+				ASTGUI.Log.Error(err.description);
+			}
 		},
 
 		empty_context: function( ct ){ // ASTGUI.miscFunctions.empty_context({ filename:'somefile.conf', context : 'context_x', cb : fn })
+			try{
 			if( parent.sessionData.PLATFORM.isAST_1_6 ){
 				var u = new listOfSynActions(ct.filename);
 				u.new_action('emptycat', ct.context , '', '' ) ;
@@ -1341,10 +1385,14 @@ var ASTGUI = {
 				});
 				x.callActions(ct.cb);
 			}
+			}catch(err){
+				ASTGUI.Log.Error(err.description);
+			}
 		},
 
 		delete_LinesLike: function( ct ){
 			// ASTGUI.miscFunctions.delete_LinesLike({ context_name : 'voicemailgroups' , beginsWithArr: ['exten=6050,'] , filename: 'extensions.conf', hasThisString:'somestring', cb:function(){} });
+			try{
 			var sel_cxt = context2json({ filename: ct.filename, context : ct.context_name , usf:0 });
 			if ( typeof ct.beginsWithArr == 'string' ){
 				ct.beginsWithArr = [ct.beginsWithArr];
@@ -1373,10 +1421,15 @@ var ASTGUI = {
 			});
 
 			x.callActions(ct.cb);
+			}catch(err){
+				ASTGUI.Log.Error(err.description);
+				ct.cb();
+			}
 		},
 
 		chanStringToArray: function(chs){ // ASTGUI.miscFunctions.chanStringToArray();
 			// expects chs as '5' or '5-8' or '5,6,7,8' and returns [5] or [5,6,7,8]
+			try{
 			if ( !chs ) return [];
 			if ( typeof chs != 'string') chs = String(chs) ;
 			chs = chs.trim();
@@ -1399,6 +1452,10 @@ var ASTGUI = {
 			}
 
 			return [chs];
+			}catch(err){
+				ASTGUI.Log.Warn( err.description );
+				return [chs];
+			}
 		},
 
 		alertIfRangeisNotdefined: function(a , b, for_what){ // ASTGUI.miscFunctions.alertIfRangeisNotdefined();
