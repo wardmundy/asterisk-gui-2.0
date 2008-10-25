@@ -1192,7 +1192,9 @@ var ASTGUI = {
 		//var uname_lc = uname.toLowerCase();
 		// TODO: come up with a better alternative than this
 		// cli output of 'sip show registry' shows only a part of long usernames
-		var uname_lc = uname.toLowerCase().substr(0,12);
+		// We should use action: status like we do for active channel monitoring.
+		
+		var uname_lc = uname.toLowerCase().substr(0,10);
 
 		for(var i = 0; i < lines.length; i++) {
 			var line = lines[i].trim().toLowerCase();
