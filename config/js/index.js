@@ -822,11 +822,19 @@ var miscFunctions = {
 				f.optionValue = (fortbr)? rg + '|s|1' : 'Goto('+ rg +'|s|1)';
 				tmp.push(f);
 			});
+		var y = astgui_managePageGroups.getPGsList();
+			y.each(function(pge){
+				var f = new destination;
+				f.optionText = 'Page Group -- ' + pge ;
+				f.optionValue = 'Goto('+ ASTGUI.contexts.PageGroups +'|'+ pge +'|1)';
+				tmp.push(f);
+			});
+
 		var y = sessionData.pbxinfo.vmgroups.getOwnProperties();
 			y.each(function( this_vmg_exten ){
 				var f = new destination;
 				f.optionText = 'VoiceMail Group -- ' + (sessionData.pbxinfo.vmgroups[this_vmg_exten].getProperty('label') || this_vmg_exten ) ;
-				f.optionValue = (fortbr) ? ASTGUI.contexts.VoiceMailGroups +'|' + this_vmg_exten + '|1' : 'Goto('+ ASTGUI.contexts.VoiceMailGroups +'|' + this_vmg_exten + '|1)'; ;
+				f.optionValue = (fortbr) ? ASTGUI.contexts.VoiceMailGroups +'|' + this_vmg_exten + '|1' : 'Goto('+ ASTGUI.contexts.VoiceMailGroups +'|' + this_vmg_exten + '|1)' ;
 				tmp.push(f);
 			});
 
@@ -877,7 +885,7 @@ var miscFunctions = {
 					tmp.push( tmp_thisRg.extension );
 				}
 			} );
-
+		tmp = tmp.concat( astgui_managePageGroups.getPGsList() );
 		var tmp_LE = ASTGUI.cloneObject(sessionData.pbxinfo['localextensions']);
 		if( tmp_LE.getProperty('defaultDirectory') ){
 			tmp.push( tmp_LE.getProperty('defaultDirectory') );

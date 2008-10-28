@@ -29,7 +29,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		// check whether the config files are in proper format and have every thing needed for the gui to function properly
 				var check_For_Contexts = {
 					general : { static : 'yes', writeprotect : 'no', clearglobalvars : 'yes' },
-					globals : { FEATURES : '' , DIALOPTIONS : '' , RINGTIME: '20', FOLLOWMEOPTIONS : '' },
+					globals : { FEATURES : '' , DIALOPTIONS : '' , RINGTIME: '20', FOLLOWMEOPTIONS : '', PAGING_HEADER : 'Intercom', PAGING_TIMEOUT : '60' },
 					'default' : {},
 					'macro-stdexten' : [
 						'exten=s,1,Set(__DYNAMIC_FEATURES=${FEATURES})',
@@ -53,6 +53,12 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 						'exten=s-BUSY,2,Goto(default,s,1)',
 						'exten=_s-.,1,Goto(s-NOANSWER,1)',
 						'exten=a,1,VoicemailMain(${ARG1})'
+					],
+					'macro-pagingintercom' : [
+						'exten=s,1,SIPAddHeader(Alert-Info: ${PAGING_HEADER})',
+						'exten=s,2,Set(TIMEOUT(absolute)=${PAGING_TIMEOUT})',
+						'exten=s,3,Page(Local/${ARG1}|${ARG2})',
+						'exten=s,4,Hangup'
 					]
 				};
 		
@@ -62,6 +68,8 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				check_For_Contexts[ASTGUI.contexts.VoiceMenuExtensions] = {} ;
 				check_For_Contexts[ASTGUI.contexts.VoiceMailGroups] = {} ;
 				check_For_Contexts[ASTGUI.contexts.Directory] = {} ;
+				check_For_Contexts[ASTGUI.contexts.PageAnExtension] = {} ;
+				check_For_Contexts[ASTGUI.contexts.PageGroups] = {} ;
 				check_For_Contexts[ASTGUI.contexts.guitools] = [
 					'exten=executecommand,1,System(${command})',
 					'exten=executecommand,n,Hangup()',
@@ -246,6 +254,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		sessionData.pbxinfo['GLOBALS'] = new ASTGUI.customObject; // store extensions.conf --> [globals]
 		sessionData.pbxinfo['ringgroups'] = new ASTGUI.customObject;
 		sessionData.pbxinfo['timebasedRules'] = new ASTGUI.customObject;
+		sessionData.pbxinfo['pagegroups'] = [];
 
 		for(var d in c){ if(c.hasOwnProperty(d)) {
 			// note: remember c[d] is an Array and is not an Object (we used usf:0)
@@ -264,6 +273,9 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			}
 			if ( d == ASTGUI.contexts.VoiceMailGroups ){
 				astgui_manageVMgroups.parseContext(c[d]);
+			}
+			if ( d == ASTGUI.contexts.PageGroups ){
+				sessionData.pbxinfo['pagegroups'] = c[d] ;
 			}
 			if( d == 'globals' ){ // look for outboundcid of all users and globaloutboungcid
 				astgui_parseGlobalContext( c[d] );
@@ -1709,6 +1721,33 @@ astgui_manageRingGroups = {
 	}
 };
 
+astgui_managePageGroups = {
+	getPGsList : function(){ // astgui_managePageGroups.getPGsList();
+ 		var tmp_pgContext = sessionData.pbxinfo['pagegroups'] ;
+		var tmp_pgExtens = [];
+		tmp_pgContext.each(function(this_line){
+			var t = ASTGUI.parseContextLine.getExten(this_line);
+			if(t){ tmp_pgExtens.push(t); }
+		});
+		return tmp_pgExtens;
+	},
+	updatePGsCache : function(cbf){
+		setTimeout(function(){
+			sessionData.pbxinfo['pagegroups'] = context2json({filename:'extensions.conf', context: ASTGUI.contexts.PageGroups , usf:0});
+			cbf();
+		}, 1000);
+	},
+	addPageGroup : function(new_pg_line, cb){ // astgui_managePageGroups.addPageGroup( new_pg_line, cbf );
+		var x = new listOfSynActions('extensions.conf');
+		x.new_action('append', ASTGUI.contexts.PageGroups , 'exten', new_pg_line);
+		x.callActions();
+		this.updatePGsCache(cb);
+	},
+	deletePageGroup : function( pgexten , cb ){ // astgui_managePageGroups.deletePageGroup( pgexten, cbf );
+		var AF = this.updatePGsCache ;
+		ASTGUI.miscFunctions.delete_LinesLike({ context_name : ASTGUI.contexts.PageGroups , beginsWithArr: [ 'exten=' + pgexten + ',' ] , filename: 'extensions.conf', hasThisString:'Macro(', cb:function(){AF(cb);}});
+	}
+};
 
 astgui_manageVMgroups = {
 	/*

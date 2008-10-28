@@ -332,6 +332,8 @@ var ASTGUI = {
 		TrunkDefaultSuffix : '_default', // ASTGUI.contexts.TrunkDefaultSuffix - to create 'DID_trunk_default' that will be included in [DID_trunk]
 		RingGroupPrefix: 'ringroups-custom-', // ASTGUI.contexts.RingGroupPrefix 
 		RingGroupExtensions: 'ringgroups', // ASTGUI.contexts.RingGroupExtensions
+		PageAnExtension :'page_an_extension', // ASTGUI.contexts.PageAnExtension
+		PageGroups : 'pagegroups', // ASTGUI.contexts.PageGroups
 		TimeBasedRulePrefix: 'timebasedrule-custom-', // ASTGUI.contexts.TimeBasedRulePrefix 
 		TimeIntervalPrefix: 'timeinterval_', // ASTGUI.contexts.TimeIntervalPrefix
 		VoiceMenuPrefix: 'voicemenu-custom-', // ASTGUI.contexts.VoiceMenuPrefix
