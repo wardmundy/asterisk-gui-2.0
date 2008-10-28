@@ -266,7 +266,7 @@ var edit_pageGroup_form = function(d){
 	$(DOM_pagegroup_editdiv).showWithBg();
 };
 
-/*
+
 var update_PageGroupsTable = function(){
 	var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
 	(function(){ // add first row
@@ -276,66 +276,46 @@ var update_PageGroupsTable = function(){
 		addCell( newRow , { html: 'Extension' });
 		addCell( newRow , { html: 'Type' });
 		addCell( newRow , { html:'Members'});
-
 		addCell( newRow , { html:''} );
 	})();
 
-	var c = parent.sessionData.pbxinfo.ringgroups ;
-	for(var d in c){if(c.hasOwnProperty(d)){
+	var c = parent.sessionData.pbxinfo['pagegroups'] ;
+	c.each( function( line ){
+		var this_exten = ASTGUI.parseContextLine.getExten(line);
+		var tmp_args = ASTGUI.parseContextLine.getArgs( line );
+		var tmp_members = tmp_args[1].split('&').join(', ');
+
+
 		var newRow = DOM_table_pageGroups_list.insertRow(-1);
 		var rn = DOM_table_pageGroups_list.rows.length;
 		newRow.className = ((rn)%2==1)?'odd':'even';
-		addCell( newRow , { html: '' } );
-		addCell( newRow , { html: c[d]['extension'] } );
-		addCell( newRow , { html: c[d]['NAME'] } );
-		
-		var TMP_MEMBERS = [];
-		var CDM = ASTGUI.cloneObject(c[d]['members']);
-		CDM.each(function(device){
-			var tmp_ext = device.afterChar('/');
-			var tmp_techn = device.beforeChar('/');
 
-			if( tmp_techn.toLowerCase() == 'zap' ){
-				var this_analogStation_user = '';
-				for( var q in parent.sessionData.pbxinfo.users ){ if( parent.sessionData.pbxinfo.users.hasOwnProperty(q) ){
-					if( parent.sessionData.pbxinfo.users[q].getProperty('zapchan') == tmp_ext ){
-						this_analogStation_user = q + '(AnalogPort ' + tmp_ext + ') ' + parent.sessionData.pbxinfo.users[q].getProperty('fullname') ;
-						TMP_MEMBERS.push( this_analogStation_user );
-						break;
-					}
-				}}
-				if(! this_analogStation_user ){
-					TMP_MEMBERS.push( 'AnalogPort ' + tmp_ext + ' ?' );
-				}
-			}else{
-				var tmp_name = (parent.sessionData.pbxinfo.users[tmp_ext] && parent.sessionData.pbxinfo.users[tmp_ext].fullname)  || '?';
-				TMP_MEMBERS.push( tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name );
-			}
-
-
-		});
-		
-		addCell( newRow , { html: TMP_MEMBERS.join(', ') } );
-		var tmp = "<span class='guiButton' onclick=\"edit_pageGroup_form('" + d +"')\">Edit</span>" +
-				"<span class='guiButtonDelete' onclick=\"delete_pageGroup_confirm('" + d +"')\">Delete</span>" ;
+		addCell( newRow , { html:'' } );
+		addCell( newRow , { html: this_exten });
+		addCell( newRow , { html: tmp_args[2].contains('d') ? 'Intercom' : 'Pager' });
+		addCell( newRow , { html: tmp_members });
+		var tmp = "<span class='guiButton' onclick=\"edit_pageGroup_form('" + this_exten +"')\">Edit</span>" +
+				"<span class='guiButtonDelete' onclick=\"delete_pageGroup_confirm('" + this_exten +"')\">Delete</span>" ;
 		addCell( newRow , { html: tmp } );
-	}}
+	});
+
 	if(DOM_table_pageGroups_list.rows.length == 1){
 		ASTGUI.domActions.clear_table(DOM_table_pageGroups_list);
 		var newRow = DOM_table_pageGroups_list.insertRow(-1);
 		newRow.className = 'even';
-		addCell( newRow , { html:'No RingGroups defined !!'} );
+		addCell( newRow , { html:'No Page/Intercom Extensions defined !!'} );
 		return ;
 	}
 };
 
 
 var localajaxinit = function(){
-	top.document.title = 'Manage RingGroups' ;
+	top.document.title = 'Paging & Intercom' ;
 	if( !ASTGUI.miscFunctions.alertIfRangeisNotdefined('rge_start','rge_end', 'RingGroups') ){
 		$('.top_buttons').hide();
 		return;
 	}
+
 	loadDOMelements();
 	
 	(function (){
@@ -422,10 +402,10 @@ var localajaxinit = function(){
 
 	})();
 
-	update_RingGroupsTable();
+	update_PageGroupsTable();
 
 };
-*/
+
 
 </script>
 <body bgcolor="EFEFEF">
