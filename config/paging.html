@@ -131,13 +131,12 @@ var save_pageGroup = function(){
 	parent.astgui_managePageGroups.addPageGroup( tmp_new_line, later );
 };
 
-/*
-var resetFields = function(){
 
+var resetFields = function(){
 	if(isNewPgGrp){
-		_$('rgedit_form_caption').innerHTML = 'New RingGroup';
-		DOM_text_rgname.value = '';
-		//DOM_select_strategy.selectedIndex = -1 ;
+		_$('pagegroup_editdiv_title').innerHTML = 'New Page/Intercom Group';
+
+		ASTGUI.resetTheseFields([ DOM_text_pageGroup_Exten , DOM_select_pageGroup_Type , DOM_chk_pageGroup_beep ]);
 		ASTGUI.selectbox.clear( DOM_select_ringthesechannels );
 		ASTGUI.selectbox.clear( DOM_select_fromlistofchannels );
 		listOfDialDevices.each(function(device){ 
@@ -165,33 +164,42 @@ var resetFields = function(){
 				ASTGUI.selectbox.append( DOM_select_fromlistofchannels, tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name , device);
 			}
 		});
-		DOM_text_rgExten.value = '' ;
-
-		ASTGUI.selectbox.populateArray( DOM_rg_fb_select ,  parent.miscFunctions.getAllDestinations() );
-		ASTGUI.resetTheseFields([ DOM_rg_fb_select , DOM_select_strategy , DOM_text_ringTime ]);
 
 		(function(){
 			var tmp_aliasextens = [];
 			var rgs_list = parent.sessionData.pbxinfo.ringgroups.getOwnProperties();
 			rgs_list.each( function(rg){
 				var c = parent.sessionData.pbxinfo['ringgroups'][rg];
-				if ( c['extension'] ){
+				if( c['extension'] ){
 					tmp_aliasextens.push( c['extension'] );
 				}
 			});
-			DOM_text_rgExten.value  = tmp_aliasextens.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('rge_start') );
+			tmp_aliasextens = tmp_aliasextens.concat( astgui_managePageGroups.getPGsList() );
+			DOM_text_pageGroup_Exten.value  = tmp_aliasextens.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('rge_start') );
 		})();
 
 		return ;
 	}
 
-	var c = parent.sessionData.pbxinfo['ringgroups'][PgGrp_EDITING];
-	DOM_text_rgname.value = c.NAME ;
-	_$('rgedit_form_caption').innerHTML = 'Edit RingGroup - ' + c.NAME ;
-	ASTGUI.selectbox.selectOption( DOM_select_strategy  , c['strategy'] );
+	var c = parent.sessionData.pbxinfo['pagegroups'] ;
+	_$('pagegroup_editdiv_title').innerHTML = 'Edit Page/Intercom Group - ' + PgGrp_EDITING ;
+
+	var line = '';
+	try{
+		line = c[  c.indexOfLike('exten='+PgGrp_EDITING+',1,Macro(pagingintercom')  ] ;
+	}catch(err){}
+
+	if(!line) return;
+	var tmp_args = ASTGUI.parseContextLine.getArgs( line );
+	var tmp_members = tmp_args[1].split('&');
+
+	ASTGUI.updateFieldToValue( DOM_text_pageGroup_Exten, PgGrp_EDITING );
+	ASTGUI.updateFieldToValue( DOM_select_pageGroup_Type, tmp_args[2].contains('d') ? '2way' : '1way' );
+	DOM_chk_pageGroup_beep.checked = !tmp_args[2].contains('q');
+
 	ASTGUI.selectbox.clear( DOM_select_ringthesechannels );
-	var mbrs = ASTGUI.cloneObject(c['members']);
-	mbrs.each(function(device){ 
+	var mbrs = ASTGUI.cloneObject(tmp_members) ; 
+	mbrs.each(function(device){
 		var tmp_ext = device.afterChar('/');
 		var tmp_techn = device.beforeChar('/');
 
@@ -230,53 +238,45 @@ var resetFields = function(){
 			ASTGUI.selectbox.append( DOM_select_fromlistofchannels, tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name , device);
 		}
 	}});
-	DOM_text_rgExten.value = (c['extension'])?c['extension']:'' ;
-	DOM_text_ringTime.value = (c['ringtime'])?c['ringtime']:'' ;
-	// select value from select box DOM_rg_fb_select
-	var destinations = parent.miscFunctions.getAllDestinations() ;
+};
 
-	var destinations_WithOut_ThisRingGroup = [];
-	destinations.each( function( this_object ){
-		if( this_object.optionValue != 'Goto('+ PgGrp_EDITING +'|s|1)' && this_object.optionValue != 'Goto('+ PgGrp_EDITING +',s,1)' ){
-			destinations_WithOut_ThisRingGroup.push( this_object );
-		}
+
+var delete_pageGroup_confirm = function(d){
+	if (!confirm('Delete Page/Intercom Group ?')) { return; }
+	parent.astgui_managePageGroups.deletePageGroup(d, function(){
+		ASTGUI.feedback({ msg:'Page/Intercom Group deleted', showfor:2 });
+		window.location.reload();
 	});
-	ASTGUI.selectbox.populateArray( DOM_rg_fb_select , destinations_WithOut_ThisRingGroup );
-	ASTGUI.selectbox.selectDestinationOption( DOM_rg_fb_select ,  ( c['fallback'] ) ? c['fallback'] : '' );
 };
 
-var delete_rg_confirm = function(d){
-	if (!confirm('Delete RingGroup ?')) { return; }
-	parent.astgui_manageRingGroups.deleteRg(d) ;
-	ASTGUI.feedback( { msg:'Ring Group deleted', showfor:2 });
-	window.location.reload();
-};
-
-var show_NewRingGroup_form = function(){
+var show_NewPageGroup_form = function(){
 	PgGrp_EDITING = '';
 	isNewPgGrp = true;
 	resetFields();
-	ASTGUI.feedback( { msg: 'Create New RingGroup !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' } );
+	ASTGUI.feedback({ msg: 'Create New Page/Intercom Extension !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' });
 	$(DOM_pagegroup_editdiv).showWithBg();
 };
 
-var edit_rg_form = function(d){
+
+var edit_pageGroup_form = function(d){
 	PgGrp_EDITING = d;
 	isNewPgGrp = false;
 	resetFields();
-	ASTGUI.feedback( { msg: 'Edit RingGroup !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' } );
+	ASTGUI.feedback( { msg: 'Edit Page/Intercom Extension !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' } );
 	$(DOM_pagegroup_editdiv).showWithBg();
 };
 
-var update_RingGroupsTable = function(){
+/*
+var update_PageGroupsTable = function(){
 	var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
 	(function(){ // add first row
 		var newRow = DOM_table_pageGroups_list.insertRow(-1);
 		newRow.className = "frow";
 		addCell( newRow , { html:'', width:'10px'} );
-		addCell( newRow , { html: 'Extension' } );
-		addCell( newRow , { html:'Ring Group'} );
-		addCell( newRow , { html:'Members'} );
+		addCell( newRow , { html: 'Extension' });
+		addCell( newRow , { html: 'Type' });
+		addCell( newRow , { html:'Members'});
+
 		addCell( newRow , { html:''} );
 	})();
 
@@ -316,8 +316,8 @@ var update_RingGroupsTable = function(){
 		});
 		
 		addCell( newRow , { html: TMP_MEMBERS.join(', ') } );
-		var tmp = "<span class='guiButton' onclick=\"edit_rg_form('" + d +"')\">Edit</span>" + 
-				"<span class='guiButtonDelete' onclick=\"delete_rg_confirm('" + d +"')\">Delete</span>" ;
+		var tmp = "<span class='guiButton' onclick=\"edit_pageGroup_form('" + d +"')\">Edit</span>" +
+				"<span class='guiButtonDelete' onclick=\"delete_pageGroup_confirm('" + d +"')\">Delete</span>" ;
 		addCell( newRow , { html: tmp } );
 	}}
 	if(DOM_table_pageGroups_list.rows.length == 1){
@@ -426,6 +426,7 @@ var localajaxinit = function(){
 
 };
 */
+
 </script>
 <body bgcolor="EFEFEF">
 <div class="iframeTitleBar"> 
@@ -436,7 +437,7 @@ var localajaxinit = function(){
 <div class='lite_Heading'> Page/Intercom Groups </div>
 
 <div class='top_buttons'  style='margin-top: -22px;'>
-	<span id='new' class='guiButtonNew' onclick='show_NewRingGroup_form();'>New Page/Intercom Group </span>
+	<span id='new' class='guiButtonNew' onclick='show_NewPageGroup_form();'>New Page/Intercom Group </span>
 </div>
 
 <table id='table_pageGroups_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
