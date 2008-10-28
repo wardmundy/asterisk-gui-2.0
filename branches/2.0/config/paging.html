@@ -292,7 +292,7 @@ var update_PageGroupsTable = function(){
 
 		addCell( newRow , { html:'' } );
 		addCell( newRow , { html: this_exten });
-		addCell( newRow , { html: tmp_args[2].contains('d') ? 'Intercom' : 'Pager' });
+		addCell( newRow , { html: tmp_args[2].contains('d') ? '2-Way Intercom' : '1-Way Paging' });
 		addCell( newRow , { html: tmp_members });
 		var tmp = "<span class='guiButton' onclick=\"edit_pageGroup_form('" + this_exten +"')\">Edit</span>" +
 				"<span class='guiButtonDelete' onclick=\"delete_pageGroup_confirm('" + this_exten +"')\">Delete</span>" ;
