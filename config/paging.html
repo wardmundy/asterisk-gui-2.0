@@ -123,14 +123,14 @@ var save_pageGroup = function(){
 			parent.ASTGUI.dialog.hide();
 			window.location.reload();
 		};
-	
-		parent.ASTGUI.dialog.waitWhile(' Saving... ');
 		parent.astgui_managePageGroups.addPageGroup( tmp_new_line, later );
 	};
 
 	if( !isNewPgGrp ){ // if editing existing ring group
+		parent.ASTGUI.dialog.waitWhile(' Saving... ');
 		parent.astgui_managePageGroups.deletePageGroup( PgGrp_EDITING, tmp_after );
 	}else{
+		parent.ASTGUI.dialog.waitWhile(' Saving... ');
 		tmp_after();
 	}
 };
@@ -247,8 +247,10 @@ var resetFields = function(){
 
 var delete_pageGroup_confirm = function(d){
 	if (!confirm('Delete Page/Intercom Group ?')) { return; }
+	parent.ASTGUI.dialog.waitWhile(' Saving... ');
 	parent.astgui_managePageGroups.deletePageGroup(d, function(){
 		ASTGUI.feedback({ msg:'Page/Intercom Group deleted', showfor:2 });
+		parent.ASTGUI.dialog.hide();
 		window.location.reload();
 	});
 };
