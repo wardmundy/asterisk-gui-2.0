@@ -317,99 +317,144 @@ var update_PageGroupsTable = function(){
 
 var localajaxinit = function(){
 	top.document.title = 'Paging & Intercom' ;
+	loadDOMelements();
+
 	if( !ASTGUI.miscFunctions.alertIfRangeisNotdefined('rge_start','rge_end', 'RingGroups') ){
 		$('.top_buttons').hide();
 		return;
 	}
 
-	loadDOMelements();
-	
-	(function (){
-		var t = parent.astgui_manageusers.listOfUsers();
-		t.each(function(usr){	
-			if( parent.sessionData.pbxinfo['users'][usr]['hassip']  && parent.sessionData.pbxinfo['users'][usr]['hassip'] == 'yes' ){
-				listOfDialDevices.push( 'SIP/' + usr );
-			}
-			if( parent.sessionData.pbxinfo['users'][usr]['hasiax']  && parent.sessionData.pbxinfo['users'][usr]['hasiax'] == 'yes' ){
-				listOfDialDevices.push( 'IAX2/' + usr );
-			}
-		});
-		t = parent.sessionData.FXS_PORTS_DETECTED ;
-		t.each(function(fxs){
-			listOfDialDevices.push('Zap/' + fxs );
-		});
+	(function(){
+		var t = [{	url:'#',
+				desc:'Group Paging/Intercom',
+				click_function: function(){
+					$('.hideall').hide();
+					$('#TAB_group_Paging').show();
 
-		ASTGUI.events.add( DOM_button_add_toringlist , 'click' , function(){
-			var t = DOM_select_fromlistofchannels.value ; if(!t){return;}
-			var s = DOM_select_fromlistofchannels.options[DOM_select_fromlistofchannels.selectedIndex].text ; if(!s){ s = t; }
-			DOM_select_fromlistofchannels.remove( DOM_select_fromlistofchannels.selectedIndex );
-			ASTGUI.selectbox.append( DOM_select_ringthesechannels, s , t );
-		});
-		ASTGUI.events.add( DOM_button_remove_fromringlist , 'click' , function(){
-			var t = DOM_select_ringthesechannels.value ; if(!t){return;}
-			var s = DOM_select_ringthesechannels.options[DOM_select_ringthesechannels.selectedIndex].text ; if(!s){ s = t; }
-			DOM_select_ringthesechannels.remove( DOM_select_ringthesechannels.selectedIndex );
-			if( listOfDialDevices.contains(t) ){ ASTGUI.selectbox.append( DOM_select_fromlistofchannels, s, t ); }
-		});
-		ASTGUI.events.add( DOM_button_removeall_fromringlist , 'click' , function(){
-			ASTGUI.selectbox.clear( DOM_select_ringthesechannels );
-			ASTGUI.selectbox.clear( DOM_select_fromlistofchannels );
-			listOfDialDevices.each(function(device){ 
-				var tmp_ext = device.afterChar('/');
-				var tmp_techn = device.beforeChar('/');
-	
-				if( tmp_techn.toLowerCase() == 'zap' ){
-					var this_analogStation_user = '';
-					for ( var q in parent.sessionData.pbxinfo.users ){ if( parent.sessionData.pbxinfo.users.hasOwnProperty(q) ){
-						if( parent.sessionData.pbxinfo.users[q].getProperty('zapchan') == tmp_ext ){
-							this_analogStation_user = q + '(AnalogPort ' + tmp_ext + ') ' + parent.sessionData.pbxinfo.users[q].getProperty('fullname') ;
-							ASTGUI.selectbox.append( DOM_select_fromlistofchannels, this_analogStation_user , device);
-							return;
-						}
-					}}
-				}else{
-					if( parent.sessionData.pbxinfo.users[tmp_ext] && parent.sessionData.pbxinfo.users[tmp_ext].fullname ){
-						var tmp_name = parent.sessionData.pbxinfo.users[tmp_ext].fullname || '?' ;
-					}else{
-						return;
-					}
-					ASTGUI.selectbox.append( DOM_select_fromlistofchannels, tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name , device);
 				}
-			});
-		});
+			},{	url: '#',
+				desc: 'Page an Extension',
+				click_function: function(){
+					$('.hideall').hide();
+					$('#TAB_page_anExtension').show();
 
-		ASTGUI.events.add( 'button_addall_toringlist' , 'click' , function(){
-			ASTGUI.selectbox.clear( DOM_select_ringthesechannels );
-			ASTGUI.selectbox.clear( DOM_select_fromlistofchannels );
-
-			listOfDialDevices.each(function(device){ 
-				var tmp_ext = device.afterChar('/');
-				var tmp_techn = device.beforeChar('/');
-	
-				if( tmp_techn.toLowerCase() == 'zap' ){
-					var this_analogStation_user = '';
-					for ( var q in parent.sessionData.pbxinfo.users ){ if( parent.sessionData.pbxinfo.users.hasOwnProperty(q) ){
-						if( parent.sessionData.pbxinfo.users[q].getProperty('zapchan') == tmp_ext ){
-							this_analogStation_user = q + '(AnalogPort ' + tmp_ext + ') ' + parent.sessionData.pbxinfo.users[q].getProperty('fullname') ;
-							ASTGUI.selectbox.append( DOM_select_ringthesechannels, this_analogStation_user , device);
-							return;
-						}
-					}}
-				}else{
-					if( parent.sessionData.pbxinfo.users[tmp_ext] && parent.sessionData.pbxinfo.users[tmp_ext].fullname ){
-						var tmp_name = parent.sessionData.pbxinfo.users[tmp_ext].fullname || '?' ;
-					}else{
-						return;
-					}
-					ASTGUI.selectbox.append( DOM_select_ringthesechannels, tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name , device);
 				}
-			});
-		});
+			},{	url: '#',
+				desc: 'Settings',
+				click_function: function(){
+					$('.hideall').hide();
+					$('#TAB_paging_settings').show();
 
+				}
+			}];
+
+		ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
 	})();
+	try{
+		(function (){
+			var t = parent.astgui_manageusers.listOfUsers();
+			t.each(function(usr){	
+				if( parent.sessionData.pbxinfo['users'][usr]['hassip']  && parent.sessionData.pbxinfo['users'][usr]['hassip'] == 'yes' ){
+					listOfDialDevices.push( 'SIP/' + usr );
+				}
+				if( parent.sessionData.pbxinfo['users'][usr]['hasiax']  && parent.sessionData.pbxinfo['users'][usr]['hasiax'] == 'yes' ){
+					listOfDialDevices.push( 'IAX2/' + usr );
+				}
+			});
+			t = parent.sessionData.FXS_PORTS_DETECTED ;
+			t.each(function(fxs){
+				listOfDialDevices.push('Zap/' + fxs );
+			});
+	
+			ASTGUI.events.add( DOM_button_add_toringlist , 'click' , function(){
+				var t = DOM_select_fromlistofchannels.value ; if(!t){return;}
+				var s = DOM_select_fromlistofchannels.options[DOM_select_fromlistofchannels.selectedIndex].text ; if(!s){ s = t; }
+				DOM_select_fromlistofchannels.remove( DOM_select_fromlistofchannels.selectedIndex );
+				ASTGUI.selectbox.append( DOM_select_ringthesechannels, s , t );
+			});
+			ASTGUI.events.add( DOM_button_remove_fromringlist , 'click' , function(){
+				var t = DOM_select_ringthesechannels.value ; if(!t){return;}
+				var s = DOM_select_ringthesechannels.options[DOM_select_ringthesechannels.selectedIndex].text ; if(!s){ s = t; }
+				DOM_select_ringthesechannels.remove( DOM_select_ringthesechannels.selectedIndex );
+				if( listOfDialDevices.contains(t) ){ ASTGUI.selectbox.append( DOM_select_fromlistofchannels, s, t ); }
+			});
+			ASTGUI.events.add( DOM_button_removeall_fromringlist , 'click' , function(){
+				ASTGUI.selectbox.clear( DOM_select_ringthesechannels );
+				ASTGUI.selectbox.clear( DOM_select_fromlistofchannels );
+				listOfDialDevices.each(function(device){ 
+					var tmp_ext = device.afterChar('/');
+					var tmp_techn = device.beforeChar('/');
+		
+					if( tmp_techn.toLowerCase() == 'zap' ){
+						var this_analogStation_user = '';
+						for ( var q in parent.sessionData.pbxinfo.users ){ if( parent.sessionData.pbxinfo.users.hasOwnProperty(q) ){
+							if( parent.sessionData.pbxinfo.users[q].getProperty('zapchan') == tmp_ext ){
+								this_analogStation_user = q + '(AnalogPort ' + tmp_ext + ') ' + parent.sessionData.pbxinfo.users[q].getProperty('fullname') ;
+								ASTGUI.selectbox.append( DOM_select_fromlistofchannels, this_analogStation_user , device);
+								return;
+							}
+						}}
+					}else{
+						if( parent.sessionData.pbxinfo.users[tmp_ext] && parent.sessionData.pbxinfo.users[tmp_ext].fullname ){
+							var tmp_name = parent.sessionData.pbxinfo.users[tmp_ext].fullname || '?' ;
+						}else{
+							return;
+						}
+						ASTGUI.selectbox.append( DOM_select_fromlistofchannels, tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name , device);
+					}
+				});
+			});
+	
+			ASTGUI.events.add( 'button_addall_toringlist' , 'click' , function(){
+				ASTGUI.selectbox.clear( DOM_select_ringthesechannels );
+				ASTGUI.selectbox.clear( DOM_select_fromlistofchannels );
+	
+				listOfDialDevices.each(function(device){ 
+					var tmp_ext = device.afterChar('/');
+					var tmp_techn = device.beforeChar('/');
+		
+					if( tmp_techn.toLowerCase() == 'zap' ){
+						var this_analogStation_user = '';
+						for ( var q in parent.sessionData.pbxinfo.users ){ if( parent.sessionData.pbxinfo.users.hasOwnProperty(q) ){
+							if( parent.sessionData.pbxinfo.users[q].getProperty('zapchan') == tmp_ext ){
+								this_analogStation_user = q + '(AnalogPort ' + tmp_ext + ') ' + parent.sessionData.pbxinfo.users[q].getProperty('fullname') ;
+								ASTGUI.selectbox.append( DOM_select_ringthesechannels, this_analogStation_user , device);
+								return;
+							}
+						}}
+					}else{
+						if( parent.sessionData.pbxinfo.users[tmp_ext] && parent.sessionData.pbxinfo.users[tmp_ext].fullname ){
+							var tmp_name = parent.sessionData.pbxinfo.users[tmp_ext].fullname || '?' ;
+						}else{
+							return;
+						}
+						ASTGUI.selectbox.append( DOM_select_ringthesechannels, tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name , device);
+					}
+				});
+			});
+	
+		})();
+		update_PageGroupsTable();
+	}catch(err){
 
-	update_PageGroupsTable();
+	}finally{
+		$('#tabbedMenu').find('A:eq(0)').click();
 
+		var c = context2json ({ filename: 'extensions.conf' , context: 'globals', usf: 1 });
+		ASTGUI.updateFieldToValue( 'text_Alert_Info_Header' , c.getProperty('PAGING_HEADER') );
+		ASTGUI.updateFieldToValue( 'select_Timeout' , c.getProperty('PAGING_TIMEOUT') );
+
+
+	}
+};
+
+
+
+
+var save_TAB_paging_settings = function(){
+	ASTGUI.updateaValue({ file:'extensions.conf', context :'globals', variable :'PAGING_HEADER', value : ASTGUI.getFieldValue('text_Alert_Info_Header') });
+	ASTGUI.updateaValue({ file:'extensions.conf', context :'globals', variable :'PAGING_TIMEOUT', value : ASTGUI.getFieldValue('select_Timeout') });
+	ASTGUI.feedback({msg:' Saved !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
 };
 
 
@@ -420,13 +465,53 @@ var localajaxinit = function(){
 	<span style="cursor: pointer; cursor: hand;" onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
 </div>
 
-<div class='lite_Heading'> Page/Intercom Groups </div>
+<div id="tabbedMenu"></div>
 
-<div class='top_buttons'  style='margin-top: -22px;'>
-	<span id='new' class='guiButtonNew' onclick='show_NewPageGroup_form();'>New Page/Intercom Group </span>
+
+<div class='hideall' id='TAB_group_Paging'>
+	<div class='lite_Heading'> Page/Intercom Groups </div>
+	<div class='top_buttons'  style='margin-top: -22px;'>
+		<span id='new' class='guiButtonNew' onclick='show_NewPageGroup_form();'>New Page/Intercom Group </span>
+	</div>
+	<table id='table_pageGroups_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
 </div>
 
-<table id='table_pageGroups_list' cellpadding=0 cellspacing=0 border=0 align=center></table>
+<div class='hideall' id='TAB_page_anExtension'>
+
+</div>
+
+<div class='hideall' id='TAB_paging_settings'>
+	<div class='lite_Heading'> Settings for Paging & Intercom </div>
+	<table cellpadding=2 cellspacing=2 border=0 width="90%" align="center">
+		<tr>	<td align="right" colspan=2 height=15></td></tr>
+		<TR>	<td align="right">Alert-Info Header :&nbsp;</td>
+			<td>
+				<input type=text id="text_Alert_Info_Header" size=16 required='yes'>
+			</td>
+		</TR>
+		<TR>	<td align="right">Timeout :&nbsp;</td>
+			<td>
+				<select id="select_Timeout" dfalt='60' required='yes'>
+				<option value="15">15 Seconds</option>
+				<option value="30">30 Seconds</option>
+				<option value="45">45 Seconds</option>
+				<option value="60">60 Seconds</option>
+				<option value="90">90 Seconds</option>
+				<option value="120">120 Seconds</option>
+				</select>
+			</td>
+		</TR>
+		<tr>	<td align="right" colspan=2 height=10></td></tr>
+		<tr>	<td align=right>
+				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>&nbsp;&nbsp;
+			</td>
+			<td>
+				<span class='guiButtonEdit' onclick='save_TAB_paging_settings();'>Save</span>
+			</td>
+		</tr>
+	</table>
+</div>
+
 
 <div id="pagegroup_editdiv" STYLE="width:600;display:none;" class='dialog'>
 	<TABLE width="100%" cellpadding=0 cellspacing=0>
