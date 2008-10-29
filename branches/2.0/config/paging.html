@@ -444,17 +444,59 @@ var localajaxinit = function(){
 		ASTGUI.updateFieldToValue( 'text_Alert_Info_Header' , c.getProperty('PAGING_HEADER') );
 		ASTGUI.updateFieldToValue( 'select_Timeout' , c.getProperty('PAGING_TIMEOUT') );
 
-
+		var d = context2json ({ filename: 'extensions.conf' , context: ASTGUI.contexts.PageAnExtension , usf: 0 });
+		var i = d.length;
+		while (i--) {
+			if( d[i].endsWith('|q)') ){
+				ASTGUI.updateFieldToValue( 'text_prefix_paging' , ASTGUI.parseContextLine.getExten(d[i]).lChop('_').withOut('X') );
+			}
+			if( d[i].endsWith('|qd)') ){
+				ASTGUI.updateFieldToValue( 'text_prefix_intercom' , ASTGUI.parseContextLine.getExten(d[i]).lChop('_').withOut('X') );
+			}
+		}
 	}
 };
 
-
-
+var load_Defaults_TAB_page_anExtension = function(){
+	ASTGUI.resetTheseFields( ['text_prefix_paging','text_prefix_intercom']);
+	$('#btn_ld_tpe').hide();
+};
 
 var save_TAB_paging_settings = function(){
 	ASTGUI.updateaValue({ file:'extensions.conf', context :'globals', variable :'PAGING_HEADER', value : ASTGUI.getFieldValue('text_Alert_Info_Header') });
 	ASTGUI.updateaValue({ file:'extensions.conf', context :'globals', variable :'PAGING_TIMEOUT', value : ASTGUI.getFieldValue('select_Timeout') });
 	ASTGUI.feedback({msg:' Saved !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
+};
+
+
+var save_TAB_page_anExtension = function(){
+	// exten => _**XXXX,1,Macro(pagingintercom|Local/${EXTEN:2}|q)		// text_prefix_paging
+	// exten => _*#XXXX,1,Macro(pagingintercom|Local/${EXTEN:2}|qd)		// text_prefix_intercom
+	// parent.sessionData.GUI_PREFERENCES.ue_start
+
+	var TMP_CONTEXT = ASTGUI.contexts.PageAnExtension ;
+
+	var tmp_X = 'X'.times( parent.sessionData.GUI_PREFERENCES.ue_start.length );
+	var tmp_text_prefix_paging = ASTGUI.getFieldValue('text_prefix_paging');
+	var tmp_text_prefix_intercom = ASTGUI.getFieldValue('text_prefix_intercom');
+
+	var u = new listOfSynActions('extensions.conf');
+
+	if( tmp_text_prefix_paging ){
+		var pg_exten = '_' + tmp_text_prefix_paging + tmp_X + ',1,Macro(pagingintercom|Local/${EXTEN:' + tmp_text_prefix_paging.length + '}|q)' ;
+		u.new_action('append', TMP_CONTEXT , 'exten', pg_exten );
+	}
+
+	if( tmp_text_prefix_intercom ){
+		var itcom_exten = '_' + tmp_text_prefix_intercom + tmp_X + ',1,Macro(pagingintercom|Local/${EXTEN:' + tmp_text_prefix_intercom.length + '}|qd)' ;
+		u.new_action('append', TMP_CONTEXT , 'exten', itcom_exten );
+	}
+
+
+	ASTGUI.miscFunctions.empty_context({ filename:'extensions.conf', context : TMP_CONTEXT , cb : function(){
+		u.callActions();
+		ASTGUI.feedback({msg:' Saved !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
+	}});
 };
 
 
@@ -477,14 +519,36 @@ var save_TAB_paging_settings = function(){
 </div>
 
 <div class='hideall' id='TAB_page_anExtension'>
-
+	<div class='lite_Heading'> Settings for Paging Individual Extensions </div>
+	<table cellpadding=2 cellspacing=2 border=0 width="90%" align="center">
+		<tr>	<td align="right" colspan=2 height=15></td></tr>
+		<TR>	<td align="right" width="50%">Prefix for Paging an Extension :&nbsp;</td>
+			<td>
+				<input type=text id="text_prefix_paging" size=2 required='yes' dfalt='**'>
+			</td>
+		</TR>
+		<TR>	<td align="right">Prefix for Dialing an Extension as Intercom :&nbsp;</td>
+			<td>
+				<input type=text id="text_prefix_intercom" size=2 required='yes' dfalt='*#'>
+			</td>
+		</TR>
+		<tr>	<td align="right" colspan=2 height=10></td></tr>
+		<tr>	<td align=right>
+				<span class='guiButton' id='btn_ld_tpe' onclick='load_Defaults_TAB_page_anExtension();'>Load Defaults</span>&nbsp;&nbsp;
+				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>&nbsp;&nbsp;
+			</td>
+			<td>
+				<span class='guiButtonEdit' onclick='save_TAB_page_anExtension();'>Save</span>
+			</td>
+		</tr>
+	</table>
 </div>
 
 <div class='hideall' id='TAB_paging_settings'>
 	<div class='lite_Heading'> Settings for Paging & Intercom </div>
 	<table cellpadding=2 cellspacing=2 border=0 width="90%" align="center">
 		<tr>	<td align="right" colspan=2 height=15></td></tr>
-		<TR>	<td align="right">Alert-Info Header :&nbsp;</td>
+		<TR>	<td align="right" width="50%">Alert-Info Header :&nbsp;</td>
 			<td>
 				<input type=text id="text_Alert_Info_Header" size=16 required='yes'>
 			</td>
