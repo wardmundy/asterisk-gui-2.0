@@ -2612,7 +2612,7 @@ ASTGUI.apps['Ztscan'] = 'ztscan > ' + ASTGUI.paths['asteriskConfig'] +'ztscan.co
 ASTGUI.apps['mISDNscan'] = 'misdn-init scan' ;
 ASTGUI.apps['flashupdate'] = 'flashupdate' ;
 
-ASTGUI.includeContexts = [ 'default' , 'parkedcalls' , ASTGUI.contexts.CONFERENCES , ASTGUI.contexts.RingGroupExtensions , ASTGUI.contexts.VoiceMenuExtensions , ASTGUI.contexts.QUEUES , ASTGUI.contexts.VoiceMailGroups , ASTGUI.contexts.Directory, ASTGUI.contexts.PageGroups ] ;
+ASTGUI.includeContexts = [ 'default' , 'parkedcalls' , ASTGUI.contexts.CONFERENCES , ASTGUI.contexts.RingGroupExtensions , ASTGUI.contexts.VoiceMenuExtensions , ASTGUI.contexts.QUEUES , ASTGUI.contexts.VoiceMailGroups , ASTGUI.contexts.Directory, ASTGUI.contexts.PageGroups , ASTGUI.contexts.PageAnExtension] ;
 
 ASTGUI.customObject.prototype = {
 	getProperty: function(p){
