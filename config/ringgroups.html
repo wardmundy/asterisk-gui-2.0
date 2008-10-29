@@ -209,6 +209,7 @@ var resetFields = function(){
 					tmp_aliasextens.push( c['extension'] );
 				}
 			});
+			tmp_aliasextens = tmp_aliasextens.concat( parent.astgui_managePageGroups.getPGsList() );
 			DOM_text_rgExten.value  = tmp_aliasextens.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('rge_start') );
 		})();
 
