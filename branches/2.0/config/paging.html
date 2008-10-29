@@ -23,14 +23,14 @@
 <link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
 <style type="text/css">
 
-	#table_pgoups_list {
+	#table_pageGroups_list {
 		border: 0px solid #666666;
 		margin-top: 8px;
 		padding : 1px;
 		width: 96%;
 	}
 
-	#table_pgoups_list {
+	#table_pageGroups_list {
 		border: 1px solid #666666;
 		margin-top: 5px;
 		margin-bottom:10px;
@@ -38,12 +38,12 @@
 		text-align: center;
 		padding : 1px;
 	}
-	#table_pgoups_list tr.frow { background: #6b79a5; color: #CED7EF; }
-	#table_pgoups_list tr.frow td{ font-weight:bold; }
-	#table_pgoups_list tr td{ padding : 3px; }
-	#table_pgoups_list tr.even { background: #DFDFDF; }
-	#table_pgoups_list tr.odd{ background: #FFFFFF; }
-	#table_pgoups_list tr.even:hover, #table_pgoups_list tr.odd:hover {
+	#table_pageGroups_list tr.frow { background: #6b79a5; color: #CED7EF; }
+	#table_pageGroups_list tr.frow td{ font-weight:bold; }
+	#table_pageGroups_list tr td{ padding : 3px; }
+	#table_pageGroups_list tr.even { background: #DFDFDF; }
+	#table_pageGroups_list tr.odd{ background: #FFFFFF; }
+	#table_pageGroups_list tr.even:hover, #table_pageGroups_list tr.odd:hover {
 		background: #a8b6e5;
 		cursor: default;
 	}
@@ -98,37 +98,41 @@ var save_pageGroup = function(){
 	}
 
 	var PAGE_EXTEN = ASTGUI.getFieldValue( DOM_text_pageGroup_Exten );
-	if( !isNewPgGrp ){ // if editing existing ring group
-		parent.astgui_manageRingGroups.deleteRg(PgGrp_EDITING) ;
-	}else{ // if is a new ring group
-		if( parent.miscFunctions.ifExtensionAlreadyExists(PAGE_EXTEN) ){
-			ASTGUI.highlightField(DOM_text_pageGroup_Exten , 'Extension already exists');
-			parent.ASTGUI.dialog.hide();
-			return;
-		}
 
-		// if( !ASTGUI.miscFunctions.isExtensionInRange( PAGE_EXTEN , 'rge_start' , 'rge_end' ) ){
-		//	ASTGUI.highlightField(DOM_text_pageGroup_Exten, 'Extension is not in preferred range');
-		//	parent.ASTGUI.dialog.hide();
-		//	return;
-		// }
-	}
-
-	var tmp_options = [];
-	if ( ASTGUI.getFieldValue(DOM_select_pageGroup_Type) == '2way' ){ tmp_options.push('d'); }
-	if ( !DOM_chk_pageGroup_beep.checked ){ tmp_options.push('q'); }
-
-	var tmp_new_line = PAGE_EXTEN + ',1,Macro(pagingintercom|' + TEMP_members.join('&') + '|'+ tmp_options.join('') + ')' ;
-
-	var later = function(){
-		var msg = ( isNewPgGrp ) ? 'New Page/Intercom Group Created' : 'Page/Intercom Group Updated';
-		ASTGUI.feedback({msg: msg, showfor:2});
+	if( isNewPgGrp && parent.miscFunctions.ifExtensionAlreadyExists(PAGE_EXTEN) ){
+		ASTGUI.highlightField(DOM_text_pageGroup_Exten , 'Extension already exists');
 		parent.ASTGUI.dialog.hide();
-		window.location.reload();
+		return;
+	}
+	// if( !ASTGUI.miscFunctions.isExtensionInRange( PAGE_EXTEN , 'rge_start' , 'rge_end' ) ){
+	//	ASTGUI.highlightField(DOM_text_pageGroup_Exten, 'Extension is not in preferred range');
+	//	parent.ASTGUI.dialog.hide();
+	//	return;
+	// }
+
+	var tmp_after = function(){
+		var tmp_options = [];
+		if ( ASTGUI.getFieldValue(DOM_select_pageGroup_Type) == '2way' ){ tmp_options.push('d'); }
+		if ( !DOM_chk_pageGroup_beep.checked ){ tmp_options.push('q'); }
+	
+		var tmp_new_line = PAGE_EXTEN + ',1,Macro(pagingintercom|' + TEMP_members.join('&') + '|'+ tmp_options.join('') + ')' ;
+	
+		var later = function(){
+			var msg = ( isNewPgGrp ) ? 'New Page/Intercom Group Created' : 'Page/Intercom Group Updated';
+			ASTGUI.feedback({msg: msg, showfor:2});
+			parent.ASTGUI.dialog.hide();
+			window.location.reload();
+		};
+	
+		parent.ASTGUI.dialog.waitWhile(' Saving... ');
+		parent.astgui_managePageGroups.addPageGroup( tmp_new_line, later );
 	};
 
-	parent.ASTGUI.dialog.waitWhile(' Saving... ');
-	parent.astgui_managePageGroups.addPageGroup( tmp_new_line, later );
+	if( !isNewPgGrp ){ // if editing existing ring group
+		parent.astgui_managePageGroups.deletePageGroup( PgGrp_EDITING, tmp_after );
+	}else{
+		tmp_after();
+	}
 };
 
 
@@ -174,7 +178,7 @@ var resetFields = function(){
 					tmp_aliasextens.push( c['extension'] );
 				}
 			});
-			tmp_aliasextens = tmp_aliasextens.concat( astgui_managePageGroups.getPGsList() );
+			tmp_aliasextens = tmp_aliasextens.concat( parent.astgui_managePageGroups.getPGsList() );
 			DOM_text_pageGroup_Exten.value  = tmp_aliasextens.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('rge_start') );
 		})();
 
