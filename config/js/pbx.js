@@ -57,7 +57,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					'macro-pagingintercom' : [
 						'exten=s,1,SIPAddHeader(Alert-Info: ${PAGING_HEADER})',
 						'exten=s,2,Set(TIMEOUT(absolute)=${PAGING_TIMEOUT})',
-						'exten=s,3,Page(Local/${ARG1}|${ARG2})',
+						'exten=s,3,Page(${ARG1}|${ARG2})',
 						'exten=s,4,Hangup'
 					]
 				};
