@@ -344,7 +344,7 @@ var USERS_MISC_FUNCTIONS = {
 			ASTGUI.feedback( { msg: ' Please select one or more users to delete !', showfor: 4 });
 			return;
 		}
-		if( !confirm('Are you sure you want to delete the selected users - ' + sel_users.join(',') + ' ?') ) { return; }
+		if( !confirm('Are you sure you want to delete the selected users - ' + sel_users.join(',') + ' ? \n\n Note: This would delete any voicemails stored in the users mailboxes.') ) { return; }
 
 		var after_deletingFirstUser = function(){
 			sel_users.removeFirst();
@@ -358,9 +358,9 @@ var USERS_MISC_FUNCTIONS = {
 		};
 
 		var delete_firstUser = function(){
-			var yn = confirm("Delete voicemail box for user " + sel_users[0] + " ?" );
+			//var yn = confirm("Delete voicemail box for user " + sel_users[0] + " ?" );
 			parent.ASTGUI.dialog.waitWhile(' deleting user ' + sel_users[0] );
-			parent.astgui_manageusers.deleteuser(sel_users[0] , yn , after_deletingFirstUser );
+			parent.astgui_manageusers.deleteuser(sel_users[0] , true , after_deletingFirstUser);
 		};
 
 		parent.ASTGUI.dialog.waitWhile(' Deleting selected users .... ');
