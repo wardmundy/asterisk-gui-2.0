@@ -492,3 +492,10 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['followme'].en[3] = "<B>Destinations:</B> List of extensions/numbers that would be dialed to reach the user during FollowMe.";
 	tooltips['followme'].en[4] = "<B>New FollowMe Number:</B> Add a new FollowMe number which could be a 'Local Extension' or an 'Outside Number'. The selected dialplan should have permissions to dial any outside numbers defined.";
 	tooltips['followme'].en[5] = "<B>Dial Order:</B> This is the order in which the FollowMe destinations are dialed to reach the user.";
+
+
+// Tooltips for "Paging" in english
+	tooltips['paging'] = { en: [] };
+	tooltips['paging'].en[0] = "<B>Alert-Info Header:</B> This is the value that is sent to the phone for an intercom call in the alert info header. It is not recommended that this valued be changed from the default of Intercom. ";
+	tooltips['paging'].en[1] = "Dial sequence that is used to prefix an extension to dial it as a Page. For instance setting this value to ** would allow to page the extension 6000 by dialing **6000.";
+	tooltips['paging'].en[2] = "Dial sequence that is used to prefix an extension to dial it as Intercom. For instance setting this value to *# would allow to initiate an intercom call with extension 6000 by dialing *#6000.";
