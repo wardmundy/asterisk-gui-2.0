@@ -45,9 +45,10 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 						'exten=a,1,VoicemailMain(${ARG1})'
 					],
 					'macro-stdexten-followme' : [
-						'exten=s,1,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})',
-						'exten=s,2,Followme(${ARG1},${FOLLOWMEOPTIONS})',
-						'exten=s,3,Voicemail(${ARG1},u)',
+						'exten=s,1,Answer',
+						'exten=s,2,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})',
+						'exten=s,3,Followme(${ARG1},${FOLLOWMEOPTIONS})',
+						'exten=s,4,Voicemail(${ARG1},u)',
 						'exten=s-NOANSWER,1,Voicemail(${ARG1},u)',
 						'exten=s-BUSY,1,Voicemail(${ARG1},b)',
 						'exten=s-BUSY,2,Goto(default,s,1)',
