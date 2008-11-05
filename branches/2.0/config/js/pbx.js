@@ -47,8 +47,10 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					'macro-stdexten-followme' : [
 						'exten=s,1,Answer',
 						'exten=s,2,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})',
-						'exten=s,3,Followme(${ARG1},${FOLLOWMEOPTIONS})',
-						'exten=s,4,Voicemail(${ARG1},u)',
+						'exten=s,3,Set(__FMCIDNUM=${CALLERID(num)})',
+						'exten=s,4,Set(__FMCIDNAME=${CALLERID(name)})',
+						'exten=s,5,Followme(${ARG1},${FOLLOWMEOPTIONS})',
+						'exten=s,6,Voicemail(${ARG1},u)',
 						'exten=s-NOANSWER,1,Voicemail(${ARG1},u)',
 						'exten=s-BUSY,1,Voicemail(${ARG1},b)',
 						'exten=s-BUSY,2,Goto(default,s,1)',
@@ -87,10 +89,14 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		
 				check_For_Contexts[ 'macro-' + ASTGUI.contexts.dialtrunks ] = [
 					// "; Macro by =  Brandon Kruse <bkruse@digium.com> & Matthew O'Gorman mogorman@digium.com",
-					'exten=s,1,Set(CALLERID(num)=${IF($[${LEN(${CID_${CALLERID(num)}})} > 2]?${CID_${CALLERID(num)}}:)})',
+					'exten=s,1,GotoIf($[${LEN(${FMCIDNUM})} > 6]?1-fmsetcid,1)',
+					'exten=s,n,Set(CALLERID(num)=${IF($[${LEN(${CID_${CALLERID(num)}})} > 2]?${CID_${CALLERID(num)}}:)})',
 					'exten=s,n,GotoIf($[${LEN(${CALLERID(num)})} > 6]?1-dial,1)',
 					'exten=s,n,Set(CALLERID(all)=${IF($[${LEN(${CID_${ARG3}})} > 6]?${CID_${ARG3}}:${GLOBAL_OUTBOUNDCID})})',
 					'exten=s,n,Goto(1-dial,1)',
+					'exten=1-fmsetcid,1,Set(CALLERID(num)=${FMCIDNUM})',
+					'exten=1-fmsetcid,n,Set(CALLERID(name)=${FMCIDNAME})',
+					'exten=1-fmsetcid,n,Goto(1-dial,1)',
 					'exten=1-dial,1,Dial(${ARG1})',
 					'exten=1-dial,n,Gotoif(${LEN(${ARG2})} > 0 ?1-${DIALSTATUS},1:1-out,1)',
 					'exten=1-CHANUNAVAIL,1,Dial(${ARG2})',
