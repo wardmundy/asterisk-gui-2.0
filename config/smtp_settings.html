@@ -33,11 +33,23 @@ var localajaxinit = function(){
 
 	top.document.title = "SMTP Settings";
 
+	ASTGUI.domActions.enableDisableByCheckBox('chk_UseAuthentication', ['AuthUser','AuthPass'] ) ;
+
 	var c = config2json({filename:ASTGUI.globals.configfile , usf:1});
 	if( c['general'] ){
 		_$('smtp_server').value = (c['general']['smtp_server']) ? c['general']['smtp_server'] : '';
 		_$('smtp_port').value = (c['general']['smtp_port']) ? c['general']['smtp_port'] : '';
+
+		if(c['general']['smtp_AuthUser'] ){
+			_$('chk_UseAuthentication').checked = true ;
+			_$('AuthUser').value = c['general']['smtp_AuthUser'] ;
+			_$('AuthPass').value = (c['general']['smtp_AuthPass']) ? c['general']['AuthPass'] : '';
+		}else{
+			_$('chk_UseAuthentication').checked = false ;
+		}
+		_$('chk_UseAuthentication').updateStatus();
 	}
+
 }
 
 
@@ -45,16 +57,35 @@ function apply_changes(){
 	var u = new listOfSynActions(ASTGUI.globals.configfile) ;
 	u.new_action('update', 'general', 'smtp_server', _$('smtp_server').value );
 	u.new_action('update', 'general', 'smtp_port', _$('smtp_port').value );
+	if( _$('chk_UseAuthentication').checked ){
+		u.new_action('update', 'general', 'smtp_AuthUser', _$('AuthUser').value );
+		u.new_action('update', 'general', 'smtp_AuthPass', _$('AuthPass').value );
+	}
 	u.callActions();
 
 	var smtpport = ( parseInt(_$('smtp_port').value, 10 ) ) ? _$('smtp_port').value : '25' ;
 	var cmd1 = "echo \"mailhub=" + _$('smtp_server').value + ":" + smtpport + "\" > /etc/ssmtp/ssmtp.conf ";
 	var cmd2 = "echo \"FromLineOverride=YES\" >> /etc/ssmtp/ssmtp.conf ";
+	var cmd3 = "" , cmd4 = "";
 
-	parent.ASTGUI.systemCmd( cmd1, function(){ 
+	if( _$('chk_UseAuthentication').checked ){
+		cmd3 = "echo \"AuthUser=" + _$('AuthUser').value + "\" >> /etc/ssmtp/ssmtp.conf ";
+		cmd4 = "echo \"AuthPass=" + _$('AuthPass').value + "\" >> /etc/ssmtp/ssmtp.conf ";
+	}
+
+	parent.ASTGUI.systemCmd( cmd1, function(){
 		parent.ASTGUI.systemCmd( cmd2, function(){
-			ASTGUI.feedback( { msg:'Changes Saved !! ', showfor:2 });
-			window.location.reload();
+			if(cmd3){
+				parent.ASTGUI.systemCmd( cmd3, function(){
+					parent.ASTGUI.systemCmd( cmd4, function(){
+						ASTGUI.feedback( { msg:'Changes Saved !! ', showfor:2 });
+						window.location.reload();
+					});
+				});
+			}else{
+				ASTGUI.feedback( { msg:'Changes Saved !! ', showfor:2 });
+				window.location.reload();
+			}
 		});
 	});
 }
@@ -77,6 +108,15 @@ function apply_changes(){
 </tr>
 <tr>	<td align=right>Port <img src="images/tooltip_info.gif" tip="en,voicemail,17" class='tooltipinfo'>:</td>
 	<td>&nbsp;<input id="smtp_port"></td>
+</tr>
+<tr>	<td align=right>Use SMTP Authentication :</td>
+	<td>&nbsp;<input id="chk_UseAuthentication" type='checkbox'></td>
+</tr>
+<tr>	<td align=right>Auth User :</td>
+	<td>&nbsp;<input id="AuthUser"></td>
+</tr>
+<tr>	<td align=right>Auth Password :</td>
+	<td>&nbsp;<input id="AuthPass"></td>
 </tr>
 <tr>	<td colspan=2 align="center">
 		<div height="10"></div><BR>
