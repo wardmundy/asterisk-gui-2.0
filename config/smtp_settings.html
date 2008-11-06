@@ -43,7 +43,7 @@ var localajaxinit = function(){
 		if(c['general']['smtp_AuthUser'] ){
 			_$('chk_UseAuthentication').checked = true ;
 			_$('AuthUser').value = c['general']['smtp_AuthUser'] ;
-			_$('AuthPass').value = (c['general']['smtp_AuthPass']) ? c['general']['AuthPass'] : '';
+			_$('AuthPass').value = (c['general']['smtp_AuthPass']) ? c['general']['smtp_AuthPass'] : '';
 		}else{
 			_$('chk_UseAuthentication').checked = false ;
 		}
