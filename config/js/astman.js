@@ -258,6 +258,10 @@ _$ = function(x){
 		return this.split(X).join(Y);
 	};
 
+	String.prototype.nl2br = function(){ // replace new lines with <BR>
+		return this.split('\n').join('<BR>');
+	};
+
 	String.prototype.strip = function(){
 		try {
 			return this.replace(/^\s+|\s+$/g, "");
@@ -310,6 +314,7 @@ var ASTGUI = {
 		GUI_DB : 'astgui', // name of the ASTDB database used by GUI -- ASTGUI.globals.GUI_DB
 		msg_notLoggedIn: 'Message: Authentication Required',
 		configfile : 'guipreferences.conf', // will be created if the file does not exist , ASTGUI.globals.configfile
+		g729RegInfo: 'g729reginfo.conf', // ASTGUI.globals.g729RegInfo, the ASTGUI.scripts.Registerg729 script will read this file to generate tab delimited file
 		hwcfgFile: 'gui_confighw.conf', // file to store configured hardware information
 		zaptelIncludeFile: 'zaptel_guiRead.conf', // file that will be used to read zapte.conf, ASTGUI.globals.zaptelIncludeFile
 		pingInterval : 5000,
@@ -2606,6 +2611,7 @@ ASTGUI.scripts['generateZaptel'] = 'sh ' + ASTGUI.paths['scripts'] + 'editzap.sh
 ASTGUI.scripts['generatemISDN_init'] = 'sh ' + ASTGUI.paths['scripts'] + 'editmisdn.sh';
 ASTGUI.scripts['dldsoundpack'] = 'sh ' + ASTGUI.paths['scripts'] + 'dldsoundpack';
 ASTGUI.scripts['mastercsvexists'] = 'sh ' + ASTGUI.paths['scripts'] + 'mastercsvexists';
+ASTGUI.scripts['Registerg729'] = 'sh ' + ASTGUI.paths['scripts'] + 'registerg729.sh';
 
 ASTGUI.apps = {};
 ASTGUI.apps['Ztscan'] = 'ztscan > ' + ASTGUI.paths['asteriskConfig'] +'ztscan.conf' ;

@@ -27,7 +27,7 @@
 var sessionData = {
 	finishedParsing : false,
 	PLATFORM: {
-		isAA50 : false, // AA50
+		isAA50 : true, // AA50
 		isABE : false, // Asterisk Business Edition
 		isOSA : false, // plain OpenSource Asterisk 
 		// also look at the 'detectPlatform' function below
@@ -200,6 +200,10 @@ var sessionData = {
 		<div page='networking.html' class='forAA50'>
 			<div class="ui-accordion-link">Networking</div>
 			<div class="ui-accordion-desc">Configures networking parameters.</div>
+		</div>
+		<div page='registerg729.html' class='forAA50'>
+			<div class="ui-accordion-link">G.729 Codec</div>
+			<div class="ui-accordion-desc">Register & Manage your G.729 Codec License Keys</div>
 		</div>
 		<div page='backup.html'>
 			<div class="ui-accordion-link">Backup</div>
