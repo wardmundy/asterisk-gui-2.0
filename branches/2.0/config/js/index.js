@@ -102,6 +102,7 @@ var onLogInFunctions = {
 					'ulaw' : 'u-law' ,
 					'alaw' : 'a-law' ,
 					'gsm'  : 'GSM' ,
+					'g729' : 'G.729A',
 					'g726' : 'G.726' ,
 					'g722' : 'G.722'
 				};
