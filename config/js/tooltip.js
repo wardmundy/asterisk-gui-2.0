@@ -299,6 +299,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 
 
 	tooltips['options'].en[13] = "The timeout variable is the number of seconds the phone will wait for each segment of a digit map expressed as an integer.";
+	tooltips['options'].en[14] = "<B>Global OutBound CID Name:</B> This is the global CallerID Name that is used for all outgoing calls. If this value is defined, all out going calls will have a 'CallerId Name' set to this value. This would be usually your company name. Leave this value blank if you want the users 'CallerID Name' to appear on outbound calls." ;
 
 	// Tooltips for Directory
 	tooltips['directory']= new Object;

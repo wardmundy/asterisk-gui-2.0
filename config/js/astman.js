@@ -321,6 +321,7 @@ var ASTGUI = {
 		app_factoryReset : '/bin/reset_config', // ASTGUI.globals.app_factoryReset
 		fnf : 'ERROR:FNF',
 		obcidstr : 'GLOBAL_OUTBOUNDCID', // ASTGUI.globals.obcidstr
+		obcidNamestr : 'GLOBAL_OUTBOUNDCIDNAME', // ASTGUI.globals.obcidNamestr
 		obcidUsrPrefix : 'CID_', // ASTGUI.globals.obcidUsrPrefix
 		sbcid_1 : 's,1,ExecIf($[ "${CALLERID(num)}"="" ],SetCallerPres,unavailable)', // ASTGUI.globals.sbcid_1
 		sbcid_2 : 's,2,ExecIf($[ "${CALLERID(num)}"="" ],Set,CALLERID(all)=unknown <0000000>)',

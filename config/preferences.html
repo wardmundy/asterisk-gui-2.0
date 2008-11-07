@@ -79,21 +79,23 @@ function localajaxinit(){
 	t.push( {url: 'flipadvanced.html', desc:'Advanced Options' } );
 
 	ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
-
 	loadDOMelements();
-	var t = parent.sessionData.pbxinfo.GLOBALS[ASTGUI.globals.obcidstr] ; 
-	DOM_obCid_input.value = (t) ? t : '' ;
+
 	var cusers = parent.astgui_manageusers.listOfUsers();
 	var op_tmp ;
 	cusers.each(function(user){
 		op_tmp = 'Goto(default,' + user + ',1)';
 		ASTGUI.selectbox.append( DOM_op_ext , 'User ' + user , op_tmp);
 	});
-
 	(function(){
 		var c = context2json ({ filename:'extensions.conf' , context: 'globals', usf: 1 });
 		var ringtime = ( c.hasOwnProperty('RINGTIME') ) ? c['RINGTIME'] : '20' ;
 		ASTGUI.updateFieldToValue( 'op_ringTimeOut_Voicemail', ringtime );
+		try{
+			ASTGUI.updateFieldToValue( DOM_obCid_input, c[ASTGUI.globals.obcidstr] || ''  );
+			ASTGUI.updateFieldToValue( 'obCidName_input', c[ASTGUI.globals.obcidNamestr] || ''  );
+		}catch(err){}
+
 	})();
 
 	try{
@@ -180,6 +182,7 @@ var save_changes = function(){
 
 	var u = new listOfSynActions('extensions.conf');
 		u.new_action('update', 'globals', ASTGUI.globals.obcidstr, ASTGUI.getFieldValue(DOM_obCid_input) );
+		u.new_action('update', 'globals', ASTGUI.globals.obcidNamestr, ASTGUI.getFieldValue('obCidName_input') );
 		u.new_action('update', 'globals', 'RINGTIME', ASTGUI.getFieldValue('op_ringTimeOut_Voicemail') );
 
 		u.new_action('delete', 'default', 'exten','' ,'o,1,' + OPEXTENSION );
@@ -278,6 +281,9 @@ var reset_ranges_default = function(){
 <table width=95% cellpadding=2 cellspacing=2 border=0  align=center>
 	<tr>	<td align=right>Global OutBound CID <img src="images/tooltip_info.gif" tip="en,options,7" class='tooltipinfo'> :</td>
 		<td><input id='obCid_input' size=16></td>
+	</tr>
+	<tr>	<td align=right>Global OutBound CID Name<img src="images/tooltip_info.gif" tip="en,options,14" class='tooltipinfo'> :</td>
+		<td><input id='obCidName_input' size=16></td>
 	</tr>
 	<tr>	<td align=right>Operator Extension <img src="images/tooltip_info.gif" tip="en,options,8" class='tooltipinfo'> :</td>
 		<td><select id='op_ext'></select></td>
