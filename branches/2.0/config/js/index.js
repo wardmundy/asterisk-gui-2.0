@@ -447,6 +447,11 @@ var onLogInFunctions = {
 
 
 var miscFunctions = {
+	toDigiumStore: function(a){ // parent.miscFunctions.toDigiumStore('G729CODEC')
+		if(!a) return;
+		var win=window.open('','myWin');
+		win.location.href = 'http://store.digium.com/productview.php?product_code='+ a ;
+	},
 
 	listOfChannels: function() { // miscFunctions.listOfChannels() -- returns an array of current active channels
 		var raw_chan_status = makeSyncRequest ( { action :'status' } );

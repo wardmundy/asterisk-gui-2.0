@@ -208,11 +208,6 @@ var localajaxinit = function(){
 	});
 };
 
-var buynow_action = function(){
-	win=window.open('','myWin');
-	win.location.href='http://store.digium.com/productview.php?product_code=IVRPROMPT';
-};
-
 </script>
 <body bgcolor="EFEFEF">
 
@@ -232,7 +227,7 @@ var buynow_action = function(){
 	<div STYLE="text-align: center;" class='top_buttons'>
 		<span class='guiButton' onclick='show_record_New();'>Record a new Voice Menu prompt</span>
 		<span class='guiButton' onclick='window.location.href="menuprompts_upload.html";' id='uploadVoiceMenuPrompt_Button'>Upload a Voice Menu prompt</span>
-		<span class='guiButton' style='margin-left:100px;' onclick='buynow_action();' id='whereToBuy_button' tip="en,record,90">Where to Buy</span>
+		<span class='guiButton' style='margin-left:100px;' onclick="parent.miscFunctions.toDigiumStore('IVRPROMPT');" id='whereToBuy_button' tip="en,record,90">Where to Buy</span>
 	</div>
 	<BR>
 	<div id="recfilesTable_div" style="height:370px; width=100%; overflow :auto; padding : 0">
