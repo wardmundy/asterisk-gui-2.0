@@ -87,14 +87,11 @@ var incomingRules_MiscFunctions = {
 
 		var tmp_edit_itrl_tf = EDIT_CONTEXT_IR.afterStr( ASTGUI.contexts.TimeIntervalPrefix ) ;
 
-		//$('.hideOnEdit').hide();
+		$('.hideOnEdit').hide();
 		_$('div_ir_edit_title').innerHTML = 'Edit Incoming Calling Rule, Trunk: ' + tmp_TRUNK + ' , Time Interval: ' + ( tmp_edit_itrl_tf || 'none' ) ;
 
 		ASTGUI.updateFieldToValue( 'edit_itrl_trunk',  tmp_TRUNK ) ;
 		ASTGUI.updateFieldToValue( 'edit_itrl_tf', tmp_edit_itrl_tf ) ;
-
-		_$('edit_itrl_trunk').disabled = true ;
-		_$('edit_itrl_tf').disabled = true;
 		ASTGUI.updateFieldToValue( 'edit_itrl_pattern', ASTGUI.parseContextLine.getExten( EDIT_CONTEXT_IR_LINE ) );
 
 		$('.localext_byDid').hide();
@@ -344,8 +341,6 @@ var incomingRules_MiscFunctions = {
 		ASTGUI.resetTheseFields(['edit_itrl_trunk', 'edit_itrl_tf', 'edit_itrl_pattern', 'edit_itrl_dest' ]);
 		incomingRules_MiscFunctions.enableDisablePattern();
 		$('.localext_byDid').hide();
-		_$('edit_itrl_trunk').disabled = false ;
-		_$('edit_itrl_tf').disabled = false;
  		_$('div_ir_edit_title').innerHTML = 'New Incoming Rule';
 		ASTGUI.feedback( { msg: 'New Incoming Rule !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' } );
 		$('.hideOnEdit').show();
