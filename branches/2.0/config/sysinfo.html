@@ -133,6 +133,17 @@ var localajaxinit = function(){
 						});
 					}
 				});
+			t.push({	url:'#',
+					desc:'DHCP Leases',
+					click_function: function(){
+						$('.hideall').hide();
+						ASTGUI.systemCmdWithOutput( 'dhcp_dump' , function(output){
+							$('#s800i_dhcpClients_output').html('<PRE>' + output + '</PRE>');
+							$('.hideall').hide();
+							$('#s800i_dhcpClients_div').show();
+						});
+					}
+				});
 		}
 		ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
 	})();
@@ -191,6 +202,10 @@ var localajaxinit = function(){
 				</td>
 			</tr>
 		</table>
+	</div>
+	<div id="s800i_dhcpClients_div" style="display:none;" class='hideall'>
+		<B>DHCP Leases:</B>
+		<div id="s800i_dhcpClients_output" style="font-family:courier; font-size:10pt;"></div>
 	</div>
 </div>
 
