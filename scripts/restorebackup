@@ -1,3 +1,9 @@
 #!/bin/bash
 tar -xf $1 -C /
+# clean out dhcpcd cache data
+rm /etc/config/dhcpcd*
+save_config
+sync
+sleep 1
+reboot
 
