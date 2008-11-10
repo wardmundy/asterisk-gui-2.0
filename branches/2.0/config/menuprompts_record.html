@@ -235,7 +235,7 @@ var localajaxinit = function(){
 	</div>
 </div>
 
-<div id="recordnew_content" STYLE="max-width:575; height:150; display:none;" class='dialog'>
+<div id="recordnew_content" STYLE="max-width:575; height:190; display:none;" class='dialog'>
 	<TABLE width="100%" cellpadding=0 cellspacing=0>
 	<TR class="dialog_title_tr">
 		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);">Record a new Voice Menu prompt</TD>
@@ -247,6 +247,13 @@ var localajaxinit = function(){
 		<tr>	<td class="field_text" align=right>File Name:</td>
 			<td><input id='newvmenu_name' size=24>
 				<input type="hidden" id="newvmenu_format" value=".gsm">
+			</td>
+		</tr>
+		<tr>	<td class="field_text" align=right>Format:</td>
+			<td>	<select id="newvmenu_format">
+					<option value='.gsm'>GSM</option>
+					<option value='.wav'>WAV</option>
+				</select>
 			</td>
 		</tr>
 		<tr>	<td class="field_text">dial this User Extension to record a new voice prompt:</td>
