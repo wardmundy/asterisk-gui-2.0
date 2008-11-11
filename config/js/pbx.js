@@ -113,25 +113,29 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		var EXN_CNF = config2json({ filename:'extensions.conf', usf:0 });
 
 		var UPDATES = new listOfActions('extensions.conf');
+		var tmp_createdNewCat ;
 		for( var contextName in check_For_Contexts ){
 			if( !check_For_Contexts.hasOwnProperty(contextName) ){ continue; }
 			//contextName
+			tmp_createdNewCat = false;
 			if( !EXN_CNF.hasOwnProperty(contextName) ){
 				UPDATES.new_action( 'newcat', contextName , '', '' );
 				EXN_CNF[contextName] = [];
+				tmp_createdNewCat = true;
 			}
 
 			if( ASTGUI.isArray( check_For_Contexts[contextName] )){ // compare whether the context matches the exact context
 				if( check_For_Contexts[contextName].join('::') != EXN_CNF[contextName].join('::') ){
-					UPDATES.new_action( 'delcat', contextName , '', '');
-					UPDATES.new_action( 'newcat', contextName , '', '');
+					if( tmp_createdNewCat == false ){
+						UPDATES.new_action( 'delcat', contextName , '', '');
+						UPDATES.new_action( 'newcat', contextName , '', '');
+					}
 
 					var tmp_context_array = ASTGUI.cloneObject(check_For_Contexts[contextName]);
 					while( tmp_context_array.length ){
 						UPDATES.new_action( 'append', contextName , tmp_context_array[0].beforeChar('=') , tmp_context_array[0].afterChar('=') );
 						tmp_context_array.splice(0,1);
 					}
-
 				}
 			}else{ // see if the context has all the properties 
 				var tmp_context_obj = check_For_Contexts[contextName];
