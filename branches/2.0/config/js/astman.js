@@ -3024,9 +3024,16 @@ listOfActions.prototype = {
 			var f = treq[ 'act_' + st ];
 			if(f){
 				ASTGUI.Log.Ajax("AJAX Request : '" + pre_uri + f + "'");
-				$.ajax({ type: "GET", url: ASTGUI.paths.rawman, data: pre_uri + f , success: function(msg){start_sqreqs(st+1);} });
+				$.ajax({ type: "GET", url: ASTGUI.paths.rawman, data: pre_uri + f , success: function(msg){
+					if( msg && typeof msg == 'string' && msg.contains('Response: Error') && msg.contains('Message:') ){
+						var err_msg = msg.afterStr('Message:');
+						callback(false, err_msg);
+					}else{
+						start_sqreqs(st+1);
+					}
+				}});
 			}else{
-				setTimeout( function(){ ajxs.style.display = 'none'; callback(); }, 500 ) ;
+				setTimeout( function(){ ajxs.style.display = 'none'; callback(true); }, 500 ) ;
 			}
 		};
 		start_sqreqs(1);
