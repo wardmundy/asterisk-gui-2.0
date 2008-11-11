@@ -161,7 +161,12 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			sessionData.continueParsing = false ;
 			UPDATES.callActions( function(){
 				var t = ASTGUI.cliCommand('dialplan reload') ;
-				setTimeout( function(){ window.location.reload(); } , 500 );
+				setTimeout( function(){
+					if( sessionData.DEBUG_MODE ){
+						alert('updated extensions.conf - from readcfg.checkEssentials()::check_For_Contexts \n Click OK to Reload');
+					}
+					window.location.reload(); 
+				} , 500 );
 			} );
 			return ;
 		}
