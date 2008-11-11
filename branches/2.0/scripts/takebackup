@@ -1,5 +1,5 @@
 #!/bin/sh
-mkdir -p /var/lib/asterisk/licenses
-/bin/tar -cf $1 /etc/asterisk /etc/localtime /var/lib/asterisk/licenses
+/bin/tar -cf $1 /etc/asterisk /etc/localtime
+
 
 
