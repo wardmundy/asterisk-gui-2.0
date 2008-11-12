@@ -159,7 +159,10 @@ managerEvents.parseOutput = function(op){
 			if( op_LC.contains('event: queuememberstatus') ){
 				setTimeout( update_AgentsListing_Table , 1000 );
 			}else if( op_LC.contains('event: meetmeleave') ||  op_LC.contains('event: meetmejoin') ){
-				setTimeout( update_Conferences_Table , 1000 );
+
+				if(manager_timers.conferences){ clearTimeout ( manager_timers.conferences ) } ;
+				manager_timers.conferences = setTimeout ( update_Conferences_Table , 2000 ) ;
+
 			}else if( op_LC.contains('event: link') ||  op_LC.contains('event: unlink') ){
 
 				if(manager_timers.parkedCalls){ clearTimeout ( manager_timers.parkedCalls ) } ;
@@ -569,6 +572,7 @@ var update_Conferences_Table = function(){
 		}
 	})();
 
+	var active_count = 0;
 	var td_COUNT = 0, m = parent.sessionData.pbxinfo.conferences ;
 	for( l in m ){ if( m.hasOwnProperty(l) && l !='admin'){
 
@@ -583,6 +587,7 @@ var update_Conferences_Table = function(){
 		newcell.align = 'center' ;
 
 		if( active_conferences.hasOwnProperty(l) ){
+			active_count++;
 			newcell.innerHTML =  l + '<BR><font color=red>' + Number(active_conferences[l].count) + ' Users</font> - ' + active_conferences[l].duration ;
 		}else{
 			newcell.innerHTML =  l + '<BR><font color=green>Not in use</font>' ;
@@ -595,6 +600,12 @@ var update_Conferences_Table = function(){
 		newcell.align =  'center' ;
 		newcell.innerHTML =  'No Conferences setup' ;
 	}
+
+	if(active_count){
+		if(manager_timers.conferences){ clearTimeout ( manager_timers.conferences ) } ;
+		manager_timers.conferences = setTimeout ( update_Conferences_Table , 5000 ) ;
+	}
+
 };
 
 
