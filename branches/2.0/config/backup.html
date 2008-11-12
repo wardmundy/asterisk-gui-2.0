@@ -258,6 +258,13 @@ function take_bkp(){
 	var bkpfile =  "backup_" + year + month + day + "_" + hour + minute + seconds ;
 
 	ASTGUI.updateFieldToValue( 'newbkp_name', bkpfile );
+	
+	if( parent.sessionData.PLATFORM.isAA50 ){
+	 	$(".AA50only").show();
+	}else{
+		$(".AA50only").hide();
+	}
+	
 	$('#newbkp_content').show() ;
 	_$('newbkp_name').focus();
 }
@@ -283,7 +290,13 @@ function backup_new(){
 	var bkpfile =  _nn.value +"__" + year + month + day +".tar";
 
 	if( parent.sessionData.PLATFORM.isAA50  ){
-		parent.ASTGUI.systemCmd( ASTGUI.scripts.takeBackup + ' ' +  bkpPath + bkpfile , function(){
+		var fullback = _$('newbkp_completeBackup').checked ;
+		if(fullback){
+			var tmp_script = ASTGUI.scripts.takeBackup + ' ' +  bkpPath + bkpfile + ' ' + 'YES';
+		}else{
+			var tmp_script = ASTGUI.scripts.takeBackup + ' ' +  bkpPath + bkpfile ;
+		}
+		parent.ASTGUI.systemCmd( tmp_script , function(){
 			ASTGUI.feedback( { msg:'Backup Successful', showfor:2 });
 			window.location.reload();
 		}) ;
@@ -351,7 +364,13 @@ function backup_new(){
 		<tr>	<td class="field_text" align="right">File Name:&nbsp;</td>
 			<td><input id='newbkp_name' size=25 class="input9" validation='alphanumericUnd' required='yes'></td>
 		</tr>
+		
+		<tr class='AA50only'>	<td colspan=2 align=center height=6></td>	</tr>
+		<tr class='AA50only'>	<td class="field_text" align="right"> Complete Backup:&nbsp;</td>
+				<td><input type='checkbox' id='newbkp_completeBackup' class="input9"></td>
+		</tr>
 		<tr>	<td colspan=2 align=center height=6></td>	</tr>
+		
 		<tr>	<td colspan=2 align=center>
 				<span class='guiButtonCancel' id="cancel_a" onclick='cancel_newbackup();'>Cancel</span>
 				<span class='guiButtonEdit' id="getbackup" onclick='backup_new();'>Backup</span>
