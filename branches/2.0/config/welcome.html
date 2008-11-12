@@ -101,6 +101,14 @@ var manager_timers = {};
 	return tmp_qlogout;
 };
 
+managerEvents.updateAllUsersStatus = function(){
+	var ul = parent.astgui_manageusers.listOfUsers();
+	ul.each(function(user){
+		var new_status = ASTGUI.getUser_DeviceStatus(user) ;
+		managerEvents.updateUserImage(user, new_status);
+	});
+};
+
 managerEvents.updateUserImage = function(user , user_status){
 	var this_td = _$('TD_USER_DEVICE_STATUS_' + user );
 	ASTGUI.domActions.removeAllChilds ( this_td );
@@ -307,7 +315,7 @@ var updateListingsTable = function(){
 	(function(){ // add first row
 		var newRow = DOM_table_Ext_list.insertRow(-1);
 		newRow.className = "frow";
-		addCell( newRow , { html:'', width:'18px'} );
+		addCell( newRow , { html: "<A href='#' onclick=\"managerEvents.updateAllUsersStatus();\"><img src='images/refresh.png' title=' Refresh ' border=0></A>" , width:'18px' });
 		addCell( newRow , { html:'Extension' } );
 		addCell( newRow , { html:'Name/Label' } );
 		addCell( newRow , { html:'Status' } );
