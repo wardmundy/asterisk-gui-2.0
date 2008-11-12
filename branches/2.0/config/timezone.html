@@ -157,6 +157,22 @@ var localajaxinit = function(){
 	});
 }
 
+
+
+
+function call_update_tz( ){
+	ASTGUI.dialog.waitWhile('Updating Timezones..');
+	
+	ASTGUI.systemCmd( "update_tz" , function(){
+		setTimeout( function(){
+			ASTGUI.dialog.hide();
+			ASTGUI.feedback({ msg:'Please reboot your appliance !', showfor:2 });
+			window.location.reload();
+		}, 20000 );
+	});
+};
+
+
 </script>
 <body bgcolor="EFEFEF">
 
@@ -165,6 +181,10 @@ var localajaxinit = function(){
 	<span style="cursor: pointer; cursor: hand;" onclick="window.location.reload();" >
 		&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;
 	</span>
+</div>
+
+<div class='top_buttons'>
+	<span class='guiButton' onclick='call_update_tz();' style='float:left'>Update Timezones</span>
 </div>
 
 <div class='lite_Heading'>Manage TimeZones</div>
