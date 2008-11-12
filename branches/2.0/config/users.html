@@ -188,7 +188,7 @@ var USERS_MISC_FUNCTIONS = {
 	},
 
 	RESET_USER_FORM_FIELDS: function(){ // USERS_MISC_FUNCTIONS.RESET_USER_FORM_FIELDS();
-		ASTGUI.resetTheseFields( ['new_ext','edit_fullname','edit_user_dialplan','edit_callerid','edit_OutBoundCallerid','edit_hasvoicemail','edit_vmsecret','edit_email','edit_hasSip','edit_hasIax','edit_fxs','edit_flash','edit_rxflash','codec_one','codec_two','codec_three','codec_fourth','codec_fifth','macaddress','linenumber','edit_secret','edit_nat','edit_canreinvite','edit_dtmfmode','edit_insecure','edit_3wayCalling','edit_inDirectory','edit_callWaiting','edit_cti','edit_isagent','edit_pickupgroup'] );
+		ASTGUI.resetTheseFields( ['new_ext','edit_fullname','edit_user_dialplan','edit_callerid','edit_OutBoundCallerid','edit_hasvoicemail','edit_vmsecret','edit_email','edit_hasSip','edit_hasIax','edit_fxs','edit_flash','edit_rxflash','codec_one','codec_two','codec_three','codec_fourth','codec_fifth','macaddress','linenumber','edit_secret','edit_nat','edit_canreinvite','edit_dtmfmode','edit_insecure','edit_3wayCalling','edit_inDirectory','edit_callWaiting','edit_cti','edit_isagent','edit_pickupgroup','edit_linekeys'] );
 		_$('edit_fxs').selectedIndex = 0; _$('codec_one').selectedIndex = 0; _$('codec_two').selectedIndex = 0; _$('codec_three').selectedIndex = 0; _$('codec_fourth').selectedIndex = 0; 
 		_$('codec_fifth').selectedIndex = 0; _$('linenumber').selectedIndex = 0; _$('edit_pickupgroup').selectedIndex = 0;
 
@@ -237,6 +237,7 @@ var USERS_MISC_FUNCTIONS = {
 
 			ASTGUI.updateFieldToValue( 'macaddress', uinfo.getProperty('macaddress') );
 			ASTGUI.updateFieldToValue( 'linenumber', uinfo.getProperty('linenumber') );
+			ASTGUI.updateFieldToValue( 'edit_linekeys', uinfo.getProperty('LINEKEYS') );
 			ASTGUI.updateFieldToValue( 'edit_secret', uinfo.getProperty('secret') );
 			ASTGUI.updateFieldToValue( 'edit_nat', uinfo.getProperty('nat') );
 			ASTGUI.updateFieldToValue( 'edit_canreinvite', uinfo.getProperty('canreinvite') );
@@ -518,11 +519,13 @@ var USERS_MISC_FUNCTIONS = {
 				x.new_action('update', u, 'autoprov', 'yes');						tmp_obj['autoprov'] = 'yes';
 				x.new_action('update', u, 'label', u );							tmp_obj['label'] = u;
 				x.new_action('update', u, 'linenumber', ASTGUI.getFieldValue('linenumber') );		tmp_obj['linenumber'] = ASTGUI.getFieldValue('linenumber');
+				x.new_action('update', u, 'LINEKEYS', ASTGUI.getFieldValue('edit_linekeys') );		tmp_obj['LINEKEYS'] = ASTGUI.getFieldValue('edit_linekeys');
 			}else{
 				x.new_action('update', u, 'autoprov', 'no');						tmp_obj['autoprov'] = 'no';
 				x.new_action('update', u, 'label', '' );						tmp_obj['label'] = '';
 				x.new_action('update', u, 'macaddress', ASTGUI.getFieldValue('macaddress') );		tmp_obj['macaddress'] = ASTGUI.getFieldValue('macaddress');
 				x.new_action('update', u, 'linenumber', ASTGUI.getFieldValue('linenumber') );		tmp_obj['linenumber'] = ASTGUI.getFieldValue('linenumber');
+				x.new_action('update', u, 'LINEKEYS', ASTGUI.getFieldValue('edit_linekeys') );		tmp_obj['LINEKEYS'] = ASTGUI.getFieldValue('edit_linekeys');
 			}
 			var after = function(){
 				parent.sessionData.pbxinfo.users[u].updateProperties(tmp_obj); // update all the edited values
@@ -797,8 +800,17 @@ var buynow_action = function(){
 							</select>
 							<img src="images/tooltip_info.gif" tip="en,users,96" class='tooltipinfo'>
 
-							<span style="margin-left:40px;">SIP/IAX Password:</span>
-							<input id="edit_secret" size=6>
+							LineKeys: <select id="edit_linekeys" dfalt='1'>
+								<option value='1'>1</option>
+								<option value='2'>2</option>
+								<option value='3'>3</option>
+								<option value='4'>4</option>
+								<option value='5'>5</option>
+								<option value='6'>6</option>
+							</select>
+							<img src="images/tooltip_info.gif" tip="en,users,2" class='tooltipinfo'>
+							
+							SIP/IAX Password: <input id="edit_secret" size=6>
 							<img src="images/tooltip_info.gif" tip="en,users,2" class='tooltipinfo'>
 						</TD>
 					</TR>
