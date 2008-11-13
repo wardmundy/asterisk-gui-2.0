@@ -57,6 +57,9 @@ var localajaxinit = function(){
 		$('.top_buttons').hide();
 		return;
 	}
+
+	$('#new_ext').keyup(function(){ $('#edit_callerid_span').html(this.value); }).change(function(){ $('#edit_callerid_span').html(this.value); });
+
 	USERS_MISC_FUNCTIONS.load_users_table();
 	$('#whereToBuy_button').tooltip({delay:0.9,showURL:false,top:15,left:-300});
 	setTimeout( function(){ USERS_MISC_FUNCTIONS.initialize_formFields(); }, 10 );
@@ -188,7 +191,7 @@ var USERS_MISC_FUNCTIONS = {
 	},
 
 	RESET_USER_FORM_FIELDS: function(){ // USERS_MISC_FUNCTIONS.RESET_USER_FORM_FIELDS();
-		ASTGUI.resetTheseFields( ['new_ext','edit_fullname','edit_user_dialplan','edit_callerid','edit_OutBoundCallerid','edit_hasvoicemail','edit_vmsecret','edit_email','edit_hasSip','edit_hasIax','edit_fxs','edit_flash','edit_rxflash','codec_one','codec_two','codec_three','codec_fourth','codec_fifth','macaddress','linenumber','edit_secret','edit_nat','edit_canreinvite','edit_dtmfmode','edit_insecure','edit_3wayCalling','edit_inDirectory','edit_callWaiting','edit_cti','edit_isagent','edit_pickupgroup','edit_linekeys'] );
+		ASTGUI.resetTheseFields( ['new_ext','edit_fullname','edit_user_dialplan','edit_OutBoundCallerid','edit_hasvoicemail','edit_vmsecret','edit_email','edit_hasSip','edit_hasIax','edit_fxs','edit_flash','edit_rxflash','codec_one','codec_two','codec_three','codec_fourth','codec_fifth','macaddress','linenumber','edit_secret','edit_nat','edit_canreinvite','edit_dtmfmode','edit_insecure','edit_3wayCalling','edit_inDirectory','edit_callWaiting','edit_cti','edit_isagent','edit_pickupgroup','edit_linekeys'] );
 		_$('edit_fxs').selectedIndex = 0; _$('codec_one').selectedIndex = 0; _$('codec_two').selectedIndex = 0; _$('codec_three').selectedIndex = 0; _$('codec_fourth').selectedIndex = 0; 
 		_$('codec_fifth').selectedIndex = 0; _$('linenumber').selectedIndex = 0; _$('edit_pickupgroup').selectedIndex = 0;
 
@@ -208,7 +211,7 @@ var USERS_MISC_FUNCTIONS = {
 //			ASTGUI.updateFieldToValue( 'macaddress', uinfo.getProperty('macaddress') );
 			ASTGUI.updateFieldToValue( 'edit_fullname', uinfo.getProperty('fullname') );
 			ASTGUI.updateFieldToValue( 'edit_user_dialplan', uinfo.getProperty('context') );
-			ASTGUI.updateFieldToValue( 'edit_callerid', uinfo.getProperty('cid_number') );
+			$('#edit_callerid_span').html(EXTENSION_EDIT);
 			ASTGUI.updateFieldToValue( 'edit_OutBoundCallerid', parent.astgui_manageusers.getOBCID_user(EXTENSION_EDIT) );
 			ASTGUI.updateFieldToValue( 'edit_hasvoicemail', uinfo.getProperty('hasvoicemail') );
 			ASTGUI.updateFieldToValue( 'edit_vmsecret', uinfo.getProperty('vmsecret') );
@@ -261,7 +264,7 @@ var USERS_MISC_FUNCTIONS = {
 			var ul = parent.astgui_manageusers.listOfUsers();
 			var tmp_newEXT = ul.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('ue_start') );
 			ASTGUI.updateFieldToValue( 'new_ext', tmp_newEXT );
-			ASTGUI.updateFieldToValue( 'edit_callerid', tmp_newEXT );
+			$('#edit_callerid_span').html(tmp_newEXT);
 		}
 
 		_$('edit_hasSip').updateStatus();
@@ -450,7 +453,7 @@ var USERS_MISC_FUNCTIONS = {
 			x.filename('users.conf');
 			x.new_action('update', u, 'fullname', 		ASTGUI.getFieldValue('edit_fullname') );	tmp_obj['fullname'] = ASTGUI.getFieldValue('edit_fullname') ;
 			x.new_action('update', u, 'context', 		ASTGUI.getFieldValue('edit_user_dialplan') );	tmp_obj['context'] = ASTGUI.getFieldValue('edit_user_dialplan') ;
-			x.new_action('update', u, 'cid_number', 	ASTGUI.getFieldValue('edit_callerid') );	tmp_obj['cid_number'] = ASTGUI.getFieldValue('edit_callerid') ;
+			x.new_action('update', u, 'cid_number', 	EXTENSION_EDIT );	tmp_obj['cid_number'] = EXTENSION_EDIT ;
 			x.new_action('update', u, 'hasvoicemail',	ASTGUI.getFieldValue('edit_hasvoicemail') );	tmp_obj['hasvoicemail'] = ASTGUI.getFieldValue('edit_hasvoicemail') ;
 			x.new_action('update', u, 'vmsecret', 		ASTGUI.getFieldValue('edit_vmsecret') );	tmp_obj['vmsecret'] = ASTGUI.getFieldValue('edit_vmsecret') ;
 			x.new_action('update', u, 'email', 		ASTGUI.getFieldValue('edit_email') );		tmp_obj['email'] = ASTGUI.getFieldValue('edit_email') ;
@@ -721,11 +724,13 @@ var buynow_action = function(){
 							<img src="images/tooltip_info.gif" tip="en,users,6" class='tooltipinfo'>
 						</TD>
 					</TR>
-					<TR>	<TD align='right'>CallerID:</TD>
-						<TD>	<input id='edit_callerid' size=5>
+					<TR>	
+						<TD align='right'>CallerID:</TD>
+						<TD>	<span id='edit_callerid_span'></span>
 							<img src="images/tooltip_info.gif" tip="en,users,4" class='tooltipinfo'>
 						</TD>
 						<TD align='left'>
+							
 							OutBound CallerID: <input id='edit_OutBoundCallerid' size=12>
 							<img src="images/tooltip_info.gif" tip="en,users,27" class='tooltipinfo'>
 						</TD>
