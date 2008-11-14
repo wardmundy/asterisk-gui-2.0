@@ -132,7 +132,7 @@ var show_Edit_Trunk = function(){
 
 	if( isNewTrunk == true ) {
 		DOM_edit_VOIPTrunk_DIV_Title.innerHTML = 'Create New SIP/IAX trunk';
-		ASTGUI.resetTheseFields([ DOM_edit_VOIPTrunk_Type, DOM_edit_VOIPTrunk_Hostname , DOM_edit_VOIPTrunk_Username ,  DOM_edit_VOIPTrunk_Password , 'trunk_obcid' , 'edit_VOIPTrunk_Providername' ]);
+		ASTGUI.resetTheseFields([ DOM_edit_VOIPTrunk_Type, DOM_edit_VOIPTrunk_Hostname , DOM_edit_VOIPTrunk_Username ,  DOM_edit_VOIPTrunk_Password , 'trunk_obcid' , 'edit_VOIPTrunk_Providername','trunk_fromdomain', 'trunk_fromuser', 'trunk_insecure' ]);
 		DOM_edit_VOIPTrunk_Type.disabled = false;
 		ASTGUI.feedback( { msg: 'Create New Trunk', showfor:2 });
 		$('#TR_trunktype').show();
@@ -148,6 +148,9 @@ var show_Edit_Trunk = function(){
 		ASTGUI.updateFieldToValue( DOM_edit_VOIPTrunk_Username , tinfo.getProperty('username') );
 		ASTGUI.updateFieldToValue( DOM_edit_VOIPTrunk_Password , tinfo.getProperty('secret') );
 		ASTGUI.updateFieldToValue( 'edit_VOIPTrunk_Providername' , tinfo.getProperty('trunkname') );
+		ASTGUI.updateFieldToValue( 'trunk_fromdomain' , tinfo.getProperty('fromdomain') );
+		ASTGUI.updateFieldToValue( 'trunk_fromuser' , tinfo.getProperty('fromuser') );
+		ASTGUI.updateFieldToValue( 'trunk_insecure' , tinfo.getProperty('insecure') );
 
 		if( tinfo.getProperty('allow') == 'all'){
 			ASTGUI.updateFieldToValue( 'codec_one', 'ulaw' );
@@ -275,6 +278,35 @@ var edit_VOIPTrunk_save_go = function(){
 
 		x.new_action('update', EDIT_TRUNK , 'host', ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Hostname) );
 			parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['host'] = ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Hostname) ;
+
+
+		(function(){
+			var tmp_fromdomain = ASTGUI.getFieldValue('trunk_fromdomain') ;
+			if( tmp_fromdomain ){
+				x.new_action('update', EDIT_TRUNK , 'fromdomain', tmp_fromdomain );
+				parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['fromdomain'] = tmp_fromdomain ;
+			}else{
+				if( parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK].hasOwnProperty('fromdomain') ){
+					delete parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['fromdomain'] ;
+				}
+			}
+	
+			var tmp_fromuser = ASTGUI.getFieldValue('trunk_fromuser') ;
+			if( tmp_fromuser ){
+				x.new_action('update', EDIT_TRUNK , 'fromuser', tmp_fromuser );
+				parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['fromuser'] = tmp_fromuser ;
+			}else{
+				if( parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK].hasOwnProperty('fromuser') ){
+					delete parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['fromuser'] ;
+				}
+			}
+
+			var tmp_insecure = ASTGUI.getFieldValue('trunk_insecure') ;
+			x.new_action('update', EDIT_TRUNK , 'insecure', tmp_insecure );
+			parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['insecure'] = tmp_insecure ;
+		})();
+
+
 		x.new_action('update', EDIT_TRUNK , 'secret', ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Password) );
 			parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['secret'] = ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Password) ;
 		x.new_action('update', EDIT_TRUNK , 'username', ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Username) );
@@ -526,7 +558,7 @@ var localajaxinit = function(){
 
 	<TR class='editTrunk_Field'>
 		<TD align="right" valign=top>Codecs :</TD>
-		<TD align="left" colspan=2>
+		<TD align="left">
 			First : <select id='codec_one'></select>
 			Second : <select id='codec_two'></select>
 			Third : <select id='codec_three'></select><BR>
@@ -537,7 +569,22 @@ var localajaxinit = function(){
 
 	<TR  class='editTrunk_Field'>
 		<TD align="right" valign=top>CallerID <img src="images/tooltip_info.gif" tip="en,trunks,36" class='tooltipinfo'> :</TD>
-		<TD align="left" colspan=2>	<input id="trunk_obcid" size=16>	</TD>
+		<TD align="left">	<input id="trunk_obcid" size=16>	</TD>
+	</TR>
+
+	<TR class='editTrunk_Field'>
+		<TD align="right" valign=top>FromDomain :</TD>
+		<TD align="left"> <input id="trunk_fromdomain" size=16> </TD>
+	</TR>
+
+	<TR class='editTrunk_Field'>
+		<TD align="right" valign=top>FromUser :</TD>
+		<TD align="left"> <input id="trunk_fromuser" size=16> </TD>
+	</TR>
+
+	<TR class='editTrunk_Field'>
+		<TD align="right" valign=top>insecure :</TD>
+		<TD align="left"> <select id="trunk_insecure" dfalt='no' class="input8"><option value='port'>port</option><option value='port,invite'>very</option><option value='no'>no</option></select> </TD>
 	</TR>
 
 	<TR class='editTrunk_Field_ermwi'>
