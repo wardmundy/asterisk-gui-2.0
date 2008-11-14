@@ -538,8 +538,12 @@ var miscFunctions = {
 	},
 
 	applyChanges : function(cb){
-		var t = ASTGUI.cliCommand('reload') ;
 		var u = _$('applyChanges_Button');
+		if (sessionData.PLATFORM.isAST_1_4) {
+			var t = ASTGUI.cliCommand('reload') ;
+		} else {
+			var t = ASTGUI.cliCommand('module reload');
+		}
 		u.style.display = 'none';
 		ASTGUI.cookies.removeCookie('configFilesChanged');
 		ASTGUI.feedback({msg:'Asterisk Reloaded !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
