@@ -327,7 +327,7 @@ var showMisdnTrunksinTable = function(){
 	for( var k in mISDNTRUNKS ){ if( mISDNTRUNKS.hasOwnProperty(k) ){ addrow_totable(k); }}
 	if(tbl.rows.length == 1){
 		tbl.style.display = 'none';
-		_$('div_noTrunks').innerHTML = '<BR><BR>You donot have any mISDN trunks defined';
+		_$('div_noTrunks').innerHTML = '<BR><BR>You do not have any mISDN trunks defined';
 	}else{
 		tbl.style.display = '';
 		_$('div_noTrunks').innerHTML = '<BR>List of mISDN Service providers (trunks)';
