@@ -222,7 +222,7 @@ var edit_queue_apply = function(){
 		return;
 	}
 
-	if( isNewQueue == true ){
+	if( isNewQueue == true ){ // new QUEUE
 		if(!ASTGUI.miscFunctions.isExtensionInRange( cat ,'qe_start','qe_end')){
 			ASTGUI.highlightField(DOM_Queue_Ext, 'Extension is not in preferred range');
 			parent.ASTGUI.dialog.hide();
@@ -255,8 +255,7 @@ var edit_queue_apply = function(){
 		x.new_action('append', cat, 'musicclass', ASTGUI.getFieldValue(DOM_edit_musicclass));
 		var s = ASTGUI.getFieldValue(DOM_edit_voicemenuclass); 
 		if (s != '') x.new_action('append', cat, 'context', s);
-
-	}else{
+	}else{ // Edit existing QUEUE
 		if( parent.sessionData.pbxinfo.queues[cat].hasOwnProperty('isOLDGUI') && parent.sessionData.pbxinfo.queues[cat].isOLDGUI == true ){
 			var u = new listOfSynActions('extensions.conf');
 			u.new_action( 'delete', 'default', 'exten', '' , parent.sessionData.pbxinfo.queues[cat].configLine );
@@ -286,7 +285,7 @@ var edit_queue_apply = function(){
 	ags.each( function(ag){
 		x.new_action('append', cat, 'member', ag );
 	});
-	
+
 	var after = function(){
 		if( isNewQueue == true ){
 			parent.sessionData.pbxinfo.queues[cat] = new ASTGUI.customObject ;
@@ -296,7 +295,15 @@ var edit_queue_apply = function(){
 		ASTGUI.feedback({ msg:'Changes Saved !', showfor:2 , color:'green', bgcolor:'#FFFFFF' });
 		window.location.reload();
 	};
-	x.callActions(after);
+
+	if( isNewQueue == true ){
+		x.callActions(after);
+	}else{
+		ASTGUI.miscFunctions.delete_LinesLike({ context_name : cat , beginsWithArr: ['member=Agent'] , filename: 'queues.conf', cb:function(){
+			x.callActions(after);
+		} });
+	}
+
 };
 
 
