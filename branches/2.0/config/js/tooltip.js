@@ -500,3 +500,12 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['paging'].en[0] = "<B>Alert-Info Header:</B> This is the value that is sent to the phone for an intercom call in the alert info header. It is not recommended that this valued be changed from the default of Intercom. ";
 	tooltips['paging'].en[1] = "Dial sequence that is used to prefix an extension to dial it as a Page. For instance setting this value to ** would allow to page the extension 6000 by dialing **6000.";
 	tooltips['paging'].en[2] = "Dial sequence that is used to prefix an extension to dial it as Intercom. For instance setting this value to *# would allow to initiate an intercom call with extension 6000 by dialing *#6000.";
+
+// Tooltips for "CDR Viewer" in english
+	tooltips['CDR'] = { en: [] };
+	tooltips['CDR'].en[0] = "<B>System calls</B> are internal calls triggered by the Asterisk GUI and flagged with a destination context of <I>asterisk_guitools</I>. Select this option to include them in the CDR list. This also includes calls with the same major unique ID as the actual <I>asterisk_guitools</I> call.";
+	tooltips['CDR'].en[1] = "<B>Inbound calls</B> are calls originating from a non-internal source (like a VoIP trunk) and sent to an internal extension";
+	tooltips['CDR'].en[2] = "<B>Outbound calls</B> are calls sent to a non-internal source (like a VoIP trunk) from an internal extension";
+	tooltips['CDR'].en[3] = "<B>Internal calls</B> are calls from one user extension to another and are not sent over a trunk";
+	tooltips['CDR'].en[4] = "<B>External calls</B> are calls from one trunk to another trunk and are not sent to any internal extension";
+	tooltips['CDR'].en[5] = "<B>All fields.</B> Select this option to display all fields recorded in the <I>Master.csv</I> CDR file.";
