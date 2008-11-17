@@ -447,7 +447,9 @@ var ASTGUI = {
 		return true;
 	},
 
-	cliCommand : function(cmd) { // ASTGUI.cliCommand(cmd);
+	cliCommand : function(cmd) { 
+		// ASTGUI.cliCommand(cmd);
+		//	Execute an asterisk CLI command and return the output
 		if( typeof cmd != 'string' ) {
 			ASTGUI.Log.Warn( 'cliCommand: Expecting cmd as String' );
 			return '';
@@ -456,7 +458,9 @@ var ASTGUI = {
 		return makeSyncRequest ( { action :'command', command: cmd } );
 	},
 
-	getUser_DeviceStatus : function( usr ){ // ASTGUI.getUser_DeviceStatus(usr) 
+	getUser_DeviceStatus : function( usr ){ 
+		// ASTGUI.getUser_DeviceStatus(usr) 
+		//	Get the DeviceStatus for a UserExtension
 		if( typeof usr == 'number' ) usr = String(usr);
 		if( typeof usr != 'string' ){
 			ASTGUI.Log.Warn( 'getUser_DeviceStatus: Expecting usr as String' );
@@ -471,7 +475,9 @@ var ASTGUI = {
 		return null;
 	},
 
-	getUser_DeviceStatus_Image : function( usr ){ // ASTGUI.getUser_DeviceStatus_Image(usr) 
+	getUser_DeviceStatus_Image : function( usr ){
+		// ASTGUI.getUser_DeviceStatus_Image(usr) 
+		//	Get the DeviceStatus Image for a UserExtension
 		var s =  this.getUser_DeviceStatus(usr) ;
 		switch(s){
 			case 'F': // No Device is Busy/InUse
@@ -490,7 +496,11 @@ var ASTGUI = {
 		}
 	},
 
-	mailboxCount : function(mbox){ // ASTGUI.mailboxCount(mox) ; --> returns the number of New/Old Messages in mbox's mailbox
+	mailboxCount : function(mbox){
+		// ASTGUI.mailboxCount(mbox)
+		//	returns the number of New/Old Voicemail Messages for a user
+		//	returns an object "{count_new: 1, count_old: 2}"
+
 		var tr = { count_new:0 , count_old : 0 };
 		if( typeof mbox == 'number' ) mbox = String(mbox);
 		if( typeof mbox != 'string' ){
@@ -517,11 +527,15 @@ var ASTGUI = {
 	},
 
 	doTransfer : function(from, to) {
+		// ASTGUI.doTransfer(from, to)
+		//	issue channel redirect
 		ASTGUI.Log.Debug("About to transfer " + from + " to " + to);
 		return makeSyncRequest ( { action :'redirect', channel :from, exten :to, context :'default', priority :'1' } );
 	},
 
 	doHangup : function(chan) {
+		// ASTGUI.doHangup(chan)
+		//	Hangsup a given channel
 		ASTGUI.Log.Debug("Executing hangup on channel : '" + chan + "'");
 		return makeSyncRequest ( { action :'hangup', channel: chan } );
 	},
@@ -782,17 +796,23 @@ var ASTGUI = {
 			}
 		},
 
-		waitWhile : function(msg){ 
+		waitWhile : function(msg){
+			// ASTGUI.dialog.waitWhile('Saving...');
+			//	use this dialog when you want to inform the user about an action in progress - Ex: 'Saving...' or 'Applying CHanges..' or 'Reloading Asteisk...' etc
 			top.alertmsgtype = 2 ;
 			this.load_iframe(msg);
 		},
 
-		alertmsg : function(msg){ // Ex: ASTGUI.dialog.alertmsg('Some Alert Message');
+		alertmsg : function(msg){
+			// ASTGUI.dialog.alertmsg('Some Alert Message');
+			//	Display custom alert message with an 'Ok' button	
 			top.alertmsgtype = 1 ;
 			this.load_iframe(msg);
 		},
 
 		hide : function(){
+			// ASTGUI.dialog.hide();
+			// Hide the dialog message, use this when you want to hide the 'waitWhile' message
 			try{
 				top.document.getElementById( top.alertframename ).style.display = "none";
 			} catch (err){ }
@@ -807,6 +827,9 @@ var ASTGUI = {
 
 	domActions: {
 		alignBbelowA: function(a,b, offsetLeft, offsetTop ){
+			// ASTGUI.domActions.alignBbelowA( element1, element2 )
+			//	Moves/Aligns Element-B below Element-A
+			//	You can further control the position by sending additional offset parameters (optional)
 			try{
 			if ( typeof a == 'string'){ a = _$(a) ; }
 			if ( typeof b == 'string'){ b = _$(a) ; }
@@ -827,7 +850,9 @@ var ASTGUI = {
 			}
 		},
 
-		alignBontopofA: function(a,b){ // ASTGUI.domActions.alignBontopofA();
+		alignBontopofA: function(a,b){
+			// ASTGUI.domActions.alignBontopofA();
+			//	set Element-B's co-ordinates to those of Element-A
 			try{
 				if ( typeof a == 'string'){ a = _$(a) ; }
 				if ( typeof b == 'string'){ b = _$(b) ; }
@@ -2028,6 +2053,7 @@ var ASTGUI = {
 		},
 
 		readAllValues: function(el){
+			// get an array of all option values in a select box
 			if ( typeof el == 'string'){ el = _$(el) ; }
 			var y = [] ;
 			for (var x=0; x < el.options.length; x++) {
@@ -2039,6 +2065,7 @@ var ASTGUI = {
 		},
 
 		populateOptions: function( el, n){
+			// Populate 'n' numbered options in a select box starting from 1
 			if ( typeof el == 'string'){ el = _$(el) ; }
 			n = Number(n);
 			ASTGUI.selectbox.clear(el);
@@ -2070,6 +2097,7 @@ var ASTGUI = {
 		},
 
 		append_option: function(el,opt){
+			// append new option to a select box element
 			if ( typeof el == 'string'){ el = _$(el) ; }
 			if($.browser.msie){
 				el.add(opt);
@@ -2079,11 +2107,13 @@ var ASTGUI = {
 		},
 
 		remove_i: function(el, i){
+			// removes i'th Option from the select box
 			if ( typeof el == 'string'){ el = _$(el) ; }
 			el.options[i] = null;
 		},
 	
 		clear: function(el){
+			// remove all options from the select box
 			if ( typeof el == 'string'){ el = _$(el) ; }
 			el.options.length = 0;
 		},
@@ -2113,7 +2143,9 @@ var ASTGUI = {
 		}
 	}, // { selectbox }
 
-	showbg: function(t){ // show/hide a transparent bg layer - ASTGUI.showbg(true);
+	showbg: function(t){ 
+		// ASTGUI.showbg(boolean)
+		// show/hide a transparent background layer while Showing/Hiding Edit Dialogs (to prevent the user from interacting with other elements on the page)
 		try{
 		if(t){
 			if( !document.getElementById('bg_transparent') ){ 
@@ -2276,7 +2308,9 @@ var ASTGUI = {
 		}
 	},
 
-	systemCmd: function(cmd, callbackfunction){ // ASTGUI.systemCmd(cmd, cbf);
+	systemCmd: function(cmd, callbackfunction){
+		// ASTGUI.systemCmd(cmd, cbf);
+		//	Execute a Unix system command
 		ASTGUI.Log.Debug("Executing System Command : '" + cmd + "'");
 		var delay_cb = function(){
 			if( parent.sessionData.PLATFORM.isAA50 ){
@@ -2382,7 +2416,8 @@ var ASTGUI = {
 	},
 
 	updateaValue: function(e){
-		// ASTGUI.updateaValue(  {file:'users.conf', context :'6000', variable :'hassip', value :'yes'}   )
+		// ASTGUI.updateaValue({ file:'users.conf', context :'6000', variable :'hassip', value :'yes' })
+		// Use this function when you have to update only one or two unique values in a config file
 		var u = new listOfSynActions(e.file) ;
 		u.new_action('update', e.context, e.variable , e.value );
 		var g = u.callActions();
