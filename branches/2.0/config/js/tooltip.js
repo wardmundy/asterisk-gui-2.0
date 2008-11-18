@@ -444,6 +444,9 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 		"</UL>\n";
 	tooltips['trunks'].en[37] = "<B>Provider Name:</B> A unique label to help you identify this trunk when listed in outbound rules, incoming rules etc.";
 	tooltips['trunks'].en[38] = "<B>Trunk Name:</B> A unique label to help you identify this trunk when listed in outbound rules, incoming rules etc. Ex: 'Port 5' ";
+	tooltips['trunks'].en[39] = "<B>Username:</B> Username that you authenticate with at VoIP provider. Must be unique if <B>Context Naming</B> is based on Username.";
+	tooltips['trunks'].en[40] = "<B>Context Naming:</B> How should Asterisk GUI determine the context name in Asterisk's .conf files.  Asterisk can assign a unique name itself, or you can base it upon the <B>Provider Name</B> or <B>Username</B> that you enter below.  Let Asterisk assign a name unles your VoIP provider requires otherwise.";
+	tooltips['trunks'].en[41] = "<B>Hostname:</B> IP address or URL for your VoIP providers server.";
 	// END   trunks_voip.html
 	
 
