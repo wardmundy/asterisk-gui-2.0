@@ -402,7 +402,7 @@ var USERS_MISC_FUNCTIONS = {
 			return;
 		}
 		var tmp = ASTGUI.getFieldValue('edit_OutBoundCallerid') ;
-		if( tmp && tmp.length < 3 ){
+		if( tmp && tmp.length < 2 ){
 			ASTGUI.highlightField('edit_OutBoundCallerid', "OutBound CallerId should be atleast 2 digits");
 			return;
 		}
