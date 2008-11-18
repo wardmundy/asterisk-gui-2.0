@@ -96,6 +96,7 @@ var loadDOMelements = function (){
 	DOM_edit_VOIPTrunk_DIV = _$('edit_VOIPTrunk_DIV');
 	DOM_edit_VOIPTrunk_DIV_Title = _$('edit_VOIPTrunk_DIV_Title');
 	DOM_edit_VOIPTrunk_Type = _$('edit_VOIPTrunk_Type');
+	DOM_edit_VOIPTrunk_Context_Basis = _$('edit_VOIPTrunk_Context_Basis');
 	DOM_edit_VOIPTrunk_Hostname = _$('edit_VOIPTrunk_Hostname');
 	DOM_edit_VOIPTrunk_Username = _$('edit_VOIPTrunk_Username');
 	DOM_edit_VOIPTrunk_Password = _$('edit_VOIPTrunk_Password');
@@ -134,14 +135,18 @@ var show_Edit_Trunk = function(){
 		DOM_edit_VOIPTrunk_DIV_Title.innerHTML = 'Create New SIP/IAX trunk';
 		ASTGUI.resetTheseFields([ DOM_edit_VOIPTrunk_Type, DOM_edit_VOIPTrunk_Hostname , DOM_edit_VOIPTrunk_Username ,  DOM_edit_VOIPTrunk_Password , 'trunk_obcid' , 'edit_VOIPTrunk_Providername','trunk_fromdomain', 'trunk_fromuser', 'trunk_insecure' ]);
 		DOM_edit_VOIPTrunk_Type.disabled = false;
+		DOM_edit_VOIPTrunk_Context_Basis.disabled = false;
 		ASTGUI.feedback( { msg: 'Create New Trunk', showfor:2 });
 		$('#TR_trunktype').show();
+		$('#TR_contextbasis').show();
 	} else {
 		$('#TR_trunktype').hide();
+		$('#TR_contextbasis').hide();
 		var ttype = parent.astgui_managetrunks.misc.getTrunkType(EDIT_TRUNK) ;
 		var tinfo = parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK];
 
 		DOM_edit_VOIPTrunk_Type.disabled = true;
+		DOM_edit_VOIPTrunk_Context_Basis.disabled = true;
 		DOM_edit_VOIPTrunk_DIV_Title.innerHTML = 'Edit ' + ttype.toUpperCase() + ' trunk ' + EDIT_TRUNK;
 		ASTGUI.updateFieldToValue( DOM_edit_VOIPTrunk_Type, ttype.toUpperCase() );
 		ASTGUI.updateFieldToValue( DOM_edit_VOIPTrunk_Hostname , tinfo.getProperty('host') );
@@ -166,6 +171,12 @@ var show_Edit_Trunk = function(){
 			ASTGUI.updateFieldToValue( 'codec_fourth', (codecs_tmp[3] && codecs_tmp[3].trim()) || '' );
 			ASTGUI.updateFieldToValue( 'codec_fifth', (codecs_tmp[4] && codecs_tmp[4].trim()) || '' );
 		}
+
+		/* Don't allow editing field if the asterisk [context] is based on it. */
+		DOM_edit_VOIPTrunk_Username.disabled = false;
+		_$('edit_VOIPTrunk_Providername').disabled = false;
+		if (EDIT_TRUNK == tinfo.getProperty('username')) DOM_edit_VOIPTrunk_Username.disabled = true;
+		if (EDIT_TRUNK == tinfo.getProperty('trunkname')) _$('edit_VOIPTrunk_Providername').disabled = true;
 
 		var c = context2json({ filename:'extensions.conf', context: 'globals' , usf: 1 });
 		ASTGUI.updateFieldToValue( 'trunk_obcid', c.getProperty(ASTGUI.globals.obcidUsrPrefix + EDIT_TRUNK) );
@@ -209,13 +220,6 @@ var show_Edit_Trunk = function(){
 };
 
 
-
-
-
-
-
-
-
 var edit_VOIPTrunk_save_go = function(){
 	var topreload = false;
 	var tmp_username = ASTGUI.getFieldValue('edit_VOIPTrunk_Username');
@@ -224,35 +228,46 @@ var edit_VOIPTrunk_save_go = function(){
 		if( !tmp_confirm ) return;
 	}
 
-	if ( !ASTGUI.checkRequiredFields(['edit_VOIPTrunk_Providername', 'edit_VOIPTrunk_Type' , 'edit_VOIPTrunk_Hostname']) ){
+	if ( !ASTGUI.checkRequiredFields(['edit_VOIPTrunk_Providername', 'edit_VOIPTrunk_Type', 'edit_VOIPTrunk_Context_Basis', 'edit_VOIPTrunk_Hostname']) ) {
 		return ;
 	}
 
 	if( isNewTrunk == true ) {
 	// New Trunk
-		var tmp_ttype = parent.astgui_managetrunks.misc.getTrunkType( DOM_edit_VOIPTrunk_Username.value );
-		//if( tmp_ttype ){
-		//	ASTGUI.highlightField( DOM_edit_VOIPTrunk_Username , "Another trunk exists with this name !!" );
-		//	return;
-		//}
+		var tcv = edit_VOIPTrunk_Context_Basis.value;  /* How do we assign context name ? */
+		if (tcv == 'FromUser') {
+			var tmp_ttype = parent.astgui_managetrunks.misc.getTrunkType( DOM_edit_VOIPTrunk_Username.value );
+			if( tmp_ttype ){
+				ASTGUI.highlightField( DOM_edit_VOIPTrunk_Username , "Another trunk exists with this name !!" );
+				return;
+			}
+		}
+		else if (tcv == 'FromProvider') {
+			var tmp_ttype = parent.astgui_managetrunks.misc.getTrunkType( ASTGUI.getFieldValue('edit_VOIPTrunk_Providername') );
+			if( tmp_ttype ){
+				ASTGUI.highlightField( 'edit_VOIPTrunk_Providername' , "Another trunk exists with this name !!" );
+				return;
+			}
+		}
 
 		var ttv = DOM_edit_VOIPTrunk_Type.value;
+
 		var trp = {
-			host: DOM_edit_VOIPTrunk_Hostname.value ,
+			host: 	  DOM_edit_VOIPTrunk_Hostname.value ,
+			username: DOM_edit_VOIPTrunk_Username.value ,
+			secret:   DOM_edit_VOIPTrunk_Password.value ,
 			trunkname: ASTGUI.getFieldValue('edit_VOIPTrunk_Providername')
 		};
-
-		if( DOM_edit_VOIPTrunk_Username.value ){
-			trp.username = ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Username) ;
-			trp.secret = ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Password) ;
-		}
 
 		var cbf = function(){
 			ASTGUI.feedback({msg:'Created New ' + ttv+ ' trunk !', showfor: 3 , color: 'green', bgcolor: '#FFFFFF'}) ;
 			window.location.reload();
 		};
-		if(ttv =='SIP'){ parent.astgui_managetrunks.addSIPTrunk( trp , cbf ) ; }
-		if(ttv =='IAX'){ parent.astgui_managetrunks.addIAXTrunk( trp , cbf ) ; }
+
+		if(ttv =='SIP'){ parent.astgui_managetrunks.addSIPTrunk( trp , cbf,
+						DOM_edit_VOIPTrunk_Context_Basis.value ) ; }
+		if(ttv =='IAX'){ parent.astgui_managetrunks.addIAXTrunk( trp , cbf,
+						DOM_edit_VOIPTrunk_Context_Basis.value ) ; }
 
 	}else if(isNewTrunk == false){
 	// Edit Existing Trunk
@@ -353,43 +368,6 @@ var edit_VOIPTrunk_save_go = function(){
 
 			}
 		// End of remote MWI
-
-		var NEW_TRUNKNAME = ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Username) ;
-		if( old_trunkUsername != NEW_TRUNKNAME ){
-			var topreload = true;
-			// if username is changed, change the trunk name, incoming context name and all timeinterval incoming context names
-			v.new_action('delete', 'globals', EDIT_TRUNK, '','' );
-			if( parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['hasiax'] == 'yes' ){
-				v.new_action('append', 'globals', NEW_TRUNKNAME,  'IAX2/' + NEW_TRUNKNAME );
-			}else if ( parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['hassip'] == 'yes' ){
-				v.new_action('append', 'globals', NEW_TRUNKNAME,  'SIP/' + NEW_TRUNKNAME );
-			}
-
-			x.new_action( 'renamecat', EDIT_TRUNK , "", NEW_TRUNKNAME ) ; // rename in users.conf
-
-			var EXT_CNF = config2json({ filename:'extensions.conf', usf:0 }) ;
-			for( var ct in EXT_CNF){ if( EXT_CNF.hasOwnProperty(ct) ){
-				if( ct == ASTGUI.contexts.TrunkDIDPrefix + EDIT_TRUNK ){
-					var tmp_DIDnewContext = ct.replaceXY(EDIT_TRUNK, NEW_TRUNKNAME) ;
-					v.new_action( 'renamecat', ct , "", tmp_DIDnewContext ) ;
-					EXT_CNF[ct].each( function( this_DID_line ){
-						if ( this_DID_line.contains( EDIT_TRUNK + '_' ) ){
-							var tmp_DID_newline = this_DID_line.replaceXY(EDIT_TRUNK, NEW_TRUNKNAME) ;
-							v.new_action( 'update', tmp_DIDnewContext, this_DID_line.beforeChar('=') ,  tmp_DID_newline.afterChar('=') , this_DID_line.afterChar('=') );
-						}
-					} );
-				}
-
-				if( ct == ASTGUI.contexts.TrunkDIDPrefix + EDIT_TRUNK || ct.beginsWith( ASTGUI.contexts.TrunkDIDPrefix + EDIT_TRUNK + '_' ) ){
-					v.new_action( 'renamecat', ct , "", ct.replaceXY(EDIT_TRUNK, NEW_TRUNKNAME)) ;
-				}
-
-			}}
-
-			var TMP_OBJ = parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK] ;
-			delete parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK] ;
-			parent.sessionData.pbxinfo.trunks[ttype][NEW_TRUNKNAME] = TMP_OBJ;
-		}
 
 		var after = function(){
 			v.callActions( function(){
@@ -541,15 +519,25 @@ var localajaxinit = function(){
 			</select>
 		</TD>
 	</TR>
+	
+	<TR id='TR_contextbasis'>
+		<TD align="right">Context Naming <img src="images/tooltip_info.gif" tip="en,trunks,40" class='tooltipinfo'>:</TD>
+		<TD>	<select id='edit_VOIPTrunk_Context_Basis'  required='yes'>
+				<option value='GUIAssigned' selected>Assigned by Asterisk GUI</option>
+				<option value='FromUser'>Based on Username</option>
+				<option value='FromProvider'>Based on Provider Name</option>
+			</select>
+		</TD>
+	</TR>
 
 	<TR>	<TD align="right">Provider Name <img src="images/tooltip_info.gif" tip="en,trunks,37" class='tooltipinfo'>:</TD>
 		<TD>	<input id='edit_VOIPTrunk_Providername' size=20 required='yes'></TD>
 	</TR>
 
-	<TR>	<TD align="right">Hostname :</TD>
+	<TR>	<TD align="right">Hostname <img src="images/tooltip_info.gif" tip="en,trunks,41" class='tooltipinfo'>:</TD>
 		<TD>	<input id='edit_VOIPTrunk_Hostname' size=30 required='yes'></TD>
 	</TR>
-	<TR>	<TD align="right">Username :</TD>
+	<TR>	<TD align="right">Username <img src="images/tooltip_info.gif" tip="en,trunks,39" class='tooltipinfo'>:</TD>
 		<TD>	<input id='edit_VOIPTrunk_Username' size=25  required='yes' validation='voipusername'></TD>
 	</TR>
 	<TR>	<TD align="right">Password :</TD>
@@ -603,7 +591,7 @@ var localajaxinit = function(){
 
 	<TR>	<TD colspan=2 align=center height=50 valign=middle>
 			<span class='guiButtonCancel' id="edit_VOIPTrunk_cancel"  onclick='ASTGUI.hideDrag(event);'>Cancel</span>
-			<span class='guiButtonEdit' id="edit_VOIPTrunk_save"  onclick='edit_VOIPTrunk_save_go();'>Add</span>
+			<span class='guiButtonEdit' id="edit_VOIPTrunk_save"  onclick='edit_VOIPTrunk_save_go();'>Save</span>
 		</TD>
 	</TR>
 	</TABLE>
