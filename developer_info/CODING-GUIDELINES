@@ -1,0 +1,168 @@
+	    --------------------------------------
+	    == Asterisk-Gui Coding Guidelines ==
+	    --------------------------------------
+
+This document began as a straight copy from the asterisk's
+doc/CODING-GUIDELINES.
+
+This document gives some basic indication on how the asterisk-gui code
+is (should be) structured. 
+
+This file will be split into 4 sections:
+(1) File/Folder organization
+(2) Html guidelines
+(3) Javascript guidelines
+(4) CSS guidelines
+
+Please read it to the end to understand in detail how the asterisk-gui
+code is organized, and to know how to extend asterisk-gui or contribute
+new code.
+
+We are looking forward to your contributions to the Asterisk-Gui.
+As Asterisk-GUI is a large and in some parts very time-sensitive 
+application, the code base needs to conform to a common set of coding 
+rules so that many developers can enhance and maintain the code. Code 
+also needs to be reviewed and tested so that it works and follows the 
+general architecture and guidelines, and is well documented.
+
+Asterisk is published under a dual-licensing scheme by Digium.
+To be accepted into the codebase, all non-trivial changes must be
+licensed to Digium. For more information, see the electronic license
+agreement on http://bugs.digium.com/.
+
+Patches should be in the form of a unified (-u) diff, made from a checkout
+from subversion.
+
+/usr/src/asterisk-gui$ svn diff > mypatch
+
+If you would like to only include changes to certain files in the patch, you
+can list them in the "svn diff" command:
+
+/usr/src/asterisk-gui$ svn diff somefile.c someotherfile.c > mypatch
+
+		------------------------------------------
+		==  PART ONE: FILE/FOLDER ORGANIZATION  ==
+		------------------------------------------
+
+* General rules
+---------------
+
+- All code, filenames, function names and comments must be in ENGLISH.
+
+- Don't annotate your changes with comments like "/* JMG 4/20/04 */";
+  Comments should explain what the code does, not when something was changed
+  or who changed it. If you have done a larger contribution, make sure
+  that you are added to the CREDITS file.
+
+- Don't make unnecessary whitespace changes throughout the code.
+  If you make changes, submit them to the tracker as separate patches
+  that only include whitespace and formatting changes.
+
+- Try to match the existing formatting of the file you are working on.
+
+- Use spaces instead of tabs when aligning in-line comments or #defines (this makes 
+  your comments aligned even if the code is viewed with another tabsize)
+
+
+* File structure
+----------------
+
+- The first lines of any file should be the Asterisk license comments.
+
+- The license comments should be followed by any styling, first links
+  then inline. Example:
+
+<!-- Initial CSS -->
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+
+#table_Ext_list {
+	border: 1px solid #666666;
+	margin-top: 5px;
+}
+
+</style>
+<!-- End Initial CSS -->
+
+- Following the CSS should be any Javascript, first includes, then inline.
+  Example:
+
+<!-- Initial Javascript -->
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/astman.js"></script>
+<script type="text/javascript">
+
+var REGISTRY_OUTPUT = { } ;
+var EX_CF;
+var tmp_image = document.createElement('IMG');
+$(tmp_image).attr('border', '0');
+
+</script>
+<!-- End Initial Javascript -->
+
+- The rest of the file should consist of the page's html.
+
+
+		---------------------------------
+		==  PART TWO: HTML GUIDELINES  ==
+		---------------------------------
+
+* General rules
+---------------
+
+- Luckily, W3C (http://www.w3c.org) already provides us with various html 
+  guidelines. These guidelines have the heavy attention of browser
+  developers and therefore should be considered when developing. 
+ 
+- For starters, lets try to follow their guidelines for XHTML 1.0 
+  (http://www.w3c.org/TR/xhtml1/) as much as possible. We'll make special 
+  notes below of any changes to their suggestions.
+
+- A good guideline cheatsheet can be found at:
+  http://www.w3c.org/TR/xhtml1/#guidelines
+
+
+		----------------------------------
+		==  PART THREE: CSS GUIDELINES  ==
+		----------------------------------
+
+* General rules
+---------------
+
+- Again, The W3C already provides various css guidelines. For now, we'll
+  follow their suggestions for CSS 2.1 (http://www.w3c.org/TR/CSS21/)
+
+- [TO BE ADDED] CSS cheatsheet discussing obvious formatting guidelines,
+  such as: each attribute has its own line, spacing rules, etc.
+
+
+		----------------------------------------
+		==  PART FOUR: JAVASCRIPT GUIDELINES  ==
+		----------------------------------------
+
+* General rules
+---------------
+
+- Because many of asterisk-gui developers also develop for asterisk and
+  (most) Javascript can follow typical C/C++ formatting guidelines, we'll
+  try to follow asterisk's coding guidelines and make exceptions where
+  necessary. The guidelines can be found by viewing "doc/CODING-GUIDELINES"
+  in asterisk source.
+
+- Also, since we use jQuery (http://www.jQuery.org) and prototype
+  (http://www.prototypejs.org), we should do what we can to follow their
+  conventions.
+
+- refrain from using 'onclick' and other associated html attributes. There
+  is a wonderful thing called Event Delegation 
+  (http://icant.co.uk/sandbox/eventdelegation/). This is a much faster
+  approach and can even be dynamic when you want it to be.
+
+- [TO BE ADDED] Javascript exceptions to asterisk coding guidelines.
+
+-----------------------------------------------
+Welcome to the Asterisk development community!
+Meet you on the asterisk-dev mailing list. 
+Subscribe at http://lists.digium.com!
+
+-- The Asterisk.org Development Team
