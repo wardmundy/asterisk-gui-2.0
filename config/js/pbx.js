@@ -154,6 +154,11 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			}
 		}
 
+		if( EXN_CNF.hasOwnProperty('default') && EXN_CNF['default'].contains('include=demo') ){
+			UPDATES.new_action('delete', 'default', 'include', '', 'demo');
+			UPDATES.new_action('append', 'default', ';include', 'demo ; This line was commented by ASTERISK GUI');
+		}
+
 		if( UPDATES.current_batch == 1 && UPDATES.current_batch_actionnumber == 0 ){ // no updates to extensions.conf
 
 		}else{
