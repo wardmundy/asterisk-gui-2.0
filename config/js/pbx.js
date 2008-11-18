@@ -33,7 +33,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					'default' : {},
 					'macro-stdexten' : [
 						'exten=s,1,Set(__DYNAMIC_FEATURES=${FEATURES})',
-						'exten=s,2,GotoIf($[${FOLLOWME_${ARG1}} = 1]?5:3)',
+						'exten=s,2,GotoIf($["${FOLLOWME_${ARG1}}" = "1"]?5:3)',
 						'exten=s,3,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})',
 						'exten=s,4,Goto(s-${DIALSTATUS},1)',
 						'exten=s,5,Macro(stdexten-followme,${ARG1},${ARG2})',
