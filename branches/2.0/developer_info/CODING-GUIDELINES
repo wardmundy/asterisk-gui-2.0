@@ -118,7 +118,25 @@ $(tmp_image).attr('border', '0');
   (http://www.w3c.org/TR/xhtml1/) as much as possible. We'll make special 
   notes below of any changes to their suggestions.
 
-- A good guideline cheatsheet can be found at:
+- Use the following example as a quick reference for html formatting. Note
+  key aspects like: capitalization, spacing, newlines, and quotation.
+
+	<div id="main"></div>
+
+	<table class="myTable">
+	<tr>
+		<td class="cell odd"> <a href="#test">test</a> </td>
+		<td class="cell even" rowspan="3"> blah </td>
+		<td class="cell odd"> 
+			<span class="first">first</span> 
+			<span class="last">last</span> 
+		</td>
+	</tr>
+	</table>
+
+	<img src="refresh.gif" title="Refresh" />
+
+- A good/thorough guideline can be found at:
   http://www.w3c.org/TR/xhtml1/#guidelines
 
 
