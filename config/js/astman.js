@@ -3014,32 +3014,42 @@ listOfActions.prototype = {
 		if( !parent.sessionData.PLATFORM.isAST_1_4 && this.FILE_CONTENT != null ){
 			// the update/delete/delcat commands fail in Asterisk 1.6.X/trunk if the corresponding category/variables are not found
 			// In Asterisk 1.4 we do not have to do this check
-
-			var tmp_FILENAME = this.filename;
-			if( top.sessionData.FileCache[tmp_FILENAME].modified ){
-				this.FILE_CONTENT = config2json({ filename: tmp_FILENAME , usf:0 });
-			}
-
 			switch( action ){
-				case 'update':
+				case 'append':
 					if( !this.FILE_CONTENT.hasOwnProperty(cat) ) return s;
-					if( this.FILE_CONTENT[cat].indexOfLike(name+'=') == -1 ){
-						action = 'append';
-					}
-					break;
-				case 'delete':
-					if( !this.FILE_CONTENT.hasOwnProperty(cat) || this.FILE_CONTENT[cat].indexOfLike(name+'=') == -1 ){
-						return s;
-					}
+					this.FILE_CONTENT[cat].push( name + "=" + value );
 					break;
 				case 'delcat':
 					if( !this.FILE_CONTENT.hasOwnProperty(cat) ){
 						return s;
 					}
+					delete this.FILE_CONTENT[cat] ;
+					break;
+				case 'delete':
+					if( !this.FILE_CONTENT.hasOwnProperty(cat) ) return s;
+					var tmp_index = this.FILE_CONTENT[cat].indexOfLike(name+'=') ;
+					if( tmp_index == -1 ) return s;
+					this.FILE_CONTENT[cat].splice(tmp_index,1);
+					break;
+				case 'newcat':
+					if( this.FILE_CONTENT.hasOwnProperty(cat) ) return s;
+					this.FILE_CONTENT[cat] = [] ;
+					break;
+				case 'update':
+					if( !this.FILE_CONTENT.hasOwnProperty(cat) ) return s;
+					var tmp_index = this.FILE_CONTENT[cat].indexOfLike(name+'=') ;
+					var tmp_line = name + "=" + value ;
+					if(  tmp_index == -1 ){
+						action = 'append';
+						this.FILE_CONTENT[cat].push(tmp_line);
+					}else{
+						this.FILE_CONTENT[cat][tmp_index] = tmp_line ;
+					}
 					break;
 				default: break;
 			}
 		}
+
 		var cnt = "" + count;
 		while(cnt.length < 6)
 			cnt = "0" + cnt;
