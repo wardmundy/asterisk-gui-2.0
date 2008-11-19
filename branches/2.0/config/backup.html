@@ -149,12 +149,20 @@ function restore_uploadedbkpfile(){
 }
 
 function addrow_totable(filename, i ){
+	// filename is of format "backup_2008nov19_164527__2008nov19.tar"
 	if(!filename.contains('__')){ return true;}
 	var fname = filename.split("__") ; // var fname[1] = 2007mar12.tar
-	var filedate = fname[1].split(".tar");
-	var day = filedate[0].substr(7);
-	var month = filedate[0].substr(4,3);
-	var year = filedate[0].substr(0,4);
+
+	var tmp_a = fname[1] ; // tmp_a = 2008nov19.tar
+	if(tmp_a.contains('_sounds.')){
+		tmp_a = tmp_a.withOut('_sounds');
+		fname[0] = fname[0] + '<b>Voicemails & Prompts</b>';
+	}
+
+	var filedate = tmp_a.rChop('.tar');
+	var day = filedate.substr(7);
+	var month = filedate.substr(4,3);
+	var year = filedate.substr(0,4);
 	
 	var newRow = _$('bkpfilesTable').insertRow(-1);
 	newRow.style.backgroundColor='#FFFFFF';
@@ -366,8 +374,8 @@ function backup_new(){
 		</tr>
 		
 		<tr class='AA50only'>	<td colspan=2 align=center height=6></td>	</tr>
-		<tr class='AA50only'>	<td class="field_text" align="right"> Complete Backup:&nbsp;</td>
-				<td><input type='checkbox' id='newbkp_completeBackup' class="input9"></td>
+		<tr class='AA50only'>	<td class="field_text" align="right"> Backup Voicemails & <BR> Custom Prompts :&nbsp;</td>
+				<td valign=top><input type='checkbox' id='newbkp_completeBackup' class="input9"></td>
 		</tr>
 		<tr>	<td colspan=2 align=center height=6></td>	</tr>
 		
