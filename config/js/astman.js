@@ -1277,20 +1277,26 @@ var ASTGUI = {
 	},
 
 	isNull : function(a){
+		// ASTGUI.isNull(a) ;
 		return a===null
 	},
 
-	isArray: function(a){ //	ASTGUI.isArray(a) ;
+	isArray: function(a){
+		// ASTGUI.isArray(a) ;
 		return a instanceof Array || ( a!= null && typeof a=="object" && typeof a.push == "function" && typeof a.concat == "function" )
 	},
 
-	loadHTML: function(u){ // loads URL 'u' in synchronus mode. note that url 'u' is restricted by same origin policy
+	loadHTML: function(u){
+		// ASTGUI.loadHTML(url)
+		// loads URL 'url' in synchronus mode. note that 'url' is restricted by same origin policy
 		var r =  Math.round(10000*Math.random());
 		var s = $.ajax({ url: u + '?r=' + r , async: false });
 		return s.responseText;
 	},
 
 	listSystemFiles : function( dir , cb ){
+		// ASTGUI.listSystemFiles( dir , callBackFunction )
+		// list of files in 'dir' will be sent to callBackFunction as an array
 		try{
 		this.systemCmd( this.scripts.ListFiles + ' ' +  dir , function(){
 			var op = ASTGUI.loadHTML( ASTGUI.paths.output_SysInfo );
@@ -1311,7 +1317,8 @@ var ASTGUI = {
 	},
 
 	miscFunctions: {
-		getChunksFromManagerOutput : function( op , usf){ // ASTGUI.miscFunctions.getChunksFromManagerOutput( output_str ) ;
+		getChunksFromManagerOutput : function( op , usf){
+			// ASTGUI.miscFunctions.getChunksFromManagerOutput( output_str ) ;
 			try{
 			var tr_Array = [];
 			var tmp_chunk = (usf) ? {} : [] ;
@@ -1366,7 +1373,19 @@ var ASTGUI = {
 			return false;
 		},
 			
-		moveUpDown_In_context: function(context, line , updown , cbf ){ 	// ASTGUI.miscFunctions.moveUpDown_In_context( ct , line , bool , cbf ) // bool = 0 for Down , 1 for Up 
+		moveUpDown_In_context: function(context, line , updown , cbf ){
+			// ASTGUI.miscFunctions.moveUpDown_In_context( ct , line , bool , cbf ) ;  bool = true for Up, false for Down (default)
+			// Use this function when you want to move a line Up/Down with in a context
+			// Example:
+			//
+			// [somcontext]
+			// include=context2
+			// include=context1
+			//
+			// use:
+			// 	ASTGUI.miscFunctions.moveUpDown_In_context( 'somcontext' , 'include=context2' , false , someCallBackFunction ) ;
+			// to move the 'include=context2' below the 'include=context1'
+
 			try{
 			updown = Number(updown);
 			var t = context2json({ filename:'extensions.conf' , context : context , usf: 0 });
@@ -1379,7 +1398,7 @@ var ASTGUI = {
 				if( t[ti] == line ){
 					var tmp_a = (updown) ? t[ ti - 1 ] : t[ ti + 1 ] ;
 					t[ti] = tmp_a ;
-					if( updown == 1 ){ // move up
+					if( updown ){ // move up
 						t[ti-1] = line ;
 					}else{ // move down
 						t[ti+1] = line ;
@@ -1427,6 +1446,8 @@ var ASTGUI = {
 
 		delete_LinesLike: function( ct ){
 			// ASTGUI.miscFunctions.delete_LinesLike({ context_name : 'voicemailgroups' , beginsWithArr: ['exten=6050,'] , filename: 'extensions.conf', hasThisString:'somestring', cb:function(){} });
+			// deletes all line in the context 'voicemailgroups' that beings with 'exten=6050,' and contains the string hasThisString (optional)
+
 			try{
 			var sel_cxt = context2json({ filename: ct.filename, context : ct.context_name , usf:0 });
 			if ( typeof ct.beginsWithArr == 'string' ){
