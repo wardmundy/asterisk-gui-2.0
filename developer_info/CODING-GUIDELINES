@@ -110,12 +110,12 @@ $(tmp_image).attr('border', '0');
 * General rules
 ---------------
 
-- Luckily, W3C (http://www.w3c.org) already provides us with various html 
+- Luckily, W3C (http://www.w3.org) already provides us with various html 
   guidelines. These guidelines have the heavy attention of browser
   developers and therefore should be considered when developing. 
  
 - For starters, lets try to follow their guidelines for XHTML 1.0 
-  (http://www.w3c.org/TR/xhtml1/) as much as possible. We'll make special 
+  (http://www.w3.org/TR/xhtml1/) as much as possible. We'll make special 
   notes below of any changes to their suggestions.
 
 - Use the following example as a quick reference for html formatting. Note
@@ -137,7 +137,7 @@ $(tmp_image).attr('border', '0');
 	<img src="refresh.gif" title="Refresh" />
 
 - A good/thorough guideline can be found at:
-  http://www.w3c.org/TR/xhtml1/#guidelines
+  http://www.w3.org/TR/xhtml1/#guidelines
 
 
 		----------------------------------
@@ -148,7 +148,7 @@ $(tmp_image).attr('border', '0');
 ---------------
 
 - Again, The W3C already provides various css guidelines. For now, we'll
-  follow their suggestions for CSS 2.1 (http://www.w3c.org/TR/CSS21/)
+  follow their suggestions for CSS 2.1 (http://www.w3.org/TR/CSS21/)
 
 - Styling should reside in <style></style> at the top of the associated 
   html page, or in a .css file. Refrain from adding a quick style="" 
