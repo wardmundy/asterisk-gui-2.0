@@ -133,7 +133,7 @@ var show_Edit_Trunk = function(){
 
 	if( isNewTrunk == true ) {
 		DOM_edit_VOIPTrunk_DIV_Title.innerHTML = 'Create New SIP/IAX trunk';
-		ASTGUI.resetTheseFields([ DOM_edit_VOIPTrunk_Type, DOM_edit_VOIPTrunk_Hostname , DOM_edit_VOIPTrunk_Username ,  DOM_edit_VOIPTrunk_Password , 'trunk_obcid' , 'edit_VOIPTrunk_Providername','trunk_fromdomain', 'trunk_fromuser', 'trunk_insecure' ]);
+		ASTGUI.resetTheseFields([ DOM_edit_VOIPTrunk_Type, DOM_edit_VOIPTrunk_Hostname , DOM_edit_VOIPTrunk_Username ,  DOM_edit_VOIPTrunk_Password , 'trunk_obcid' , 'edit_VOIPTrunk_Providername','trunk_fromdomain', 'trunk_fromuser','trunk_authuser', 'trunk_insecure' ]);
 		DOM_edit_VOIPTrunk_Type.disabled = false;
 		DOM_edit_VOIPTrunk_Context_Basis.disabled = false;
 		ASTGUI.feedback( { msg: 'Create New Trunk', showfor:2 });
@@ -155,6 +155,7 @@ var show_Edit_Trunk = function(){
 		ASTGUI.updateFieldToValue( 'edit_VOIPTrunk_Providername' , tinfo.getProperty('trunkname') );
 		ASTGUI.updateFieldToValue( 'trunk_fromdomain' , tinfo.getProperty('fromdomain') );
 		ASTGUI.updateFieldToValue( 'trunk_fromuser' , tinfo.getProperty('fromuser') );
+		ASTGUI.updateFieldToValue( 'trunk_authuser' , tinfo.getProperty('authuser') );
 		ASTGUI.updateFieldToValue( 'trunk_insecure' , tinfo.getProperty('insecure') );
 
 		if( tinfo.getProperty('allow') == 'all'){
@@ -315,6 +316,17 @@ var edit_VOIPTrunk_save_go = function(){
 					delete parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['fromuser'] ;
 				}
 			}
+
+			var tmp_authuser = ASTGUI.getFieldValue('trunk_authuser') ;
+			if( tmp_authuser ){
+				x.new_action('update', EDIT_TRUNK , 'authuser', tmp_authuser );
+				parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['authuser'] = tmp_authuser ;
+			}else{
+				if( parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK].hasOwnProperty('authuser') ){
+					delete parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['authuser'] ;
+				}
+			}
+
 
 			var tmp_insecure = ASTGUI.getFieldValue('trunk_insecure') ;
 			x.new_action('update', EDIT_TRUNK , 'insecure', tmp_insecure );
@@ -569,11 +581,15 @@ var localajaxinit = function(){
 		<TD align="right" valign=top>FromUser :</TD>
 		<TD align="left"> <input id="trunk_fromuser" size=16> </TD>
 	</TR>
-
+	<TR class='editTrunk_Field'>
+		<TD align="right" valign=top>AuthUser :</TD>
+		<TD align="left"> <input id="trunk_authuser" size=16> </TD>
+	</TR>
 	<TR class='editTrunk_Field'>
 		<TD align="right" valign=top>insecure :</TD>
 		<TD align="left"> <select id="trunk_insecure" dfalt='no' class="input8"><option value='port'>port</option><option value='port,invite'>very</option><option value='no'>no</option></select> </TD>
 	</TR>
+
 
 	<TR class='editTrunk_Field_ermwi'>
 		<TD align="right">
