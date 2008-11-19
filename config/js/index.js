@@ -787,7 +787,7 @@ var miscFunctions = {
 			y.each(function(user){
 				var f = new destination;
 				f.optionText = 'User Extension -- ' + user ;
-				f.optionValue = (fortbr)? 'default|' + user + '|1' : 'Goto(default|' + user + '|1)' ;
+				f.optionValue = (fortbr)? 'default,' + user + ',1' : 'Goto(default,' + user + ',1)' ;
 				tmp.push(f);
 				if(!fortbr && sessionData.pbxinfo.users[user].getProperty('hasvoicemail').isAstTrue() ){
 					var p_Text = 'User VoiceMailBox ' + user ;
@@ -798,14 +798,14 @@ var miscFunctions = {
 			y.each(function(meetme){
 				var f = new destination;
 				f.optionText = 'Conference Room -- ' + meetme ;
-				f.optionValue = (fortbr)? ASTGUI.contexts.CONFERENCES + '|' + meetme + '|1' :  'Goto('+ ASTGUI.contexts.CONFERENCES +'|'+ meetme + '|1)';
+				f.optionValue = (fortbr)? ASTGUI.contexts.CONFERENCES + ',' + meetme + ',1' :  'Goto('+ ASTGUI.contexts.CONFERENCES +','+ meetme + ',1)';
 				tmp.push(f);
 			});
 		var y = sessionData.pbxinfo.queues.getOwnProperties();
 			y.each(function(q){
 				var f = new destination;
 				f.optionText = 'Queue -- ' + q ;
-				f.optionValue = (fortbr)? ASTGUI.contexts.QUEUES + '|' + q + '|1' : 'Goto('+ ASTGUI.contexts.QUEUES +'|'+ q + '|1)';
+				f.optionValue = (fortbr)? ASTGUI.contexts.QUEUES + ',' + q + ',1' : 'Goto('+ ASTGUI.contexts.QUEUES +','+ q + ',1)';
 				tmp.push(f);
 			});
 		var y = sessionData.pbxinfo.voicemenus.getOwnProperties();
@@ -813,7 +813,7 @@ var miscFunctions = {
 				var vm_name = sessionData.pbxinfo.voicemenus[vmenu].comment || vmenu ;
 				var f = new destination;
 				f.optionText = 'VoiceMenu -- ' + vm_name ;
-				f.optionValue = (fortbr)? vmenu+ '|s|1' : 'Goto('+ vmenu +'|s|1)';
+				f.optionValue = (fortbr)? vmenu+ ',s,1' : 'Goto('+ vmenu +',s,1)';
 				tmp.push(f);
 			});
 		var y = sessionData.pbxinfo.timebasedRules.getOwnProperties();
@@ -821,7 +821,7 @@ var miscFunctions = {
 				var tbr_label = sessionData.pbxinfo.timebasedRules[tbr].label || tbr ;
 				var f = new destination;
 				f.optionText = 'Time Based Rule -- ' + tbr_label;
-				f.optionValue = (fortbr)? tbr + '|s|1' : 'Goto('+ tbr +'|s|1)';
+				f.optionValue = (fortbr)? tbr + ',s,1' : 'Goto('+ tbr +',s,1)';
 				tmp.push(f);
 			});
 		var y = sessionData.pbxinfo.ringgroups.getOwnProperties();
@@ -829,14 +829,14 @@ var miscFunctions = {
 				var rg_name = sessionData.pbxinfo.ringgroups[rg].NAME || rg ;
 				var f = new destination;
 				f.optionText = 'Ring Group -- ' + rg_name ;
-				f.optionValue = (fortbr)? rg + '|s|1' : 'Goto('+ rg +'|s|1)';
+				f.optionValue = (fortbr)? rg + ',s,1' : 'Goto('+ rg +',s,1)';
 				tmp.push(f);
 			});
 		var y = astgui_managePageGroups.getPGsList();
 			y.each(function(pge){
 				var f = new destination;
 				f.optionText = 'Page Group -- ' + pge ;
-				f.optionValue = 'Goto('+ ASTGUI.contexts.PageGroups +'|'+ pge +'|1)';
+				f.optionValue = 'Goto('+ ASTGUI.contexts.PageGroups +','+ pge +',1)';
 				tmp.push(f);
 			});
 
@@ -844,7 +844,7 @@ var miscFunctions = {
 			y.each(function( this_vmg_exten ){
 				var f = new destination;
 				f.optionText = 'VoiceMail Group -- ' + (sessionData.pbxinfo.vmgroups[this_vmg_exten].getProperty('label') || this_vmg_exten ) ;
-				f.optionValue = (fortbr) ? ASTGUI.contexts.VoiceMailGroups +'|' + this_vmg_exten + '|1' : 'Goto('+ ASTGUI.contexts.VoiceMailGroups +'|' + this_vmg_exten + '|1)' ;
+				f.optionValue = (fortbr) ? ASTGUI.contexts.VoiceMailGroups +',' + this_vmg_exten + ',1' : 'Goto('+ ASTGUI.contexts.VoiceMailGroups +',' + this_vmg_exten + ',1)' ;
 				tmp.push(f);
 			});
 
@@ -852,13 +852,13 @@ var miscFunctions = {
 			var nde = sessionData.pbxinfo['localextensions'].getProperty('defaultDirectory') ;
 			var f = new destination;
 			f.optionText = 'Names Directory -- ' + nde ;
-			f.optionValue = (fortbr) ? ASTGUI.contexts.Directory + '|' + nde + '|1' : 'Goto('+ ASTGUI.contexts.Directory + '|' + nde + '|1)'; ;
+			f.optionValue = (fortbr) ? ASTGUI.contexts.Directory + ',' + nde + ',1' : 'Goto('+ ASTGUI.contexts.Directory + ',' + nde + ',1)'; ;
 			tmp.push(f);
 		}
 
 			var f = new destination; // we always point to default|o instead of to where defautl|o points to, so that if when a different user is selected as operator, we do not have to update the menus
 			f.optionText = 'Operator';
-			f.optionValue = (fortbr)? 'default|o|1' : 'Goto(default|o|1)';
+			f.optionValue = (fortbr)? 'default,o,1' : 'Goto(default,o,1)';
 			tmp.push(f);
 
 		if(!fortbr){

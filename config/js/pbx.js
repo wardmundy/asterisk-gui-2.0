@@ -406,7 +406,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			df.each( function(line){
 				if( line.contains( ',1,Goto(ringroups-custom-' ) ){
 					var rg_ext = ASTGUI.parseContextLine.getExten(line) ;
-					var rg_name = line.betweenXY('(', '|') ; //ringroups-custom-1
+					var rg_name = ASTGUI.parseContextLine.getArgs(line)[0] ; //ringroups-custom-1
 					if( !sessionData.pbxinfo.ringgroups.hasOwnProperty(rg_name) ){
 						var tmp = {
 							NAME : rg_name,
@@ -1422,7 +1422,7 @@ astgui_manageVoiceMenus = {
 		});
 		if( new_menu.alias_exten ){ // add 'exten = 7000,1,Goto(voicemenu-custom-1|s|1)' in  context 'voicemenus'
 			if( !new_menu.alias_exten.contains(',') || !new_menu.alias_exten.toLowerCase().contains('goto(') ){// if new_menu.alias_exten is '4444'
-				new_menu.alias_exten = new_menu.alias_exten.lChop('exten=') + ',1,Goto(' + new_name + '|s|1)' ;
+				new_menu.alias_exten = new_menu.alias_exten.lChop('exten=') + ',1,Goto(' + new_name + ',s,1)' ;
 			}
 			x.new_action( 'append', ASTGUI.contexts.VoiceMenuExtensions , 'exten', new_menu.alias_exten );
 		}
@@ -1505,7 +1505,7 @@ astgui_manageConferences = {
 			var configOptions = line.afterChar('=');
 			var params = configOptions.betweenXY('|',')');
 			if( params.contains('a') &&  params.contains('A') ) { // if is a meetMe Admin Login
-				b = configOptions.betweenXY('(','|');
+				b = ASTGUI.parseContextLine.getArgs(line)[0] ;
 			}
 			if( !sessionData.pbxinfo.conferences.hasOwnProperty(b) ){
 				sessionData.pbxinfo.conferences[b] = new ASTGUI.customObject ;
@@ -1662,7 +1662,7 @@ astgui_manageRingGroups = {
 		}
 
 		for(var u=0, v = rgextns.length; u < v ; u++ ){
-			if( rgextns[u].contains(cxtname + '|') ){
+			if( rgextns[u].contains(cxtname + '|') || rgextns[u].contains(cxtname + ',') ){
 				rg.extension = ASTGUI.parseContextLine.getExten(rgextns[u]);
 				break;
 			}
@@ -1717,7 +1717,7 @@ astgui_manageRingGroups = {
 		var after = function() {
 			if( rg.extension ){
 				var u = new listOfSynActions('extensions.conf') ;
-				u.new_action( 'append', ASTGUI.contexts.RingGroupExtensions , 'exten',  rg.extension + ',1,Goto(' + newrg + '|s|1)' );
+				u.new_action( 'append', ASTGUI.contexts.RingGroupExtensions , 'exten',  rg.extension + ',1,Goto(' + newrg + ',s,1)' );
 				u.callActions();
 			}
 			sessionData.pbxinfo.ringgroups[newrg] = rg ;
@@ -1732,13 +1732,8 @@ astgui_manageRingGroups = {
 		var u = new listOfSynActions('extensions.conf') ;
 		u.new_action('delcat', rgname , '', '');
 		if( sessionData.pbxinfo.ringgroups[rgname].extension ){
-
-
-
 			var f = sessionData.pbxinfo.ringgroups[rgname].extension ;
-
-
-			u.new_action( 'delete', ASTGUI.contexts.RingGroupExtensions , 'exten', '', f + ',1,Goto(' + rgname + '|s|1)' ) ;
+			u.new_action( 'delete', ASTGUI.contexts.RingGroupExtensions , 'exten', '', f + ',1,Goto(' + rgname + ',s,1)' ) ;
 			if( sessionData.pbxinfo.ringgroups[rgname].hasOwnProperty('isOLDRG') && sessionData.pbxinfo.ringgroups[rgname].isOLDRG == true ){
 				u.new_action( 'delete', 'default' , 'exten', '', f + ',1,Goto(' + rgname + '|s|1)' ) ;
 			}
@@ -2059,13 +2054,12 @@ astgui_updateConfigFromOldGui = function(){
 			if(!this_line.beginsWith('exten=') ){ return ; }
 			var match_str = this_line.afterChar('=');
 	
-			if ( this_line.contains('MeetMe(${EXTEN}|') ){
+			if ( this_line.contains('MeetMe(${EXTEN}') ){
 			// Move any conferences into [conferences]
 				// old
 				// 	[default]
 				// 	exten => 6000,1,MeetMe(${EXTEN}|MI) // delete this line
-	
-					sa.new_action('delete', 'default' , 'exten', '', match_str );
+						sa.new_action('delete', 'default' , 'exten', '', match_str );
 				// new
 				//	[conferences]
 				// 	exten => 6000,1,MeetMe(${EXTEN}|MI)
@@ -2079,7 +2073,7 @@ astgui_updateConfigFromOldGui = function(){
 				//	[voicemenu-custom-?] 
 				//	exten = ????,?,Goto(conferences|6000|1)
 				var tmp_exten = ASTGUI.parseContextLine.getExten(match_str);
-				var tmp_oldMM_gotoStr = 'Goto(default|' + tmp_exten + '|1)' ;
+				var tmp_oldMM_gotoStr = 'Goto(default,' + tmp_exten + ',1)' ;
 	
 				for ( var catname in ext_conf ){
 					if( !ext_conf.hasOwnProperty(catname) ) continue;
@@ -2095,7 +2089,7 @@ astgui_updateConfigFromOldGui = function(){
 					this_menu.each( function( this_menu_line ){
 						if( this_menu_line.contains( tmp_oldMM_gotoStr ) ){
 							var tmp_toReplace = this_menu_line.afterChar('=');
-							var tmp_ReplaceWith = tmp_toReplace.replaceXY(tmp_oldMM_gotoStr, 'Goto(' + ASTGUI.contexts.CONFERENCES +'|' + tmp_exten + '|1)' );
+							var tmp_ReplaceWith = tmp_toReplace.replaceXY(tmp_oldMM_gotoStr, 'Goto(' + ASTGUI.contexts.CONFERENCES +',' + tmp_exten + ',1)' );
 							sa.new_action( 'update', catname , 'exten', tmp_ReplaceWith , tmp_toReplace );
 						}
 					});
@@ -2141,7 +2135,7 @@ astgui_updateConfigFromOldGui = function(){
 					this_menu.each( function( this_menu_line ){
 						if( this_menu_line.contains( tmp_oldRG_gotoStr ) ){
 							var tmp_toReplace = this_menu_line.afterChar('=');
-							var tmp_ReplaceWith = tmp_toReplace.replaceXY( tmp_oldRG_gotoStr, 'Goto(' + THIS_RGNAME +'|s|1)' );
+							var tmp_ReplaceWith = tmp_toReplace.replaceXY( tmp_oldRG_gotoStr, 'Goto(' + THIS_RGNAME +',s,1)' );
 							sa.new_action( 'update', catname , 'exten', tmp_ReplaceWith , tmp_toReplace );
 						}
 					});
@@ -2190,7 +2184,7 @@ astgui_updateConfigFromOldGui = function(){
 						this_menu.each( function( this_menu_line ){
 							if( this_menu_line.contains( tmp_oldQ_gotoStr ) ){
 								var tmp_toReplace = this_menu_line.afterChar('=');
-								var tmp_ReplaceWith = tmp_toReplace.replaceXY(tmp_oldQ_gotoStr, 'Goto(' + ASTGUI.contexts.QUEUES +'|' + tmp_exten + '|1)' );
+								var tmp_ReplaceWith = tmp_toReplace.replaceXY(tmp_oldQ_gotoStr, 'Goto(' + ASTGUI.contexts.QUEUES +',' + tmp_exten + ',1)' );
 								sa.new_action( 'update', catname , 'exten', tmp_ReplaceWith , tmp_toReplace );
 							}
 						});
