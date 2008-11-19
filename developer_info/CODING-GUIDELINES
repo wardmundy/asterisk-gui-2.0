@@ -149,7 +149,7 @@ $(tmp_image).attr('border', '0');
   necessary. The guidelines can be found by viewing "doc/CODING-GUIDELINES"
   in asterisk source.
 
-- Also, since we use jQuery (http://www.jQuery.org) and prototype
+- Also, since we use jQuery (http://www.jQuery.com) and prototype
   (http://www.prototypejs.org), we should do what we can to follow their
   conventions.
 
