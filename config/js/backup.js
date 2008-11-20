@@ -129,7 +129,7 @@ function addrow_totable(filename, i ){
 	var tmp_a = fname[1] ; // tmp_a = 2008nov19.tar
 	if(tmp_a.contains('_sounds.')){
 		tmp_a = tmp_a.withOut('_sounds');
-		fname[0] = fname[0] + '<b>Voicemails & Prompts</b>';
+		fname[0] = fname[0] + '<BR><b>Voicemails & Prompts</b>';
 	}
 
 	var filedate = tmp_a.rChop('.tar');
@@ -190,7 +190,7 @@ function restore_bkp(filename){
 
 function restore_bkp_step3(file_fullpath){
 	if( parent.sessionData.PLATFORM.isAA50 ){
-		parent.ASTGUI.dialog.waitWhile(' The Sytem will reboot shortly ');
+		parent.ASTGUI.dialog.waitWhile(' The System will reboot shortly ');
 		parent.ASTGUI.systemCmd( ASTGUI.scripts.restoreBackup + " " + file_fullpath, function(){
 			ASTGUI.feedback( { msg:'Configuration restored !!', showfor:2 });
 			parent.miscFunctions.AFTER_REBOOT_CMD();
