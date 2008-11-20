@@ -1232,8 +1232,10 @@ var ASTGUI = {
 		for(var i = 0; i < lines.length; i++) {
 			var line = lines[i].trim().toLowerCase();
 			if (!line || line.beginsWith('host') ){ continue; }
-			if( ( line.beginsWith(host+':') || ( this_IP && line.beginsWith(this_IP + ' ') ) )  && line.contains( ' ' + uname_lc + ' ' ) ){
-				if( line.contains(' registered') ){
+			if( ( line.contains(host) || (this_IP && line.contains(this_IP)) )  && line.contains(uname_lc) ){
+				if( line.contains('unregistered') ){
+					return '<font color=red>Unregistered</font>';
+				}else if( line.contains('registered') ){
 					return '<font color=green>Registered</font>' ;
 				}else if( line.contains('auth. sent') ){
 					return '<font color=red>Waiting for Authentication</font>';
@@ -1241,8 +1243,6 @@ var ASTGUI = {
 					return '<font color=red>Request Sent</font>';
 				}else if( line.contains('rejected') ){
 					return '<font color=red>Rejected</font>';
-				}else if( line.contains('unregistered') ){
-					return '<font color=red>Unregistered</font>';
 				}else{
 					return '<font color=red>Unregistered</font>';
 				}
