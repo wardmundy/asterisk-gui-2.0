@@ -67,6 +67,12 @@ can list them in the "svn diff" command:
 * File structure
 ----------------
 
+- HTML files that include roughly more than 100 lines of javascript should
+  have the javascript moved into a .js file in the config/js/ folder. The
+  associated js file should have the same basename as the html file. Example:
+
+  	config/index.html has config/js/index.js
+  
 - The first lines of any file should be the Asterisk license comments.
 
 - The license comments should be followed by any styling, first links
