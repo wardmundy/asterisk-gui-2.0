@@ -26,14 +26,23 @@
 <link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
 <style type="text/css">
 	.no_obcid{ color: #FF0000; }
-	#table_userslist {
-		border: 1px solid #666666;
+	#table_userslist_container{
+		clear:both;
+		height: 600px;
+		margin-left: 5px;
+		margin-right: 20px;
 		margin-top: 5px;
 		margin-bottom:10px;
-		width: 96%;
+		overflow:auto;
+	}
+
+	#table_userslist {
+		border: 1px solid #666666;
+		width: 99%;
 		text-align: center;
 		padding : 1px;
 	}
+
 	#table_userslist tr.frow { background: #6b79a5; color: #CED7EF; }
 	#table_userslist tr.frow td{ font-weight:bold; }
 	#table_userslist tr td{ padding : 3px; }
@@ -59,7 +68,9 @@
 		<span class='lite_Heading' style='margin-left: 80px'> List of User Extensions </span>
 	</div>
 
-<table id='table_userslist' cellpadding=0 cellspacing=0 border=0 align=center style='clear:both;'></table>
+<div id='table_userslist_container'>
+<table id='table_userslist' cellpadding=0 cellspacing=0 border=0 align=center></table>
+</div>
 
 <div id="edit_userExtension_div" STYLE="width:750; display: none;" class='dialog'>
 	<TABLE width="100%" cellpadding=0 cellspacing=0>
