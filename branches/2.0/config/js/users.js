@@ -274,6 +274,7 @@ var USERS_MISC_FUNCTIONS = {
 		_$('edit_userExtension_div_title').innerHTML = 'Edit User Extension - ' + a ;
 		USERS_MISC_FUNCTIONS.RESET_USER_FORM_FIELDS();
 		$('#edit_userExtension_div').showWithBg();
+		try{_$('edit_userExtension_div').scrollIntoView(true);}catch(err){}
 	},
 	
 	getSelectedUsers : function(){ // USERS_MISC_FUNCTIONS.getSelectedUsers();
