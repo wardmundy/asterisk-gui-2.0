@@ -319,7 +319,7 @@ var localajaxinit = function() {
 
 	parent.ASTGUI.dialog.waitWhile(' Grabbing your Records... ');
 
-	parent.ASTGUI.systemCmd(ASTGUI.scripts.mastercsvexists, function (){
+	parent.ASTGUI.systemCmd(top.sessionData.directories.script_mastercsvexists, function (){
 		var content = ASTGUI.loadHTML("./Master.csv"); /* "./" is good enough. */
 		records = content.split("\n");
 		var intDest = parent.astgui_manageusers.listOfUsers();

@@ -66,7 +66,7 @@ networking_ApplyChanges = function(){
 
 		var cmd4 = "echo \" HOSTNAME=" + _$('HOSTNAME').value + " LEASE_LAN=" + _$('LEASE_LAN').value + " NTP_ADDRESS=" + _$('NTP_ADDRESS').value + " TFTP_LAN=" + _$('TFTP_LAN').value + " DOMAIN_LAN=" + _$('DOMAIN_LAN').value + " MAX_LEASE=" + _$('MAX_LEASE').value + "\" >> " + network_params;
 
-		var cmd5 = ASTGUI.scripts.NetworkSettings;
+		var cmd5 = top.sessionData.directories.script_NetworkSettings;
 
 		(function(){
 			var u = new listOfSynActions('phoneprov.conf') ;

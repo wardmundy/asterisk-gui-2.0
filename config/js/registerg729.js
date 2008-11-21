@@ -74,7 +74,7 @@ var register_New_license = function(){
 
 		ASTGUI.dialog.waitWhile('Registering Key...');
 		x.callActions(function(){
-			ASTGUI.systemCmdWithOutput( ASTGUI.scripts['Registerg729'] + " " + ASTGUI.getFieldValue('text_g729licensekey'), function(result){
+			ASTGUI.systemCmdWithOutput( top.sessionData.directories.script_Registerg729 + " " + ASTGUI.getFieldValue('text_g729licensekey'), function(result){
 				ASTGUI.dialog.hide();
 				if(result.contains('SUCCESS')){
 					alert('Registration Successfull ! \n Please reboot for changes to take effect');

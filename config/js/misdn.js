@@ -34,7 +34,7 @@ var isnewTrunk ;
 var misdnConfig = {
 
 	detectCards: function(){
-		parent.ASTGUI.systemCmdWithOutput( ASTGUI.apps.mISDNscan , function(s){ // run 'misdn-init scan'
+		parent.ASTGUI.systemCmdWithOutput( top.sessionData.directories.app_mISDNscan , function(s){ // run 'misdn-init scan'
 			try{
 				var records = s.split("\n");
 				var span=1, ns;
@@ -243,7 +243,7 @@ function generate_applyMisdn(){
 	x.new_action('append', d, "debug" , "0");
 	x.callActions(function(){
 		// call the script that would generate /etc/misdn-init.conf from /etc/asterisk/applymisdn.conf
-		parent.ASTGUI.systemCmd( ASTGUI.scripts.generatemISDN_init + " applysettings", function(){ 
+		parent.ASTGUI.systemCmd( top.sessionData.directories.script_generatemISDN_init + " applysettings", function(){ 
 			alert("You need to restart your machine for these settings to take effect");
 			window.location.reload();
 			return true; 

@@ -154,19 +154,19 @@ var onLogInFunctions = {
 				pu = true;
 			}
 			if( !http_conf.post_mappings.hasOwnProperty('backups') ){
-				var tmp_cbkp = ASTGUI.paths.ConfigBkp;
+				var tmp_cbkp = top.sessionData.directories.ConfigBkp ;
 				if( tmp_cbkp.endsWith('/') ){ tmp_cbkp = tmp_cbkp.rChop('/'); }
 				u.new_action('append', 'post_mappings' , 'backups', tmp_cbkp ) ;
 				pu = true;
 			}
 			if( !http_conf.post_mappings.hasOwnProperty('moh') ){
-				var tmp_cbkp = ASTGUI.paths.MOH ;
+				var tmp_cbkp = top.sessionData.directories.MOH ;
 				if( tmp_cbkp.endsWith('/') ){ tmp_cbkp = tmp_cbkp.rChop('/'); }
 				u.new_action('append', 'post_mappings' , 'moh', tmp_cbkp ) ;
 				pu = true;
 			}
 			if( !http_conf.post_mappings.hasOwnProperty('voicemenuprompts') ){
-				var tmp_cbkp = ASTGUI.paths['menusRecord'] ;
+				var tmp_cbkp = top.sessionData.directories.menusRecord ;
 				if( tmp_cbkp.endsWith('/') ){ tmp_cbkp = tmp_cbkp.rChop('/'); }
 				u.new_action('append', 'post_mappings' , 'voicemenuprompts', tmp_cbkp ) ;
 				pu = true;
@@ -187,13 +187,13 @@ var onLogInFunctions = {
 				pu = true;
 			}
 			if( !http_conf.post_mappings.hasOwnProperty('backups') ){
-				var tmp_cbkp = ASTGUI.paths['ConfigBkp'] ;
+				var tmp_cbkp = top.sessionData.directories.ConfigBkp ;
 				if( tmp_cbkp.endsWith('/') ){ tmp_cbkp = tmp_cbkp.rChop('/'); }
 				u.new_action('append', 'post_mappings' , 'backups', tmp_cbkp ) ;
 				pu = true;
 			}
 			if( !http_conf.post_mappings.hasOwnProperty('moh') ){
-				var tmp_cbkp = ASTGUI.paths.MOH ;
+				var tmp_cbkp = top.sessionData.directories.MOH ;
 				if( tmp_cbkp.endsWith('/') ){ tmp_cbkp = tmp_cbkp.rChop('/'); }
 				u.new_action('append', 'post_mappings' , 'moh', tmp_cbkp ) ;
 				pu = true;
@@ -221,7 +221,7 @@ var onLogInFunctions = {
 		var rand_1 = Math.round(100000*Math.random());
 		ASTGUI.systemCmdWithOutput( 'echo ' + rand_1  , function(s){
 			if( !s.contains(rand_1) ){
-				ASTGUI.dialog.alertmsg( 'Asterisk needs write privileges on ' + ASTGUI.paths['guiInstall'] );
+				ASTGUI.dialog.alertmsg( 'Asterisk needs write privileges on ' + top.sessionData.directories.guiInstall );
 			}
 
 			ASTGUI.dialog.waitWhile('detecting Hardware ..');
@@ -229,10 +229,52 @@ var onLogInFunctions = {
 		});
 	},
 
+	setGUI_Paths: function(){
+		// onLogInFunctions.setGUI_Paths()
+		var ASTERISK_CONF = context2json({ filename:'asterisk.conf' , context : 'directories' , usf:1 }) ;
+
+		sessionData.directories.asteriskConfig = ( ASTERISK_CONF.hasOwnProperty('astetcdir') ) ? ASTERISK_CONF.astetcdir : '/etc/asterisk/' ;
+		sessionData.directories.astvarlibdir = ( ASTERISK_CONF.hasOwnProperty('astvarlibdir') ) ? ASTERISK_CONF.astvarlibdir : '/var/lib/asterisk/' ;
+		sessionData.directories.AGIBIN = ( ASTERISK_CONF.hasOwnProperty('astagidir') ) ? ASTERISK_CONF.astagidir : '/var/lib/asterisk/agi-bin/' ;
+		sessionData.directories.astspooldir = ( ASTERISK_CONF.hasOwnProperty('astspooldir') ) ? ASTERISK_CONF.astspooldir : '/var/spool/asterisk/' ;
+
+		if( !sessionData.directories.asteriskConfig.endsWith('/') ){ sessionData.directories.asteriskConfig = sessionData.directories.asteriskConfig + '/' ; }
+		if( !sessionData.directories.astvarlibdir.endsWith('/') ){ sessionData.directories.astvarlibdir = sessionData.directories.astvarlibdir + '/' ; }
+		if( !sessionData.directories.AGIBIN.endsWith('/') ){ sessionData.directories.AGIBIN = sessionData.directories.AGIBIN + '/' ; }
+		if( !sessionData.directories.astspooldir.endsWith('/') ){ sessionData.directories.astspooldir = sessionData.directories.astspooldir + '/' ; }
+
+		sessionData.directories.guiInstall = sessionData.directories.astvarlibdir + 'static-http/config/' ;
+		sessionData.directories.ConfigBkp = sessionData.directories.astvarlibdir + 'gui_backups/';
+		sessionData.directories.ConfigBkp_dldPath = sessionData.directories.guiInstall + 'private/bkps/'; // path for keeping the bkp files for download
+		sessionData.directories.Sounds = sessionData.directories.astvarlibdir + 'sounds/' ;
+		sessionData.directories.MOH = sessionData.directories.astvarlibdir + 'moh/' ; // path for music on hold files
+		sessionData.directories.menusRecord = sessionData.directories.Sounds + 'record/' ;
+
+		sessionData.directories.scripts = sessionData.directories.astvarlibdir + 'scripts/';/* Directory for gui scripts (listfiles, for example) */	
+		sessionData.directories.output_SysInfo = './sysinfo_output.html' ;
+		sessionData.directories.voicemails_dir = '/var/spool/asterisk/voicemail/default/' ;
+
+
+		sessionData.directories.script_takeBackup =  'sh ' + sessionData.directories.scripts + 'takebackup';
+		sessionData.directories.script_restoreBackup =  'sh ' + sessionData.directories.scripts + 'restorebackup';
+		sessionData.directories.script_SysInfo = 'sh ' + sessionData.directories.scripts + 'gui_sysinfo';
+		sessionData.directories.script_ListFiles = 'sh ' + sessionData.directories.scripts + 'listfiles';
+		sessionData.directories.script_NetworkSettings = 'sh ' + sessionData.directories.scripts + 'networking.sh';
+		sessionData.directories.script_generateZaptel = 'sh ' + sessionData.directories.scripts + 'editzap.sh';
+		sessionData.directories.script_generatemISDN_init = 'sh ' + sessionData.directories.scripts + 'editmisdn.sh';
+		sessionData.directories.script_dldsoundpack = 'sh ' + sessionData.directories.scripts + 'dldsoundpack';
+		sessionData.directories.script_mastercsvexists = 'sh ' + sessionData.directories.scripts + 'mastercsvexists';
+		sessionData.directories.script_Registerg729 = 'sh ' + sessionData.directories.scripts + 'registerg729.sh';
+
+		sessionData.directories.app_Ztscan = 'ztscan > ' + sessionData.directories.asteriskConfig +'ztscan.conf' ;
+		sessionData.directories.app_mISDNscan = 'misdn-init scan' ;
+		sessionData.directories.app_flashupdate = 'flashupdate' ;
+	},
+
 	checkifLoggedIn: function(){
 		var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=ping', async: false });
 		var resp = s.getResponseHeader("Server");
-
+		onLogInFunctions.setGUI_Paths();
 		onLogInFunctions.detectPlatform(resp); // <-- PLATFORM Detection
 
 		if(s.responseText.toLowerCase().match('pong')){
@@ -377,7 +419,7 @@ var onLogInFunctions = {
 		var cb = function(){
 			onLogInFunctions.updatePanels4Platform();
 		};
-		ASTGUI.systemCmd(ASTGUI.apps.Ztscan, cb);
+		ASTGUI.systemCmd(top.sessionData.directories.app_Ztscan, cb);
 	},
 
 
