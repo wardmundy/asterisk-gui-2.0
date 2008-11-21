@@ -872,7 +872,7 @@ var miscFunctions = {
 		var tmp = [] ;
 		tmp = tmp.concat( astgui_manageusers.listOfUsers() );
 		if( sessionData.pbxinfo['localextensions'].hasOwnProperty('VoiceMailMain') ){
-			tmp.push( ASTGUI.parseContextLine.getExten(sessionData.pbxinfo['localextensions'].hasOwnProperty('VoiceMailMain')) ) ;
+			tmp.push( ASTGUI.parseContextLine.getExten( sessionData.pbxinfo['localextensions']['VoiceMailMain'] ) ) ;
 		}
 		var y = sessionData.pbxinfo.voicemenus.getOwnProperties();
 			y.each( function( item ){
