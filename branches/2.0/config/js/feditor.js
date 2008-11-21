@@ -84,7 +84,7 @@ var localajaxinit = function(){
 	parent.ASTGUI.dialog.waitWhile('loading list of filenames ..');
 	ASTGUI.selectbox.append(_$('filenames'),"Config Files", "");
 	_$('filenames').options[0].style.fontWeight = "bold";
-	parent.ASTGUI.listSystemFiles( ASTGUI.paths.asteriskConfig , function(listOfFiles) {
+	parent.ASTGUI.listSystemFiles( top.sessionData.directories.asteriskConfig , function(listOfFiles) {
 		try{
 			listOfFiles.each( function( file ) {
 				if( file.endsWith('.conf') ){ ASTGUI.selectbox.append( _$('filenames'), file , file ); }

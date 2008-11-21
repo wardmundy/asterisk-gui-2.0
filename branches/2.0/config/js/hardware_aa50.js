@@ -123,7 +123,7 @@ var applySettings = {
 
 
 	generate_zaptel: function(){
-		parent.ASTGUI.systemCmd( ASTGUI.scripts.generateZaptel + " applysettings" , function(){
+		parent.ASTGUI.systemCmd( top.sessionData.directories.script_generateZaptel + " applysettings" , function(){
 			parent.sessionData.REQUIRE_RESTART = true ;
 			parent.ASTGUI.systemCmd( "ztcfg -vv" , function(){
 				applySettings.save_opermode_settings();

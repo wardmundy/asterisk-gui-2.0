@@ -68,7 +68,7 @@ var play_record_file = function(){
 			context : ASTGUI.contexts.guitools ,
 			exten   : 'play_file',
 			priority : '1',
-			Variable : 'var1=' + ASTGUI.paths.menusRecord + CURRENT_FILE
+			Variable : 'var1=' + top.sessionData.directories.menusRecord + CURRENT_FILE
 		});
 	}
 	if(ACTION == 'RECORD' ){
@@ -81,7 +81,7 @@ var play_record_file = function(){
 var delete_file = function(fn){
 	if(!confirm("Delete selected Voice Menu prompt ?")){ return ; }
 	ASTGUI.dialog.waitWhile(' Deleting file ...');
-	parent.ASTGUI.systemCmd( "/bin/rm -f '" + ASTGUI.paths.menusRecord + fn + "'", function(){ 
+	parent.ASTGUI.systemCmd( "/bin/rm -f '" + top.sessionData.directories.menusRecord + fn + "'", function(){ 
 		ASTGUI.feedback( { msg:'Delete Request Successfull !', showfor:2 });
 		setTimeout ( function(){ ASTGUI.dialog.hide(); window.location.reload(); } , 1500 );
 	});
@@ -116,7 +116,7 @@ var RecordFile = function( extension ){ // uses/dials  extension to record into 
 		context : ASTGUI.contexts.guitools ,
 		exten   : 'record_vmenu',
 		priority : '1',
-		Variable : 'var1=' + ASTGUI.paths.menusRecord + CURRENT_FILE
+		Variable : 'var1=' + top.sessionData.directories.menusRecord + CURRENT_FILE
 	});
 
 	parent.ASTGUI.dialog.waitWhile( 'Please wait while the system <BR> Calls the specified Extension ... ' );
@@ -160,7 +160,7 @@ var localajaxinit = function(){
 
 	$('#whereToBuy_button').tooltip({delay:0.9,showURL:false,top:15,left:-300});
 
-	ASTGUI.listSystemFiles( ASTGUI.paths.menusRecord , function(recfiles) {
+	ASTGUI.listSystemFiles( top.sessionData.directories.menusRecord , function(recfiles) {
 		for( var i=0 ; i < recfiles.length ; i++ ){
 			var filename = recfiles[i].stripTags();
 			var newRow = _rft.insertRow(-1);

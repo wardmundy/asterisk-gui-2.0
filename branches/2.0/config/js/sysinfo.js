@@ -48,7 +48,7 @@ var percentage_usage = function(du){
 };
 
 function getsysinfohtml(){
-	_$('sysinfohtml').innerHTML = ASTGUI.loadHTML(ASTGUI.paths.output_SysInfo);
+	_$('sysinfohtml').innerHTML = ASTGUI.loadHTML(top.sessionData.directories.output_SysInfo);
 	_$('osversion').innerHTML = _$('si_uname').innerHTML;
 	_$('uptime').innerHTML = _$('si_uptime').innerHTML.replace(/load average/, "<BR>Load Average");
 	_$('asterisk').innerHTML =  parent.sessionData.AsteriskVersionString + "<BR>" + "Asterisk GUI-version : " + ( parent.sessionData.gui_version || ASTGUI.globals.version ) ;
@@ -139,5 +139,5 @@ var localajaxinit = function(){
 		}
 		ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
 	})();
-	parent.ASTGUI.systemCmd( parent.ASTGUI.scripts.SysInfo, function(){ parent.ASTGUI.dialog.hide(); getsysinfohtml(); } );
+	parent.ASTGUI.systemCmd( top.sessionData.directories.script_SysInfo, function(){ parent.ASTGUI.dialog.hide(); getsysinfohtml(); } );
 }

@@ -115,12 +115,12 @@ var VoiceMenus_miscFunctions = {
 	load_Sounds: function(){ // VoiceMenus_miscFunctions.load_Sounds();
 		parent.ASTGUI.dialog.waitWhile('loading list of sounds ..');
 
-		var LANG_PATH = ASTGUI.paths.Sounds ;
+		var LANG_PATH = top.sessionData.directories.Sounds ;
 
 		var c = config2json({filename: 'users.conf', usf:1});
 		if(c.hasOwnProperty('general')){
 			if ( c['general'].getProperty('language') != 'en' ){
-				var LANG_PATH = ASTGUI.paths.Sounds + c['general'].getProperty('language') + '/' ;
+				var LANG_PATH = top.sessionData.directories.Sounds + c['general'].getProperty('language') + '/' ;
 			}
 		}
 
@@ -138,7 +138,7 @@ var VoiceMenus_miscFunctions = {
 	},
 
 	load_recordedSounds: function(){
-		ASTGUI.listSystemFiles( ASTGUI.paths.menusRecord , function(recfiles) {
+		ASTGUI.listSystemFiles( top.sessionData.directories.menusRecord , function(recfiles) {
 			var tmp_obj = {};
 			recfiles.each(function( CURRENT_FILE ){
 				CURRENT_FILE = 'record/' + chop_Extension(CURRENT_FILE);
@@ -154,7 +154,7 @@ var VoiceMenus_miscFunctions = {
 
 	load_aig_files : function(){
 		parent.ASTGUI.dialog.waitWhile('loading list of AIG scripts ..');
-		ASTGUI.listSystemFiles( ASTGUI.paths.AGIBIN , function(recfiles) {
+		ASTGUI.listSystemFiles( top.sessionData.directories.AGIBIN , function(recfiles) {
 			AGI_FILES = recfiles;
 			parent.ASTGUI.dialog.hide();
 			ASTGUI.COMBOBOX.call( _$('newstep_agi') , AGI_FILES, 450 );

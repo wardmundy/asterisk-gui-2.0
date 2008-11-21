@@ -28,7 +28,7 @@ onUploadForm_load = function(){
 		$('#uploadForm_container').hide();
 		parent.ASTGUI.dialog.waitWhile( 'Creating configuration needed for uploading voice prompts ...' );
 
-		var tmp_a = ASTGUI.paths.menusRecord.rChop('/');
+		var tmp_a = top.sessionData.directories.menusRecord.rChop('/');
 		var u = new listOfSynActions('http.conf') ;
 			if( !top.sessionData.httpConf.postmappings_defined ){
 				u.new_action( 'newcat', 'post_mappings', '', '');
@@ -92,7 +92,7 @@ function localajaxinit() {
 	}
 
 	parent.ASTGUI.dialog.waitWhile('Loading ...');
-	parent.ASTGUI.systemCmd( "mkdir -p " + ASTGUI.paths.menusRecord , function(){
+	parent.ASTGUI.systemCmd( "mkdir -p " + top.sessionData.directories.menusRecord , function(){
 		parent.ASTGUI.dialog.hide();
 	});
 

@@ -19,7 +19,7 @@
  *
  */
 
-var bkpPath = ASTGUI.paths.ConfigBkp ;
+var bkpPath = top.sessionData.directories.ConfigBkp ;
 var upload_Filename = ""; // will be updated by upload_form.html
 var starteduploading = 0;
 var upload_Path; // path for 'uploads' as defined in http.conf - this variable will be automatically updated from http.conf
@@ -72,14 +72,14 @@ function localajaxinit() {
 	var rand_2 = Math.round(100000*Math.random());
 	var tmp_check_perms_guibkps = function(){
 		ASTGUI.dialog.waitWhile('Checking write privileges on backups folder');
-		ASTGUI.systemCmd( "touch "+ ASTGUI.paths['ConfigBkp'] + rand_2 , function(){
+		ASTGUI.systemCmd( "touch "+ top.sessionData.directories.ConfigBkp + rand_2 , function(){
 
-			ASTGUI.listSystemFiles( ASTGUI.paths['ConfigBkp'], function(a){
+			ASTGUI.listSystemFiles( top.sessionData.directories.ConfigBkp , function(a){
 				a = a.join('');
 				if( a.contains(rand_2) ){
-					ASTGUI.systemCmd( "rm '"+ ASTGUI.paths['ConfigBkp'] + rand_2 + "'" , function(){});
+					ASTGUI.systemCmd( "rm '"+ top.sessionData.directories.ConfigBkp + rand_2 + "'" , function(){});
 				}else{
-					ASTGUI.dialog.alertmsg( 'missing ' + ASTGUI.paths['ConfigBkp'] + '<BR> OR Asterisk does not have write privileges on ' + ASTGUI.paths['ConfigBkp'] );
+					ASTGUI.dialog.alertmsg( 'missing ' + top.sessionData.directories.ConfigBkp + '<BR> OR Asterisk does not have write privileges on ' + top.sessionData.directories.ConfigBkp );
 					return;
 				}
 
@@ -154,8 +154,8 @@ function addrow_totable(filename, i ){
 
 
 function dld_bkp( filename ){
-	parent.ASTGUI.systemCmd( "mkdir -p "+ ASTGUI.paths.ConfigBkp_dldPath + " ; /bin/rm " + ASTGUI.paths.ConfigBkp_dldPath + "* ", function(){
-		parent.ASTGUI.systemCmd( "/bin/ln -s "+ bkpPath + filename + " " + ASTGUI.paths.ConfigBkp_dldPath + filename , function(){
+	parent.ASTGUI.systemCmd( "mkdir -p "+ top.sessionData.directories.ConfigBkp_dldPath + " ; /bin/rm " + top.sessionData.directories.ConfigBkp_dldPath + "* ", function(){
+		parent.ASTGUI.systemCmd( "/bin/ln -s "+ bkpPath + filename + " " + top.sessionData.directories.ConfigBkp_dldPath + filename , function(){
 			var location_dir = window.location.href ;
 			location_dir = location_dir.rChop('backup.html') ;
 			var download_link =  location_dir + "private/bkps/" + filename ;
@@ -191,7 +191,7 @@ function restore_bkp(filename){
 function restore_bkp_step3(file_fullpath){
 	if( parent.sessionData.PLATFORM.isAA50 ){
 		parent.ASTGUI.dialog.waitWhile(' The System will reboot shortly ');
-		parent.ASTGUI.systemCmd( ASTGUI.scripts.restoreBackup + " " + file_fullpath, function(){
+		parent.ASTGUI.systemCmd( top.sessionData.directories.script_restoreBackup + " " + file_fullpath, function(){
 			ASTGUI.feedback( { msg:'Configuration restored !!', showfor:2 });
 			parent.miscFunctions.AFTER_REBOOT_CMD();
 			/* ***************** Todo Restart ******************* */
@@ -273,9 +273,9 @@ function backup_new(){
 	if( parent.sessionData.PLATFORM.isAA50  ){
 		var fullback = _$('newbkp_completeBackup').checked ;
 		if(fullback){
-			var tmp_script = ASTGUI.scripts.takeBackup + ' ' +  bkpPath + bkpfile + ' ' + 'YES';
+			var tmp_script = top.sessionData.directories.script_takeBackup + ' ' +  bkpPath + bkpfile + ' ' + 'YES';
 		}else{
-			var tmp_script = ASTGUI.scripts.takeBackup + ' ' +  bkpPath + bkpfile ;
+			var tmp_script = top.sessionData.directories.script_takeBackup + ' ' +  bkpPath + bkpfile ;
 		}
 		parent.ASTGUI.systemCmd( tmp_script , function(){
 			ASTGUI.feedback( { msg:'Backup Successful', showfor:2 });

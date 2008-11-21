@@ -314,7 +314,7 @@ var ASTGUI = {
 		GUI_DB : 'astgui', // name of the ASTDB database used by GUI -- ASTGUI.globals.GUI_DB
 		msg_notLoggedIn: 'Message: Authentication Required',
 		configfile : 'guipreferences.conf', // will be created if the file does not exist , ASTGUI.globals.configfile
-		g729RegInfo: 'g729reginfo.conf', // ASTGUI.globals.g729RegInfo, the ASTGUI.scripts.Registerg729 script will read this file to generate tab delimited file
+		g729RegInfo: 'g729reginfo.conf', // ASTGUI.globals.g729RegInfo, the sessionData.directories.script_Registerg729 script will read this file to generate tab delimited file
 		hwcfgFile: 'gui_confighw.conf', // file to store configured hardware information
 		zaptelIncludeFile: 'zaptel_guiRead.conf', // file that will be used to read zapte.conf, ASTGUI.globals.zaptelIncludeFile
 		pingInterval : 5000,
@@ -1298,8 +1298,8 @@ var ASTGUI = {
 		// ASTGUI.listSystemFiles( dir , callBackFunction )
 		// list of files in 'dir' will be sent to callBackFunction as an array
 		try{
-		this.systemCmd( this.scripts.ListFiles + ' ' +  dir , function(){
-			var op = ASTGUI.loadHTML( ASTGUI.paths.output_SysInfo );
+		this.systemCmd( top.sessionData.directories.script_ListFiles + ' ' +  dir , function(){
+			var op = ASTGUI.loadHTML( top.sessionData.directories.output_SysInfo );
 			var tmp_files = op.split('\n');
 			var files = [];
 			for( var i =0 ; i < tmp_files.length ; i++){
@@ -1360,7 +1360,7 @@ var ASTGUI = {
 				var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=createconfig&filename='+ fileName , async: false }).responseText;
 				callback();
 			}else{
-				ASTGUI.systemCmd( 'touch ' + ASTGUI.paths.asteriskConfig + fileName, callback );
+				ASTGUI.systemCmd( 'touch ' + top.sessionData.directories.asteriskConfig + fileName, callback );
 			}
 		},
 
@@ -2354,10 +2354,10 @@ var ASTGUI = {
 		// usage :: ASTGUI.systemCmdWithOutput( 'uptime' , callback(output){ /* do something with output */ } );
 		// Use this function when you want to execute a specific system command and read the output
 		// output will be sent as a argument to the callback function
-		var fcmd = cmd + ' > ' + this.paths['guiInstall'] + ( this.paths['output_SysInfo'].afterChar('/') || this.paths['output_SysInfo'] ) ;
+		var fcmd = cmd + ' > ' + top.sessionData.directories.guiInstall + ( top.sessionData.directories.output_SysInfo.afterChar('/') || top.sessionData.directories.output_SysInfo ) ;
 		var after = function(){
 			parent.document.getElementById('ajaxstatus').style.display = 'none';
-			var op = ASTGUI.loadHTML( ASTGUI.paths.output_SysInfo ) ;
+			var op = ASTGUI.loadHTML( top.sessionData.directories.output_SysInfo ) ;
 			cb( op ) ;
 		};
 		var delay_cb = function(){ setTimeout(after,500); };
@@ -2642,38 +2642,7 @@ var ASTGUI = {
 }; // ( AstGUI )
 
 ASTGUI.paths = {};
-
-ASTGUI.paths['guiInstall'] = '/var/lib/asterisk/static-http/config/';
 ASTGUI.paths['rawman'] = '../../rawman';
-ASTGUI.paths['asteriskConfig'] = '/etc/asterisk/';
-ASTGUI.paths['ConfigBkp'] = '/var/lib/asterisk/gui_backups/';
-ASTGUI.paths['ConfigBkp_dldPath'] = ASTGUI.paths['guiInstall'] + 'private/bkps/'; // path for keeping the bkp files for download
-ASTGUI.paths['AGIBIN'] = '/var/lib/asterisk/agi-bin/';
-ASTGUI.paths['Sounds'] = '/var/lib/asterisk/sounds/';
-ASTGUI.paths['MOH'] = '/var/lib/asterisk/moh/' ; // path for music on hold files
-ASTGUI.paths['menusRecord'] = ASTGUI.paths['Sounds'] + 'record/' ;
-
-ASTGUI.paths['scripts'] = '/var/lib/asterisk/scripts/';/* Directory for gui scripts (listfiles, for example) */	
-ASTGUI.paths['output_SysInfo'] = './sysinfo_output.html' ;
-ASTGUI.paths['voicemails_dir'] = '/var/spool/asterisk/voicemail/default/' ;
-
-ASTGUI.scripts = {};
-
-ASTGUI.scripts['takeBackup'] = 'sh ' + ASTGUI.paths['scripts'] + 'takebackup';
-ASTGUI.scripts['restoreBackup'] = 'sh ' + ASTGUI.paths['scripts'] + 'restorebackup';
-ASTGUI.scripts['SysInfo'] = 'sh ' + ASTGUI.paths['scripts'] + 'gui_sysinfo';
-ASTGUI.scripts['ListFiles'] = 'sh ' + ASTGUI.paths['scripts'] + 'listfiles';
-ASTGUI.scripts['NetworkSettings'] = 'sh ' + ASTGUI.paths['scripts'] + 'networking.sh';
-ASTGUI.scripts['generateZaptel'] = 'sh ' + ASTGUI.paths['scripts'] + 'editzap.sh';
-ASTGUI.scripts['generatemISDN_init'] = 'sh ' + ASTGUI.paths['scripts'] + 'editmisdn.sh';
-ASTGUI.scripts['dldsoundpack'] = 'sh ' + ASTGUI.paths['scripts'] + 'dldsoundpack';
-ASTGUI.scripts['mastercsvexists'] = 'sh ' + ASTGUI.paths['scripts'] + 'mastercsvexists';
-ASTGUI.scripts['Registerg729'] = 'sh ' + ASTGUI.paths['scripts'] + 'registerg729.sh';
-
-ASTGUI.apps = {};
-ASTGUI.apps['Ztscan'] = 'ztscan > ' + ASTGUI.paths['asteriskConfig'] +'ztscan.conf' ;
-ASTGUI.apps['mISDNscan'] = 'misdn-init scan' ;
-ASTGUI.apps['flashupdate'] = 'flashupdate' ;
 
 ASTGUI.includeContexts = [ 'default' , 'parkedcalls' , ASTGUI.contexts.CONFERENCES , ASTGUI.contexts.RingGroupExtensions , ASTGUI.contexts.VoiceMenuExtensions , ASTGUI.contexts.QUEUES , ASTGUI.contexts.VoiceMailGroups , ASTGUI.contexts.Directory, ASTGUI.contexts.PageGroups , ASTGUI.contexts.PageAnExtension] ;
 

@@ -366,7 +366,7 @@ var loadConfigFiles = {
 		ASTGUI.Log.Debug("start function: loadConfigFiles.runZtscan()");
 
 		ASTGUI.miscFunctions.createConfig( 'applyzap.conf', function(){
-			parent.ASTGUI.systemCmd( ASTGUI.apps.Ztscan , function(){ // run ztscan and then try loading ztscan.conf
+			parent.ASTGUI.systemCmd( top.sessionData.directories.app_Ztscan , function(){ // run ztscan and then try loading ztscan.conf
 				window.setTimeout( loadConfigFiles.readZtscanConf , 700 ); // leave some time for ztscan to generate ztscan.conf
 			});
 			ASTGUI.Log.Debug("end of function: loadConfigFiles.runZtscan()");
@@ -808,7 +808,7 @@ var applySettings = {
 	},
 
 	generate_zaptel: function(){
-		parent.ASTGUI.systemCmd( ASTGUI.scripts.generateZaptel + " applysettings" , function(){
+		parent.ASTGUI.systemCmd( top.sessionData.directories.script_generateZaptel + " applysettings" , function(){
 			parent.sessionData.REQUIRE_RESTART = (HAS_ANALOGHARDWARE || HAS_DIGITALHARDWARE)? true : false;
 			parent.ASTGUI.systemCmd( "ztcfg -vv" , function(){
 				applySettings.save_opermode_settings();

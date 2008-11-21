@@ -628,7 +628,7 @@ astgui_manageusers  = { // all the functions related to user management would re
 		
 		qs_x.callActions(function(){
 			if( deletevm ){
-				ASTGUI.systemCmd('rm ' + ASTGUI.paths['voicemails_dir'] + user + ' -rf', cb);
+				ASTGUI.systemCmd('rm ' + top.sessionData.directories.voicemails_dir + user + ' -rf', cb);
 			}else{
 				cb();
 			}
@@ -1857,7 +1857,7 @@ astgui_updateConfigFromOldGui = function(){
 
 	var n_Lower = n.toLowerCase();
 	if( n_Lower.contains('response: error') && n_Lower.contains('message: config file not found') ){
-		parent.ASTGUI.systemCmd( 'touch ' + ASTGUI.paths['asteriskConfig'] + ASTGUI.globals.configfile , function(){
+		parent.ASTGUI.systemCmd( 'touch ' + top.sessionData.directories.asteriskConfig + ASTGUI.globals.configfile , function(){
 			top.window.location.reload();
 		});
 		return false;
@@ -2233,7 +2233,7 @@ astgui_updateConfigFromOldGui = function(){
 			var tmp_bkpFileName = ( sessionData.PLATFORM.isABE ) ? 'Upgrade_backup_of_C1.x__' + year + month + day + '.tar' :  'Upgrade_backup_before_GUI__' + year + month + day + '.tar' ;
 	
 			parent.ASTGUI.dialog.waitWhile('Taking Backup of current configuration ...');
-			ASTGUI.systemCmd( "tar -cf " + ASTGUI.paths.ConfigBkp + tmp_bkpFileName + ' ' +  ' /etc/asterisk', function(){
+			ASTGUI.systemCmd( "tar -cf " + top.sessionData.directories.ConfigBkp + tmp_bkpFileName + ' ' +  ' /etc/asterisk', function(){
 				ASTGUI.feedback({ msg:'Backup Successful', showfor:2 });
 				do_Upgrade();
 			});

@@ -195,7 +195,7 @@ var manage_moh = {
 			};
 
 		var tmp_MOH_PATH_PM_NAME = ASTGUI.contexts.mohdirPrefix + tmp_moh_classname ;
-		var tmp_MOH_PATH = ASTGUI.paths['MOH'] + tmp_MOH_PATH_PM_NAME ;
+		var tmp_MOH_PATH = top.sessionData.directories.MOH + tmp_MOH_PATH_PM_NAME ;
 
 		parent.ASTGUI.dialog.waitWhile(' creating moh class ...');
 		// create entry from musiconhold.conf
