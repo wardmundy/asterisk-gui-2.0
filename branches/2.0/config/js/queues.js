@@ -145,8 +145,8 @@ var show_Queue_Form = function(){
 		ASTGUI.resetTheseFields([ DOM_Queue_Ext, DOM_edit_label ,DOM_edit_strategy , DOM_edit_musicclass , DOM_edit_timeout , DOM_edit_wrapuptime , DOM_edit_maxlen , DOM_edit_autofill , DOM_edit_autopause , DOM_edit_joinempty , DOM_edit_leavewhenempty , DOM_edit_reportholdtime, DOM_edit_voicemenuclass  ]); /* reset all fields */
 		ASTGUI.domActions.unCheckAll( ag_chkbxClass );
 		DOM_Queue_Ext.disabled = false;
-		var tmp_ql = parent.sessionData.pbxinfo.queues.getOwnProperties();
-		DOM_Queue_Ext.value  = tmp_ql.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('qe_start') );
+		var tmp_allextensions = ASTGUI.cloneObject( parent.miscFunctions.getAllExtensions() );
+		DOM_Queue_Ext.value  = tmp_allextensions.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('qe_start') );
 		DOM_edit_QueueDiv_title.innerHTML = 'New Queue';
 		$(DOM_edit_QueueDiv).showWithBg();
 		ASTGUI.feedback({ msg:'Create New Queue!', showfor:2 });

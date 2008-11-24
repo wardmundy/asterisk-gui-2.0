@@ -169,8 +169,7 @@ var resetFields = function(){
 
 		(function(){
 			var tmp_allextensions = ASTGUI.cloneObject( parent.miscFunctions.getAllExtensions() );
-			var tmp_newEXT = tmp_allextensions.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('rge_start') );
-			DOM_text_rgExten.value  = tmp_newEXT ;
+			DOM_text_rgExten.value  = tmp_allextensions.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('rge_start') );
 		})();
 
 		return ;
