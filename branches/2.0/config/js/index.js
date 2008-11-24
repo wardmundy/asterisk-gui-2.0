@@ -878,44 +878,53 @@ var miscFunctions = {
 		return tmp;
 	},
 
-	ifExtensionAlreadyExists: function(a){ // miscFunctions.ifExtensionAlreadyExists() - returns true if an extension already exists, false Other wise
+	getAllExtensions : function(){ // miscFunctions.getAllExtensions() - returns Array of all Extensions
 		var tmp = [] ;
-		tmp = tmp.concat( astgui_manageusers.listOfUsers() );
-		if( sessionData.pbxinfo['localextensions'].hasOwnProperty('VoiceMailMain') ){
-			tmp.push( ASTGUI.parseContextLine.getExten( sessionData.pbxinfo['localextensions']['VoiceMailMain'] ) ) ;
+		try{
+			tmp = tmp.concat( astgui_manageusers.listOfUsers() );
+			if( sessionData.pbxinfo['localextensions'].hasOwnProperty('VoiceMailMain') ){
+				tmp.push( ASTGUI.parseContextLine.getExten( sessionData.pbxinfo['localextensions']['VoiceMailMain'] ) ) ;
+			}
+			var y = sessionData.pbxinfo.voicemenus.getOwnProperties();
+				y.each( function( item ){
+					var tmp_thisVMenu = ASTGUI.cloneObject(sessionData.pbxinfo.voicemenus[item]);
+					if( tmp_thisVMenu.getProperty('alias_exten') ){
+						tmp.push( ASTGUI.parseContextLine.getExten(tmp_thisVMenu.alias_exten) );
+					}
+				} );
+			var y = sessionData.pbxinfo.conferences.getOwnProperties();
+				y.each( function( item ){
+					var tmp_thisMeetMe = ASTGUI.cloneObject(sessionData.pbxinfo.conferences[item]);
+					if( tmp_thisMeetMe.getProperty('configOptions') ){
+						tmp.push( ASTGUI.parseContextLine.getExten(tmp_thisMeetMe.configOptions) );
+					}
+					if( tmp_thisMeetMe.getProperty('adminOptions') ){
+						tmp.push( ASTGUI.parseContextLine.getExten(tmp_thisMeetMe.adminOptions) );
+					}
+				} );
+			var y = sessionData.pbxinfo.ringgroups.getOwnProperties();
+				y.each( function( item ){
+					var tmp_thisRg = ASTGUI.cloneObject(sessionData.pbxinfo.ringgroups[item]);
+					if( tmp_thisRg.getProperty('extension') ){
+						tmp.push( tmp_thisRg.extension );
+					}
+				} );
+			tmp = tmp.concat( astgui_managePageGroups.getPGsList() );
+			var tmp_LE = ASTGUI.cloneObject(sessionData.pbxinfo['localextensions']);
+			if( tmp_LE.getProperty('defaultDirectory') ){
+				tmp.push( tmp_LE.getProperty('defaultDirectory') );
+			}
+			tmp = tmp.concat( sessionData.pbxinfo.vmgroups.getOwnProperties() );
+			tmp = tmp.concat( sessionData.pbxinfo.queues.getOwnProperties() );
+		}catch(err){ 
+
+		}finally{
+			return tmp;
 		}
-		var y = sessionData.pbxinfo.voicemenus.getOwnProperties();
-			y.each( function( item ){
-				var tmp_thisVMenu = ASTGUI.cloneObject(sessionData.pbxinfo.voicemenus[item]);
-				if( tmp_thisVMenu.getProperty('alias_exten') ){
-					tmp.push( ASTGUI.parseContextLine.getExten(tmp_thisVMenu.alias_exten) );
-				}
-			} );
-		var y = sessionData.pbxinfo.conferences.getOwnProperties();
-			y.each( function( item ){
-				var tmp_thisMeetMe = ASTGUI.cloneObject(sessionData.pbxinfo.conferences[item]);
-				if( tmp_thisMeetMe.getProperty('configOptions') ){
-					tmp.push( ASTGUI.parseContextLine.getExten(tmp_thisMeetMe.configOptions) );
-				}
-				if( tmp_thisMeetMe.getProperty('adminOptions') ){
-					tmp.push( ASTGUI.parseContextLine.getExten(tmp_thisMeetMe.adminOptions) );
-				}
-			} );
-		var y = sessionData.pbxinfo.ringgroups.getOwnProperties();
-			y.each( function( item ){
-				var tmp_thisRg = ASTGUI.cloneObject(sessionData.pbxinfo.ringgroups[item]);
-				if( tmp_thisRg.getProperty('extension') ){
-					tmp.push( tmp_thisRg.extension );
-				}
-			} );
-		tmp = tmp.concat( astgui_managePageGroups.getPGsList() );
-		var tmp_LE = ASTGUI.cloneObject(sessionData.pbxinfo['localextensions']);
-		if( tmp_LE.getProperty('defaultDirectory') ){
-			tmp.push( tmp_LE.getProperty('defaultDirectory') );
-		}
-		tmp = tmp.concat( sessionData.pbxinfo.vmgroups.getOwnProperties() );
-		tmp = tmp.concat( sessionData.pbxinfo.queues.getOwnProperties() );
-		return tmp.contains(a) ;
+	},
+
+	ifExtensionAlreadyExists: function(a){ // miscFunctions.ifExtensionAlreadyExists() - returns true if an extension already exists, false Other wise
+		return this.getAllExtensions().contains(a);
 	}
 };
 
