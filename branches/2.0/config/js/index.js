@@ -836,6 +836,16 @@ var miscFunctions = {
 			});
 		var y = sessionData.pbxinfo.queues.getOwnProperties();
 			y.each(function(q){
+				if( sessionData.pbxinfo.queues[q]['configLine'].contains(',1,agentlogin()') ){
+					var tmp_exten = ASTGUI.parseContextLine.getExten(sessionData.pbxinfo.queues[q]['configLine']) ;
+					tmp.push({ optionText: 'Agent Login -- ' + tmp_exten , optionValue: 'Goto('+ ASTGUI.contexts.QUEUES +','+ tmp_exten + ',1)' });
+					return;
+				}
+				if( sessionData.pbxinfo.queues[q]['configLine'].contains(',1,agentcallbacklogin()') ){
+					var tmp_exten = ASTGUI.parseContextLine.getExten(sessionData.pbxinfo.queues[q]['configLine']) ;
+					tmp.push({ optionText: 'Agent Callback Login -- ' + tmp_exten , optionValue: 'Goto('+ ASTGUI.contexts.QUEUES +','+ tmp_exten + ',1)' });
+					return;
+				}
 				tmp.push({ optionText: 'Queue -- ' + q, optionValue: 'Goto('+ ASTGUI.contexts.QUEUES +','+ q + ',1)' });
 			});
 		var y = sessionData.pbxinfo.voicemenus.getOwnProperties();
@@ -916,7 +926,7 @@ var miscFunctions = {
 			}
 			tmp = tmp.concat( sessionData.pbxinfo.vmgroups.getOwnProperties() );
 			tmp = tmp.concat( sessionData.pbxinfo.queues.getOwnProperties() );
-		}catch(err){ 
+		}catch(err){
 
 		}finally{
 			return tmp;
