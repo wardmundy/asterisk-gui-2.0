@@ -72,12 +72,23 @@ _$ = function(x){
 	};
 	
 	Array.prototype.firstAvailable = function(start) {
-		if(!start){ start = 1; }else{ start = Number( start ); }
-		if(!this.length){return start;}
-		for(var y=0, x=[] ; y< this.length; y++){ x.push( Number(this[y]) ); } // 'this' can also be an array of number strings
-		var i=0;
-		while( i < 1 ){
-			if( x.contains(start) ){ start++; }else{ return start; }
+		start = (!start)? 1 : Number( start );
+		if(!this.length)
+			return start;
+		for( var y=0, x=[], z=this.length ; y < z ; y++ ){
+			var NT = Number(this[y]) ;
+			if( NT < start )
+				continue;
+			x.push(NT);
+		}
+		if( !x.length )
+			return start;
+		while(true){
+			if( x.contains(start) ){
+				start++;
+			}else{
+				return start;
+			}
 		}
 	};
 
