@@ -168,16 +168,9 @@ var resetFields = function(){
 		ASTGUI.resetTheseFields([ DOM_rg_fb_select , DOM_select_strategy , DOM_text_ringTime ]);
 
 		(function(){
-			var tmp_aliasextens = [];
-			var rgs_list = parent.sessionData.pbxinfo.ringgroups.getOwnProperties();
-			rgs_list.each( function(rg){
-				var c = parent.sessionData.pbxinfo['ringgroups'][rg];
-				if ( c['extension'] ){
-					tmp_aliasextens.push( c['extension'] );
-				}
-			});
-			tmp_aliasextens = tmp_aliasextens.concat( parent.astgui_managePageGroups.getPGsList() );
-			DOM_text_rgExten.value  = tmp_aliasextens.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('rge_start') );
+			var tmp_allextensions = ASTGUI.cloneObject( parent.miscFunctions.getAllExtensions() );
+			var tmp_newEXT = tmp_allextensions.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('rge_start') );
+			DOM_text_rgExten.value  = tmp_newEXT ;
 		})();
 
 		return ;
