@@ -234,11 +234,8 @@ var USERS_MISC_FUNCTIONS = {
 			ASTGUI.updateFieldToValue( 'edit_hasIax', 'yes' );
 			ASTGUI.updateFieldToValue( 'edit_flash', '750' );
 			ASTGUI.updateFieldToValue( 'edit_rxflash', '1250' );
-			var ul = ASTGUI.cloneObject( parent.astgui_manageusers.listOfUsers() );
-			if( parent.sessionData.pbxinfo['localextensions'].hasOwnProperty('VoiceMailMain') ){
-				ul.push( ASTGUI.parseContextLine.getExten( parent.sessionData.pbxinfo['localextensions']['VoiceMailMain'] ) );
-			}
-			var tmp_newEXT = ul.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('ue_start') );
+			var tmp_allextensions = ASTGUI.cloneObject( parent.miscFunctions.getAllExtensions() );
+			var tmp_newEXT = tmp_allextensions.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('ue_start') );
 			ASTGUI.updateFieldToValue( 'new_ext', tmp_newEXT );
 			$('#edit_callerid_span').html(tmp_newEXT);
 		}
@@ -399,15 +396,14 @@ var USERS_MISC_FUNCTIONS = {
 		}
 
 		if( isNewUSER  ){
-
 				var NU_EXT = ASTGUI.getFieldValue('new_ext');
-				if( ! ASTGUI.miscFunctions.isExtensionInRange( NU_EXT ,'ue_start','ue_end') ){
-					ASTGUI.highlightField('new_ext' , 'Extension is not in preferred range');
+				if( parent.miscFunctions.ifExtensionAlreadyExists(NU_EXT) ){
+					ASTGUI.highlightField('new_ext', 'Extension already exists');
 					parent.ASTGUI.dialog.hide();
 					return;
 				}
-				if( parent.miscFunctions.ifExtensionAlreadyExists(NU_EXT) ){
-					ASTGUI.highlightField('new_ext', 'Extension already exists');
+				if( ! ASTGUI.miscFunctions.isExtensionInRange( NU_EXT ,'ue_start','ue_end') ){
+					ASTGUI.highlightField('new_ext' , 'Extension is not in preferred range');
 					parent.ASTGUI.dialog.hide();
 					return;
 				}
