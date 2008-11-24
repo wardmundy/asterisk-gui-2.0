@@ -115,25 +115,11 @@ var editMeetme_form = function(k){
 var show_MeetMe_Form = function(){
 	if(isNewBridge == true){
 		ASTGUI.resetTheseFields([DOM_edit_Ext , DOM_edit_PinCode , DOM_edit_AdminPinCode , DOM_edit_moh_firstcaller , DOM_edit_callerMenu , DOM_edit_announceCallers, DOM_edit_quietMode , DOM_edit_waitMarked]);
-
-		(function(){
-			var meetme_rooms = [];
-			var m = parent.sessionData.pbxinfo.conferences ;
-			for( l in m ){ if( m.hasOwnProperty(l) && l !='admin'){
-				meetme_rooms.push(l);
-				var tmp_room = ASTGUI.cloneObject(parent.sessionData.pbxinfo.conferences[l]);
-				var t = ASTGUI.parseContextLine.getExten( tmp_room.getProperty('adminOptions') ) ;
-				if(t){
-					meetme_rooms.push(t);
-				}
-			}}
-
-			DOM_edit_Ext.value  = meetme_rooms.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('mm_start') );
-		})();
+		var tmp_allextensions = ASTGUI.cloneObject( parent.miscFunctions.getAllExtensions() );
+		DOM_edit_Ext.value  = tmp_allextensions.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('mm_start') );
 		//mml.push(DOM_edit_Ext.value);
 		_$('edit_adminExtension').value = ''; // mml.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('mm_start') );
 		DOM_edit_Ext.disabled = false;
-
 		DOM_edit_MeetMe_title.innerHTML = 'New Conference Bridge';
 		ASTGUI.feedback( { msg:'New Conference Bridge', showfor: 3 } );
 		$(DOM_edit_MeetMeDiv).showWithBg();
@@ -235,20 +221,21 @@ var edit_meetMe_apply = function(){
 	}else{
 		var NU_EXT = ASTGUI.getFieldValue(DOM_edit_Ext);
 
-		if( ! ASTGUI.miscFunctions.isExtensionInRange( NU_EXT ,'mm_start','mm_end') ){
-			ASTGUI.highlightField(DOM_edit_Ext , 'Extension is not in preferred range');
-			parent.ASTGUI.dialog.hide();
-			return;
-		}
-
 		if( parent.miscFunctions.ifExtensionAlreadyExists(NU_EXT) ){
 			ASTGUI.highlightField(DOM_edit_Ext , 'Extension already exists');
 			parent.ASTGUI.dialog.hide();
 			return;
 		}
+
 		var ADMIN_EXT = ASTGUI.getFieldValue(DOM_edit_adminExtension);
 		if( ADMIN_EXT && parent.miscFunctions.ifExtensionAlreadyExists(ADMIN_EXT) ){
 			ASTGUI.highlightField(DOM_edit_adminExtension , 'Extension already exists');
+			parent.ASTGUI.dialog.hide();
+			return;
+		}
+
+		if( ! ASTGUI.miscFunctions.isExtensionInRange( NU_EXT ,'mm_start','mm_end') ){
+			ASTGUI.highlightField(DOM_edit_Ext , 'Extension is not in preferred range');
 			parent.ASTGUI.dialog.hide();
 			return;
 		}

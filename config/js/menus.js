@@ -541,19 +541,8 @@ var show_createNewMenu_Form = function(){
 	VoiceMenus_miscFunctions.reset_VoicemenuFields();
 	VoiceMenus_miscFunctions.refresh_allSteps();
 
-	(function(){
-		var tmp_aliasextens = [];
-		var lvms = parent.sessionData.pbxinfo.voicemenus.getOwnProperties();
-		lvms.each( function(vm_name){
-			var ae_line  = parent.sessionData.pbxinfo.voicemenus[vm_name].getProperty('alias_exten') ;
-			if( ae_line ) {
-				var ael = ASTGUI.parseContextLine.getExten(ae_line);
-				tmp_aliasextens.push( ael );
-			}
-		});
-		_$('vmenu_ext').value  = tmp_aliasextens.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('vme_start') );
-	})();
-
+	var tmp_allextensions = ASTGUI.cloneObject( parent.miscFunctions.getAllExtensions() );
+	_$('vmenu_ext').value  = tmp_allextensions.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('vme_start') );
 	_$('vmenu_allowKeyPressEvents').checked = false ;
 	_$('vmenu_allowKeyPressEvents').updateStatus();
 

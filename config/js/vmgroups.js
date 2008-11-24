@@ -98,8 +98,8 @@ var vmgroups_miscFunctions = {
 
 	reset_allFields : function(){ // vmgroups_miscFunctions.reset_allFields();
 		if(isNEW_VMG){
-			var vmgroups = parent.sessionData.pbxinfo.vmgroups.getOwnProperties();
-			var NEW_EXT = vmgroups.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('vmg_start') );
+			var tmp_allextensions = ASTGUI.cloneObject( parent.miscFunctions.getAllExtensions() );
+			var NEW_EXT = tmp_allextensions.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('vmg_start') );
 			_$('edit_vmgroup_exten').value = NEW_EXT ;
 			_$('edit_vmgroup_label').value = '' ;
 			_$('edit_vmgroup_exten').disabled = false;

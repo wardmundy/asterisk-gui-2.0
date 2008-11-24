@@ -137,19 +137,8 @@ var resetFields = function(){
 			}
 		});
 
-		(function(){
-			var tmp_aliasextens = [];
-			var rgs_list = parent.sessionData.pbxinfo.ringgroups.getOwnProperties();
-			rgs_list.each( function(rg){
-				var c = parent.sessionData.pbxinfo['ringgroups'][rg];
-				if( c['extension'] ){
-					tmp_aliasextens.push( c['extension'] );
-				}
-			});
-			tmp_aliasextens = tmp_aliasextens.concat( parent.astgui_managePageGroups.getPGsList() );
-			DOM_text_pageGroup_Exten.value  = tmp_aliasextens.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('rge_start') );
-		})();
-
+		var tmp_allextensions = ASTGUI.cloneObject( parent.miscFunctions.getAllExtensions() );
+		DOM_text_pageGroup_Exten.value  = tmp_allextensions.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('rge_start') );
 		return ;
 	}
 

@@ -1479,15 +1479,15 @@ astgui_manageConferences = {
 	The GUI creates/expects conference rooms in the following format	
 		extensions.conf
 			[ASTGUI.contexts.CONFERENCES]
-			exten => 6001,1,MeetMe(${EXTEN}|MsIwAq)
-			exten => 6002,1,MeetMe(6001|MsIwAq) // 6001's extension for admin/marked users
+			exten => 6001,1,MeetMe(${EXTEN}|MsIwq)
+			exten => 6002,1,MeetMe(6001|MsIwqaA) // 6001's extension for admin/marked users
 		meetme.conf 
 			[rooms]
 			conf = 6001,4567,7654 
 		//6001 is the conference number, 4567 is the password to join, 7654 is the adminpwd
 
 	the above conference room is stored in the data structure as
-		sessionData.pbxinfo.conferences['6001'] = { configOptions : '6001,1,MeetMe(${EXTEN}|MsIwAq)' , pwdString : '6001,4567,7654' }
+		sessionData.pbxinfo.conferences['6001'] = { configOptions : '6001,1,MeetMe(${EXTEN}|MsIwq)' ,adminOptions:'6002,1,MeetMe(${EXTEN}|MsIwqaA)',  pwdString : '6001,4567,7654' }
 	*/
 
 	loadMeetMeRooms: function(){
