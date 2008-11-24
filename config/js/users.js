@@ -234,7 +234,10 @@ var USERS_MISC_FUNCTIONS = {
 			ASTGUI.updateFieldToValue( 'edit_hasIax', 'yes' );
 			ASTGUI.updateFieldToValue( 'edit_flash', '750' );
 			ASTGUI.updateFieldToValue( 'edit_rxflash', '1250' );
-			var ul = parent.astgui_manageusers.listOfUsers();
+			var ul = ASTGUI.cloneObject( parent.astgui_manageusers.listOfUsers() );
+			if( parent.sessionData.pbxinfo['localextensions'].hasOwnProperty('VoiceMailMain') ){
+				ul.push( ASTGUI.parseContextLine.getExten( parent.sessionData.pbxinfo['localextensions']['VoiceMailMain'] ) );
+			}
 			var tmp_newEXT = ul.firstAvailable( parent.sessionData.GUI_PREFERENCES.getProperty('ue_start') );
 			ASTGUI.updateFieldToValue( 'new_ext', tmp_newEXT );
 			$('#edit_callerid_span').html(tmp_newEXT);
