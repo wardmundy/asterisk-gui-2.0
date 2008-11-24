@@ -903,6 +903,14 @@ var miscFunctions = {
 			f.optionValue = (fortbr)? 'default,o,1' : 'Goto(default,o,1)';
 			tmp.push(f);
 
+		if( sessionData.pbxinfo['localextensions'].hasOwnProperty('VoiceMailMain') ){
+			 var tmp_VMM_Exten = ASTGUI.parseContextLine.getExten( sessionData.pbxinfo['localextensions']['VoiceMailMain'] ) ;
+			var f = new destination;
+			f.optionText = 'Check Voicemails -- ' + tmp_VMM_Exten ;
+			f.optionValue = (fortbr)? 'default,' + tmp_VMM_Exten + ',1' : 'Goto(default,' + tmp_VMM_Exten + ',1)' ;
+			tmp.push(f);
+		}
+
 		if(!fortbr){
 			tmp.push({ optionText: 'Hangup' , optionValue: 'Hangup' });
 			tmp.push({ optionText: 'Congestion' , optionValue: 'Congestion' });
