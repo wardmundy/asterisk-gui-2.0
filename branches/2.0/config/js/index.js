@@ -833,6 +833,13 @@ var miscFunctions = {
 		var y = sessionData.pbxinfo.conferences.getOwnProperties();
 			y.each(function(meetme){
 				tmp.push({ optionText: 'Conference Room -- ' + meetme , optionValue: 'Goto('+ ASTGUI.contexts.CONFERENCES +','+ meetme + ',1)' });
+				
+				var tmp_adminOptions = sessionData.pbxinfo.conferences[meetme].getProperty('adminOptions') ;
+				if( tmp_adminOptions ){
+					var meetme_admin = ASTGUI.parseContextLine.getExten( tmp_adminOptions );
+					tmp.push({ optionText: 'Conference Room Admin -- ' + meetme_admin , optionValue: 'Goto('+ ASTGUI.contexts.CONFERENCES +','+ meetme_admin + ',1)' });
+				}
+
 			});
 		var y = sessionData.pbxinfo.queues.getOwnProperties();
 			y.each(function(q){
