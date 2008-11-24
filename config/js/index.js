@@ -816,105 +816,65 @@ var miscFunctions = {
 		});
 	},
 
-	getAllDestinations: function(fortbr){ // miscFunctions.getAllDestinations() // --> returns an Array of Objects
-	// There are many places in the gui where we want to preset a select box with all possible destinations
-	// Ex: in incoming calls, Voicemenus, TimeBased Routing, RingGroups etc etc.
+	getAllDestinations: function(){ // miscFunctions.getAllDestinations() // --> returns an Array of Objects
+	// There are various places in the gui where we want to preset a select box with all possible destinations
+	// for Example - in incoming calls, Voicemenus, RingGroups etc.
 	// this function navigates through all properties of sessionData.pbxinfo and returns an Array of Objects with all the possible destinations
 		var tmp = [] ;
-		var destination = function(){
-			this.optionText = '';
-			this.optionValue = '';
-		};
 		var y = astgui_manageusers.listOfUsers();
 			y.each(function(user){
-				var f = new destination;
-				f.optionText = 'User Extension -- ' + user ;
-				f.optionValue = (fortbr)? 'default,' + user + ',1' : 'Goto(default,' + user + ',1)' ;
-				tmp.push(f);
-				if(!fortbr && sessionData.pbxinfo.users[user].getProperty('hasvoicemail').isAstTrue() ){
-					var p_Text = 'User VoiceMailBox ' + user ;
-					tmp.push({ optionText: p_Text , optionValue: 'Voicemail(' + user + ',u)' });
+				tmp.push({ optionText: 'User Extension -- ' + user , optionValue: 'Goto(default,' + user + ',1)' });
+
+				if( sessionData.pbxinfo.users[user].getProperty('hasvoicemail').isAstTrue() ){
+					tmp.push({ optionText: 'User VoiceMailBox ' + user , optionValue: 'Voicemail(' + user + ',u)' });
 				}
+
 			});
 		var y = sessionData.pbxinfo.conferences.getOwnProperties();
 			y.each(function(meetme){
-				var f = new destination;
-				f.optionText = 'Conference Room -- ' + meetme ;
-				f.optionValue = (fortbr)? ASTGUI.contexts.CONFERENCES + ',' + meetme + ',1' :  'Goto('+ ASTGUI.contexts.CONFERENCES +','+ meetme + ',1)';
-				tmp.push(f);
+				tmp.push({ optionText: 'Conference Room -- ' + meetme , optionValue: 'Goto('+ ASTGUI.contexts.CONFERENCES +','+ meetme + ',1)' });
 			});
 		var y = sessionData.pbxinfo.queues.getOwnProperties();
 			y.each(function(q){
-				var f = new destination;
-				f.optionText = 'Queue -- ' + q ;
-				f.optionValue = (fortbr)? ASTGUI.contexts.QUEUES + ',' + q + ',1' : 'Goto('+ ASTGUI.contexts.QUEUES +','+ q + ',1)';
-				tmp.push(f);
+				tmp.push({ optionText: 'Queue -- ' + q, optionValue: 'Goto('+ ASTGUI.contexts.QUEUES +','+ q + ',1)' });
 			});
 		var y = sessionData.pbxinfo.voicemenus.getOwnProperties();
 			y.each(function(vmenu){
 				var vm_name = sessionData.pbxinfo.voicemenus[vmenu].comment || vmenu ;
-				var f = new destination;
-				f.optionText = 'VoiceMenu -- ' + vm_name ;
-				f.optionValue = (fortbr)? vmenu+ ',s,1' : 'Goto('+ vmenu +',s,1)';
-				tmp.push(f);
+				tmp.push({ optionText: 'VoiceMenu -- ' + vm_name , optionValue: 'Goto('+ vmenu +',s,1)' });
 			});
-		var y = sessionData.pbxinfo.timebasedRules.getOwnProperties();
-			y.each(function(tbr){
-				var tbr_label = sessionData.pbxinfo.timebasedRules[tbr].label || tbr ;
-				var f = new destination;
-				f.optionText = 'Time Based Rule -- ' + tbr_label;
-				f.optionValue = (fortbr)? tbr + ',s,1' : 'Goto('+ tbr +',s,1)';
-				tmp.push(f);
-			});
+// 		var y = sessionData.pbxinfo.timebasedRules.getOwnProperties();
+// 			y.each(function(tbr){
+// 				var tbr_label = sessionData.pbxinfo.timebasedRules[tbr].label || tbr ;
+// 				tmp.push({ optionText: 'Time Based Rule -- ' + tbr_label , optionValue: 'Goto('+ tbr +',s,1)' });
+// 			});
 		var y = sessionData.pbxinfo.ringgroups.getOwnProperties();
 			y.each(function(rg){
 				var rg_name = sessionData.pbxinfo.ringgroups[rg].NAME || rg ;
-				var f = new destination;
-				f.optionText = 'Ring Group -- ' + rg_name ;
-				f.optionValue = (fortbr)? rg + ',s,1' : 'Goto('+ rg +',s,1)';
-				tmp.push(f);
+				tmp.push({ optionText: 'Ring Group -- ' + rg_name , optionValue: 'Goto('+ rg +',s,1)' });
 			});
 		var y = astgui_managePageGroups.getPGsList();
 			y.each(function(pge){
-				var f = new destination;
-				f.optionText = 'Page Group -- ' + pge ;
-				f.optionValue = 'Goto('+ ASTGUI.contexts.PageGroups +','+ pge +',1)';
-				tmp.push(f);
+				tmp.push({ optionText: 'Page Group -- ' + pge , optionValue: 'Goto('+ ASTGUI.contexts.PageGroups +','+ pge +',1)' });
 			});
-
 		var y = sessionData.pbxinfo.vmgroups.getOwnProperties();
 			y.each(function( this_vmg_exten ){
-				var f = new destination;
-				f.optionText = 'VoiceMail Group -- ' + (sessionData.pbxinfo.vmgroups[this_vmg_exten].getProperty('label') || this_vmg_exten ) ;
-				f.optionValue = (fortbr) ? ASTGUI.contexts.VoiceMailGroups +',' + this_vmg_exten + ',1' : 'Goto('+ ASTGUI.contexts.VoiceMailGroups +',' + this_vmg_exten + ',1)' ;
-				tmp.push(f);
+				tmp.push({
+						optionText: 'VoiceMail Group -- ' + (sessionData.pbxinfo.vmgroups[this_vmg_exten].getProperty('label') || this_vmg_exten ),
+						optionValue: 'Goto('+ ASTGUI.contexts.VoiceMailGroups +',' + this_vmg_exten + ',1)'
+					});
 			});
-
 		if( sessionData.pbxinfo['localextensions'].getProperty('defaultDirectory') ){
 			var nde = sessionData.pbxinfo['localextensions'].getProperty('defaultDirectory') ;
-			var f = new destination;
-			f.optionText = 'Names Directory -- ' + nde ;
-			f.optionValue = (fortbr) ? ASTGUI.contexts.Directory + ',' + nde + ',1' : 'Goto('+ ASTGUI.contexts.Directory + ',' + nde + ',1)'; ;
-			tmp.push(f);
+			tmp.push({ optionText: 'Names Directory -- ' + nde , optionValue: 'Goto('+ ASTGUI.contexts.Directory + ',' + nde + ',1)' });
 		}
-
-			var f = new destination; // we always point to default|o instead of to where defautl|o points to, so that if when a different user is selected as operator, we do not have to update the menus
-			f.optionText = 'Operator';
-			f.optionValue = (fortbr)? 'default,o,1' : 'Goto(default,o,1)';
-			tmp.push(f);
-
 		if( sessionData.pbxinfo['localextensions'].hasOwnProperty('VoiceMailMain') ){
 			 var tmp_VMM_Exten = ASTGUI.parseContextLine.getExten( sessionData.pbxinfo['localextensions']['VoiceMailMain'] ) ;
-			var f = new destination;
-			f.optionText = 'Check Voicemails -- ' + tmp_VMM_Exten ;
-			f.optionValue = (fortbr)? 'default,' + tmp_VMM_Exten + ',1' : 'Goto(default,' + tmp_VMM_Exten + ',1)' ;
-			tmp.push(f);
+			tmp.push({ optionText: 'Check Voicemails -- ' + tmp_VMM_Exten , optionValue: 'Goto(default,' + tmp_VMM_Exten + ',1)' });
 		}
-
-		if(!fortbr){
-			tmp.push({ optionText: 'Hangup' , optionValue: 'Hangup' });
-			tmp.push({ optionText: 'Congestion' , optionValue: 'Congestion' });
-		}
+		tmp.push({ optionText: 'Operator' , optionValue: 'Goto(default,o,1)' });
+		tmp.push({ optionText: 'Hangup' , optionValue: 'Hangup' });
+		tmp.push({ optionText: 'Congestion' , optionValue: 'Congestion' });
 		return tmp;
 	},
 
