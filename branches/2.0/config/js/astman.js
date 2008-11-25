@@ -649,6 +649,9 @@ var ASTGUI = {
 		// this.comboDiv - the div element created
 		// this.comboOptions - the array of options
 		var e = this;
+		$(e).autocomplete(a, { width: w } );
+
+		/*
 		var k = document.createElement('DIV');
 		var continue_cleanup = true;
 
@@ -716,6 +719,8 @@ var ASTGUI = {
 		e.comboOptions = a.sort();
 		ASTGUI.events.add( e, 'focus' , creatediv ) ;
 		ASTGUI.events.add( e, 'keyup' , updateDivAndShow ) ;
+
+		*/
 	},
 
 	customObject : function(){
