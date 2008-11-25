@@ -808,21 +808,6 @@ var ASTGUI = {
 			}
 		},
 
-		bindMenu: function(m,n){
-			// assigns menu list element 'm' to button/span/element 'n' 
-			// m will be aligned below n , 
-			// and when n is clicked m will be displayed, and if clicked anywhere else on the document m will be 'hidden'
-			if ( typeof m == 'string'){ m = _$(m) ; }
-			if ( typeof n == 'string'){ n = _$(n) ; }
-			ASTGUI.events.add( n , 'click' , function(b){
-					(b||window.event).cancelBubble = true;
-					ASTGUI.domActions.alignBbelowA(n, m);
-					m.style.display = '';
-					n.style.background ='#a8b6e5';
-				}) ;
-			ASTGUI.events.add( document , 'click' , function(){ n.style.background =''; m.style.display ='none' ;} ) ;
-		},
-
 		CheckAll: function(x){ // check all checkboxes of class x - ASTGUI.domActions.CheckAll();
 			var y = $("." + x) ;
 			for(var g=0, h = y.length; g < h; g++){
@@ -863,8 +848,7 @@ var ASTGUI = {
 		},
 
 		clear_table: function(h){ // ASTGUI.domActions.clear_table($el)
-			if ( typeof h == 'string'){ h = _$(h) ; }
-			for( var i=0; i <  h.rows.length; ){ h.deleteRow(i); }
+			ASTGUI.domActions.removeAllChilds(h);
 		},
 
 		findPos: function (el){ // returns the 'el.left, el.top' in pixels of a given element
@@ -907,8 +891,7 @@ var ASTGUI = {
 						this.value = '' ;
 					};
 				}
-			);
-			$(el).blur(
+			).blur(
 				function () {
 					if( this.value == '' ){
 						this.value = this.defaultValue ;
@@ -1298,7 +1281,6 @@ var ASTGUI = {
 				return [] ;
 			}
 		},
-
 
 		createConfig : function( fileName, callback){ // ASTGUI.miscFunctions.createConfig( 'filaName', function(){ } ) ;
 			if( parent.sessionData.PLATFORM.isAST_1_6 ){
@@ -2635,7 +2617,6 @@ var makeSyncRequest = function( params){ // for making synchronus requests
 	return s.responseText;
 };
 
-
 var context2json = function(params){ 
 	// usage :: context2json({ filename:'something.conf' , context : 'context_1' , usf:0 })
 	// get a specific context from a file
@@ -2800,7 +2781,6 @@ var config2json = function( params ){
 	}
 	return toJSO(s);
 }; // ( config2json )
-
 
 var listOfSynActions = function(file){
 	// this object should be used if you have 1 to 4 update actions needed to be performed synchronusly.
