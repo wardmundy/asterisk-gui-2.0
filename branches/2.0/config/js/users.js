@@ -435,7 +435,7 @@ var USERS_MISC_FUNCTIONS = {
 			x.new_action('update', u, 'callwaiting', 	ASTGUI.getFieldValue('edit_callWaiting') );	tmp_obj['callwaiting'] = ASTGUI.getFieldValue('edit_callWaiting') ;
 			x.new_action('update', u, 'hasmanager', 	ASTGUI.getFieldValue('edit_cti') );		tmp_obj['hasmanager'] = ASTGUI.getFieldValue('edit_cti') ;
 			if( ASTGUI.getFieldValue('edit_cti') == 'yes' ){
-				var tmp_permisions = 'system,call,log,verbose,command,agent,user,config' ;
+				var tmp_permisions = 'system,call,log,verbose,command,agent,user,config,originate' ;
 				x.new_action('update', u, 'managerread', tmp_permisions); 				tmp_obj['managerread'] = tmp_permisions ;
 				x.new_action('update', u, 'managerwrite', tmp_permisions);				tmp_obj['managerwrite'] = tmp_permisions ;
 			}else{
