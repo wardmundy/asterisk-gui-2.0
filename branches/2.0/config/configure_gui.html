@@ -22,7 +22,7 @@
 <script src="js/astman.js"></script>
 <script>
 
-var PINGINTERVAL = 30 * 1000 ; // 30 seconds
+var PINGINTERVAL = 10 * 1000 ;
 
 var keepPinging = function(){
 	var makePingRequest = function(){
@@ -39,6 +39,7 @@ var keepPinging = function(){
 			error: function(){}
 		});
 	};
+	makePingRequest();
 	KEEPPINGING = setInterval( makePingRequest, PINGINTERVAL);
 };
 
