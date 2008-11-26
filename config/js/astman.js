@@ -2601,10 +2601,10 @@ var makeRequest = function( params){ // for making Asynchronus requests
 	if( params.action == "updateconfig" ){
 		params.srcfilename = params.filename;
 		params.dstfilename = params.filename;
-		if(top.sessionData.DEBUG_MODE ){ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
+		if(top.sessionData && top.sessionData.DEBUG_MODE ){ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
 		delete params.filename;
 	}else{
-		if(top.sessionData.DEBUG_MODE ){ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
+		if(top.sessionData && top.sessionData.DEBUG_MODE ){ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
 	}
 
 	$.get(ASTGUI.paths.rawman, params, cb);
@@ -2612,7 +2612,7 @@ var makeRequest = function( params){ // for making Asynchronus requests
 
 var makeSyncRequest = function( params){ // for making synchronus requests
 	// usage ::  makeSyncRequest ( { action :'getconfig', filename: 'something.conf' } ) // no need for call back function
-	if(top.sessionData.DEBUG_MODE ){ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
+	if(top.sessionData && top.sessionData.DEBUG_MODE ){ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
 	var s = $.ajax({ url: ASTGUI.paths.rawman, data: params , async: false });
 	return s.responseText;
 };
@@ -3002,29 +3002,30 @@ listOfActions.prototype = {
 
 (function(){
 	var onload_doThese = function(){
-		window.onerror = function(err, url, errcode ){ // Log any errors on this page
-			var msg = 'ErrorCode / LineNumber : ' + errcode  + '<BR> Error : ' + err + '<BR> Location: ' + url ;
-			ASTGUI.Log.Error(msg);
-			ASTGUI.dialog.hide();
-			if( top.sessionData && top.sessionData.DEBUG_MODE ){ // show alerts only in debug mode
-				var alertmsg = 'ErrorCode / LineNumber : ' + errcode  + '\n Error : ' + err + '\n Location: ' + url ;
-				alert(alertmsg);
-			}
-			if ( jQuery.browser.msie ){ // If critical error in IE , reload entire GUI
-				top.window.reload();
-			}
-			return true;
-		};
+		if( top.sessionData ){
+			window.onerror = function(err, url, errcode ){ // Log any errors on this page
+				var msg = 'ErrorCode / LineNumber : ' + errcode  + '<BR> Error : ' + err + '<BR> Location: ' + url ;
+				ASTGUI.Log.Error(msg);
+				ASTGUI.dialog.hide();
+				if( top.sessionData && top.sessionData.DEBUG_MODE ){ // show alerts only in debug mode
+					var alertmsg = 'ErrorCode / LineNumber : ' + errcode  + '\n Error : ' + err + '\n Location: ' + url ;
+					alert(alertmsg);
+				}
+				if ( jQuery.browser.msie ){ // If critical error in IE , reload entire GUI
+					top.window.reload();
+				}
+				return true;
+			};
+			ASTGUI.showToolTips(); // Load any tooltips in this page
 
-		ASTGUI.showToolTips(); // Load any tooltips in this page
-		try{
-			if( window.jQuery ){
-				$().ajaxStart( function(){ parent.document.getElementById('ajaxstatus').style.display = ''; });
+			var AJS = parent.document.getElementById('ajaxstatus') ;
+			if( window.jQuery && AJS ){
+				$().ajaxStart( function(){ AJS.style.display = ''; });
 				$().ajaxStop( function(){
-					setTimeout( function(){parent.document.getElementById('ajaxstatus').style.display = 'none';}, 500 );
+					setTimeout( function(){ AJS.style.display = 'none'; }, 500 );
 				});
 			}
-		}catch(err){}
+		}
 		if( window.localajaxinit && (typeof localajaxinit == 'function' ) ){
 			window.localajaxinit();
 		}
