@@ -252,7 +252,7 @@ var onLogInFunctions = {
 
 		sessionData.directories.scripts = sessionData.directories.astvarlibdir + 'scripts/';/* Directory for gui scripts (listfiles, for example) */	
 		sessionData.directories.output_SysInfo = './sysinfo_output.html' ;
-		sessionData.directories.voicemails_dir = '/var/spool/asterisk/voicemail/default/' ;
+		sessionData.directories.voicemails_dir = sessionData.directories.astspooldir + 'voicemail/default/' ;
 
 
 		sessionData.directories.script_takeBackup =  'sh ' + sessionData.directories.scripts + 'takebackup';
