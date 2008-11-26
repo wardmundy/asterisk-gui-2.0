@@ -1,0 +1,339 @@
+<!--
+ * Asterisk-GUI	- an Asterisk configuration interface
+ *
+ * Google Talk/Jabber Configuration
+ *
+ * Copyright (C) 2008, Digium, Inc.
+ *
+ * Pari Nannapaneni <pari@digium.com>
+ *
+ * See http://www.asterisk.org for more information about
+ * the Asterisk project. Please do not directly contact
+ * any of the maintainers of this project for assistance;
+ * the project provides a web site, mailing lists and IRC
+ * channels for your use.
+ *
+ * This program is free software, distributed under the terms of
+ * the GNU General Public License Version 2. See the LICENSE file
+ * at the top of the source tree.
+ *
+-->
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<style type="text/css">
+	#table_BuddiesList {
+		border: 1px solid #666666;
+		margin-top: 5px;
+		margin-bottom:10px;
+		width: 96%;
+		text-align: center;
+		padding : 1px;
+	}
+
+	#table_BuddiesList tr.heading { background: #FFFFFF; }
+	#table_BuddiesList tr.frow { background: #6b79a5; color: #CED7EF; }
+	#table_BuddiesList tr.frow td{ font-weight:bold; }
+	#table_BuddiesList tr td{ padding : 3px; }
+	#table_BuddiesList tr.even { background: #DFDFDF; }
+	#table_BuddiesList tr.odd{ background: #FFFFFF; }
+	#table_BuddiesList tr.even:hover, #table_BuddiesList tr.odd:hover {
+		background: #a8b6e5;
+		cursor: default;
+	}
+
+
+	#table_AccountsList {
+		border: 1px solid #666666;
+		margin-top: 5px;
+		margin-bottom:10px;
+		text-align: center;
+		padding : 1px;
+	}
+	#table_AccountsList tr.heading { background: #6b79a5;}
+	#table_AccountsList tr td { padding : 3px; }
+	#table_AccountsList tr.even { background: #DFDFDF; }
+	#table_AccountsList tr.odd { background: #FFFFFF; }
+	#table_AccountsList tr.even:hover, #table_AccountsList tr.odd:hover {
+		background: #a8b6e5;
+		cursor: default;
+	}
+
+</style>
+<script>
+var GTALK_CNF , JABBER_CNF;
+
+var EDIT_BUDDY ;
+var EDIT_ACCOUNT ;
+
+
+var MANAGE_BUDDIES = {
+	listBuddies : function(){ // MANAGE_BUDDIES.listBuddies
+		var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
+		var TBL = _$('table_BuddiesList');
+		ASTGUI.domActions.clear_table(TBL);
+
+			var newRow = TBL.insertRow(-1);
+			newRow.className = 'heading' ;
+			addCell( newRow , { html: "<span class='lite_Heading'>Peers</span>",align:'center', colspan:4 });
+
+			var newRow = TBL.insertRow(-1);
+			newRow.className = 'frow' ;
+			addCell( newRow , { html: 'UserName' });
+			addCell( newRow , { html: 'Context' });
+			addCell( newRow , { html: '&nbsp;&nbsp;Connection&nbsp;&nbsp;' });
+			addCell( newRow , { html: '',width:'175px' });
+
+		for( buddy in GTALK_CNF ){
+			if( !GTALK_CNF.hasOwnProperty(buddy) || buddy == 'general' ) continue;
+
+			var newRow = TBL.insertRow(-1);
+			newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
+			addCell( newRow , { html:GTALK_CNF[buddy].username });
+			addCell( newRow , { html:GTALK_CNF[buddy].context });
+			addCell( newRow , { html:GTALK_CNF[buddy].connection });
+			var tmp = "<span class='guiButton' onclick=\"MANAGE_BUDDIES.edit_buddy_form('" + buddy +"')\">Edit</span>&nbsp;"
+					+ "<span class='guiButtonDelete' onclick=\"MANAGE_BUDDIES.deleteBuddy('" + buddy +"')\">Delete</span>" ;
+			addCell( newRow , { html: tmp });
+
+		}
+	},
+
+	deleteBuddy : function(a){ // MANAGE_BUDDIES.deleteBuddy();
+		if(!confirm("Delete peer '"+ a + "' ?")) { return true; }
+		var u = new listOfSynActions('gtalk.conf') ;
+			u.new_action('delcat', a, '', '');
+		u.callActions();
+		ASTGUI.feedback( { msg:"'deleted peer " + a , showfor: 3, color:'red', bgcolor:'#FFFFFF' } );
+		window.location.reload();
+	},
+
+	addBuddy: function(){ // MANAGE_BUDDIES.addBuddy();
+
+		if ( EDIT_BUDDY ){
+			var u = new listOfSynActions('gtalk.conf') ;
+			u.new_action('delcat', EDIT_BUDDY , '', '');
+			u.callActions();
+		}
+
+		var v = new listOfActions('gtalk.conf');
+		var tmp_uname = ASTGUI.getFieldValue('edit_buddyName_text');
+		var tmp_connection = ASTGUI.getFieldValue('edit_buddyConnection_select');
+		if( !tmp_uname.contains('@') ){ 
+			tmp_uname = tmp_uname + '@gmail.com';
+		}
+		var catname = ( EDIT_BUDDY ) ? EDIT_BUDDY : tmp_uname.beforeChar('@');
+
+		v.new_action('newcat', catname, '', '');
+		v.new_action('append', catname , 'username', tmp_uname );
+		v.new_action('append', catname , 'disallow', 'all');
+		v.new_action('append', catname , 'allow', 'all');
+		v.new_action('append', catname , 'context', 'default');
+		v.new_action('append', catname , 'connection', tmp_connection );
+		v.callActions( function(){
+			ASTGUI.feedback( { msg:"updated peer" , showfor: 3, color:'red', bgcolor:'#FFFFFF' } );
+			window.location.reload();
+		});
+	},
+
+	new_buddy_form : function(){ // MANAGE_BUDDIES.new_buddy_form();
+		EDIT_BUDDY = '';
+		ASTGUI.resetTheseFields([ 'edit_buddyName_text', 'edit_buddyConnection_select' ]);
+		$('#buddy_editdiv .dialog_title > span').html('Add Peer');
+		$('#buddy_editdiv').showWithBg();
+	},
+
+	edit_buddy_form : function(a){ // MANAGE_BUDDIES.edit_buddy_form();
+		if(!a) return;
+
+		EDIT_BUDDY = a;
+		ASTGUI.updateFieldToValue( 'edit_buddyName_text',  GTALK_CNF[EDIT_BUDDY].username );
+		ASTGUI.updateFieldToValue( 'edit_buddyConnection_select', GTALK_CNF[EDIT_BUDDY].connection );
+		$('#buddy_editdiv .dialog_title > span').html( 'Edit Peer ' + EDIT_BUDDY);
+		$('#buddy_editdiv').showWithBg();
+	}
+};
+
+var MANAGE_ACCOUNTS = {
+	listAccounts : function(){
+		var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
+		var TBL = _$('table_AccountsList');
+		ASTGUI.domActions.clear_table(TBL);
+
+			var newRow = TBL.insertRow(-1);
+			newRow.className = 'heading' ;
+			addCell( newRow , { html: "<span class='lite_Heading' style='color: #FFFFFF;'>gtalk Accounts</span>",align:'center', colspan:2 });
+
+		for( account in JABBER_CNF ){
+			if( !JABBER_CNF.hasOwnProperty(account) || account == 'general' ) continue;
+
+			ASTGUI.selectbox.append('edit_buddyConnection_select', account , account );
+
+			var newRow = TBL.insertRow(-1);
+			newRow.className = ((TBL.rows.length)%2==0) ? 'odd':'even';
+
+			addCell( newRow , { html:JABBER_CNF[account].username + "&nbsp;&nbsp;[" + account + "]" } );
+				var tmp = "<span class='guiButton' onclick=\"MANAGE_ACCOUNTS.edit_Account_form('" + account +"')\">Edit</span>&nbsp;"
+					+ "<span class='guiButtonDelete' onclick=\"MANAGE_ACCOUNTS.deleteAccount('" + account +"')\">Delete</span>" ;
+			addCell( newRow , { html: tmp, width: '175px'});
+		}
+	},
+
+	deleteAccount : function(a){ // MANAGE_ACCOUNTS.deleteAccount()
+		if(!confirm("Delete account '"+ a + "' ?")) { return true; }
+		var u = new listOfSynActions('jabber.conf') ;
+			u.new_action('delcat', a, '', '');
+		u.callActions();
+		ASTGUI.feedback( { msg:"'Deleted jabber account " + a , showfor: 3, color:'red', bgcolor:'#FFFFFF' } );
+		window.location.reload();
+
+	},
+
+	saveAccount : function(){ // MANAGE_ACCOUNTS.saveAccount()
+		if ( EDIT_ACCOUNT ){
+			var u = new listOfSynActions('jabber.conf') ;
+			u.new_action('delcat', EDIT_ACCOUNT , '', '');
+			u.callActions();
+		}
+
+		var v = new listOfActions('jabber.conf');
+		var tmp_uname = ASTGUI.getFieldValue('edit_account_text');
+		if( !tmp_uname.contains('@') ){
+			tmp_uname = tmp_uname + '@gmail.com';
+		}
+		var catname = ( EDIT_ACCOUNT ) ? EDIT_ACCOUNT : tmp_uname.beforeChar('@');
+		v.new_action('newcat', catname, '', '');
+		v.new_action('append', catname , 'type', 'client');
+		v.new_action('append', catname , 'serverhost', 'talk.google.com');
+		v.new_action('append', catname , 'username', tmp_uname);
+		v.new_action('append', catname , 'secret', ASTGUI.getFieldValue('edit_account_secret'));
+		v.new_action('append', catname , 'port', '5222');
+		v.new_action('append', catname , 'usetls', 'yes');
+		v.new_action('append', catname , 'usesasl', 'yes');
+		v.new_action('append', catname , 'statusmessage', ASTGUI.getFieldValue('edit_account_status'));
+		v.new_action('append', catname , 'timeout', '100');
+		v.callActions( function(){
+			ASTGUI.feedback( { msg:"updated account" , showfor: 3, color:'red', bgcolor:'#FFFFFF' } );
+			window.location.reload();
+		});
+
+	},
+
+	new_Account_form : function(){ // MANAGE_ACCOUNTS.new_Account_form()
+		EDIT_ACCOUNT = '';
+		ASTGUI.resetTheseFields([ 'edit_account_text', 'edit_account_secret','edit_account_status' ]);
+		$('#account_editdiv .dialog_title > span').html('Add new Account');
+		$('#account_editdiv').showWithBg();
+	},
+
+	edit_Account_form : function(a){ // MANAGE_ACCOUNTS.edit_Account_form()
+		if(!a) return;
+		EDIT_ACCOUNT = a;
+
+		ASTGUI.updateFieldToValue( 'edit_account_text',  JABBER_CNF[EDIT_ACCOUNT].username );
+		ASTGUI.updateFieldToValue( 'edit_account_secret',  JABBER_CNF[EDIT_ACCOUNT].secret );
+		ASTGUI.updateFieldToValue( 'edit_account_status',  JABBER_CNF[EDIT_ACCOUNT].statusmessage );
+
+		$('#account_editdiv .dialog_title > span').html('Edit Account ' + EDIT_ACCOUNT );
+		$('#account_editdiv').showWithBg();
+
+	}
+
+};
+
+var localajaxinit = function(){
+	top.document.title = 'Google Talk Preferences' ;
+	GTALK_CNF = config2json({ filename:'gtalk.conf', usf:1 }); // buddies
+	JABBER_CNF = config2json({ filename:'jabber.conf', usf:1 }); // accounts
+
+	MANAGE_ACCOUNTS.listAccounts();
+	MANAGE_BUDDIES.listBuddies();
+};
+
+
+</script>
+<body bgcolor="EFEFEF">
+	<div class="iframeTitleBar">
+		Google Talk Settings
+		<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+	</div>
+	<div class='top_buttons'>
+		<span class='guiButtonNew' onclick='MANAGE_BUDDIES.new_buddy_form();'>New Peer</span>
+		<span class='guiButtonNew' onclick='MANAGE_ACCOUNTS.new_Account_form();'>New gtalk Account</span>
+		<span class='lite_Heading'  style='margin-left: 80px'> Google Talk Settings </span>
+	</div>
+	<!--<center>
+		<div style='text-align:center; 	background-color : #FFFFFF; width: 95%; padding: 5px; margin-left: 1px; margin-top:14px; margin-bottom:20px; border:1px solid #CDCDCD; color: #575757 ' class='lite'>
+		send or receive calls to your buddies on Google Talk network
+		</div>
+	</center>-->
+	<div>
+		<div style='float:left; margin:20px'>
+			<table id='table_BuddiesList' cellpadding=0 cellspacing=0 border=0 align=center></table>
+		</div>
+		<div style='float:right; margin:20px'>
+			<table id='table_AccountsList' cellpadding=0 cellspacing=0 border=0 align=center></table>
+		</div>
+	</div>
+
+
+
+<div id="buddy_editdiv" STYLE="width:500px; display:none;" class='dialog'>
+	<TABLE width="100%" cellpadding=0 cellspacing=0>
+	<TR class="dialog_title_tr">
+		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);"><span></span></TD>
+		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
+	</TR>
+	</TABLE>
+	<table cellpadding=2 cellspacing=2 border=0 width="100%" align="center">
+		<tr>	<td align="right" colspan=2 height=10></td></tr>
+		<tr>	<td align=right>Username:&nbsp;</td>
+			<td colspan=2><input id="edit_buddyName_text" size=25></td>
+		</tr>
+		<tr>	<td align=right>Connection:&nbsp;</td>
+			<td colspan=2><select id="edit_buddyConnection_select"></select></td>
+		</tr>
+		<tr>	<td align="right" colspan=2 height=10></td></tr>
+		<tr>	<td align=center colspan=3>
+				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
+				<span class='guiButtonEdit' onclick='MANAGE_BUDDIES.addBuddy();'>Save</span>
+			</td>
+		</tr>
+		<tr>	<td align="right" colspan=2 height=10></td></tr>
+	</table>
+</div>
+
+
+<div id="account_editdiv" STYLE="width:500px; display:none;" class='dialog'>
+	<TABLE width="100%" cellpadding=0 cellspacing=0>
+	<TR class="dialog_title_tr">
+		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);"><span></span></TD>
+		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
+	</TR>
+	</TABLE>
+	<table cellpadding=2 cellspacing=2 border=0 width="100%" align="center">
+		<tr>	<td align="right" colspan=2 height=10></td></tr>
+		<tr>	<td align=right>Username:&nbsp;</td>
+			<td colspan=2><input id="edit_account_text" size=25></td>
+		</tr>
+		<tr>	<td align=right>Password:&nbsp;</td>
+			<td colspan=2><input id="edit_account_secret" size=16></td>
+		</tr>
+		<tr>	<td align=right>Status Message:&nbsp;</td>
+			<td colspan=2><input id="edit_account_status" size=25></td>
+		</tr>
+		<tr>	<td align="right" colspan=2 height=10></td></tr>
+		<tr>	<td align=center colspan=3>
+				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
+				<span class='guiButtonEdit' onclick='MANAGE_ACCOUNTS.saveAccount();'>Save</span>
+			</td>
+		</tr>
+		<tr>	<td align="right" colspan=2 height=10></td></tr>
+	</table>
+</div>
+
+
+
+</body>
+
