@@ -3017,12 +3017,14 @@ listOfActions.prototype = {
 		};
 
 		ASTGUI.showToolTips(); // Load any tooltips in this page
-		if( window.jQuery ){
-			$().ajaxStart( function(){ parent.document.getElementById('ajaxstatus').style.display = ''; });
-			$().ajaxStop( function(){
-				setTimeout( function(){parent.document.getElementById('ajaxstatus').style.display = 'none';}, 500 );
-			});
-		}
+		try{
+			if( window.jQuery ){
+				$().ajaxStart( function(){ parent.document.getElementById('ajaxstatus').style.display = ''; });
+				$().ajaxStop( function(){
+					setTimeout( function(){parent.document.getElementById('ajaxstatus').style.display = 'none';}, 500 );
+				});
+			}
+		}catch(err){}
 		if( window.localajaxinit && (typeof localajaxinit == 'function' ) ){
 			window.localajaxinit();
 		}
