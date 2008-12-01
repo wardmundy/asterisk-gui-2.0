@@ -61,7 +61,7 @@
 
 </style>
 <script>
-var GTALK_CNF , JABBER_CNF;
+var GTALK_CNF , JABBER_CNF, EXTENSIONS_CNF;
 
 var EDIT_BUDDY ;
 var EDIT_ACCOUNT ;
@@ -73,35 +73,39 @@ var MANAGE_BUDDIES = {
 		var TBL = _$('table_BuddiesList');
 		ASTGUI.domActions.clear_table(TBL);
 
-			var newRow = TBL.insertRow(-1);
-			newRow.className = 'heading' ;
-			addCell( newRow , { html: "<span class='lite_Heading'>Peers</span>",align:'center', colspan:4 });
-
+		var newRow = TBL.insertRow(-1);
+		newRow.className = 'heading' ;
+		addCell( newRow , { html: "<span class='lite_Heading'>Peers</span>",align:'center', colspan: 4 });
 
 		for( buddy in GTALK_CNF ){
 			if( !GTALK_CNF.hasOwnProperty(buddy) || buddy == 'general' ) continue;
 
 			var newRow = TBL.insertRow(-1);
 			newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
-			addCell( newRow , { html:GTALK_CNF[buddy].username });
-			addCell( newRow , { html:GTALK_CNF[buddy].context });
+			addCell( newRow , { html:GTALK_CNF[buddy].username , align:'left'});
+
+			var tmp_context = GTALK_CNF[buddy].context || '' ;
+
+			var dest_line = ( tmp_context && tmp_context.contains(ASTGUI.contexts.gtalkIncomingContext) && EXTENSIONS_CNF.hasOwnProperty(tmp_context) ) ? EXTENSIONS_CNF[tmp_context][0] : '' ;
+			var dest_args = ASTGUI.parseContextLine.getArgs(dest_line) ;
+			addCell( newRow , { html: ASTGUI.parseContextLine.toKnownContext(dest_args) , align:'left' } );
+
+
 			addCell( newRow , { html:GTALK_CNF[buddy].connection });
+
 			var tmp = "<span class='guiButton' onclick=\"MANAGE_BUDDIES.edit_buddy_form('" + buddy +"')\">Edit</span>&nbsp;"
 					+ "<span class='guiButtonDelete' onclick=\"MANAGE_BUDDIES.deleteBuddy('" + buddy +"')\">Delete</span>" ;
 			addCell( newRow , { html: tmp });
 		}
 
-
 		if( TBL.rows.length == 1 ){
-			//var FR = TBL.rows[1] ;
-			//FR.parentNode.removeChild(FR);
 			var newRow = TBL.insertRow(-1);
 			addCell( newRow , { html: "<BR>No peers configured. To send or receive calls from your friends on google talk, Add the peer name by clicking on the 'New peer' button.<BR><BR>", colspan:4 });
 		}else{
 			var newRow = TBL.insertRow(1);
 			newRow.className = 'frow' ;
 			addCell( newRow , { html: 'UserName' });
-			addCell( newRow , { html: 'Context' });
+			addCell( newRow , { html: 'Incoming Calls' });
 			addCell( newRow , { html: '&nbsp;&nbsp;Connection&nbsp;&nbsp;' });
 			addCell( newRow , { html: '' });
 		}
@@ -122,6 +126,10 @@ var MANAGE_BUDDIES = {
 			var u = new listOfSynActions('gtalk.conf') ;
 			u.new_action('delcat', EDIT_BUDDY , '', '');
 			u.callActions();
+
+			u.clearActions('extensions.conf') ;
+			u.new_action('delcat', GTALK_CNF[EDIT_BUDDY].context , '', '');
+			u.callActions();
 		}
 
 		var v = new listOfActions('gtalk.conf');
@@ -136,9 +144,16 @@ var MANAGE_BUDDIES = {
 		v.new_action('append', catname , 'username', tmp_uname );
 		v.new_action('append', catname , 'disallow', 'all');
 		v.new_action('append', catname , 'allow', 'all');
-		v.new_action('append', catname , 'context', 'default');
+		v.new_action('append', catname , 'context', ASTGUI.contexts.gtalkIncomingContext + catname );
+
 		v.new_action('append', catname , 'connection', tmp_connection );
 		v.callActions( function(){
+
+			var W = new listOfSynActions('extensions.conf') ;
+			W.new_action('newcat', ASTGUI.contexts.gtalkIncomingContext + catname , '', '');
+			W.new_action('append', ASTGUI.contexts.gtalkIncomingContext + catname , 'exten', 's,1,' + ASTGUI.getFieldValue('edit_buddyIncomingCalls_select') );
+			W.callActions();
+
 			ASTGUI.feedback( { msg:"updated peer" , showfor: 3, color:'red', bgcolor:'#FFFFFF' } );
 			window.location.reload();
 		});
@@ -146,17 +161,20 @@ var MANAGE_BUDDIES = {
 
 	new_buddy_form : function(){ // MANAGE_BUDDIES.new_buddy_form();
 		EDIT_BUDDY = '';
-		ASTGUI.resetTheseFields([ 'edit_buddyName_text', 'edit_buddyConnection_select' ]);
+		ASTGUI.resetTheseFields([ 'edit_buddyName_text', 'edit_buddyConnection_select', 'edit_buddyIncomingCalls_select']);
 		$('#buddy_editdiv .dialog_title > span').html('Add Peer');
 		$('#buddy_editdiv').showWithBg();
 	},
 
 	edit_buddy_form : function(a){ // MANAGE_BUDDIES.edit_buddy_form();
 		if(!a) return;
-
 		EDIT_BUDDY = a;
 		ASTGUI.updateFieldToValue( 'edit_buddyName_text',  GTALK_CNF[EDIT_BUDDY].username );
 		ASTGUI.updateFieldToValue( 'edit_buddyConnection_select', GTALK_CNF[EDIT_BUDDY].connection );
+
+		var dest_line = ( EXTENSIONS_CNF.hasOwnProperty( GTALK_CNF[EDIT_BUDDY].context ) ) ? EXTENSIONS_CNF[ GTALK_CNF[EDIT_BUDDY].context ][0] : '' ;
+		ASTGUI.selectbox.selectDestinationOption( 'edit_buddyIncomingCalls_select' , ASTGUI.parseContextLine.getAppWithArgs(dest_line) );
+
 		$('#buddy_editdiv .dialog_title > span').html( 'Edit Peer ' + EDIT_BUDDY);
 		$('#buddy_editdiv').showWithBg();
 	}
@@ -258,6 +276,10 @@ var localajaxinit = function(){
 	top.document.title = 'Google Talk Preferences' ;
 	GTALK_CNF = config2json({ filename:'gtalk.conf', usf:1 }); // buddies
 	JABBER_CNF = config2json({ filename:'jabber.conf', usf:1 }); // accounts
+	EXTENSIONS_CNF = config2json({ filename:'extensions.conf', usf:0 });
+
+	var someArray = parent.miscFunctions.getAllDestinations() ; 
+	ASTGUI.selectbox.populateArray('edit_buddyIncomingCalls_select', someArray);
 
 	(function(){
 		// check if the general section of the config files are configured
@@ -334,6 +356,11 @@ var localajaxinit = function(){
 		<tr>	<td align=right>Connection:&nbsp;</td>
 			<td colspan=2><select id="edit_buddyConnection_select"></select></td>
 		</tr>
+
+		<tr>	<td align=right>Incoming Calls to :&nbsp;</td>
+			<td colspan=2><select id="edit_buddyIncomingCalls_select"></select></td>
+		</tr>
+
 		<tr>	<td align="right" colspan=2 height=10></td></tr>
 		<tr>	<td align=center colspan=3>
 				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
