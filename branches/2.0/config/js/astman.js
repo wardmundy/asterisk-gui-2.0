@@ -1234,16 +1234,17 @@ var ASTGUI = {
 		// list of files in 'dir' will be sent to callBackFunction as an array
 		try{
 		this.systemCmd( top.sessionData.directories.script_ListFiles + ' ' +  dir , function(){
-			var op = ASTGUI.loadHTML( top.sessionData.directories.output_SysInfo );
-			var tmp_files = op.split('\n');
-			var files = [];
-			for( var i =0 ; i < tmp_files.length ; i++){
-				if( typeof tmp_files[i] == "undefined" ){ continue; }
-				tmp_files[i] = tmp_files[i].trim();
-				if( tmp_files[i] == "" ){ continue; }
-				files.push(tmp_files[i]);
-			}
-			cb(files);
+			ASTGUI.loadHTML( top.sessionData.directories.output_SysInfo , function(op){
+				var tmp_files = op.split('\n');
+				var files = [];
+				for( var i =0 ; i < tmp_files.length ; i++){
+					if( typeof tmp_files[i] == "undefined" ){ continue; }
+					tmp_files[i] = tmp_files[i].trim();
+					if( tmp_files[i] == "" ){ continue; }
+					files.push(tmp_files[i]);
+				}
+				cb(files);
+			});
 		});
 		}catch(err){
 			ASTGUI.Log.Error(err.description);
