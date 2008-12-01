@@ -359,6 +359,7 @@ var ASTGUI = {
 		Directory: 'directory', // ASTGUI.contexts.Directory
 		CallingRulePrefix : 'CallingRule_', // context for calling rules being with - ASTGUI.contexts.CallingRulePrefix 
 		CallingPlanPrefix: 'DLPN_', // context for DialPlans -- ASTGUI.contexts.CallingPlanPrefix
+		gtalkIncomingContext: 'gtalk_incoming_', // ASTGUI.contexts.gtalkIncomingContext
 		mohdirPrefix : 'guimohdir_' // ASTGUI.contexts.mohdirPrefix
 		// music on hold directories created by gui will have this prefix
 		// also post_mappings definitions in http.conf will have this name
@@ -1608,7 +1609,7 @@ var ASTGUI = {
 			// expects  q  as 'exten=s,2,foo(ssssssss,ssdsd,assd)' OR 's,2,foo(ssssssss,ssdsd,assd)' OR 's,2,foo(ssssssss|ssdsd|assd)'
 			// OR 's,1,Answer' OR 's,n,Hangup'
 			// and   returns [ssssssss,ssdsd,assd] or [] // arguments as an array 
-			if (typeof q != 'string') return [];
+			if (typeof q != 'string' || !q ) return [];
 			q = q.trim();
 			if ( !q.endsWith(')') || !q.contains('(') ){
 				ASTGUI.Log.Error( "ASTGUI.parseContextLine.getArgs() - No Argument found for \"" + q + "\" " );
@@ -1644,6 +1645,7 @@ var ASTGUI = {
 
 		toKnownContext: function(args){  // usage ASTGUI.parseContextLine.toKnownContext(y)
 			// converts args to a readable format - ex: default|6000|1 to 'user 6000'
+			if(!args.length){ return ''; }
 			try{
 			if(typeof args == 'string'){
 				args = this.getArgsArrayFromArgsString(args);
