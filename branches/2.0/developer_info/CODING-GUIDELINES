@@ -182,6 +182,17 @@ $(tmp_image).attr('border', '0');
   (http://www.prototypejs.org), we should do what we can to follow their
   conventions.
 
+- Javascript code should be considered as libraries. Functions that can be
+  reused should reside in a file with the proper scope. For example, a
+  generic parsing function that could be used on any page should exist in 
+  index.js as opposed to only welcome.js. 
+
+- Javascript code should exist in a separate file located in config/js/ if
+  code is roughly 100 lines or longer, or used in multiple pages. The
+  exception to this guideline is any window.onload functions (for jQuery
+  this is $(document).ready()). These functions should remain in the html
+  file as they are considered to be custom for that page.
+
 - refrain from using 'onclick' and other associated html attributes. There
   is a wonderful thing called Event Delegation 
   (http://icant.co.uk/sandbox/eventdelegation/). This is a much faster
