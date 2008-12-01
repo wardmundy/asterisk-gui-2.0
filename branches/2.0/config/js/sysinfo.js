@@ -48,7 +48,6 @@ var percentage_usage = function(du){
 };
 
 function getsysinfohtml(){
-	_$('sysinfohtml').innerHTML = ASTGUI.loadHTML(top.sessionData.directories.output_SysInfo);
 	ASTGUI.systemCmdWithOutput( 'uname -a' , function(output){ _$('osversion').innerHTML = output; });
 	ASTGUI.systemCmdWithOutput( 'uptime' , function(output){ _$('uptime').innerHTML = output.replace(/load average/, "<BR>Load Average"); });
 	ASTGUI.systemCmdWithOutput( 'date' , function(output){ 
