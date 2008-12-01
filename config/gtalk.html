@@ -247,6 +247,34 @@ var localajaxinit = function(){
 	GTALK_CNF = config2json({ filename:'gtalk.conf', usf:1 }); // buddies
 	JABBER_CNF = config2json({ filename:'jabber.conf', usf:1 }); // accounts
 
+	(function(){
+		// check if the general section of the config files are configured
+		var u = new listOfSynActions('gtalk.conf') ;
+		if( !GTALK_CNF.hasOwnProperty('general') ){
+			u.new_action('newcat', 'general' , '', '');
+		}
+		if( GTALK_CNF.hasOwnProperty('general') && !GTALK_CNF['general'].hasOwnProperty('allowguest') ){
+			u.new_action('append', 'general' , 'allowguest', 'no');
+		}
+
+		var v = new listOfSynActions('jabber.conf') ;
+		if( !JABBER_CNF.hasOwnProperty('general') ){
+			v.new_action('newcat', 'general' , '', '');
+		}
+		if( JABBER_CNF.hasOwnProperty('general') && !JABBER_CNF['general'].hasOwnProperty('autoprune') ){
+			v.new_action('append', 'general' , 'autoprune', 'no');
+		}
+		if( JABBER_CNF.hasOwnProperty('general') && !JABBER_CNF['general'].hasOwnProperty('autoregister') ){
+			v.new_action('append', 'general' , 'autoregister', 'yes');
+		}
+
+		if( u.actionCount || v.actionCount ) {
+			u.callActions();
+			v.callActions();
+			window.location.reload();
+		}
+	})();
+
 	MANAGE_ACCOUNTS.listAccounts();
 	MANAGE_BUDDIES.listBuddies();
 };
