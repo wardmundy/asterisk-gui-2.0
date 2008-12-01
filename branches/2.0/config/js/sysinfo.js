@@ -49,14 +49,19 @@ var percentage_usage = function(du){
 
 function getsysinfohtml(){
 	_$('sysinfohtml').innerHTML = ASTGUI.loadHTML(top.sessionData.directories.output_SysInfo);
-	_$('osversion').innerHTML = _$('si_uname').innerHTML;
-	_$('uptime').innerHTML = _$('si_uptime').innerHTML.replace(/load average/, "<BR>Load Average");
+	ASTGUI.systemCmdWithOutput( 'uname -a' , function(output){ _$('osversion').innerHTML = output; });
+	ASTGUI.systemCmdWithOutput( 'uptime' , function(output){ _$('uptime').innerHTML = output.replace(/load average/, "<BR>Load Average"); });
+	ASTGUI.systemCmdWithOutput( 'date' , function(output){ 
+		_$('today').innerHTML = (parent.sessionData.PLATFORM.isAA50) ? ASTGUI.toLocalTime(output).camelize() : output ;
+		if(parent.sessionData.PLATFORM.isAA50) {
+			_$('today').innerHTML += "&nbsp;&nbsp;<A href='date.html' class='splbutton' title='Click to update Date and Time'><B>Edit</B></A>";
+		}
+	});
+	ASTGUI.systemCmdWithOutput( 'hostname' , function(output){ 
+		_$('hostname').innerHTML = output ;
+	});
+
 	_$('asterisk').innerHTML =  parent.sessionData.AsteriskVersionString + "<BR>" + "Asterisk GUI-version : " + ( parent.sessionData.gui_version || ASTGUI.globals.version ) ;
-	_$('today').innerHTML = (parent.sessionData.PLATFORM.isAA50) ? ASTGUI.toLocalTime(_$('si_date').innerHTML).camelize() : _$('si_date').innerHTML ;
-	if(parent.sessionData.PLATFORM.isAA50) {
-		_$('today').innerHTML += "&nbsp;&nbsp;<A href='date.html' class='splbutton' title='Click to update Date and Time'><B>Edit</B></A>";
-	}
-	_$('hostname').innerHTML =_$('si_hostname').innerHTML;
 	$('#tabbedMenu').find('A:eq(0)').click();
 }
 
@@ -139,5 +144,6 @@ var localajaxinit = function(){
 		}
 		ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
 	})();
-	parent.ASTGUI.systemCmd( top.sessionData.directories.script_SysInfo, function(){ parent.ASTGUI.dialog.hide(); getsysinfohtml(); } );
+	parent.ASTGUI.dialog.hide();
+	getsysinfohtml();
 }

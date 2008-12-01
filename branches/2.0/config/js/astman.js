@@ -1214,12 +1214,19 @@ var ASTGUI = {
 		return a instanceof Array || ( a!= null && typeof a=="object" && typeof a.push == "function" && typeof a.concat == "function" )
 	},
 
-	loadHTML: function(u){
+	loadHTML: function(u , cb){
 		// ASTGUI.loadHTML(url)
 		// loads URL 'url' in synchronus mode. note that 'url' is restricted by same origin policy
 		var r =  Math.round(10000*Math.random());
-		var s = $.ajax({ url: u + '?r=' + r , async: false });
-		return s.responseText;
+
+		if( cb && typeof cb == 'function' ) {
+			$.ajax({ url: u + '?r=' + r , async: true, success: function(msg){
+				cb(msg);
+			}});
+		}else{
+			var s = $.ajax({ url: u + '?r=' + r , async: false });
+			return s.responseText;
+		}
 	},
 
 	listSystemFiles : function( dir , cb ){
@@ -2281,12 +2288,16 @@ var ASTGUI = {
 		// usage :: ASTGUI.systemCmdWithOutput( 'uptime' , callback(output){ /* do something with output */ } );
 		// Use this function when you want to execute a specific system command and read the output
 		// output will be sent as a argument to the callback function
-		var fcmd = cmd + ' > ' + top.sessionData.directories.guiInstall + ( top.sessionData.directories.output_SysInfo.afterChar('/') || top.sessionData.directories.output_SysInfo ) ;
+		//var fcmd = cmd + ' > ' + top.sessionData.directories.guiInstall +  ;
+		var tmp_opf = ( top.sessionData.directories.output_SysInfo.afterChar('/') || top.sessionData.directories.output_SysInfo ).rChop('.html') + Math.round( 10000 * Math.random() ) + '.html' ;
+		var fcmd = cmd + ' > ' + top.sessionData.directories.guiInstall + tmp_opf ;
+
 		var after = function(){
 			parent.document.getElementById('ajaxstatus').style.display = 'none';
-			var op = ASTGUI.loadHTML( top.sessionData.directories.output_SysInfo ) ;
-			cb( op ) ;
+			ASTGUI.loadHTML( tmp_opf , cb );
+			ASTGUI.systemCmd( 'rm ' + top.sessionData.directories.guiInstall + tmp_opf, function(){});
 		};
+
 		var delay_cb = function(){ setTimeout(after,500); };
 		if( parent.sessionData.PLATFORM.isAA50 ){
 			parent.document.getElementById('ajaxstatus').style.display = '';
