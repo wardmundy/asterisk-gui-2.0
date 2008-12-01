@@ -46,6 +46,7 @@ var AGI_FILES = [];
 var chop_Extension = function(a){
 	if( !a ){ return ''; }
 	if( a.endsWith('.gsm') ){ return a.rChop('.gsm'); }
+	else if( a.endsWith('.wav') ){ return a.rChop('.wav'); }
 	else if( a.endsWith('.alaw') ){ return a.rChop('.alaw'); }
 	else if( a.endsWith('.g722') ){ return a.rChop('.g722'); }
 	else if( a.endsWith('.g729') ){ return a.rChop('.g729'); }
