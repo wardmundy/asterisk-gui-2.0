@@ -257,7 +257,6 @@ var onLogInFunctions = {
 
 		sessionData.directories.script_takeBackup =  'sh ' + sessionData.directories.scripts + 'takebackup';
 		sessionData.directories.script_restoreBackup =  'sh ' + sessionData.directories.scripts + 'restorebackup';
-		sessionData.directories.script_SysInfo = 'sh ' + sessionData.directories.scripts + 'gui_sysinfo';
 		sessionData.directories.script_ListFiles = 'sh ' + sessionData.directories.scripts + 'listfiles';
 		sessionData.directories.script_NetworkSettings = 'sh ' + sessionData.directories.scripts + 'networking.sh';
 		sessionData.directories.script_generateZaptel = 'sh ' + sessionData.directories.scripts + 'editzap.sh';
