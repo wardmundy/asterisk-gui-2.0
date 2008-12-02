@@ -308,6 +308,12 @@ var VoiceMenus_miscFunctions = {
 					_$('newstep_dial_ThisNumber').value = '';
 					tip_chosenStep.innerHTML = 'Dial a number/buddy using the default skype account';
 					break;
+				case 'DialViaGtalk':
+					lbl('Dial via gtalk');
+					$('#newstep_gtalkpeers').show();
+					_$('newstep_gtalkpeers').selectedIndex = -1 ;
+					tip_chosenStep.innerHTML = 'Dial a user on the google talk network.';
+					break;
 				case 'Macro':
 					lbl('Macro');
 					$('#newstep_custom').show();
@@ -421,6 +427,9 @@ var VoiceMenus_miscFunctions = {
 				break;
 			case 'DialViaSkype':
 				newstep = 'Dial(Skype/' + ASTGUI.getFieldValue('newstep_dial_ThisNumber') + ')' ;
+				break;
+			case 'DialViaGtalk':
+				newstep = 'Dial(gtalk/' + ASTGUI.getFieldValue('newstep_gtalkpeers') + ')' ;
 				break;
 			case 'Macro':
 				newstep = 'Macro(' + ASTGUI.getFieldValue('newstep_custom') + ')' ;
@@ -704,6 +713,17 @@ var localajaxinit = function(){
 		if( modules_show.contains('res_skypeforasterisk') && modules_show.contains('chan_skype') ){
 			ASTGUI.selectbox.append('newStep_select_action', 'Dial via Skype', 'DialViaSkype');
 		}
+		if( modules_show.contains('res_jabber') && modules_show.contains('chan_gtalk') ){
+			ASTGUI.selectbox.append('newStep_select_action', 'Dial via gtalk', 'DialViaGtalk');
+			var GTALK_CNF = config2json({ filename:'gtalk.conf', usf:1 }); // buddies
+			for( buddy in GTALK_CNF ){
+				if( !GTALK_CNF.hasOwnProperty(buddy) || buddy == 'general' ) continue;
+				ASTGUI.selectbox.append( 'newstep_gtalkpeers' , GTALK_CNF[buddy].username , GTALK_CNF[buddy].connection + '/' + GTALK_CNF[buddy].username );
+			}
+		}
+
+
+
 	}, 1000);
 
 	if( !ASTGUI.miscFunctions.alertIfRangeisNotdefined('vme_start','vme_end', 'VoiceMenus') ){
