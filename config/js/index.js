@@ -425,6 +425,14 @@ var onLogInFunctions = {
 		if( !tmp_continue )return;
 
 		$(".AdvancedMode").hide();
+
+		setTimeout( function(){
+			var modules_show = ASTGUI.cliCommand('module show');
+			if( modules_show.contains('res_jabber.so') && modules_show.contains('chan_gtalk.so') ){
+				parent.miscFunctions.hide_panel('gtalk.html', 1);
+			}
+		}, 2000);
+
 		if(sessionData.PLATFORM.isAA50 ){
 			$(".notinAA50").remove(); 
 			$(".forAA50").show();
@@ -523,11 +531,15 @@ var miscFunctions = {
 		return TI_LIST;
 	},
 
-	hide_panel: function(fname){ // parent.miscFunctions.hide_panel('page.html')
+	hide_panel: function(fname , show){ // parent.miscFunctions.hide_panel('page.html' , 0/1 )
 		var t = $('.ui-accordion-link') ;
 		for(var p=0; p < t.length ; p++){
 			if( $(t[p].parentNode).attr("page") == fname ){
-				$(t[p].parentNode).hide();
+				if(show){
+					$(t[p].parentNode).show();
+				}else{
+					$(t[p].parentNode).hide();
+				}
 				return;
 			}
 		}
