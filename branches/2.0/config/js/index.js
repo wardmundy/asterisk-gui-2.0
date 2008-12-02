@@ -1027,6 +1027,9 @@ var after_localajaxinit = function(){
 		DOM_mainscreen.style.top = DOM_accordion_div.offsetTop ;
 		miscFunctions.resizeMainIframe();
 		window.onresize = miscFunctions.resizeMainIframe;
+		window.onunload = function (e) {
+			DOM_mainscreen.src = 'blank.html';
+		};
 		ASTGUI.Log.Debug('calling onLogInFunctions.checkifLoggedIn()');
 		onLogInFunctions.checkifLoggedIn();
 		if(sessionData.DEBUG_MODE){
