@@ -434,6 +434,10 @@ var onLogInFunctions = {
 			if( modules_show.contains('codec_g729a') ){
 				miscFunctions.hide_panel('registerg729.html', 1);
 			}
+			if( modules_show.contains('res_skypeforasterisk') && modules_show.contains('chan_skype') ){
+				miscFunctions.hide_panel('skype.html', 1);
+			}
+
 		}, 2000);
 
 		if(sessionData.PLATFORM.isAA50 ){
