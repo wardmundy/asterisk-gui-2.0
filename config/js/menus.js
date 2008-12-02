@@ -302,6 +302,12 @@ var VoiceMenus_miscFunctions = {
 					$('#newstep_custom').show();
 					tip_chosenStep.innerHTML = 'Add a <i>Custom Step</i> to the VoiceMenu';
 					break;
+				case 'DialViaSkype':
+					lbl('Dial via Skype');
+					$('#newstep_dial_ThisNumber').show();
+					_$('newstep_dial_ThisNumber').value = '';
+					tip_chosenStep.innerHTML = 'Dial a number/buddy using the default skype account';
+					break;
 				case 'Macro':
 					lbl('Macro');
 					$('#newstep_custom').show();
@@ -412,6 +418,9 @@ var VoiceMenus_miscFunctions = {
 				break;
 			case 'CustomApp':
 				newstep = ASTGUI.getFieldValue('newstep_custom') ;
+				break;
+			case 'DialViaSkype':
+				newstep = 'Dial(Skype/' + ASTGUI.getFieldValue('newstep_dial_ThisNumber') + ')' ;
 				break;
 			case 'Macro':
 				newstep = 'Macro(' + ASTGUI.getFieldValue('newstep_custom') + ')' ;
@@ -689,6 +698,14 @@ var localajaxinit = function(){
 	if(parent.sessionData.advancedmode == true ){
 		ASTGUI.selectbox.append('newStep_select_action', 'Custom App', 'CustomApp');
 	}
+
+	setTimeout( function(){
+		var modules_show = ASTGUI.cliCommand('module show');
+		if( modules_show.contains('res_skypeforasterisk') && modules_show.contains('chan_skype') ){
+			ASTGUI.selectbox.append('newStep_select_action', 'Dial via Skype', 'DialViaSkype');
+		}
+	}, 1000);
+
 	if( !ASTGUI.miscFunctions.alertIfRangeisNotdefined('vme_start','vme_end', 'VoiceMenus') ){
 		$('.top_buttons').hide();
 		return;
