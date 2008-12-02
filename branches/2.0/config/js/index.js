@@ -429,7 +429,10 @@ var onLogInFunctions = {
 		setTimeout( function(){
 			var modules_show = ASTGUI.cliCommand('module show');
 			if( modules_show.contains('res_jabber.so') && modules_show.contains('chan_gtalk.so') ){
-				parent.miscFunctions.hide_panel('gtalk.html', 1);
+				miscFunctions.hide_panel('gtalk.html', 1);
+			}
+			if( modules_show.contains('codec_g729a') ){
+				miscFunctions.hide_panel('registerg729.html', 1);
 			}
 		}, 2000);
 
