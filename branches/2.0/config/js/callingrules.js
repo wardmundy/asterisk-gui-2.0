@@ -119,7 +119,7 @@ var load_DOMelements = function(){
 		});
 
 		var modules_show = ASTGUI.cliCommand('module show');
-		if( modules_show.contains('res_skypeforasterisk') && modules_show.contains('chan_skype.so') ){
+		if( modules_show.contains('res_skypeforasterisk') && modules_show.contains('chan_skype') ){
 			ASTGUI.selectbox.append( DOM_new_crl_trunk , 'Skype', 'Skype');
 			ASTGUI.selectbox.append( DOM_new_crl_fotrunk , 'Skype', 'Skype');
 		}
