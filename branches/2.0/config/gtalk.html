@@ -110,25 +110,29 @@ var MANAGE_BUDDIES = {
 		}
 	},
 
-	deleteBuddy : function(a){ // MANAGE_BUDDIES.deleteBuddy();
-		if(!confirm("Delete peer '"+ a + "' ?")) { return true; }
-		var u = new listOfSynActions('gtalk.conf') ;
+	deleteBuddy : function(a , silentmode){ // MANAGE_BUDDIES.deleteBuddy(); use silentmode to delete while editing buddy
+		if(!silentmode){
+			if( !confirm("Delete peer '"+ a + "' ?") ) return true;
+		}
+
+		var u = new listOfSynActions('gtalk.conf');
 			u.new_action('delcat', a, '', '');
 		u.callActions();
-		ASTGUI.feedback( { msg:"'deleted peer " + a , showfor: 3, color:'red', bgcolor:'#FFFFFF' } );
-		window.location.reload();
+
+		u.clearActions('extensions.conf');
+			u.new_action('delcat', GTALK_CNF[a].context , '', '');
+		u.callActions();
+
+		if(!silentmode){
+			ASTGUI.feedback( { msg:"deleted peer '" + a + "'" , showfor: 3, color:'red', bgcolor:'#FFFFFF' } );
+			window.location.reload();
+		}
 	},
 
 	addBuddy: function(){ // MANAGE_BUDDIES.addBuddy();
 
 		if ( EDIT_BUDDY ){
-			var u = new listOfSynActions('gtalk.conf') ;
-			u.new_action('delcat', EDIT_BUDDY , '', '');
-			u.callActions();
-
-			u.clearActions('extensions.conf') ;
-			u.new_action('delcat', GTALK_CNF[EDIT_BUDDY].context , '', '');
-			u.callActions();
+			this.deleteBuddy(EDIT_BUDDY , true);
 		}
 
 		var v = new listOfActions('gtalk.conf');
@@ -210,21 +214,20 @@ var MANAGE_ACCOUNTS = {
 		}
 	},
 
-	deleteAccount : function(a){ // MANAGE_ACCOUNTS.deleteAccount()
-		if(!confirm("Delete account '"+ a + "' ?")) { return true; }
+	deleteAccount : function(a, silentmode){ // MANAGE_ACCOUNTS.deleteAccount()
+		if(!silentmode && !confirm("Delete account '"+ a + "' ?")) { return true; }
 		var u = new listOfSynActions('jabber.conf') ;
-			u.new_action('delcat', a, '', '');
+		u.new_action('delcat', a, '', '');
 		u.callActions();
-		ASTGUI.feedback( { msg:"'Deleted jabber account " + a , showfor: 3, color:'red', bgcolor:'#FFFFFF' } );
-		window.location.reload();
-
+		if( !silentmode ){
+			ASTGUI.feedback({ msg:"Deleted jabber account '" + a + "'", showfor: 3, color:'red', bgcolor:'#FFFFFF' });
+			window.location.reload();
+		}
 	},
 
 	saveAccount : function(){ // MANAGE_ACCOUNTS.saveAccount()
 		if ( EDIT_ACCOUNT ){
-			var u = new listOfSynActions('jabber.conf') ;
-			u.new_action('delcat', EDIT_ACCOUNT , '', '');
-			u.callActions();
+			this.deleteAccount(EDIT_ACCOUNT, true);
 		}
 
 		var v = new listOfActions('jabber.conf');
