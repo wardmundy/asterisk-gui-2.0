@@ -47,17 +47,31 @@
 var SKYPE_CNF, EXTENSIONS_CNF;
 var EDIT_ACCOUNT ;
 
+
+var set_as_default_account = function(a){
+	ASTGUI.updateaValue({ file: 'chan_skype.conf', context :'general', variable :'default_user', value : a });
+	ASTGUI.feedback( { msg: 'Updated default Skype Account !', showfor: 2 , color: 'blue', bgcolor: '#FFFFFF' } );
+	window.location.reload();
+};
+
+
 var MANAGE_ACCOUNTS = {
 	listAccounts : function(){
 		var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
 		var TBL = _$('table_AccountsList');
 		ASTGUI.domActions.clear_table(TBL);
 
+		var DEFAULT_ACCOUNT = ( SKYPE_CNF.hasOwnProperty('general') && SKYPE_CNF['general'].default_user ) ? SKYPE_CNF['general'].default_user : '' ;
+
 		for( account in SKYPE_CNF ){
 			if( !SKYPE_CNF.hasOwnProperty(account) || account == 'general' ) continue;
 
 			var newRow = TBL.insertRow(-1);
 			newRow.className = ((TBL.rows.length)%2==1) ? 'odd':'even';
+
+			var img_name = ( DEFAULT_ACCOUNT == account ) ? 'images/edit.gif' : 'images/checkbox_blank.gif';
+			addCell( newRow , { html: "<A href='#' TITLE='Set this as the default skype account for placing calls through skype network'><img src=" + img_name + " border=0 onclick=\"set_as_default_account('" + account +"')\"></A>" } );
+
 			addCell( newRow , { html: account, align: 'left' });
 
 			var tmp_context = SKYPE_CNF[account].context || '' ;
@@ -76,6 +90,7 @@ var MANAGE_ACCOUNTS = {
 		}else{
 			var newRow = TBL.insertRow(0);
 			newRow.className = 'frow' ;
+			addCell( newRow , { html:'Default' } );
 			addCell( newRow , { html: 'Skype Account' , align: 'left' });
 			addCell( newRow , { html: 'Incoming calls go to', align: 'left' });
 			addCell( newRow , { html: '' });
