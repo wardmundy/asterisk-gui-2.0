@@ -360,6 +360,7 @@ var ASTGUI = {
 		CallingRulePrefix : 'CallingRule_', // context for calling rules being with - ASTGUI.contexts.CallingRulePrefix 
 		CallingPlanPrefix: 'DLPN_', // context for DialPlans -- ASTGUI.contexts.CallingPlanPrefix
 		gtalkIncomingContext: 'gtalk_incoming_', // ASTGUI.contexts.gtalkIncomingContext
+		skypeIncomingContext: 'skype_incoming_', // ASTGUI.contexts.skypeIncomingContext
 		mohdirPrefix : 'guimohdir_' // ASTGUI.contexts.mohdirPrefix
 		// music on hold directories created by gui will have this prefix
 		// also post_mappings definitions in http.conf will have this name
