@@ -60,6 +60,7 @@ var edit_CR_form = function(a,b){
 	}else{
 		_$('toLocalDest').checked = false;
 		ASTGUI.selectbox.selectOption(DOM_new_crl_trunk, tmp_cr.firstTrunk );
+
 		DOM_new_crl_tr_stripx.value = tmp_cr.stripdigits_firstTrunk  ;
 		DOM_new_crl_tr_prepend.value = tmp_cr.firstPrepend ;
 		if(tmp_cr.secondTrunk){
@@ -116,6 +117,12 @@ var load_DOMelements = function(){
 			ASTGUI.selectbox.append( DOM_new_crl_trunk, a[0], a[1] );
 			ASTGUI.selectbox.append( DOM_new_crl_fotrunk , a[0], a[1] );
 		});
+
+		var modules_show = ASTGUI.cliCommand('module show');
+		if( modules_show.contains('res_skypeforasterisk') && modules_show.contains('chan_skype.so') ){
+			ASTGUI.selectbox.append( DOM_new_crl_trunk , 'Skype', 'Skype');
+			ASTGUI.selectbox.append( DOM_new_crl_fotrunk , 'Skype', 'Skype');
+		}
 	})();
 };
 
@@ -305,15 +312,18 @@ var new_crl_save_go = function(){
 			return ;
 		}
 
-		var Trunk_Build_str = ',${' + t1 + '}/' + DOM_new_crl_tr_prepend.value + '${EXTEN:' + tmp_stripx  + '}' ;
+		var t1_braces = (t1 == 'Skype') ? t1 : '${' + t1 + '}' ;
+		var Trunk_Build_str = ',' + t1_braces + '/' + DOM_new_crl_tr_prepend.value + '${EXTEN:' + tmp_stripx  + '}' ;
 		var foTrunk_Build_str = ',' ;
+
 		if(DOM_new_crl_foChkbx.checked){
-			foTrunk_Build_str += '${' + t2 + '}/' + DOM_new_crl_fotr_prepend.value + '${EXTEN:' + tmp_fotr_stripx + '}' ;
+			var t2_braces = (t2 == 'Skype') ? t2 : '${' + t2 + '}' ;
+			foTrunk_Build_str += t2_braces + '/' + DOM_new_crl_fotr_prepend.value + '${EXTEN:' + tmp_fotr_stripx + '}' ;
 		}
 
-		var t1 = ',' + t1 ;
-		var t2 = ',' + t2 ;
-		var as = DOM_new_crl_pattern.value + ',1,Macro(' + ASTGUI.contexts.dialtrunks + Trunk_Build_str + foTrunk_Build_str + t1 + t2 + ')' ;
+		var t1_cidarg = ( t1 == 'Skype') ? ',' : ',' + t1 ;
+		var t2_cidarg = ( t2 == 'Skype') ? ',' : ',' + t2 ;
+		var as = DOM_new_crl_pattern.value + ',1,Macro(' + ASTGUI.contexts.dialtrunks + Trunk_Build_str + foTrunk_Build_str + t1_cidarg + t2_cidarg + ')' ;
 	}
 
 	if( isNew ){

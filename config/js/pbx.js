@@ -1091,6 +1091,7 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 		},
 
 		getTrunkName: function(TRUNK){ // astgui_managetrunks.misc.getTrunkName(TRUNK)
+			if( TRUNK == 'Skype' ) return TRUNK ;
 			var r = sessionData.pbxinfo.trunks;
 			if ( r.sip[TRUNK] ) { return r.sip[TRUNK]['trunkname'] || TRUNK ; }
 			if ( r.iax[TRUNK] ) { return r.iax[TRUNK]['trunkname'] || TRUNK ; }

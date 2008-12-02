@@ -1831,6 +1831,11 @@ var ASTGUI = {
 					u.splice(0,2);
 					WhatToDial = u.join('/'); // take the part after second '/'
 				}
+				if( u.length == 2){
+					var trunkname = u[0] ;
+					var channel = u[0] ;
+					var WhatToDial = u[1] ;
+				}
 			}
 			// we expect WhatToDial to be in '1${EXTEN:1}' or in '${EXTEN}' or in '${EXTEN:1}' or in '9${EXTEN}' format or a plain extensin string
 			if( WhatToDial.contains('${') ){
