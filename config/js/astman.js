@@ -1660,6 +1660,9 @@ var ASTGUI = {
 					return 'Goto User ' + u ;
 				}
 			};
+			if( args[0] == 'pagegroups' ){
+				return 'Goto Page Group ' + args[1] ;
+			};
 			if( args[0] == ASTGUI.contexts.QUEUES ){
 				return 'Goto Queue ' + args[1] ;
 			};
@@ -1725,6 +1728,9 @@ var ASTGUI = {
 			}
 
 			if( all_LC == "disa" ){
+				if ( args[0] && args[1] && args[0] == 'no-password' ){
+					return 'DISA using context ' + args[1] + ' (no password)';
+				}
 				return 'DISA ' + ( args[0] && ' using password ' + args[0] ) + ( args[1] && ' against context ' + args[1] ) ;
 			}
 
