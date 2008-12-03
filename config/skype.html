@@ -1,7 +1,7 @@
 <!--
  * Asterisk-GUI	- an Asterisk configuration interface
  *
- * Asterisk-Skype Configuration
+ * 'Skype for Asterisk' Configuration
  *
  * Copyright (C) 2008, Digium, Inc.
  *
@@ -47,53 +47,48 @@
 var SKYPE_CNF, EXTENSIONS_CNF;
 var EDIT_ACCOUNT ;
 
-
 var set_as_default_account = function(a){
 	ASTGUI.updateaValue({ file: 'chan_skype.conf', context :'general', variable :'default_user', value : a });
 	ASTGUI.feedback( { msg: 'Updated default Skype Account !', showfor: 2 , color: 'blue', bgcolor: '#FFFFFF' } );
 	window.location.reload();
 };
 
-
 var MANAGE_ACCOUNTS = {
 	listAccounts : function(){
-		var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
-		var TBL = _$('table_AccountsList');
-		ASTGUI.domActions.clear_table(TBL);
-
+		var TBL = ASTGUI.TABLE('table_AccountsList');
+		TBL.clear();
 		var DEFAULT_ACCOUNT = ( SKYPE_CNF.hasOwnProperty('general') && SKYPE_CNF['general'].default_user ) ? SKYPE_CNF['general'].default_user : '' ;
 
 		for( account in SKYPE_CNF ){
 			if( !SKYPE_CNF.hasOwnProperty(account) || account == 'general' ) continue;
 
-			var newRow = TBL.insertRow(-1);
-			newRow.className = ((TBL.rows.length)%2==1) ? 'odd':'even';
-
 			var img_name = ( DEFAULT_ACCOUNT == account ) ? 'images/edit.gif' : 'images/checkbox_blank.gif';
-			addCell( newRow , { html: "<A href='#' TITLE='Set this as the default skype account for placing calls through skype network'><img src=" + img_name + " border=0 onclick=\"set_as_default_account('" + account +"')\"></A>" } );
-
-			addCell( newRow , { html: account, align: 'left' });
-
 			var tmp_context = SKYPE_CNF[account].context || '' ;
 			var dest_line = ( tmp_context && tmp_context.contains(ASTGUI.contexts.skypeIncomingContext) && EXTENSIONS_CNF.hasOwnProperty(tmp_context) ) ? EXTENSIONS_CNF[tmp_context][0] : '' ;
 			var dest_args = ASTGUI.parseContextLine.getArgs(dest_line) ;
-			addCell( newRow , { html: ASTGUI.parseContextLine.toKnownContext(dest_args) , align:'left' } );
-
-				var tmp = "<span class='guiButton' onclick=\"MANAGE_ACCOUNTS.edit_Account_form('" + account +"')\">Edit</span>&nbsp;"
+			var tmp = "<span class='guiButton' onclick=\"MANAGE_ACCOUNTS.edit_Account_form('" + account +"')\">Edit</span>&nbsp;"
 					+ "<span class='guiButtonDelete' onclick=\"MANAGE_ACCOUNTS.deleteAccount('" + account +"')\">Delete</span>" ;
-			addCell( newRow , { html: tmp, align: 'center' });
+
+
+			TBL.addRow({className : 'alt'});
+
+			TBL.addCell({ html: "<A href='#' TITLE='Set this as the default skype account for placing calls through skype network'><img src=" 
+						+ img_name + " border=0 onclick=\"set_as_default_account('" + account +"')\"></A>" });
+			TBL.addCell({ html: account, align: 'left' });
+			TBL.addCell({ html: ASTGUI.parseContextLine.toKnownContext(dest_args) , align:'left' });
+			TBL.addCell({ html: tmp, align: 'center' });
 		}
 
-		if( TBL.rows.length == 0 ){
-			var newRow = TBL.insertRow(-1);
-			addCell( newRow , { html: "<BR>No Skype accounts configured. <BR> Please click on 'New Skype Account' button to send and receive calls via your skype account.<BR><BR>"});
+		if( TBL.rowCount() == 0 ){
+			TBL.addRow();
+			TBL.addCell({ html: "<BR>No Skype accounts configured. <BR> Please click on 'New Skype Account' button to send and receive calls via your skype account.<BR><BR>"});
 		}else{
-			var newRow = TBL.insertRow(0);
-			newRow.className = 'frow' ;
-			addCell( newRow , { html:'Default' } );
-			addCell( newRow , { html: 'Skype Account' , align: 'left' });
-			addCell( newRow , { html: 'Incoming calls go to', align: 'left' });
-			addCell( newRow , { html: '' });
+			TBL.addRow({className : 'frow'} , 0);
+
+			TBL.addCell({ html: 'Default' });
+			TBL.addCell({ html: 'Skype Account' , align: 'left' });
+			TBL.addCell({ html: 'Incoming calls go to', align: 'left' });
+			TBL.addCell({ html: '' });
 		}
 	},
 
@@ -163,7 +158,6 @@ var MANAGE_ACCOUNTS = {
 
 };
 
-
 var localajaxinit = function(){
 	top.document.title = 'Configure Skype Accounts' ;
 	SKYPE_CNF = config2json({ filename:'chan_skype.conf', usf:1 });
@@ -174,8 +168,6 @@ var localajaxinit = function(){
 
 	MANAGE_ACCOUNTS.listAccounts();
 };
-
-
 </script>
 <body bgcolor="EFEFEF">
 	<div class="iframeTitleBar">
