@@ -659,6 +659,13 @@ var ASTGUI = {
 		if ( !(this instanceof ASTGUI.customObject) ) { return new ASTGUI.customObject(); }
 	},
 
+	TABLE : function(a){
+		if(!a) return;
+		if ( !(this instanceof ASTGUI.TABLE) ) { return new ASTGUI.TABLE(a); }
+		this.TableElement = ( typeof a == 'string' ) ? _$(a) : a ;
+		this.TableRow = null ;
+	},
+
 	toCustomObject : function(a){// if a is a native object returns an ASTGUI.customObject version of a
 		if( ASTGUI.isArray(a) || a === null || typeof a =='number' || typeof a =='string' || typeof a =='boolean' || typeof a != 'object' ) return a;
 
@@ -2618,6 +2625,44 @@ ASTGUI.customObject.prototype = {
 			}
 		}
 		return a ;
+	}
+};
+
+ASTGUI.TABLE.prototype = {
+
+	addRow: function( e , rowindex ){ // Usage: 'TABLE'.addRow({className : 'alt'});
+		var TBL = this.TableElement ;
+		var newRow = (typeof rowindex == 'number' ) ? TBL.insertRow(rowindex) : TBL.insertRow(-1) ;
+		if( !!e ){
+			if( e.hasOwnProperty('className') ){
+				if(e.className == 'alt'){
+					newRow.className = ((TBL.rows.length)%2==1) ? 'odd':'even';
+				}else{
+					newRow.className = e.className ;
+				}
+				delete e.className;
+			}
+			for( f in e ){
+				if( !e.hasOwnProperty(f) ) continue;
+				newRow.f = e[f] ;
+			}
+		}
+		this.TableRow = newRow ;
+	},
+
+	addCell: function( C ){ // Usage: 'TABLE'.addCell({ html: 'newCell Text', align:'center', width:'20px' });
+		var el = this.TableRow ;
+		ASTGUI.domActions.tr_addCell( el, C );
+	},
+
+	clear : function(){ // Usage: 'TABLE'.clear()
+		var el = this.TableElement ;
+		ASTGUI.domActions.clear_table(el);
+	},
+
+	rowCount : function(){
+		var el = this.TableElement ;
+		return el.rows.length;
 	}
 };
 
