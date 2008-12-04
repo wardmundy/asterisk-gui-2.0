@@ -95,6 +95,10 @@ _$ = function(x){
 	Array.prototype.removeFirst = function(){ // opposite of push - removes the first element of the array
 		this.splice(0,1);
 	};
+
+	Array.prototype.removeLast = function(){ // removes the last element of the array
+		this.pop();
+	};
 	
 	if(!Array.indexOf){
 		Array.prototype.indexOf = function(a){
@@ -1823,14 +1827,11 @@ var ASTGUI = {
 
 		parseTrunkDialArgument: function(y){ // usage ASTGUI.parseContextLine.parseTrunkDialArgument(y)
 			// expects y as  '${trunk_1}/XXX${EXTEN:X}' OR SIP/user/XXX${EXTEN:X}
-			if (typeof y != 'string') {
+			if( !y || typeof y != 'string') {
 				ASTGUI.Log.Error('ASTGUI.parseContextLine.parseTrunkDialArgument: expecting y as string');
-				return null;
+				return { name : '', channel : '', prepend : '', stripx : '' };
 			}
 			var WhatToDial = '';
-			if (!y) {
-				return null;
-			}
 			y = y.trim();
 			if( y.beginsWith('${') && y.afterChar('}').beginsWith('/') ) {
 				var trunkname = y.betweenXY('{' , '}');
@@ -1855,7 +1856,7 @@ var ASTGUI = {
 				if(!WhatToDial.contains('${EXTEN')){ // if WhatToDial is in some other format that the gui does not understand
 					// TODO : replace the above if condition with a regular expression to check for the acceptable formats
 					// TODO : THROW ERROR
-					return null;
+					return {name : trunkname, channel : channel, prepend : WhatToDial, stripx : ''};
 				}
 				var prepend = WhatToDial.beforeChar('$') ;
 				var extenString = WhatToDial.betweenXY('{','}') ;
