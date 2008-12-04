@@ -65,7 +65,6 @@ var MANAGE_ACCOUNTS = {
 			var img_name = ( DEFAULT_ACCOUNT == account ) ? 'images/edit.gif' : 'images/checkbox_blank.gif';
 			var tmp_context = SKYPE_CNF[account].context || '' ;
 			var dest_line = ( tmp_context && tmp_context.contains(ASTGUI.contexts.skypeIncomingContext) && EXTENSIONS_CNF.hasOwnProperty(tmp_context) ) ? EXTENSIONS_CNF[tmp_context][0] : '' ;
-			var dest_args = ASTGUI.parseContextLine.getArgs(dest_line) ;
 			var tmp = "<span class='guiButton' onclick=\"MANAGE_ACCOUNTS.edit_Account_form('" + account +"')\">Edit</span>&nbsp;"
 					+ "<span class='guiButtonDelete' onclick=\"MANAGE_ACCOUNTS.deleteAccount('" + account +"')\">Delete</span>" ;
 
@@ -75,7 +74,7 @@ var MANAGE_ACCOUNTS = {
 			TBL.addCell({ html: "<A href='#' TITLE='Set this as the default skype account for placing calls through skype network'><img src=" 
 						+ img_name + " border=0 onclick=\"set_as_default_account('" + account +"')\"></A>" });
 			TBL.addCell({ html: account, align: 'left' });
-			TBL.addCell({ html: ASTGUI.parseContextLine.toKnownContext(dest_args) , align:'left' });
+			TBL.addCell({ html: ASTGUI.parseContextLine.showAs(dest_line) , align:'left' });
 			TBL.addCell({ html: tmp, align: 'center' });
 		}
 
