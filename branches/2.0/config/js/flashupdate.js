@@ -175,6 +175,7 @@ var localajaxinit = function (){
 			$("#overlayUpload_TR").show();
 		}
 		if(!parent.sessionData.PLATFORM.isAA50_OEM ){
+			$('#UpdatePolycomFirmware').show();
 			ASTGUI.systemCmdWithOutput( 'firmware_version' , function(a){
 				current_version = a.trim();
 				_$('span_current_fwversion').innerHTML = '<B> Current Firmware version : ' + current_version + '&nbsp;&nbsp;</B>';
