@@ -117,7 +117,9 @@ networking_ApplyChanges = function(){
 function localajaxinit() {
 	top.document.title = 'Network Settings' ;
 	parent.ASTGUI.dialog.waitWhile('Loading Information ...');
-
+	if(!parent.sessionData.PLATFORM.isAA50_OEM ){
+		$('#URLforPolycom').show();
+	}
 	var t = [
 		{url:'#', desc:'General', click_function: function(){ $('#general_div').show(); $('#lan_div').hide(); $('#wan_div').hide(); }  } ,
 		{url:'#', desc:'WAN', click_function: function(){ $('#general_div').hide(); $('#lan_div').hide(); $('#wan_div').show(); } },
