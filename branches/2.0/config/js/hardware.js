@@ -260,7 +260,7 @@ function showtable(){ // navigates through the SPANS object and presents as a ta
 			ASTGUI.domActions.tr_addCell( newRow, {html: 'SPAN' } );
 			ASTGUI.domActions.tr_addCell( newRow, {html: 'ALARMS' } );
 			ASTGUI.domActions.tr_addCell( newRow, {html: 'Framing/Coding' } );
-			ASTGUI.domActions.tr_addCell( newRow, {html: 'channels<BR>Used/Total', align : 'center' } );
+			ASTGUI.domActions.tr_addCell( newRow, {html: 'channels Used/Total', align : 'center' } );
 			ASTGUI.domActions.tr_addCell( newRow, {html: 'Signalling', align : 'center'} );
 			ASTGUI.domActions.tr_addCell( newRow, {html: '' } );
 		};
