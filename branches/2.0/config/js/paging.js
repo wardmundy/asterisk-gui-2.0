@@ -399,7 +399,6 @@ var localajaxinit = function(){
 
 		var c = context2json ({ filename: 'extensions.conf' , context: 'globals', usf: 1 });
 		ASTGUI.updateFieldToValue( 'text_Alert_Info_Header' , c.getProperty('PAGING_HEADER') );
-		ASTGUI.updateFieldToValue( 'select_Timeout' , c.getProperty('PAGING_TIMEOUT') );
 
 		var d = context2json ({ filename: 'extensions.conf' , context: ASTGUI.contexts.PageAnExtension , usf: 0 });
 		var i = d.length;
@@ -421,7 +420,6 @@ var load_Defaults_TAB_page_anExtension = function(){
 
 var save_TAB_paging_settings = function(){
 	ASTGUI.updateaValue({ file:'extensions.conf', context :'globals', variable :'PAGING_HEADER', value : ASTGUI.getFieldValue('text_Alert_Info_Header') });
-	ASTGUI.updateaValue({ file:'extensions.conf', context :'globals', variable :'PAGING_TIMEOUT', value : ASTGUI.getFieldValue('select_Timeout') });
 	ASTGUI.feedback({msg:' Saved !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
 };
 
