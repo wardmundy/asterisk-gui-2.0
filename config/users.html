@@ -76,6 +76,7 @@
 	<TABLE width="100%" cellpadding=0 cellspacing=0>
 	<TR class="dialog_title_tr">
 		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);"><span id="edit_userExtension_div_title"></span></TD>
+		<TD width="120"><span id='User_AdvancedEditButton' class='guiButton' onclick='USERS_MISC_FUNCTIONS.show_UserEdit_Advanced();'>Advanced Edit</span></TD>
 		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
 	</TR>
 	</TABLE>
@@ -424,6 +425,26 @@
 	</TABLE>
 </div>
 
+
+<div id="edit_User_Advanced_DIV" STYLE="width:650; max-height:450;display:none;" class='dialog'>
+	<TABLE width="100%" cellpadding=0 cellspacing=0>
+	<TR class="dialog_title_tr">
+		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);"><span></span></TD>
+		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
+	</TR>
+	</TABLE>
+	<TABLE	align=center cellpadding=2 cellspacing=2 border=0 width='100%'>
+		<TR>	<TD align="center">
+				<textarea id='edit_USER_Advanced_details' rows=15 cols=80></textarea>
+			</TD>
+		</TR>
+		<TR>	<TD align=center height=50 valign=middle>
+				<span class='guiButtonCancel' onclick='USERS_MISC_FUNCTIONS.show_UserEdit_normal();'>Cancel</span>
+				<span class='guiButtonEdit' onclick='USERS_MISC_FUNCTIONS.save_User_Advanced();'>Update</span>
+			</TD>
+		</TR>
+	</TABLE>
+</div>
 
 
 <div style="display:none">

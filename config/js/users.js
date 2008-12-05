@@ -39,6 +39,51 @@ var localajaxinit = function(){
 };
 
 var USERS_MISC_FUNCTIONS = {
+	show_UserEdit_normal : function(){ // USERS_MISC_FUNCTIONS.show_UserEdit_normal();
+		$('#edit_User_Advanced_DIV').hideWithBg();
+		$('#edit_userExtension_div').showWithBg();
+	},
+
+	save_User_Advanced : function(){ // USERS_MISC_FUNCTIONS.save_User_Advanced();
+		parent.ASTGUI.dialog.waitWhile('Saving ..') ;
+
+		try{
+			ASTGUI.miscFunctions.empty_context({ filename:'users.conf', context : EXTENSION_EDIT, cb : function(){
+				var x = new listOfActions('users.conf');
+
+				var user_lines = ASTGUI.getFieldValue('edit_USER_Advanced_details') ;
+				user_lines = user_lines.split('\n');
+				user_lines.each( function(this_line){
+					x.new_action( 'append', EXTENSION_EDIT , this_line.beforeChar('=') , this_line.afterChar('=') );
+				});
+				x.callActions( function(){
+					ASTGUI.dialog.waitWhile('Updated User information <BR> Reloading GUI ... ');
+					setTimeout( function(){ top.window.location.reload(); } , 2000 );
+				});
+			}});
+		}catch(err){
+			alert("Error saving User information");
+			top.window.location.reload();
+		}
+	},
+
+	show_UserEdit_Advanced : function(){ // USERS_MISC_FUNCTIONS.show_UserEdit_Advanced();
+		parent.ASTGUI.dialog.waitWhile('Loading ..') ;
+		$('#edit_User_Advanced_DIV').showWithBg();
+		$('#edit_userExtension_div').hideWithBg();
+		$('#edit_User_Advanced_DIV .dialog_title > span').html( 'Edit User ' + EXTENSION_EDIT + " -- Advanced");
+
+		var textarea = _$('edit_USER_Advanced_details');
+		textarea.value = '';
+		var t = config2json({filename:'users.conf', usf:0});
+		if( t.hasOwnProperty(EXTENSION_EDIT) ){
+			//textarea.rows = t[EXTENSION_EDIT].length + 1 ;
+			textarea.value = t[EXTENSION_EDIT].join('\n');
+		}
+
+		parent.ASTGUI.dialog.hide() ;
+	},
+
 	initialize_formFields : function(){ // USERS_MISC_FUNCTIONS.initialize_formFields();
 		//Load dialplans into 'edit_user_dialplan'
 		var dps = parent.astgui_manageCallPlans.listPlans() ;
@@ -265,9 +310,11 @@ var USERS_MISC_FUNCTIONS = {
 		ASTGUI.feedback( { msg: 'Create New User !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' } );
 		USERS_MISC_FUNCTIONS.RESET_USER_FORM_FIELDS();
 		$('#edit_userExtension_div').showWithBg();
+		$('#User_AdvancedEditButton').hide();
 	},
 
 	EDIT_USER_FORM : function(a){ // USERS_MISC_FUNCTIONS.EDIT_USER_FORM();
+		$('#User_AdvancedEditButton').show();
 		isNewUSER = false ;
 		EXTENSION_EDIT = a ;
 		ASTGUI.feedback( { msg: 'Edit User Extension !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' } );
