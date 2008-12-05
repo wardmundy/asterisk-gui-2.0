@@ -32,7 +32,7 @@ var loadDOMelements = function(){
 
 function localajaxinit(){
 	top.document.title = "General Preferences" ;
-	if( parent.sessionData.PLATFORM.isAST_1_6 || parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ){
+	if( (parent.sessionData.PLATFORM.isAST_1_6 || parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE) && !parent.sessionData.PLATFORM.isAA50_OEM ){
 		$('.16_Only').show();
 		(function(){
 			var c = config2json( { filename: 'phoneprov.conf' , usf: 0 } );
@@ -181,7 +181,7 @@ var save_changes = function(){
 		u.new_action('append', 'default', 'exten', 'o,1,' + ASTGUI.getFieldValue(DOM_op_ext) );
 	u.callActions();
 
-	if( parent.sessionData.PLATFORM.isAST_1_6 || parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ){
+	if( (parent.sessionData.PLATFORM.isAST_1_6 || parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE) && !parent.sessionData.PLATFORM.isAA50_OEM ){
 		u.clearActions('phoneprov.conf');
 		u.new_action('delete', 'polycom', 'setvar','', 'IDLEIMAGE_ACTIVE=1' );
 		u.new_action('delete', 'polycom', 'setvar','', 'IDLEIMAGE_ACTIVE=0' );
