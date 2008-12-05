@@ -29,7 +29,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		// check whether the config files are in proper format and have every thing needed for the gui to function properly
 				var check_For_Contexts = {
 					general : { static : 'yes', writeprotect : 'no', clearglobalvars : 'yes' },
-					globals : { FEATURES : '' , DIALOPTIONS : '' , RINGTIME: '20', FOLLOWMEOPTIONS : '', PAGING_HEADER : 'Intercom', PAGING_TIMEOUT : '60' },
+					globals : { FEATURES : '' , DIALOPTIONS : '' , RINGTIME: '20', FOLLOWMEOPTIONS : '', PAGING_HEADER : 'Intercom' },
 					'default' : {},
 					'macro-stdexten' : [
 						'exten=s,1,Set(__DYNAMIC_FEATURES=${FEATURES})',
@@ -59,9 +59,8 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					],
 					'macro-pagingintercom' : [
 						'exten=s,1,SIPAddHeader(Alert-Info: ${PAGING_HEADER})',
-						'exten=s,2,Set(TIMEOUT(absolute)=${PAGING_TIMEOUT})',
-						'exten=s,3,Page(${ARG1}|${ARG2})',
-						'exten=s,4,Hangup'
+						'exten=s,2,Page(${ARG1}|${ARG2})',
+						'exten=s,3,Hangup'
 					]
 				};
 		
