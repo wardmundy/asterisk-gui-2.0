@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# script to detect whether zaptel/dahdi was installed & generate an include file for GUI
+
 OUTPUTFILE="/etc/asterisk/dahdi_guiread.conf"
 
 echo "" > ${OUTPUTFILE}
