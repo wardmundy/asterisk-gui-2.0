@@ -623,11 +623,11 @@ var localajaxinit = function(){
 		(function(){
 			if( parent.sessionData.PLATFORM.isAA50 ) {
 				ASTGUI.systemCmdWithOutput( 'firmware_version' , function(a){
-					_$('firmware_div').innerHTML = 'Firmware : v' + a.trim() ;
+					_$('sys_uptime_div').innerHTML = 'Firmware : v' + a.trim() ;
 				});
 			}else{
 				ASTGUI.systemCmdWithOutput( 'uptime' , function(a){
-					_$('firmware_div').innerHTML = 'Uptime : ' + a.trim() ;
+					_$('sys_uptime_div').innerHTML = 'Uptime : ' + a.trim() ;
 				});
 			}
 		})();	
