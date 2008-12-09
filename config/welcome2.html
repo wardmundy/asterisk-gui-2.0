@@ -455,9 +455,9 @@ img.loadTrunks, img.loadQueues {
 				$(e.target).siblings('span').each( function() {
 					$(this).removeClass('active');
 					var title = $(this).attr('title');
-					extension_loads[title] = extension_loads[title]?true:false;
+					extension_loads[title] = false;
 				});
-				$('#extensions_list').find('.sip, .iax, .analog, .features.').show();
+				$('#extensions_list').find('.sip, .iax, .analog, .feature').show();
 			}
 			
 			var title = $(e.target).attr('title');
