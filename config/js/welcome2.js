@@ -613,9 +613,10 @@ manager_events.parseOutput = function(op) {
 		case 'event: join':
 			/* event[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
 			var exten = event[2].split(' ')[1].split('/')[1].split('-')[0];
+			var cid = event[3].split(' ')[1];
 			var queue = event[5].split(' ')[1];		//Queue: 6501
 			var position = event[6].split(' ')[1];		//Position: 1
-			this.addQueueCall(queue, exten, position);
+			this.addQueueCall(queue, exten, cid, position);
 			break;
 		case 'event: leave':
 			/* event[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
@@ -764,7 +765,7 @@ manager_events.updateAgent = function(event, agent, loginchan) {
 	});
 };
 
-manager_events.addQueueCall = function (queue, exten, position) {
+manager_events.addQueueCall = function (queue, exten, cid, position) {
 	var calls_tbody = $('#queue_'+queue.toString()+' .calls > .list > tbody');
 	var new_row = $('<tr></tr>').attr('id',''+queue.toString()+'_call_'+exten.toString()).addClass('call').addClass('new');
 
@@ -773,7 +774,7 @@ manager_events.addQueueCall = function (queue, exten, position) {
 	}
 
 	$("<td></td>").html(position).appendTo(new_row);
-	$("<td></td>").html(exten).appendTo(new_row);
+	$("<td></td>").html(cid).appendTo(new_row);
 	$("<td></td>").html('0:00').addClass('count_html_up').appendTo(new_row);
 
 	calls_tbody.append(new_row);
