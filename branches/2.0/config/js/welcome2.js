@@ -235,7 +235,7 @@ var loadExtensions = function() {
 
 			$("<td></td>").html('').appendTo(new_row);
 			$("<td></td>").html(this_vmg_exten).appendTo(new_row);
-			$("<td></td>").html(parent.sessionDate.pbxinfo.vmgroups[this_vmg_exten].getProperty('label')).appendTo(new_row);
+			$("<td></td>").html(parent.sessionData.pbxinfo.vmgroups[this_vmg_exten].getProperty('label')).appendTo(new_row);
 			$("<td></td>").html('').appendTo(new_row);
 			$("<td></td>").html('VoiceMail Group').appendTo(new_row);
 
