@@ -88,6 +88,17 @@ div.title span.minimaxi {
 
 #legend {
 	text-align: center;
+	margin-left: 30px;
+	margin-right: 20px;
+	margin-top: 0px;
+	margin-bottom:0px;
+	padding:0px;
+	font-weight: normal;
+	color: #000000;
+}
+
+#extensions_list {
+	margin-top: 5px;
 }
 
 div.content {
@@ -511,12 +522,6 @@ img.loadTrunks, img.loadQueues {
 	</div>
 
 	<div class="left column">
-		<div id="legend">
-			<img src="images/status_green.png" border="0"> Free 
-			<img src="images/status_orange.png" border="0"> Ringing 
-			<img src="images/status_red.png" border="0"> Busy 
-			<img src="images/status_gray.png" border="0"> UnAvailable 
-		</div>
 		<div id="sysstat_left_container" class="content_container">
 			<div id="sys_status_trunks" class="content">
 				<div class="handle title"> 
@@ -555,6 +560,12 @@ img.loadTrunks, img.loadQueues {
 						<span title="feature" class="section"> Features </span>
 						<span title="iax" class="section"> IAX </span>
 						<span title="sip" class="section"> SIP </span>
+						<span id="legend">
+							<img src="images/status_green.png" border="0"> Free 
+							<img src="images/status_orange.png" border="0"> Ringing 
+							<img src="images/status_red.png" border="0"> Busy 
+							<img src="images/status_gray.png" border="0"> UnAvailable 
+						</span>
 					</div>
 					<table id="extensions_list" class="list">
 					<thead>
