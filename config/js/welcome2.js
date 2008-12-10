@@ -673,6 +673,7 @@ manager_events.parseOutput = function(op) {
 			this.parkedCall(exten, chan, from, timeout, cid);
 			break;
 		case 'event: parkedcallgiveup':
+		case 'event: parkedcalltimeout':
 		case 'event: unparkedcall':
 			var exten = event[2].split(' ')[1];	/* Exten: <parkexten> */
 			this.unparkedCall(exten);
