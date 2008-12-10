@@ -2245,6 +2245,7 @@ astgui_updateConfigFromOldGui = function(){
 
 
 var localajaxinit = function(){
+	top.document.title = 'Asterisk Configuration' ;
 	$.getScript( 'js/guiversion.js', function(){
 		try{
 			sessionData.gui_version = gui_version ;
