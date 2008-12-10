@@ -41,7 +41,7 @@ var tooltips = new Object;
 
 	tooltips['users'] .en[11] = "<B>InterAsterisk eXchange Protocol:</B> Check this option if the User or Phone is using IAX or is an IAX device.";
 
-	tooltips['users'] .en[12] = "<B>Computer Telephony Integration:</B> Check this option if this user is to be permitted Asterisk Manager Interface (AMI) interface access for AMI client applications."; //CTI:
+	tooltips['users'] .en[12] = "<B>ADA/Manager:</B> Check this option if this user is to be permitted Asterisk Manager Interface (AMI) interface access for AMI client applications, or use the Asterisk Desktop Assistant.";
 
 	tooltips['users'] .en[13] = "<B>Call Waiting:</B> Check this option if the User or Phone should have Call-Waiting capability.";
 
