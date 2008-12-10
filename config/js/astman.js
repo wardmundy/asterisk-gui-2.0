@@ -2317,8 +2317,9 @@ var ASTGUI = {
 
 		var after = function(){
 			parent.document.getElementById('ajaxstatus').style.display = 'none';
-			ASTGUI.loadHTML( tmp_opf , cb );
-			ASTGUI.systemCmd( 'rm ' + top.sessionData.directories.guiInstall + tmp_opf, function(){});
+			ASTGUI.loadHTML( tmp_opf , function(cmd_output){
+				ASTGUI.systemCmd( 'rm ' + top.sessionData.directories.guiInstall + tmp_opf, function(){cb(cmd_output);} );
+			});
 		};
 
 		var delay_cb = function(){ setTimeout(after,500); };

@@ -645,9 +645,7 @@ var miscFunctions = {
 	
 		doLogout: function(){
 			var f = makeSyncRequest({ action :'logoff'});
-			DOM_mainscreen.src = 'blank.html';
-			parent.ASTGUI.dialog.waitWhile('Logging out ...');
-			setTimeout( window.location.reload , 20);
+			top.window.location.replace(top.window.location.href);
 		}
 	},
 
