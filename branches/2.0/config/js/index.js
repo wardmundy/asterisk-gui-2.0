@@ -297,7 +297,7 @@ var onLogInFunctions = {
 				} , 1000 );
 				return ; // about to reload
 			}
-			DOM_mainscreen.src = 'home.html';
+			DOM_mainscreen.src = 'blank.html';
 			setTimeout ( miscFunctions.resizeMainIframe, 1000 );
 
 			onLogInFunctions.makePings.start();
@@ -645,7 +645,9 @@ var miscFunctions = {
 	
 		doLogout: function(){
 			var f = makeSyncRequest({ action :'logoff'});
-			top.window.location.reload();
+			DOM_mainscreen.src = 'blank.html';
+			parent.ASTGUI.dialog.waitWhile('Logging out ...');
+			setTimeout( window.location.reload , 20);
 		}
 	},
 
