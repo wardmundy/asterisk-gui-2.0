@@ -71,7 +71,7 @@ var onLogInFunctions = {
 						onLogInFunctions.makePings.stop();
 						top.window.location.replace(top.window.location.href); return true; 
 					}else{
-						ASTGUI.Log.Debug('PING Request: Success');
+						ASTGUI.Log.Ajax('PING Request: Success');
 					}
 				};
 				$.ajax({

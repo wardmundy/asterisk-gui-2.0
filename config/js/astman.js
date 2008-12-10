@@ -704,7 +704,7 @@ var ASTGUI = {
 		},
 
 		Error: function( msg ){ // ASTGUI.Log.Error();
-			if( !top.sessionData || !top.sessionData.DEBUG_WHICH.Error ) return;
+			if( !msg || !top.sessionData || !top.sessionData.DEBUG_WHICH.Error ) return;
 			if( msg.length <=5 && ASTGUI.errorCodes[msg] ){
 				this.doLog( '<B>' + ASTGUI.errorCodes[msg] + '</B>' , '#992b23' );
 			}else{
