@@ -997,7 +997,7 @@ var countHtml = function() {
 		this.innerHTML = new_time;
 	});
 
-	setTimeout('countHtml()',1000);
+	setTimeout(arguments.callee,1000);
 };
 
 var countSecs = function() {
@@ -1009,7 +1009,7 @@ var countSecs = function() {
 		this.innerHTML = parseInt(this.innerHTML, 10)-1;
 	});
 
-	setTimeout('countSecs()',1000);
+	setTimeout(arguments.callee,1000);
 };
 
 var html2secs = function(html) {
