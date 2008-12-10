@@ -87,6 +87,7 @@ div.title span.minimaxi {
 }
 
 #legend {
+	float: right;
 	text-align: center;
 	margin-left: 30px;
 	margin-right: 20px;
@@ -554,19 +555,20 @@ img.loadTrunks, img.loadQueues {
 				</div>
 				<div class="clear"></div>
 				<div class="body">
+					<span id="legend">
+						<img src="images/status_green.png" border="0"> Free 
+						<img src="images/status_orange.png" border="0"> Ringing 
+						<img src="images/status_red.png" border="0"> Busy 
+						<img src="images/status_gray.png" border="0"> UnAvailable 
+					</span>
 					<div id="extensions_sections">
 						<span title="all" class="section active"> All </span>
 						<span title="analog" class="section"> Analog </span>
 						<span title="feature" class="section"> Features </span>
 						<span title="iax" class="section"> IAX </span>
 						<span title="sip" class="section"> SIP </span>
-						<span id="legend">
-							<img src="images/status_green.png" border="0"> Free 
-							<img src="images/status_orange.png" border="0"> Ringing 
-							<img src="images/status_red.png" border="0"> Busy 
-							<img src="images/status_gray.png" border="0"> UnAvailable 
-						</span>
 					</div>
+					<div class="clear"></div>
 					<table id="extensions_list" class="list">
 					<thead>
 					<tr class="list_titles">
