@@ -465,11 +465,11 @@ img.loadTrunks, img.loadQueues {
 		}
 	}));
 
-	setTimeout("loadTrunks()", 1);
+	setTimeout(loadTrunks, 1);
 	loadExtensions();
-	setTimeout("loadQueues()", 1);
-	setTimeout("loadConferenceRooms()", 1);
-	setTimeout("loadParkingLot()", 1);
+	setTimeout(loadQueues, 1);
+	setTimeout(loadConferenceRooms, 1);
+	setTimeout(loadParkingLot, 1);
 
 	/* jQuery Tablesorter init */
 	/* this requires a rewrite of the loadExtensions and loadTrunks */
@@ -490,8 +490,8 @@ img.loadTrunks, img.loadQueues {
 	manager_events.watch();
 
 	/* countUp and countDown tickers */
-	setTimeout('countHtml()',1000);
-	setTimeout('countSecs()',1000);
+	setTimeout(countHtml,1000);
+	setTimeout(countSecs,1000);
 
 	return;
  });
