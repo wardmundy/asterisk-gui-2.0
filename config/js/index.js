@@ -231,12 +231,13 @@ var onLogInFunctions = {
 
 	setGUI_Paths: function(){
 		// onLogInFunctions.setGUI_Paths()
-		var ASTERISK_CONF = context2json({ filename:'asterisk.conf' , context : 'directories' , usf:1 }) ;
+		var ASTERISK_CONF = context2json({ filename:'asterisk.conf' , context : 'directories' , usf:1 });
+		if( ASTERISK_CONF === null ){ ASTERISK_CONF = new ASTGUI.customObject ; } // if context 'directories' not found in asterisk.conf
 
-		sessionData.directories.asteriskConfig = ( ASTERISK_CONF.hasOwnProperty('astetcdir') ) ? ASTERISK_CONF.astetcdir : '/etc/asterisk/' ;
-		sessionData.directories.astvarlibdir = ( ASTERISK_CONF.hasOwnProperty('astvarlibdir') ) ? ASTERISK_CONF.astvarlibdir : '/var/lib/asterisk/' ;
-		sessionData.directories.AGIBIN = ( ASTERISK_CONF.hasOwnProperty('astagidir') ) ? ASTERISK_CONF.astagidir : '/var/lib/asterisk/agi-bin/' ;
-		sessionData.directories.astspooldir = ( ASTERISK_CONF.hasOwnProperty('astspooldir') ) ? ASTERISK_CONF.astspooldir : '/var/spool/asterisk/' ;
+		sessionData.directories.asteriskConfig =  ASTERISK_CONF.getProperty('astetcdir') ||  '/etc/asterisk/' ;
+		sessionData.directories.astvarlibdir = ASTERISK_CONF.getProperty('astvarlibdir') || '/var/lib/asterisk/' ;
+		sessionData.directories.AGIBIN = ASTERISK_CONF.getProperty('astagidir') || '/var/lib/asterisk/agi-bin/' ;
+		sessionData.directories.astspooldir = ASTERISK_CONF.getProperty('astspooldir') || '/var/spool/asterisk/' ;
 
 		if( !sessionData.directories.asteriskConfig.endsWith('/') ){ sessionData.directories.asteriskConfig = sessionData.directories.asteriskConfig + '/' ; }
 		if( !sessionData.directories.astvarlibdir.endsWith('/') ){ sessionData.directories.astvarlibdir = sessionData.directories.astvarlibdir + '/' ; }
