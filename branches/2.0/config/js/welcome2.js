@@ -22,12 +22,7 @@
 var REGISTRY_OUTPUT = {};
 var manager_events = {};
 var manager_timers = {};
-var extension_loads = {};
-extension_loads.all = true;
-extension_loads.analog = true;
-extension_loads.features = true;
-extension_loads.iax = true;
-extension_loads.sip = true;
+var extension_loads = { all: true, analog: true, features: true, iax: true, sip: true };
 
 var loadTrunks = function() {
 	EX_CF = config2json({filename:'extensions.conf', usf:0 });
@@ -714,7 +709,10 @@ manager_events.parseOutput = function(op) {
 			break;
 		}
 	}
-	} catch (err) { alert(err);}
+	} catch (err) {
+		ASTGUI.Log.Error('Error Parsing waitevent response : manager_events.parseOutput() ');
+		ASTGUI.Log.Error(err.description);
+	}
 
 	this.watch();
 };
@@ -1031,9 +1029,9 @@ var secs2html = function(secs) {
 	mins = mins % 60;
 	secs = secs % 60;
 	if (hrs != 0) {
-		return ''+hrs.toString()+':'+mins.toString()+':'+(secs<10 ?'0':'')+secs.toString();
+		return ''+hrs.toString()+':'+mins.toString()+':'+secs.addZero();
 	} else {
-		return ''+mins.toString()+':'+(secs<10?'0':'')+secs.toString();
+		return ''+mins.toString()+':'+secs.addZero();
 	}
 };
 
