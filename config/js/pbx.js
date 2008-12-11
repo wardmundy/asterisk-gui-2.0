@@ -1705,12 +1705,12 @@ astgui_manageRingGroups = {
 		if( rg.strategy == 'ringinorder' ){
 			rg.members.each(
 				function(member){
-					x.new_action('append', newrg, 'exten', 's,n,Dial(' + member +',' + rg.ringtime + ',i)' );
+					x.new_action('append', newrg, 'exten', 's,n,Dial(' + member +',' + rg.ringtime + ',${DIALOPTIONS}i)' );
 				}
 			);
 		}else{
 			if(rg.members.length){
-				x.new_action('append', newrg, 'exten', 's,n,Dial(' + rg.members.join('&') +',' + rg.ringtime + ',i)' );
+				x.new_action('append', newrg, 'exten', 's,n,Dial(' + rg.members.join('&') +',' + rg.ringtime + ',${DIALOPTIONS}i)' );
 			}
 		}
 		x.new_action( 'append', newrg, 'exten', 's,n,' + rg.fallback );
