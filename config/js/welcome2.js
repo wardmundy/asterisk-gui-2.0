@@ -469,7 +469,7 @@ var loadConferenceRooms = function() {
 		/* 0. Channel		1. Context	2. Extension	3. Prio		4. State
 		*  5. Application	6. Data		7. CallerID	8. <blank>	9. AccountCode
 		*  10. Duration		10. BridgedTo 						*/
-		if (chan[5].toLowerCase() != 'meetme') {
+		if ( chan.length < 6 || chan[5].toLowerCase() != 'meetme') {
 			continue;
 		}
 
