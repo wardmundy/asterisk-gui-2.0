@@ -195,9 +195,8 @@ function updatePortInfo(){
 	PORTS[p]['option'] = _$('editport_option').value ;
 	PORTS[p]['edited'] = true;
 	misdnConfig.showMisdnConfiginTable();
-	_$('edit_port').style.display = "none";
-
-	_$('misdntable_r'+p).style.background = "#C9AAAA";
+	$('#edit_port').hideWithBg(); 
+	// _$('misdntable_r'+p).style.background = "#C9AAAA";
 
 }
 
