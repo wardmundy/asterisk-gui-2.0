@@ -227,12 +227,18 @@ function generate_applyMisdn(){
 		if(PORTS[k]['portType']){ pmode_ports[PORTS[k]['portType']].push(k); }
 	}}
 
-
-	for( var k in PORTS ){ if( PORTS.hasOwnProperty(k) ){ 
+	var tmp_optionMaster_clock ;
+	for( var k in PORTS ){ if( PORTS.hasOwnProperty(k) ){
 		if( PORTS[k]['option'] ){
 			x.new_action('append', d , 'option',  k + ',' + PORTS[k]['option']);
+		if( PORTS[k]['option'] == 'master_clock' ){
+			tmp_optionMaster_clock = k;
+		}
 		}
 	}}
+	if( !tmp_optionMaster_clock ){
+		x.new_action( 'append', d , 'option', '1,master_clock' );
+	}
 
 	for( var k in pmode_ports ){ if( pmode_ports.hasOwnProperty(k) && pmode_ports[k].length ){
 		x.new_action('append', d , k , pmode_ports[k].join(','));
