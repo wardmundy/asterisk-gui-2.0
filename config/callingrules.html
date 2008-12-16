@@ -92,8 +92,14 @@
 						</label>
 					</legend>
 					<table width='580'>
-					<TR>	<TD align="right" width='40%'>Destination :</TD>
-						<TD><select id='new_crl_localDest'></select></TD>
+					<TR>	<TD align="right" width='40%' valign='top'>Destination :</TD>
+						<TD>
+							<select id='new_crl_localDest'></select>
+							<div id='new_crl_localDest_CUSTOM_container' style='margin-top:3px;display:none'>
+								<input id='new_crl_localDest_CUSTOM' size=30> <BR>
+								Ex: Macro(someMacro,${EXTEN:1})
+							</div>
+						</TD>
 					</TR>
 					</table>
 				</fieldset>
