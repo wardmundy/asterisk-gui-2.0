@@ -1073,6 +1073,7 @@ var ASTGUI = {
 	},
 
 	getFieldValue : function(el){ // ASTGUI.getFieldValue(el)
+		if( !el ){ return ''; }
 		if ( typeof el == 'string'){ el = _$(el) ; }
 		switch(el.type){
 			case 'checkbox':

@@ -212,11 +212,23 @@ var update_CRLSTable = function(){
 
 var localajaxinit = function() {
 	top.document.title = "Edit Calling Rules";
-	ASTGUI.selectbox.populateArray( 'new_crl_localDest' ,  parent.miscFunctions.getAllDestinations() );
+
+	var tmp_someArray = parent.miscFunctions.getAllDestinations() ;
+	tmp_someArray.push({ optionText: 'Custom' , optionValue: 'CUSTOM' });
+	ASTGUI.selectbox.populateArray( 'new_crl_localDest' , tmp_someArray);
 	ASTGUI.domActions.showHideClassByCheckBox( 'toLocalDest', 'STT_TR_OPTIONS', true );
 	load_DOMelements();
 	update_CRLSTable();
 	ASTGUI.events.add( 'restore_default_clrs_button', 'click' , restore_default_callingRules );
+
+	$('#new_crl_localDest').change(function(){
+		if( this.value == 'CUSTOM'){
+			$('#new_crl_localDest_CUSTOM_container').show();
+			$('#new_crl_localDest_CUSTOM').val('').focus();
+		}else{
+			$('#new_crl_localDest_CUSTOM_container').hide();
+		}
+	});
 };
 
 
@@ -286,7 +298,12 @@ var new_crl_save_go = function(){
 	}
 
 	if( _$('toLocalDest').checked ){
-		var as = DOM_new_crl_pattern.value + ',1,' + ASTGUI.getFieldValue('new_crl_localDest') ;
+		var tmp_new_crl_localDest = ASTGUI.getFieldValue('new_crl_localDest') ;
+		if( tmp_new_crl_localDest == 'CUSTOM' ){
+			var as = DOM_new_crl_pattern.value + ',1,' + ASTGUI.getFieldValue('new_crl_localDest_CUSTOM') ; ////// <<<<<<<<<<<<<<<<<<<
+		}else{
+			var as = DOM_new_crl_pattern.value + ',1,' + tmp_new_crl_localDest ;
+		}
 	}else{
 		var t1 = ASTGUI.getFieldValue(DOM_new_crl_trunk);
 		var t2 = ASTGUI.getFieldValue(DOM_new_crl_fotrunk);
