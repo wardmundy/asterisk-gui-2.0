@@ -23,7 +23,7 @@ var REGCONTEXT = 'general' ;
 
 var list_keyFiles = function(){
 	
-	ASTGUI.listSystemFiles( '/var/lib/asterisk/licenses/' , function(listOfFiles) {
+	ASTGUI.listSystemFiles( parent.sessionData.directories.astvarlibdir + 'licenses/' , function(listOfFiles) {
 		if(listOfFiles.length){
 			$('#div_list_keysheading').show().html( "<B>License Keys:</B> " + listOfFiles.join(', '));
 		}else{
