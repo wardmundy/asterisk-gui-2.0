@@ -261,6 +261,12 @@ var VoiceMenus_miscFunctions = {
 					$('#newstep_gotoDestination').show();
 					tip_chosenStep.innerHTML = '';
 					break;
+				case 'toDestinationByCallerId':
+					lbl('Goto Destiantion if CallerId is');
+					$('#newstep_pwd').val('').show();
+					$('#newstep_gotoDestinationByCallerId').show();
+					tip_chosenStep.innerHTML = 'Goto this destination, if callerId number matches the specified number';
+					break;
 				case 'setLanguage':
 					lbl('Set Language');
 					$('#newstep_setlanguage').show();
@@ -397,6 +403,12 @@ var VoiceMenus_miscFunctions = {
 				break;
 			case 'toDestination':
 				newstep = ASTGUI.getFieldValue('newstep_gotoDestination');
+				break;
+			case 'toDestinationByCallerId':
+				// newstep = 'GotoIf($["${CALLERID(num)}" == "newstep_pwd"]? newstep_gotoDestinationByCallerId )'
+				newstep = "GotoIf($[\"${CALLERID(num)}\" == \""
+ 					+ ASTGUI.getFieldValue('newstep_pwd')
+					+ "\"]?"+ ASTGUI.getFieldValue('newstep_gotoDestinationByCallerId') +")" ;
 				break;
 			case 'setLanguage':
 				newstep = 'Set(CHANNEL(language)=' + ASTGUI.getFieldValue('newstep_setlanguage') + ')';
@@ -607,9 +619,15 @@ var edit_voiceMenu_KeyPressActions_form = function(){
 
 
 var updateVoiceMenus_Table = function(){
-	var someArray = parent.miscFunctions.getAllDestinations() ; 
-	ASTGUI.selectbox.populateArray('newstep_gotoDestination', someArray);
-	ASTGUI.selectbox.populateArray('kpe_destinations', someArray);
+	(function(){
+		var someArray = parent.miscFunctions.getAllDestinations() ;
+		ASTGUI.selectbox.populateArray('newstep_gotoDestination', someArray);
+
+		var someOtherArray = parent.miscFunctions.getAllDestinations(1) ;
+		ASTGUI.selectbox.populateArray('newstep_gotoDestinationByCallerId', someOtherArray);
+
+		ASTGUI.selectbox.populateArray('kpe_destinations', someArray);
+	})();
 	ASTGUI.selectbox.insert_before('kpe_destinations','None', '', 0);
 
 	$('#sqSteps').click(function(event){

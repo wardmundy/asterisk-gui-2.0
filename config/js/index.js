@@ -833,7 +833,7 @@ var miscFunctions = {
 		});
 	},
 
-	getAllDestinations: function(){ // miscFunctions.getAllDestinations() // --> returns an Array of Objects
+	getAllDestinations: function(without_Goto){ // miscFunctions.getAllDestinations() // --> returns an Array of Objects
 	// There are various places in the gui where we want to preset a select box with all possible destinations
 	// for Example - in incoming calls, Voicemenus, RingGroups etc.
 	// this function navigates through all properties of sessionData.pbxinfo and returns an Array of Objects with all the possible destinations
@@ -909,6 +909,22 @@ var miscFunctions = {
 		tmp.push({ optionText: 'Operator' , optionValue: 'Goto(default,o,1)' });
 		tmp.push({ optionText: 'Hangup' , optionValue: 'Hangup' });
 		tmp.push({ optionText: 'Congestion' , optionValue: 'Congestion' });
+
+		if( without_Goto ){
+			var tmp_withoutGoto = [];
+			for( var t=0; t < tmp.length; t++ ){
+				if( tmp[t].optionValue.beginsWith('Goto(') ){
+
+					tmp_withoutGoto.push({
+						optionText	: tmp[t].optionText ,
+						optionValue	: tmp[t].optionValue.lChop('Goto(').rChop(')')
+					});
+
+				}
+			}
+			return tmp_withoutGoto;
+		}
+
 		return tmp;
 	},
 
