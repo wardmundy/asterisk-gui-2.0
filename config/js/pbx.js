@@ -525,6 +525,12 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		sessionData.FXS_PORTS_DETECTED = [];
 		var y;
 		var c = config2json({filename:'ztscan.conf', usf:0});
+		var tmp_dahdi_contexts = c.getOwnProperties();
+		if( !tmp_dahdi_contexts.length ){ // no analog or digital hardware found, hide the hardware configuration & misdn panels
+			miscFunctions.hide_panel('digital.html', 0);
+			miscFunctions.hide_panel('misdn.html', 0);
+		}
+
 		for( var d in c ){ if (c.hasOwnProperty(d) ) {
 			c[d].each( function( item ) {
 				if( item.beginsWith('port=') && item.contains('FXO') && !item.contains('FAILED') ){ // we are looking for item if it is in the format 'port=4,FXO'
