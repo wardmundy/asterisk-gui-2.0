@@ -1864,6 +1864,9 @@ astgui_updateConfigFromOldGui = function(){
 	var n_Lower = n.toLowerCase();
 	if( n_Lower.contains('response: error') && n_Lower.contains('message: config file not found') ){
 		parent.ASTGUI.systemCmd( 'touch ' + top.sessionData.directories.asteriskConfig + ASTGUI.globals.configfile , function(){
+			if( top.sessionData.DEBUG_MODE ){
+				alert('Creating' + ASTGUI.globals.configfile + ' :: astgui_updateConfigFromOldGui() \n Click OK to Reload');
+			}
 			top.window.location.reload();
 		});
 		return false;
@@ -2220,6 +2223,9 @@ astgui_updateConfigFromOldGui = function(){
 		sa.callActions( function(){
 			SU.callActions( function(){
 				var u = ASTGUI.updateaValue({ file: ASTGUI.globals.configfile, context: 'general', variable: 'config_upgraded', value: 'yes' }) ;
+				if( top.sessionData.DEBUG_MODE ){
+					alert('Upgraded Configuration :: astgui_updateConfigFromOldGui() \n Click OK to Reload');
+				}
 				top.window.location.reload();
 			});
 		});
