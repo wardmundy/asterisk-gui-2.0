@@ -6,7 +6,6 @@ ul.ui-tabs-nav {
 
 ul.ui-tabs-nav li {
 	display: inline;
-	float: left;
 	font-weight: bold;
 	margin: 0px;
 	margin-left: 3px;
@@ -65,11 +64,12 @@ ul.ui-tabs-nav li.ui-tabs-selected a, ul.ui-tabs-nav li.ui-tabs-selected a:visit
 }
 
 div.ui-tabs-panel {
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
 	background-color: #FFFFFF;
 	border: 1px solid #6b79a5;
 	margin: 0px;
+	margin-top: 22px;
 	min-height: 100px;
 	padding: 4px;
 }
