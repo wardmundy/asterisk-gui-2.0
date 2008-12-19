@@ -958,7 +958,7 @@ manager_events.meetmeTalking = function(meetme, exten, is_talking) {
 };
 
 //abstracted out because its called in manager_events.meetmeJoin & loadConferences
-addMeetmeMember = function(meetme, user_num, duration) {
+var addMeetmeMember = function(meetme, user_num, duration) {
 	//set duration's default value
 	duration = typeof(duration) != 'undefined' ? duration : 0;
 

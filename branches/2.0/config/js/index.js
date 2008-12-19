@@ -607,6 +607,10 @@ var miscFunctions = {
 		ASTGUI.cookies.removeCookie('configFilesChanged');
 		ASTGUI.feedback({msg:'Asterisk Reloaded !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
 
+		if( sessionData.hasOwnProperty('gui_version') && sessionData.gui_version.trim() ){
+			ASTGUI.updateaValue({ file: ASTGUI.globals.configfile , context :'general', variable :'config_gui_version', value : sessionData.gui_version });
+		}
+
 		if(sessionData.PLATFORM.isAA50 ){
 			//TODO - Save Changes
 			parent.ASTGUI.systemCmd( 'save_config', function(){ if(cb){cb();} } );
