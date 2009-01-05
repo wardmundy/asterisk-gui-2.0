@@ -597,6 +597,9 @@ var miscFunctions = {
 	},
 
 	applyChanges : function(cb){
+		if( sessionData.hasOwnProperty('gui_version') && sessionData.gui_version.trim() ){
+			ASTGUI.updateaValue({ file: ASTGUI.globals.configfile , context :'general', variable :'config_gui_version', value : sessionData.gui_version });
+		}
 		var u = _$('applyChanges_Button');
 		if (sessionData.PLATFORM.isAST_1_4) {
 			var t = ASTGUI.cliCommand('reload') ;
@@ -606,10 +609,6 @@ var miscFunctions = {
 		u.style.display = 'none';
 		ASTGUI.cookies.removeCookie('configFilesChanged');
 		ASTGUI.feedback({msg:'Asterisk Reloaded !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
-
-		if( sessionData.hasOwnProperty('gui_version') && sessionData.gui_version.trim() ){
-			ASTGUI.updateaValue({ file: ASTGUI.globals.configfile , context :'general', variable :'config_gui_version', value : sessionData.gui_version });
-		}
 
 		if(sessionData.PLATFORM.isAA50 ){
 			//TODO - Save Changes
