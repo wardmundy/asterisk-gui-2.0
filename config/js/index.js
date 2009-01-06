@@ -208,6 +208,23 @@ var onLogInFunctions = {
 		u.new_action('delcat', rand , '', '') ;
 		u.callActions();
 		ASTGUI.cookies.setCookie( 'rwaccess' , 'yes' );
+
+		if( sessionData.PLATFORM.isAST_1_6 ){
+			// make sure originate privilege is defined in asterisk 1.6
+			// This was introduced in Asterisk 1.6 and users upgrading from 1.4 do not have this
+			var tmp_managerUser = ASTGUI.cookies.getCookie('username') ;
+			var manager_conf = config2json({ filename:'manager.conf', usf:1 });
+			if( manager_conf[tmp_managerUser].hasOwnProperty('write') ){
+				var write_value = manager_conf[tmp_managerUser]['write'];
+				if( !write_value.contains('originate') ){
+					var u = new listOfSynActions('manager.conf');
+					u.new_action( 'update', tmp_managerUser, 'write', write_value + ',originate' , write_value );
+					u.callActions();
+					return 'manager_updated'; // about to reload
+				}
+			}
+		}
+
 		return true;
 	},
 
@@ -287,10 +304,14 @@ var onLogInFunctions = {
 				ASTGUI.dialog.alertmsg('The GUI does not have necessary privileges. <BR> Please check the manager permissions for the user !');
 				return;
 			}
-			if( crwp == 'postmappings_updated' ){
+			if( crwp == 'postmappings_updated' || crwp == 'manager_updated' ){
 				parent.ASTGUI.dialog.waitWhile(' reloading asterisk ... ');
 				var t = ASTGUI.cliCommand('reload') ;
 				setTimeout( function(){ 
+					if( sessionData.PLATFORM.isAST_1_6 ){
+						alert('                          Config files updated. '
+							+ '\n' + ' Please stop Asterisk and Start over for the changes to take effect' );
+					}
 					if( sessionData.DEBUG_MODE ){
 						alert('postmappings updated in http.conf' + '\n' + 'Click OK to reload');
 					}
