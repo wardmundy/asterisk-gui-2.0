@@ -51,7 +51,7 @@ var loadDOMelements = function(){
 	DOM_text_rgExten = _$('text_rgExten');
 	DOM_text_ringTime = _$('text_ringTime');
 	DOM_rg_fb_select = _$('rg_fb_select');
-
+	DOM_edit_ignoreRedir = _$('edit_ignoreRedir');
 };
 
 var ringGroupExistsbyThisName = function( thisName ){
@@ -114,7 +114,9 @@ var save_rg = function(){
 		members : TEMP_members,
 		extension : RG_EXTEN ,
 		ringtime : DOM_text_ringTime.value ,
-		fallback : ''
+		fallback : '',
+		ignore : _$('edit_ignoreRedir').checked
+
 	};
 
 	tmp_obj = ASTGUI.toCustomObject(tmp_obj);
@@ -134,6 +136,7 @@ var resetFields = function(){
 	if(isNewRG){
 		_$('rgedit_form_caption').innerHTML = 'New RingGroup';
 		DOM_text_rgname.value = '';
+		DOM_edit_ignoreRedir.checked = true;
 		//DOM_select_strategy.selectedIndex = -1 ;
 		ASTGUI.selectbox.clear( DOM_select_ringthesechannels );
 		ASTGUI.selectbox.clear( DOM_select_fromlistofchannels );
@@ -222,6 +225,7 @@ var resetFields = function(){
 	}});
 	DOM_text_rgExten.value = (c['extension'])?c['extension']:'' ;
 	DOM_text_ringTime.value = (c['ringtime'])?c['ringtime']:'' ;
+	DOM_edit_ignoreRedir.checked = (c['ignore']==true) ;
 	// select value from select box DOM_rg_fb_select
 	var destinations = parent.miscFunctions.getAllDestinations() ;
 
