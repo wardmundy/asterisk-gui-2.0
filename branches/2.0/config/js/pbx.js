@@ -1635,6 +1635,7 @@ astgui_manageRingGroups = {
 			rg.NAME = '';
 			rg.members = [];
 			rg.strategy = '';
+			rg.ignore = true ;
 
 		if( cxt[0].contains('exten=s,1') &&  cxt[0].toLowerCase().contains('noop(')  ){
 			rg.NAME = cxt[0].betweenXY( '(' , ')' );
@@ -1658,6 +1659,7 @@ astgui_manageRingGroups = {
 					rg.members.push( args[0] );
 				}
 				rg.ringtime = ( args[1] );
+				rg.ignore =  ( args[2] &&  args[2].contains('i') ) ? true : false ;
 			}
 		});
 
@@ -1704,6 +1706,7 @@ astgui_manageRingGroups = {
 		if( !rg.fallback ){
 			rg.fallback = 'Hangup'
 		}
+		var tmp_ignore = (rg.ignore) ? '${DIALOPTIONS}i' : '${DIALOPTIONS}' ;
 		var x = new listOfActions();
 		x.filename('extensions.conf');
 		x.new_action('newcat', newrg , '', '');
@@ -1711,12 +1714,12 @@ astgui_manageRingGroups = {
 		if( rg.strategy == 'ringinorder' ){
 			rg.members.each(
 				function(member){
-					x.new_action('append', newrg, 'exten', 's,n,Dial(' + member +',' + rg.ringtime + ',${DIALOPTIONS}i)' );
+					x.new_action('append', newrg, 'exten', 's,n,Dial(' + member +',' + rg.ringtime + ','+ tmp_ignore + ')' );
 				}
 			);
 		}else{
 			if(rg.members.length){
-				x.new_action('append', newrg, 'exten', 's,n,Dial(' + rg.members.join('&') +',' + rg.ringtime + ',${DIALOPTIONS}i)' );
+				x.new_action('append', newrg, 'exten', 's,n,Dial(' + rg.members.join('&') +',' + rg.ringtime + ',' + tmp_ignore + ')');
 			}
 		}
 		x.new_action( 'append', newrg, 'exten', 's,n,' + rg.fallback );
