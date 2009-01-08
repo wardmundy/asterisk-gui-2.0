@@ -379,8 +379,10 @@ var ASTGUI = {
 	},
 
 	ASTDB:{
-		updateKey : function( k ){ // ASTGUI.ASTDB.updateKey( { dbname: 'astgui', key : 'keyname', keyvalue : 'keyvalue' } );
-			// k = { dbname: 'astgui', key : 'keyname', keyvalue : 'keyvalue' } // dbname is optional, defaults to ASTGUI.globals.GUI_DB
+		updateKey : function( k ){ 
+			// ASTGUI.ASTDB.updateKey( { dbname: 'astgui', key : 'keyname', keyvalue : 'keyvalue' } );
+			// dbname is optional, defaults to ASTGUI.globals.GUI_DB
+			// 	returns true if success, false otherwise
 			if( !k.hasOwnProperty('dbname') ){
 				k.dbname = ASTGUI.globals.GUI_DB ;
 			}
@@ -390,8 +392,10 @@ var ASTGUI = {
 			return false;
 		},
 
-		deleteKey : function( k ){ // ASTGUI.ASTDB.deleteKey( { dbname: 'astgui', key : 'keyname' } );
-			// k = { dbname: 'astgui', key : 'keyname' } // dbname is optional, defaults to ASTGUI.globals.GUI_DB
+		deleteKey : function( k ){
+			// ASTGUI.ASTDB.deleteKey( { dbname: 'astgui', key : 'keyname' } );
+			// dbname is optional, defaults to ASTGUI.globals.GUI_DB
+			// 	returns true if success, false otherwise
 			if( !k.hasOwnProperty('dbname') ){
 				k.dbname = ASTGUI.globals.GUI_DB ;
 			}
@@ -402,8 +406,10 @@ var ASTGUI = {
 		},
 
 
-		getKey : function(k){  // ASTGUI.ASTDB.getKey( { dbname: 'astgui', key : 'keyname' } );
-			// k = { dbname: 'astgui', key : 'keyname' } // dbname is optional, defaults to ASTGUI.globals.GUI_DB
+		getKey : function(k){
+			// ASTGUI.ASTDB.getKey( { dbname: 'astgui', key : 'keyname' } );
+			// dbname is optional, defaults to ASTGUI.globals.GUI_DB
+			// returns null if key is not found, otherwise returns the key-value 
 			if( !k.hasOwnProperty('dbname') ){
 				k.dbname = ASTGUI.globals.GUI_DB ;
 			}
@@ -416,8 +422,12 @@ var ASTGUI = {
 			return op.trim();
 		},
 
-		getAllKeys : function(k){ // ASTGUI.ASTDB.getAllKeys( { dbname: 'astgui' } );
-			// k = { dbname: 'astgui' } // dbname is optional, defaults to ASTGUI.globals.GUI_DB
+		getAllKeys : function(k){
+			// ASTGUI.ASTDB.getAllKeys( { dbname: 'astgui' } );
+			// dbname is optional, defaults to ASTGUI.globals.GUI_DB
+			// returns an object with all the keys in the database as properties and key-values as propertyvalues
+			// returns a null if database not found
+
 			if( !k.hasOwnProperty('dbname') ){
 				k.dbname = ASTGUI.globals.GUI_DB ;
 			}
