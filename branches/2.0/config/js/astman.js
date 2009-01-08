@@ -1382,13 +1382,13 @@ var ASTGUI = {
 
 		empty_context: function( ct ){ // ASTGUI.miscFunctions.empty_context({ filename:'somefile.conf', context : 'context_x', cb : fn })
 			try{
-			if( parent.sessionData.PLATFORM.isAST_1_6 ){
-				var u = new listOfSynActions(ct.filename);
-				u.new_action('emptycat', ct.context , '', '' ) ;
-				u.callActions();
-				ct.cb();
-				return;
-			}else{
+			//if( parent.sessionData.PLATFORM.isAST_1_6 ){
+			//	var u = new listOfSynActions(ct.filename);
+			//	u.new_action('emptycat', ct.context , '', '' ) ;
+			//	u.callActions();
+			//	ct.cb();
+			//	return;
+			//}else{
 				var sel_cxt = context2json({ filename: ct.filename , context : ct.context , usf:0 });
 				var x = new listOfActions(ct.filename);
 				sel_cxt.each(function(line){
@@ -1397,7 +1397,7 @@ var ASTGUI = {
 					x.new_action('delete', ct.context , var_name, '', var_value);
 				});
 				x.callActions(ct.cb);
-			}
+			//}
 			}catch(err){
 				ASTGUI.Log.Error(err.description);
 			}
