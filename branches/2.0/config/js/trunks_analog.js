@@ -151,7 +151,7 @@ var new_ATRNK_save_go = function(){
 			window.location.reload();
 		};
 
-		var tmp_object = {'zapchan':scs , trunkname: trunk_name } ;
+		var tmp_object = {'zapchan':scs , 'trunkname': trunk_name } ;
 		Electrical_Fields.each(function(fld){
 			tmp_object[fld] = ASTGUI.getFieldValue( _$(fld) );
 		});
