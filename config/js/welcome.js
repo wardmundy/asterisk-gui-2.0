@@ -324,6 +324,7 @@ var loadQueues = function() {
 			}
 		}
 
+		if( !lines[line_index] ) lines[line_index] = '';
 		//line #2 (index=1) will either be 'Members:' or 'No Members'
 		if (lines[line_index].contains('Members:')) {
 			line_index++;
