@@ -1042,15 +1042,3 @@ var pushRow = function(tbody, cells) {
 	}
 	new_row.appendTo(tbody);
 };
-
- jQuery.delegate = function(rules) {
- return function(e) {
- 	var target = $(e.target);
-	
-	for (var selector in rules) {
-	        if (target.is(selector)) {
-		 	return rules[selector].apply(this, $.makeArray(arguments));
-		}
-	}
-}
-};
