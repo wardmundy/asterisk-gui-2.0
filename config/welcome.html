@@ -360,6 +360,7 @@ img.loadTrunks, img.loadQueues {
 <script type="text/javascript" src="js/jquery.ui.draggable.js"></script>
 <script type="text/javascript" src="js/jquery.ui.sortable.js"></script>
 <script type="text/javascript" src="js/jquery.ui.tabs.js"></script>
+<script type="text/javascript" src="js/jquery.delegate-1.1.js"></script>
 <script type="text/javascript" src="js/jquery.tablesorter.js"></script>
 <script type="text/javascript" src="js/jquery.tablesorter.pager.js"></script>
 <script type="text/javascript" src="js/astman.js"></script>
@@ -419,36 +420,38 @@ img.loadTrunks, img.loadQueues {
 	getsysinfohtml(); //pre-load general information as its not automatically triggered
 
 	/* Event Delegation */
-	$('body').click( $.delegate({
-		'.minimaxi': function (e) {
-			$(e.target).parent().parent().children(".body").toggle();
-			if ($(e.target).html() == "[ - ]") {
-				$(e.target).html("[ + ]");
+	$('body')
+		.delegate('click','.minimaxi', function () {
+			$(this).parent().parent().children(".body").toggle();
+			if ($(this).html() == "[ - ]") {
+				$(this).html("[ + ]");
 			} else {
-				$(e.target).html("[ - ]");
+				$(this).html("[ - ]");
 			}
-		},
-		'img.loadTrunks': function (e) {
+			return false;
+		})
+		.delegate('click','img.loadTrunks', function () {
 			loadTrunks();
-		},
-		'img.loadQueues': function (e) {
+			return false;
+		})
+		.delegate('click','img.loadQueues', function () {
 			loadQueues();
-		}
-	}));
-	$('#extensions_sections').click( $.delegate({
-		'.section': function (e) {
+			return false;
+	});
+	$('#extensions_sections')
+		.delegate('click','.section', function () {
 			var title;
-			if ( (title = $(e.target).attr('title')) != 'all') {
+			if ( (title = $(this).attr('title')) != 'all') {
 				//set all to inactive
-				$(e.target).siblings('span:first[title=all]').removeClass('active');
+				$(this).siblings('span:first[title=all]').removeClass('active');
 				extension_loads['all'] = false;
 
 				//toggle active for title
-				var has_class = $(e.target).toggleClass('active').hasClass('active');
+				var has_class = $(this).toggleClass('active').hasClass('active');
 				extension_loads[title] = has_class?true:false;
 
 				//traverse sections and show or hide appropriately
-				$(e.target).siblings('[title!=all]').andSelf().each( function() {
+				$(this).siblings('[title!=all]').andSelf().each( function() {
 					var show = $(this).hasClass('active');
 					var title = $(this).attr('title');
 					
@@ -463,8 +466,8 @@ img.loadTrunks, img.loadQueues {
 					$('#extensions_list .sip.iax').show();
 				}
 			} else {
-				$(e.target).addClass('active');
-				$(e.target).siblings('span').each( function() {
+				$(this).addClass('active');
+				$(this).siblings('span').each( function() {
 					$(this).removeClass('active');
 					var title = $(this).attr('title');
 					extension_loads[title] = false;
@@ -472,10 +475,9 @@ img.loadTrunks, img.loadQueues {
 				$('#extensions_list').find('.sip, .iax, .analog, .feature').show();
 			}
 			
-			var title = $(e.target).attr('title');
+			var title = $(this).attr('title');
 			extension_loads[title] = extension_loads[title]?true:false;
-		}
-	}));
+	});
 
 	setTimeout(loadTrunks, 1);
 	loadExtensions();
