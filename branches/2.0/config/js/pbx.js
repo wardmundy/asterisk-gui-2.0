@@ -2109,6 +2109,29 @@ astgui_updateConfigFromOldGui = function(){
 				//	[voicemenus]
 				//	exten = 7000,1,Goto(voicemenu-custom-1|s|1)
 					sa.new_action('append', ASTGUI.contexts.VoiceMenuExtensions , 'exten', match_str );
+
+					var tmp_exten = ASTGUI.parseContextLine.getExten(match_str);
+					var tmp_oldVM_gotoStr = ASTGUI.parseContextLine.getAppWithArgs(match_str);
+					for ( var catname in ext_conf ){
+						if( !ext_conf.hasOwnProperty(catname) ) continue;
+						if( catname.beginsWith('DID_') ){
+							if( catname.contains( '_' + ASTGUI.contexts.TimeIntervalPrefix ) || catname.endsWith(ASTGUI.contexts.TrunkDefaultSuffix) ){ continue; }
+						}else if( catname.beginsWith('voicemenu-custom-') ){
+		
+						}else{
+							continue;
+						}
+		
+						var this_menu = ext_conf[catname] ;
+						this_menu.each( function( this_menu_line ){
+							if( this_menu_line.contains( tmp_oldVM_gotoStr ) ){
+								var tmp_toReplace = this_menu_line.afterChar('=');
+								var tmp_ReplaceWith = tmp_toReplace.replaceXY( tmp_oldVM_gotoStr, 'Goto(' + ASTGUI.contexts.VoiceMenuExtensions + ',' + tmp_exten + ',1)' );
+								sa.new_action( 'update', catname , 'exten', tmp_ReplaceWith , tmp_toReplace );
+							}
+						});
+					}
+
 				return;
 			}
 	
