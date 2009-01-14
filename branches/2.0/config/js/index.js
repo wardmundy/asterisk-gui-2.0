@@ -487,10 +487,10 @@ var onLogInFunctions = {
 		if( tmp_enableOverLay.isAstTrue() ){
 			var tmp_overlay_dir = '';
 			if( sessionData.PLATFORM.isAA50 ){
-				tmp_overlay_dir = 'mkdir -p /var/lib/asterisk/sounds/asteriskoverlay' ;
+				tmp_overlay_dir = 'mkdir -p '+sessionData.directories.astvarlibdir+'/sounds/asteriskoverlay' ;
 			}
 			if( sessionData.PLATFORM.isABE ){
-				tmp_overlay_dir = 'mkdir -p /var/lib/asterisk/gui-overlay' ;
+				tmp_overlay_dir = 'mkdir -p '+sessionData.directories.astvarlibdir+'/gui-overlay' ;
 			}
 			ASTGUI.systemCmd( tmp_overlay_dir , function(){
 				top.window.location.href = this_mainURL.withOut( 'overlay=' );
