@@ -176,32 +176,47 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		}
 
 		(function(){
-			var tmp_file = ASTGUI.globals.zaptelIncludeFile;
-			var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=' + tmp_file , async: false }).responseText;
+			var runScript_detectdahdi = function(){
+				ASTGUI.systemCmd( sessionData.directories.script_detectdahdi , function(){
+					setTimeout( function(){
+						if( sessionData.DEBUG_MODE ){
+							alert(ASTGUI.globals.dahdiIncludeFile + 'not found, ran script ' + sessionData.directories.script_detectdahdi + ' \n Click OK to Reload');
+						}
+						window.location.reload();
+					} , 500 );
+				});
+			};
+
+			var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=' + ASTGUI.globals.dahdiIncludeFile , async: false }).responseText;
 			if( s.contains('Response: Error') && s.contains('Message: Config file not found') ){
-				ASTGUI.miscFunctions.createConfig( tmp_file , function(){
-					var u = new listOfSynActions(tmp_file) ;
-					u.new_action('delcat', 'general', "", ""); 
-					u.new_action('newcat', 'general', "", ""); 
-					u.new_action('update', 'general', '#include "../zaptel.conf" ;', ' ;');
-					u.callActions();
+				sessionData.continueParsing = false ;
+				ASTGUI.systemCmd( sessionData.directories.app_dahdi_genconf , function(){
+					if( sessionData.DEBUG_MODE ){
+						alert( 'ran ' + sessionData.directories.app_dahdi_genconf + ' \n Click OK to Reload' );
+					}
+					window.location.reload() ;
 				});
 				return;
 			}else{
-				var q = config2json({ configFile_output:s , usf:0 });
-				if( q.hasOwnProperty('general') ){
-					q.general.each(function(line){
-						if ( !line.beginsWith('fx') ){ return ;}
-						if( line.beginsWith('fxoks=') || line.beginsWith('fxsks=') ){
-							var ksports = ASTGUI.miscFunctions.chanStringToArray( line.afterChar('=') );
-							sessionData.PORTS_SIGNALLING.ks = sessionData.PORTS_SIGNALLING.ks.concat(ksports);
-						}
-						if( line.beginsWith('fxols=') || line.beginsWith('fxsls=') ){
-							var lsports = ASTGUI.miscFunctions.chanStringToArray( line.afterChar('=') );
-							sessionData.PORTS_SIGNALLING.ls = sessionData.PORTS_SIGNALLING.ls.concat(lsports);
-						}
+				var q = context2json({ configFile_output:s, context: 'general', usf:0 });
+				if( q === null ){ // if context 'general' is not found
+					ASTGUI.systemCmd( sessionData.directories.script_detectdahdi , function(){
+						sessionData.continueParsing = false ;
+						runScript_detectdahdi();
+						return;
 					});
 				}
+				q.each(function(line){
+					if ( !line.beginsWith('fx') ){ return ;}
+					if( line.beginsWith('fxoks=') || line.beginsWith('fxsks=') ){
+						var ksports = ASTGUI.miscFunctions.chanStringToArray( line.afterChar('=') );
+						sessionData.PORTS_SIGNALLING.ks = sessionData.PORTS_SIGNALLING.ks.concat(ksports);
+					}
+					if( line.beginsWith('fxols=') || line.beginsWith('fxsls=') ){
+						var lsports = ASTGUI.miscFunctions.chanStringToArray( line.afterChar('=') );
+						sessionData.PORTS_SIGNALLING.ls = sessionData.PORTS_SIGNALLING.ls.concat(lsports);
+					}
+				});
 			}
 		})();
 
@@ -465,15 +480,16 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			}
 
 			if( c[d].hasOwnProperty('hasexten') && c[d]['hasexten'] == 'no' && !d.beginsWith('span_') ){ // if context is a trunk - could be a analog, iax, sip
-				if( c[d]['hasiax'] == 'yes' ){ // if the context is for an iax trunk
+				if( c[d].hasOwnProperty('hasiax') && c[d]['hasiax'].isAstTrue() ){ // if the context is for an iax trunk
 					sessionData.pbxinfo['trunks']['iax'][d] = c[d] ;
 					continue;
 				}
-				if( c[d]['hassip'] == 'yes' ){ // if the context is for an sip trunk
+				if( c[d].hasOwnProperty('hassip') && c[d]['hassip'].isAstTrue() ){ // if the context is for an sip trunk
 					sessionData.pbxinfo['trunks']['sip'][d] = c[d];
 					continue;
 				}
-				if( c[d]['zapchan'] && (!c[d]['hasiax'] || c[d]['hasiax'] =='no') && (!c[d]['hassip'] || c[d]['hassip'] =='no')){
+//				if( c[d]['zapchan'] && (!c[d]['hasiax'] || c[d]['hasiax'] =='no') && (!c[d]['hassip'] || c[d]['hassip'] =='no')){
+				if( c[d].hasOwnProperty('zapchan') || c[d].hasOwnProperty('dahdichan') ){
 					// if is an analog trunk - note that here we are NOT expecting a 'FXO channel(FXS signalled) on a T1/E1'
 					// we assume that all the ports in zapchan are actual analog FXO ports
 					// a trunk for T1/E1 analog channels would begin with 'span_'
@@ -482,7 +498,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				}
 			}
 
-			if( d.beginsWith('span_') && c[d]['zapchan'] ){ 
+			if( d.beginsWith('span_') && ( c[d].hasOwnProperty('zapchan') || c[d].hasOwnProperty('dahdichan') ) ){
 				sessionData.pbxinfo['trunks']['pri'][d] = c[d];
 				continue;
 			}
@@ -518,13 +534,13 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		}}
 	},
 
-	ztScanConf: function(){ // readcfg.ztScanConf();
-		// reads ztscan.conf and updates sessionData.FXO_PORTS_DETECTED and sessionData.FXS_PORTS_DETECTED
+	dahdiScanConf : function(){ // readcfg.dahdiScanConf();
+		// reads dahdi_scan.conf and updates sessionData.FXO_PORTS_DETECTED and sessionData.FXS_PORTS_DETECTED
 		// reads ASTGUI.globals.hwcfgFile and looks for analog hardware changes
 		sessionData.FXO_PORTS_DETECTED = [];
 		sessionData.FXS_PORTS_DETECTED = [];
 		var y;
-		var c = config2json({filename:'ztscan.conf', usf:0});
+		var c = config2json({filename: ASTGUI.globals.dahdiScanOutput , usf:0});
 		var tmp_dahdi_contexts = c.getOwnProperties();
 		if( !tmp_dahdi_contexts.length ){ // no analog or digital hardware found, hide the hardware configuration & misdn panels
 			miscFunctions.hide_panel('digital.html', 0);
@@ -569,7 +585,8 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 // 				hideNo: true
 // 			});
 // 		}
-	} // end of readcfg.ztScanConf();
+
+	} // end of readcfg.dahdiScanConf();
 }; // end of readcfg
 
 
@@ -847,7 +864,16 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 	addAnalogTrunk: function(tr, cbf){ // creates a new analog trunk with the details metioned in tr object, cbf is callback function
 		// usage:: astgui_managetrunks.addAnalogTrunk({ 'zapchan':'2,3,4' , (optional) trunkname:'Ports 2,3,4'} , cbf) ;
 
-		if(! tr.hasOwnProperty('zapchan') ){return false;} // zapchan is a required parameter. 
+		if( !tr.hasOwnProperty('zapchan') &&  !tr.hasOwnProperty('dahdichan') ){return false;} // zapchan is a required parameter. 
+
+		if( tr.hasOwnProperty('zapchan') ){
+			var TMP_CHANNELS = tr.zapchan ;
+			delete tr.zapchan ;
+		}
+		if( tr.hasOwnProperty('dahdichan') ){
+			var TMP_CHANNELS = tr.dahdichan ;
+			delete tr.dahdichan ;
+		}
 
 		var trunk = astgui_managetrunks.misc.nextAvailableTrunk_x();
 		var group = astgui_managetrunks.misc.nextAvailableGroup();
@@ -863,10 +889,9 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 			sessionData.pbxinfo.trunks.analog[trunk] = new ASTGUI.customObject; // add new/reset analog trunk info in sessionData
 		x.new_action('append', trunk, 'group', group);
 			sessionData.pbxinfo.trunks.analog[trunk]['group'] = group;
-		x.new_action('append', trunk, 'zapchan', tr.zapchan);
-			sessionData.pbxinfo.trunks.analog[trunk]['zapchan'] = tr.zapchan ;
-		var zap_channels = ASTGUI.miscFunctions.chanStringToArray(tr.zapchan);
-		delete tr.zapchan ;
+		x.new_action('append', trunk, parent.sessionData.DahdiChannelString , TMP_CHANNELS);
+			sessionData.pbxinfo.trunks.analog[trunk][parent.sessionData.DahdiChannelString] = TMP_CHANNELS;
+		var zap_channels = ASTGUI.miscFunctions.chanStringToArray( TMP_CHANNELS );
 
 		x.new_action('append', trunk, 'hasexten', 'no');
 			sessionData.pbxinfo.trunks.analog[trunk]['hasexten'] = 'no';
@@ -886,11 +911,12 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 
 
 		// these fields are already added, delete before iterating through userinfo
-		if(! tr.hasOwnProperty('group') ){ delete tr.group ; }
-		if(! tr.hasOwnProperty('signalling') ){ delete tr.signalling ; } // we will set the signalling based on zaptel.conf, so ignore what ever signalling is passed
-		if(! tr.hasOwnProperty('hasiax') ){ delete tr.hasiax ; }
-		if(! tr.hasOwnProperty('hassip') ){ delete tr.hassip ; }
-		if(! tr.hasOwnProperty('trunkstyle') ){ delete tr.trunkstyle ; }
+		if( tr.hasOwnProperty('group') ){ delete tr.group ; }
+		if( tr.hasOwnProperty('signalling') ){ delete tr.signalling ; } // we will set the signalling based on zaptel.conf, so ignore what ever signalling is passed
+		if( tr.hasOwnProperty('hasiax') ){ delete tr.hasiax ; }
+		if( tr.hasOwnProperty('hassip') ){ delete tr.hassip ; }
+		if( tr.hasOwnProperty('trunkstyle') ){ delete tr.trunkstyle ; }
+
 		for( var d in tr ){ if( tr.hasOwnProperty(d) ) {
 			x.new_action( 'append', trunk , d, tr[d] );
 				sessionData.pbxinfo.trunks.analog[trunk][d] = tr[d];
@@ -912,7 +938,7 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 			v.new_action('newcat', ct + ASTGUI.contexts.TrunkDefaultSuffix , '', ''); // add context
 			v.new_action('append', ct , 'include', ct + ASTGUI.contexts.TrunkDefaultSuffix );
 
-			v.new_action('append', 'globals', trunk , 'Zap/g' + group);
+			v.new_action('append', 'globals', trunk , parent.sessionData.DahdiDeviceString + '/g' + group);
 
 			var h = v.callActions();
 			if( h.contains('Response: Success') ){

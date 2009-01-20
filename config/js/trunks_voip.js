@@ -387,15 +387,14 @@ var load_VOIPTrunksTable = function (){
 var localajaxinit = function(){
 	top.document.title = 'Manage custom SIP/IAX Trunks ' ;
 	(function (){ // populate TABS
-		var tmp_providersPage = ( parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ) ? 'trunks_sps.html' : 'trunks_providers.html';
 		var t = [];
-		if( !parent.sessionData.PLATFORM.AA50_SKU.contains('800') ){
-			t.push({ url: 'trunks_analog.html', desc: 'Analog Trunks' });
-		};
-		t.push({ url: tmp_providersPage , desc:'Service Providers' });
-		t.push({ url:'#', desc:'VOIP Trunks', selected:true });
+			t.push({url:'trunks_analog.html', desc:'Analog Trunks'});
+		if( parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ){
+			t.push({url:'trunks_sps.html', desc:'Service Providers'});
+		}
+			t.push({url:'trunks_voip.html', desc:'VOIP Trunks', selected:true});
 		if( !parent.sessionData.PLATFORM.isAA50 ){
-			t.push ({url:'trunks_digital.html', desc:'T1/E1/BRI Trunks'} );
+			t.push({url:'trunks_digital.html', desc:'T1/E1/BRI Trunks'});
 		}
 		ASTGUI.tabbedOptions( _$('tabbedMenu') , t);
 

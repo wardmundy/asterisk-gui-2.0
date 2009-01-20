@@ -2697,7 +2697,7 @@ jQuery.extend({
 						if( !top.sessionData.FileCache.hasOwnProperty(tmp_filename) ){ top.sessionData.FileCache[tmp_filename] = {}; }
 						top.sessionData.FileCache[tmp_filename].modified = true;
 
-					if( s.url.contains('&srcfilename=http.conf&') || s.url.contains( '&srcfilename=' + ASTGUI.globals.zaptelIncludeFile + '&') ){
+					if( s.url.contains('&srcfilename=http.conf&') ){
 
 					}else{
 						ASTGUI.cookies.setCookie( 'configFilesChanged' , 'yes' );

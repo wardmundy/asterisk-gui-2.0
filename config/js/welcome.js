@@ -92,7 +92,8 @@ var loadTrunks = function() {
 		addCell( newRow , { html:'' });
 		addCell( newRow , { html: c[d]['trunkname'] });
 		addCell( newRow , { html: 'Digital (' + c[d]['signalling'] + ')' }); // 
-		addCell( newRow , { html: 'Ports: ' + c[d]['zapchan'] });
+		var tmp_channels = c[d]['dahdichan'] || c[d]['zapchan'] || ' ' ;
+		addCell( newRow , { html: 'Ports: ' + tmp_channels });
 		addCell( newRow , { html:''} );
 	}}
 

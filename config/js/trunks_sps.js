@@ -47,12 +47,14 @@ var localajaxinit = function(){
 		ASTGUI.selectbox.populateArray('codec_fifth', R);
 	})();
 	(function (){
-		var t = [ ];
+		var t = [];
 		if( !parent.sessionData.PLATFORM.AA50_SKU.contains('800') ){
-			t.push({ url: 'trunks_analog.html', desc: 'Analog Trunks' });
-		};
-		t.push({url:'#', desc:'Service Providers', selected:true });
-		t.push({url:'trunks_voip.html', desc:'VOIP Trunks'});
+			t.push({url:'trunks_analog.html', desc:'Analog Trunks'});
+		}
+		if( parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ){
+			t.push({url:'trunks_sps.html', desc:'Service Providers', selected:true });
+		}
+			t.push({url:'trunks_voip.html', desc:'VOIP Trunks'});
 		if( !parent.sessionData.PLATFORM.isAA50 ){
 			t.push({url:'trunks_digital.html', desc:'T1/E1/BRI Trunks'});
 		}

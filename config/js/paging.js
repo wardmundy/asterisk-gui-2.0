@@ -104,6 +104,31 @@ var save_pageGroup = function(){
 };
 
 
+var GetDevice_UserName = function( device ){
+	// device = SIP/6002 or Zap/1, or DAHDI/1 or IAX2/6001
+	var tmp_ext = device.afterChar('/');
+	var tmp_techn = device.beforeChar('/');
+
+	if( tmp_techn.toLowerCase() == 'zap' || tmp_techn.toLowerCase() == 'dahdi' ){
+		for ( var q in parent.sessionData.pbxinfo.users ){ if( parent.sessionData.pbxinfo.users.hasOwnProperty(q) ){
+			if( parent.sessionData.pbxinfo.users[q].hasOwnProperty('zapchan') && parent.sessionData.pbxinfo.users[q]['zapchan'] == tmp_ext ){
+				return q + '(AnalogPort ' + tmp_ext + ') ' + parent.sessionData.pbxinfo.users[q].getProperty('fullname');
+			}
+			if( parent.sessionData.pbxinfo.users[q].hasOwnProperty('dahdichan') && parent.sessionData.pbxinfo.users[q]['dahdichan'] == tmp_ext ){
+				return q + '(AnalogPort ' + tmp_ext + ') ' + parent.sessionData.pbxinfo.users[q].getProperty('fullname');
+			}
+		}}
+		return 'AnalogPort ' + tmp_ext ;
+	}else{
+		if( parent.sessionData.pbxinfo.users.hasOwnProperty(tmp_ext) ){
+			var tmp_name = parent.sessionData.pbxinfo.users[tmp_ext].getProperty('fullname');
+			return tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name
+		}
+		return tmp_ext + '(' + tmp_techn + ')' ;
+	}
+};
+
+
 var resetFields = function(){
 	if(isNewPgGrp){
 		_$('pagegroup_editdiv_title').innerHTML = 'New Page/Intercom Group';
@@ -111,30 +136,8 @@ var resetFields = function(){
 		ASTGUI.resetTheseFields([ DOM_text_pageGroup_Exten , DOM_select_pageGroup_Type , DOM_chk_pageGroup_beep ]);
 		ASTGUI.selectbox.clear( DOM_select_ringthesechannels );
 		ASTGUI.selectbox.clear( DOM_select_fromlistofchannels );
-		listOfDialDevices.each(function(device){ 
-			var tmp_ext = device.afterChar('/');
-			var tmp_techn = device.beforeChar('/');
-
-			if( tmp_techn.toLowerCase() == 'zap' ){
-
-				var this_analogStation_user = '';
-				for ( var q in parent.sessionData.pbxinfo.users ){ if( parent.sessionData.pbxinfo.users.hasOwnProperty(q) ){
-					if( parent.sessionData.pbxinfo.users[q].getProperty('zapchan') == tmp_ext ){
-						this_analogStation_user = q + '(AnalogPort ' + tmp_ext + ') ' + parent.sessionData.pbxinfo.users[q].getProperty('fullname') ;
-						ASTGUI.selectbox.append( DOM_select_fromlistofchannels, this_analogStation_user , device);
-						return;
-					}
-				}}
-
-			}else{
-
-				if( parent.sessionData.pbxinfo.users[tmp_ext] && parent.sessionData.pbxinfo.users[tmp_ext].fullname ){
-					var tmp_name = parent.sessionData.pbxinfo.users[tmp_ext].fullname || '?' ;
-				}else{
-					return;
-				}
-				ASTGUI.selectbox.append( DOM_select_fromlistofchannels, tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name , device);
-			}
+		listOfDialDevices.each( function(device){
+			ASTGUI.selectbox.append( DOM_select_fromlistofchannels, GetDevice_UserName(device) , device);
 		});
 
 		var tmp_allextensions = ASTGUI.cloneObject( parent.miscFunctions.getAllExtensions() );
@@ -161,43 +164,13 @@ var resetFields = function(){
 	ASTGUI.selectbox.clear( DOM_select_ringthesechannels );
 	var mbrs = ASTGUI.cloneObject(tmp_members) ; 
 	mbrs.each(function(device){
-		var tmp_ext = device.afterChar('/');
-		var tmp_techn = device.beforeChar('/');
-
-		if( tmp_techn.toLowerCase() == 'zap' ){
-			var this_analogStation_user = '';
-			for( var q in parent.sessionData.pbxinfo.users ){ if( parent.sessionData.pbxinfo.users.hasOwnProperty(q) ){
-				if( parent.sessionData.pbxinfo.users[q].getProperty('zapchan') == tmp_ext ){
-					this_analogStation_user = q + '(AnalogPort ' + tmp_ext + ') ' + parent.sessionData.pbxinfo.users[q].getProperty('fullname') ;
-					ASTGUI.selectbox.append( DOM_select_ringthesechannels, this_analogStation_user , device );
-					return;
-				}
-			}}
-		}else{
-			var tmp_name = (parent.sessionData.pbxinfo.users[tmp_ext] && parent.sessionData.pbxinfo.users[tmp_ext].fullname) || '?';
-			ASTGUI.selectbox.append( DOM_select_ringthesechannels, tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name , device);
-		}
+		ASTGUI.selectbox.append( DOM_select_ringthesechannels, GetDevice_UserName(device) , device );
 	});
 
 
 	ASTGUI.selectbox.clear( DOM_select_fromlistofchannels );
 	listOfDialDevices.each(function(device){ if( ! mbrs.contains(device) ){
-		var tmp_ext = device.afterChar('/');
-		var tmp_techn = device.beforeChar('/');
-
-		if( tmp_techn.toLowerCase() == 'zap' ){
-			var this_analogStation_user = '';
-			for( var q in parent.sessionData.pbxinfo.users ){ if( parent.sessionData.pbxinfo.users.hasOwnProperty(q) ){
-				if( parent.sessionData.pbxinfo.users[q].getProperty('zapchan') == tmp_ext ){
-					this_analogStation_user = q + '(AnalogPort ' + tmp_ext + ') ' + parent.sessionData.pbxinfo.users[q].getProperty('fullname') ;
-					ASTGUI.selectbox.append( DOM_select_fromlistofchannels, this_analogStation_user , device );
-					return;
-				}
-			}}
-		}else{
-			var tmp_name = (parent.sessionData.pbxinfo.users[tmp_ext] && parent.sessionData.pbxinfo.users[tmp_ext].fullname)  || '?' ;
-			ASTGUI.selectbox.append( DOM_select_fromlistofchannels, tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name , device);
-		}
+		ASTGUI.selectbox.append( DOM_select_fromlistofchannels, GetDevice_UserName(device) , device );
 	}});
 };
 
@@ -319,9 +292,9 @@ var localajaxinit = function(){
 				}
 			});
 			t = parent.sessionData.FXS_PORTS_DETECTED ;
-			t.each(function(fxs){
-				listOfDialDevices.push('Zap/' + fxs );
-			});
+			t.each( function(fxs){
+				listOfDialDevices.push( parent.sessionData.DahdiDeviceString + '/' + fxs );
+			} );
 	
 			ASTGUI.events.add( DOM_button_add_toringlist , 'click' , function(){
 				var t = DOM_select_fromlistofchannels.value ; if(!t){return;}
@@ -338,58 +311,18 @@ var localajaxinit = function(){
 			ASTGUI.events.add( DOM_button_removeall_fromringlist , 'click' , function(){
 				ASTGUI.selectbox.clear( DOM_select_ringthesechannels );
 				ASTGUI.selectbox.clear( DOM_select_fromlistofchannels );
-				listOfDialDevices.each(function(device){ 
-					var tmp_ext = device.afterChar('/');
-					var tmp_techn = device.beforeChar('/');
-		
-					if( tmp_techn.toLowerCase() == 'zap' ){
-						var this_analogStation_user = '';
-						for ( var q in parent.sessionData.pbxinfo.users ){ if( parent.sessionData.pbxinfo.users.hasOwnProperty(q) ){
-							if( parent.sessionData.pbxinfo.users[q].getProperty('zapchan') == tmp_ext ){
-								this_analogStation_user = q + '(AnalogPort ' + tmp_ext + ') ' + parent.sessionData.pbxinfo.users[q].getProperty('fullname') ;
-								ASTGUI.selectbox.append( DOM_select_fromlistofchannels, this_analogStation_user , device);
-								return;
-							}
-						}}
-					}else{
-						if( parent.sessionData.pbxinfo.users[tmp_ext] && parent.sessionData.pbxinfo.users[tmp_ext].fullname ){
-							var tmp_name = parent.sessionData.pbxinfo.users[tmp_ext].fullname || '?' ;
-						}else{
-							return;
-						}
-						ASTGUI.selectbox.append( DOM_select_fromlistofchannels, tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name , device);
-					}
+				listOfDialDevices.each(function(device){
+					ASTGUI.selectbox.append( DOM_select_fromlistofchannels, GetDevice_UserName(device) , device );
 				});
 			});
 	
 			ASTGUI.events.add( 'button_addall_toringlist' , 'click' , function(){
 				ASTGUI.selectbox.clear( DOM_select_ringthesechannels );
 				ASTGUI.selectbox.clear( DOM_select_fromlistofchannels );
-	
-				listOfDialDevices.each(function(device){ 
-					var tmp_ext = device.afterChar('/');
-					var tmp_techn = device.beforeChar('/');
-		
-					if( tmp_techn.toLowerCase() == 'zap' ){
-						var this_analogStation_user = '';
-						for ( var q in parent.sessionData.pbxinfo.users ){ if( parent.sessionData.pbxinfo.users.hasOwnProperty(q) ){
-							if( parent.sessionData.pbxinfo.users[q].getProperty('zapchan') == tmp_ext ){
-								this_analogStation_user = q + '(AnalogPort ' + tmp_ext + ') ' + parent.sessionData.pbxinfo.users[q].getProperty('fullname') ;
-								ASTGUI.selectbox.append( DOM_select_ringthesechannels, this_analogStation_user , device);
-								return;
-							}
-						}}
-					}else{
-						if( parent.sessionData.pbxinfo.users[tmp_ext] && parent.sessionData.pbxinfo.users[tmp_ext].fullname ){
-							var tmp_name = parent.sessionData.pbxinfo.users[tmp_ext].fullname || '?' ;
-						}else{
-							return;
-						}
-						ASTGUI.selectbox.append( DOM_select_ringthesechannels, tmp_ext + '('+ tmp_techn +')' + ' ' + tmp_name , device);
-					}
+				listOfDialDevices.each( function(device){
+					ASTGUI.selectbox.append( DOM_select_ringthesechannels, GetDevice_UserName(device) , device );
 				});
 			});
-	
 		})();
 		update_PageGroupsTable();
 	}catch(err){
