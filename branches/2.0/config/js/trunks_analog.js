@@ -21,7 +21,7 @@
 var zapchan_Before = '';
 var FXOS = [];
 var isNew ;
-var EDIT_TRUNK;
+var EDIT_TRUNK, DAHDICHANNELSTRING ;
 var VOLSETTINGS = {};
 var Electrical_Fields = ['busydetect', 'busycount', 'busypattern', 'ringtimeout', 'answeronpolarityswitch', 'hanguponpolarityswitch' , 'callprogress', 'progzone', 'usecallerid', 'cidstart', 'pulsedial', 'cidsignalling', 'flash', 'rxflash', 'mailbox'];
 
@@ -45,7 +45,7 @@ var disable_usedChannels = function(trunk){ // trunk is (optional, used while ed
 	var c = parent.astgui_managetrunks.listOfAnalogTrunks();
 	c.each(function(item){
 		if(trunk && trunk == item ) return;
-		used = used.concat( ASTGUI.miscFunctions.chanStringToArray(parent.sessionData.pbxinfo['trunks']['analog'][item]['zapchan']) ) ;
+		used = used.concat( ASTGUI.miscFunctions.chanStringToArray(parent.sessionData.pbxinfo['trunks']['analog'][item][DAHDICHANNELSTRING]) ) ;
 	});
 	ASTGUI.domActions.unCheckAll( ch_chkbxClass );
 	ASTGUI.domActions.disableSelected(ch_chkbxClass, used);
@@ -78,8 +78,8 @@ var selectedTrunk_editOptions_form = function(w){
 	_$('new_ATRNK_DIV_title').innerHTML = 'Edit Analog Trunk';
 	_$('new_ATRNK_addUpdateButton').innerHTML = 'Update';
 	disable_usedChannels(EDIT_TRUNK);
-	checkChannels( parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['zapchan'] );
-	zapchan_Before = parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['zapchan'];
+	checkChannels( parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK][DAHDICHANNELSTRING] );
+	zapchan_Before = parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK][DAHDICHANNELSTRING];
 	var ct = ASTGUI.contexts.TrunkDIDPrefix + EDIT_TRUNK ;
 	ASTGUI.updateFieldToValue( 'edit_trunkName' ,  parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK].getProperty('trunkname') );
 	getPreviousVolumeForChannelsofThisTrunk( EDIT_TRUNK );
@@ -155,6 +155,7 @@ var new_ATRNK_save_go = function(){
 		Electrical_Fields.each(function(fld){
 			tmp_object[fld] = ASTGUI.getFieldValue( _$(fld) );
 		});
+
 		parent.astgui_managetrunks.addAnalogTrunk( tmp_object , cbf ) ;
 		return;
 	}
@@ -162,7 +163,7 @@ var new_ATRNK_save_go = function(){
 	// just update the selected channels
 	(function(){
 		var x = new listOfSynActions('users.conf');
-			x.new_action('update', EDIT_TRUNK , 'zapchan', scs );
+			x.new_action('update', EDIT_TRUNK , DAHDICHANNELSTRING, scs );
 			x.new_action('delete', EDIT_TRUNK , 'gui_volume', '' );
 			x.new_action('delete', EDIT_TRUNK , 'gui_fxooffset', '' );
 			x.new_action('delete', EDIT_TRUNK , 'rxgain', '' );
@@ -191,7 +192,7 @@ var new_ATRNK_save_go = function(){
 	var variablename =  ASTGUI.globals.obcidUsrPrefix + EDIT_TRUNK ;
 	ASTGUI.updateaValue({ file: 'extensions.conf', context: 'globals', variable: variablename , value: ASTGUI.getFieldValue('trunk_obcid') }) ;
 
-	parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['zapchan'] = scs;
+	parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK][DAHDICHANNELSTRING] = scs;
 	ASTGUI.feedback({msg:'Updated Analog trunk ', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
 	save_audioLevels( save_electrical );
 };
@@ -229,7 +230,7 @@ var update_AnalogTrunksTable = function(){
 			var newRow = DOM_table_ATRUNKS_list.insertRow(-1);
 			newRow.className = ((DOM_table_ATRUNKS_list.rows.length)%2==1)?'odd':'even';
 			addCell( newRow , { html: parent.sessionData.pbxinfo['trunks']['analog'][item]['trunkname'] });
-			addCell( newRow , { html: parent.sessionData.pbxinfo['trunks']['analog'][item]['zapchan'] } );
+			addCell( newRow , { html: parent.sessionData.pbxinfo['trunks']['analog'][item][DAHDICHANNELSTRING] } );
 			addCell( newRow , { html: tmp} );
 		});
 
@@ -253,6 +254,7 @@ var delete_trunk_confirm = function(a){
 };
 
 var localajaxinit = function(){
+	DAHDICHANNELSTRING = parent.sessionData.DahdiChannelString;
 	if( parent.sessionData.PLATFORM.AA50_SKU.contains('800') ){
 		window.location.href= 'trunks_sps.html';
 		return;
@@ -261,17 +263,15 @@ var localajaxinit = function(){
 	FXOS = parent.sessionData.FXO_PORTS_DETECTED ;
 	top.document.title = 'Manage Analog Trunks' ;
 	(function (){
-		var tmp_providersPage = ( parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ) ? 'trunks_sps.html' : 'trunks_providers.html';
-		var t = [
-			{url:'#', desc:'Analog Trunks', selected:true } ,
-			{url: tmp_providersPage, desc:'Service Providers'} ,
-			{url:'trunks_voip.html', desc:'VOIP Trunks'}
-		];
-
+		var t = [];
+			t.push({url:'trunks_analog.html', desc:'Analog Trunks', selected:true });
+		if( parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ){
+			t.push({url:'trunks_sps.html', desc:'Service Providers'});
+		}
+			t.push({url:'trunks_voip.html', desc:'VOIP Trunks'});
 		if( !parent.sessionData.PLATFORM.isAA50 ){
 			t.push({url:'trunks_digital.html', desc:'T1/E1/BRI Trunks'});
 		}
-
 		ASTGUI.tabbedOptions( _$('tabbedMenu') , t);
 
 		var y = parent.astgui_manageusers.listOfUsers();
@@ -309,7 +309,7 @@ var save_electrical = function(){
 
 var getPreviousVolumeForChannelsofThisTrunk = function( trunk ){
 	var c = context2json({ filename:'users.conf' , context : trunk, usf:0 });
-	var channels = ASTGUI.miscFunctions.chanStringToArray( parent.sessionData.pbxinfo.trunks.analog[trunk]['zapchan'] ) ;
+	var channels = ASTGUI.miscFunctions.chanStringToArray( parent.sessionData.pbxinfo.trunks.analog[trunk][DAHDICHANNELSTRING] ) ;
 	if ( !channels.length ) return ;
 
 	VOLSETTINGS = {} ;
@@ -387,7 +387,7 @@ var save_audioLevels = function( CB_FN ){
 
 
 var reset_calibration = function(){
-	var zc = parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['zapchan'].split(',') ;
+	var zc = parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK][DAHDICHANNELSTRING].split(',') ;
 	var x = new listOfActions('users.conf');
 		x.new_action('delete', EDIT_TRUNK , 'gui_volume', '' );
 		x.new_action('delete', EDIT_TRUNK , 'gui_fxooffset', '' );
@@ -427,7 +427,7 @@ var calibrate_ports = function(){
 			ASTGUI.dialog.alertmsg('Finished Calibrating !! <BR> Click "Apply Changes" and restart your appliance ');
 		}
 	};
-	var zc = parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['zapchan'] ;
+	var zc = parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK][DAHDICHANNELSTRING] ;
 	var k = zc.split(',').join(' ') ;
 	parent.ASTGUI.dialog.waitWhile('Starting Calibration script ..');
 	var st = setTimeout(

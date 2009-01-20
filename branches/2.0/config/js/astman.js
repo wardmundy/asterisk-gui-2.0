@@ -330,8 +330,9 @@ var ASTGUI = {
 		msg_notLoggedIn: 'Message: Authentication Required',
 		configfile : 'guipreferences.conf', // will be created if the file does not exist , ASTGUI.globals.configfile
 		g729RegInfo: 'g729reginfo.conf', // ASTGUI.globals.g729RegInfo, the sessionData.directories.script_Registerg729 script will read this file to generate tab delimited file
-		hwcfgFile: 'gui_confighw.conf', // file to store configured hardware information
-		zaptelIncludeFile: 'zaptel_guiRead.conf', // file that will be used to read zapte.conf, ASTGUI.globals.zaptelIncludeFile
+		hwcfgFile: 'gui_confighw.conf', // file to store configured hardware information, to detect hardware changes
+		dahdiIncludeFile: 'dahdi_guiread.conf', // file that will be used to read zaptel.conf or dahdi/system.conf , ASTGUI.globals.dahdiIncludeFile
+		dahdiScanOutput: 'dahdi_scan.conf', // file that will be used to read output from ztscan or dahdi_scan, ASTGUI.globals.dahdiScanOutput
 		pingInterval : 5000,
 		app_factoryReset : '/bin/reset_config', // ASTGUI.globals.app_factoryReset
 		fnf : 'ERROR:FNF',
@@ -2744,6 +2745,10 @@ var context2json = function(params){
 			}
 		}
 		return (catfound)?cat : null ;
+	};
+
+	if( params.hasOwnProperty('configFile_output') ){
+		return toJSO( params.configFile_output );
 	};
 
 	ASTGUI.Log.Ajax("AJAX Request : reading '" +  params.filename + "'");

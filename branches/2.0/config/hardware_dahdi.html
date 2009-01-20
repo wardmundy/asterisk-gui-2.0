@@ -3,7 +3,7 @@
  *
  * Digital Card Setup / Detection 
  *
- * Copyright (C) 2007-2008, Digium, Inc.
+ * Copyright (C) 2007-2009, Digium, Inc.
  *
  * Brandon Kruse <bkruse@digium.com>
  * Pari Nannapaneni <pari@digium.com>
@@ -49,7 +49,7 @@
  -->
 <script src="js/jquery.js"></script>
 <script src="js/astman.js"></script>
-<script src="js/hardware.js"></script>
+<script src="js/hardware_dahdi.js"></script>
 <script src="js/jquery.tooltip.js"></script>
 <script src="js/jquery.autocomplete.js"></script>
 <link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
@@ -118,9 +118,7 @@
 
 	<div class="pageheading">Analog Hardware</div>
 	<div style="overflow:auto;left:40">
-		<table id="FXSFXO_ports_td" cellpadding=5 cellspacing=1 align=center border=0 class='taglist' width=480>
-
-		</table>
+		<table id="FXSFXO_ports_td" cellpadding=5 cellspacing=1 align=center border=0 class='taglist' width=480></table>
 	</div>
 
 	<div>
@@ -179,172 +177,6 @@
 		</table>
 	</div>
 
-
-	<div class="pageheading">Advanced Settings</div>
-	
-	<table align=center>
-	
-	<tr>	<td align=right>Module Name : </td>
-		<td>&nbsp;<input id="zap_moduleName" dfalt='wctdm24xxp' size=10></td>
-	</tr>
-	<tr><td align=right>Opermode <img src="images/tooltip_info.gif" tip="en,opermode_settings,0" class='tooltipinfo'> : </td>
-		<td>
-		<input type='checkbox' id='enable_disable_checkbox_opermode'>&nbsp;
-		<select id="opermode" dfalt='USA'>
-			<option value="USA">USA</option>
-			<option value="ARGENTINA">ARGENTINA</option>
-			<option value="AUSTRALIA">AUSTRALIA</option>
-			<option value="AUSTRIA">AUSTRIA</option>
-			<option value="BAHRAIN">BAHRAIN</option>
-			<option value="BELGIUM">BELGIUM</option>
-			<option value="BRAZIL">BRAZIL</option>
-			<option value="BULGARIA">BULGARIA</option>
-			<option value="CANADA">CANADA</option>
-			<option value="CHILE">CHILE</option>
-			<option value="CHINA">CHINA</option>
-			<option value="COLUMBIA">COLUMBIA</option>
-			<option value="CROATIA">CROATIA</option>
-			<option value="CYRPUS">CYRPUS</option>
-			<option value="CZECH">CZECH</option>
-			<option value="DENMARK">DENMARK</option>
-			<option value="ECUADOR">ECUADOR</option>
-			<option value="EGYPT">EGYPT</option>
-			<option value="ELSALVADOR">ELSALVADOR</option>
-			<option value="FCC">FCC</option>
-			<option value="FINLAND">FINLAND</option>
-			<option value="FRANCE">FRANCE</option>
-			<option value="GERMANY">GERMANY</option>
-			<option value="GREECE">GREECE</option>
-			<option value="GUAM">GUAM</option>
-			<option value="HONGKONG">HONGKONG</option>
-			<option value="HUNGARY">HUNGARY</option>
-			<option value="ICELAND">ICELAND</option>
-			<option value="INDIA">INDIA</option>
-			<option value="INDONESIA">INDONESIA</option>
-			<option value="IRELAND">IRELAND</option>
-			<option value="ISRAEL">ISRAEL</option>
-			<option value="ITALY">ITALY</option>
-			<option value="JAPAN">JAPAN</option>
-			<option value="JORDAN">JORDAN</option>
-			<option value="KAZAKHSTAN">KAZAKHSTAN</option>
-			<option value="KUWAIT">KUWAIT</option>
-			<option value="LATVIA">LATVIA</option>
-			<option value="LEBANON">LEBANON</option>
-			<option value="LUXEMBOURG">LUXEMBOURG</option>
-			<option value="MACAO">MACAO</option>
-			<option value="MALAYSIA">MALAYSIA</option>
-			<option value="MALTA">MALTA</option>
-			<option value="MEXICO">MEXICO</option>
-			<option value="MOROCCO">MOROCCO</option>
-			<option value="NETHERLANDS">NETHERLANDS</option>
-			<option value="NEWZEALAND">NEWZEALAND</option>
-			<option value="NIGERIA">NIGERIA</option>
-			<option value="NORWAY">NORWAY</option>
-			<option value="OMAN">OMAN</option>
-			<option value="PAKISTAN">PAKISTAN</option>
-			<option value="PERU">PERU</option>
-			<option value="PHILIPPINES">PHILIPPINES</option>
-			<option value="POLAND">POLAND</option>
-			<option value="PORTUGAL">PORTUGAL</option>
-			<option value="ROMANIA">ROMANIA</option>
-			<option value="RUSSIA">RUSSIA</option>
-			<option value="SAUDIARABIA">SAUDIARABIA</option>
-			<option value="SINGAPORE">SINGAPORE</option>
-			<option value="SLOVAKIA">SLOVAKIA</option>
-			<option value="SLOVENIA">SLOVENIA</option>
-			<option value="SOUTHAFRICA">SOUTHAFRICA</option>
-			<option value="SOUTHKOREA">SOUTHKOREA</option>
-			<option value="SPAIN">SPAIN</option>
-			<option value="SWEDEN">SWEDEN</option>
-			<option value="SWITZERLAND">SWITZERLAND</option>
-			<option value="SYRIA">SYRIA</option>
-			<option value="TAIWAN">TAIWAN</option>
-			<option value="TBR21">TBR21</option>
-			<option value="THAILAND">THAILAND</option>
-			<option value="UAE">UAE</option>
-			<option value="UK">UK</option>
-			<option value="YEMEN">YEMEN</option>
-		</select>
-		</td>
-	</tr>
-	
-	<tr><td align=right>a-law override <img src="images/tooltip_info.gif" tip="en,opermode_settings,1" class='tooltipinfo'> : </td>
-		<td>
-			<input type='checkbox' id='enable_disable_checkbox_alawoverride'>&nbsp;
-			<select id="alawoverride" dfalt='0'>
-				<option value="0">ulaw</option>
-				<option value="1">alaw</option>
-			</select>
-		</td>
-	</tr>
-	<tr><td align=right>fxs honor mode <img src="images/tooltip_info.gif" tip="en,opermode_settings,2" class='tooltipinfo'> : </td>
-		<td>	
-			<input type='checkbox' id='enable_disable_checkbox_fxshonormode'>&nbsp;
-			<select id="fxshonormode" dfalt='0'>
-				<option value="0">apply opermode to fxo modules only </option>
-				<option value="1">apply opermode to fxs and fxo modules</option>
-			</select>
-		</td>
-	</tr>
-	
-	<tr><td align=right>boostringer <img src="images/tooltip_info.gif" tip="en,opermode_settings,3" class='tooltipinfo'> : </td>
-		<td>
-			<input type='checkbox' id='enable_disable_checkbox_boostringer'>&nbsp;
-			<select id="boostringer" dfalt='0'>
-				<option value="0">normal</option>
-				<option value="1">peak(89V)</option>
-			</select>
-		</td>
-	</tr>
-	<tr><td align=right>fastringer <img src="images/tooltip_info.gif" tip="en,opermode_settings,5" class='tooltipinfo'> : </td>
-		<td>
-			<input type='checkbox' id='enable_disable_checkbox_fastringer'>&nbsp;
-			<select id="fastringer" dfalt='0'>
-				<option value="0">normal</option>
-				<option value="1">fast ringer (25hz) </option>
-			</select>
-		</td>
-	</tr>
-	<tr><td align=right>lowpower <img src="images/tooltip_info.gif" tip="en,opermode_settings,4" class='tooltipinfo'> : </td>
-		<td>
-			<input type='checkbox' id='enable_disable_checkbox_lowpower'>&nbsp;
-			<select id="lowpower" dfalt='0'>
-				<option value="0">normal</option>
-				<option value="1">fast ringer to 50V peak</option>
-			</select>
-		</td>
-	</tr>
-	<tr>	<td align=right>ring detect <img src="images/tooltip_info.gif" tip="en,opermode_settings,6" class='tooltipinfo'> : </td>
-		<td>
-			<input type='checkbox' id='enable_disable_checkbox_fwringdetect'>&nbsp;
-			<select id="fwringdetect" dfalt='0'>
-				<option value='0'>standard</option>
-				<option value='1'>full wave</option>
-			</select>
-		</td>
-	</tr>
-	<tr>	<td align=right>MWI mode <img src="images/tooltip_info.gif" tip="en,opermode_settings,7" class='tooltipinfo'> : </td>
-		<td>
-			<input type='checkbox' id='enable_disable_checkbox_mwimode'>&nbsp;
-			<select id="mwimode" dfalt='none'>
-				<option value='none'>None</option>
-				<option value='FSK'>FSK</option>
-				<option value='NEON'>NEON</option>
-			</select>
-		</td>
-	</tr>
-	
-	<tr class='neon_settings' style='display:none'>
-		<td align=right>Neon MWI voltage Level :</td>
-		<td>&nbsp;<input id="neonmwi_level" size=2></td>
-	</tr>
-	
-	<tr class='neon_settings' style='display:none'>
-		<td align=right>Neon MWI off Limit (ms) :</td>
-		<td>&nbsp;<input id="neonmwi_offlimit" size=4></td>
-	</tr>
-	</table>
-
 	<div style="overflow:auto;left:40">
 		<table  cellpadding=5 cellspacing=1 align=center border=0>
 			<tr>	<td height=50 valign='bottom'>
@@ -354,6 +186,7 @@
 			</tr>
 		</table>
 	</div>
+
 </div>
 
 <div id="errmsg" style="display:none"></div>
@@ -391,7 +224,8 @@
 			</select>
 		</TD>
 	</TR>
-	<TR id="signalling_container">	<TD align="right">Switch Type</TD>
+	<TR id="switchtype_container">
+		<TD align="right"> Switch Type </TD>
 		<TD>	<select id="editspan_switchtype">
 				<option value="national">National ISDN 2 (default)</option>
 				<option value="dms100">Nortel DMS100</option>

@@ -242,7 +242,7 @@ var onLogInFunctions = {
 			}
 
 			ASTGUI.dialog.waitWhile('detecting Hardware ..');
-			onLogInFunctions.runZtscan();
+			onLogInFunctions.run_detectdahdi();
 		});
 	},
 
@@ -250,7 +250,6 @@ var onLogInFunctions = {
 		// onLogInFunctions.setGUI_Paths()
 		var ASTERISK_CONF = context2json({ filename:'asterisk.conf' , context : 'directories' , usf:1 });
 		if( ASTERISK_CONF === null ){ ASTERISK_CONF = new ASTGUI.customObject ; } // if context 'directories' not found in asterisk.conf
-
 		sessionData.directories.asteriskConfig =  ASTERISK_CONF.getProperty('astetcdir') ||  '/etc/asterisk/' ;
 		sessionData.directories.astvarlibdir = ASTERISK_CONF.getProperty('astvarlibdir') || '/var/lib/asterisk/' ;
 		sessionData.directories.AGIBIN = ASTERISK_CONF.getProperty('astagidir') || '/var/lib/asterisk/agi-bin/' ;
@@ -280,8 +279,10 @@ var onLogInFunctions = {
 		sessionData.directories.script_dldsoundpack = 'sh ' + sessionData.directories.scripts + 'dldsoundpack';
 		sessionData.directories.script_mastercsvexists = 'sh ' + sessionData.directories.scripts + 'mastercsvexists';
 		sessionData.directories.script_Registerg729 = 'sh ' + sessionData.directories.scripts + 'registerg729.sh';
+		sessionData.directories.script_detectdahdi = 'sh ' + sessionData.directories.scripts + 'detectdahdi.sh';
 
-		sessionData.directories.app_Ztscan = 'ztscan > ' + sessionData.directories.asteriskConfig +'ztscan.conf' ;
+		sessionData.directories.app_DahdiScan = 'dahdi_scan > ' + sessionData.directories.asteriskConfig + ASTGUI.globals.dahdiScanOutput ;
+		sessionData.directories.app_dahdi_genconf = 'dahdi_genconf'; // generates new /etc/dahdi/system.conf
 		sessionData.directories.app_mISDNscan = 'misdn-init scan' ;
 		sessionData.directories.app_flashupdate = 'flashupdate' ;
 	},
@@ -427,20 +428,35 @@ var onLogInFunctions = {
 				miscFunctions.hide_panel('digital.html');
 				onLogInFunctions.updatePanels4Platform();
 			}else{
-				onLogInFunctions.runZtscan();
+				onLogInFunctions.run_detectdahdi();
 			}
 		};
 		ASTGUI.systemCmdWithOutput( 's800iconfig' , after);
 	},
 
-	runZtscan : function(){ // onLogInFunctions.runZtscan()
+	run_detectdahdi : function(){ // onLogInFunctions.run_detectdahdi()
 		ASTGUI.dialog.waitWhile('detecting Hardware ..');
-		var cb = function(){
-			onLogInFunctions.updatePanels4Platform();
-		};
-		ASTGUI.systemCmd(top.sessionData.directories.app_Ztscan, cb);
-	},
 
+		ASTGUI.systemCmdWithOutput( sessionData.directories.script_detectdahdi , function(op){
+			op = op.toLowerCase();
+
+			sessionData.DahdiChannelString = 'dahdichan' ;
+			sessionData.DahdiDeviceString = 'DAHDI' ;
+
+			sessionData.directories.app_DahdiScan = 'dahdi_scan > ' + sessionData.directories.asteriskConfig + ASTGUI.globals.dahdiScanOutput ;
+
+			if( op.contains('zaptel') ){
+				sessionData.DahdiChannelString = 'zapchan' ;
+				sessionData.DahdiDeviceString = 'Zap' ;
+				sessionData.directories.app_DahdiScan = 'ztscan > ' + sessionData.directories.asteriskConfig + ASTGUI.globals.dahdiScanOutput ;
+				miscFunctions.hide_panel('misdn.html', 1);
+			}else{
+				miscFunctions.hide_panel('misdn.html', -1);
+			}
+
+			ASTGUI.systemCmd( sessionData.directories.app_DahdiScan , onLogInFunctions.updatePanels4Platform );
+		});
+	},
 
 	updatePanels4Platform: function(){
 		var tmp_continue = astgui_updateConfigFromOldGui(); // update configuration form 1.x gui if needed
@@ -507,7 +523,6 @@ var onLogInFunctions = {
 // 			});
 		}
 
-
 		//if( sessionData.PLATFORM.isAA50  ){
 			DOM_mainscreen.src = 'home.html?status=1';
 		//}
@@ -515,7 +530,7 @@ var onLogInFunctions = {
 		if( sessionData.PLATFORM.isAA50 && sessionData.PLATFORM.AA50_SKU.contains('800') ){
 			// no need to parse ztscan output for s800 SKU
 		}else{
-			readcfg.ztScanConf();
+			readcfg.dahdiScanConf();
 		}
 
 		miscFunctions.show_advancedMode();
@@ -560,15 +575,13 @@ var miscFunctions = {
 		return TI_LIST;
 	},
 
-	hide_panel: function(fname , show){ // parent.miscFunctions.hide_panel('page.html' , 0/1 )
+	hide_panel: function(fname , show){ // parent.miscFunctions.hide_panel('page.html' , 0/1/-1 ) , use -1 for deleteing a panel
 		var t = $('.ui-accordion-link') ;
 		for(var p=0; p < t.length ; p++){
 			if( $(t[p].parentNode).attr("page") == fname ){
-				if(show){
-					$(t[p].parentNode).show();
-				}else{
-					$(t[p].parentNode).hide();
-				}
+				if(!show) $(t[p].parentNode).hide();
+				if( show == -1 ) $(t[p].parentNode).remove();
+				if( show == 1) $(t[p].parentNode).show();
 				return;
 			}
 		}
@@ -1023,22 +1036,9 @@ var after_localajaxinit = function(){
 
 	if( sessionData.PLATFORM.isABE ){ // ABE-1600
 		try{
-			(function(){
-				var all_divs = $('div');
-				var i = 0;
-				while( all_divs[i] ){
-					var adi = all_divs[i];
-					var pg = $(adi).attr('page') ;
-					if( pg && pg == 'mohfiles.html' ){
-						adi.parentNode.removeChild(adi);
-						break;
-					}
-					i++;
-				}
-			})();
+			miscFunctions.hide_panel('mohfiles.html', -1);
 		}catch(err){}
 	}
-
 
 	var loadGUI = function(){
 		DOM_accordion_div = _$('accordion_div');

@@ -192,7 +192,7 @@ var USERS_MISC_FUNCTIONS = {
 			addCell( newRow , { html: "<input type=checkbox  class='selected_extensions' value='"+ user +"'>" } );
 			addCell( newRow , { html: user } );
 			addCell( newRow , { html: ud.getProperty('fullname') || '--' } );
-			addCell( newRow , { html: ud.getProperty('zapchan') || '--' } );
+			addCell( newRow , { html: ud.getProperty(top.sessionData.DahdiChannelString) || '--' } );
 			addCell( newRow , { html: ( ud.getProperty('hassip').isAstTrue() ) ? 'Yes' : '--' , align:'center'} );
 			addCell( newRow , { html: ( ud.getProperty('hasiax').isAstTrue() ) ? 'Yes' : '--' , align:'center'} );
 
@@ -236,7 +236,7 @@ var USERS_MISC_FUNCTIONS = {
 			ASTGUI.updateFieldToValue( 'edit_email', uinfo.getProperty('email') );
 			ASTGUI.updateFieldToValue( 'edit_hasSip', uinfo.getProperty('hassip') );
 			ASTGUI.updateFieldToValue( 'edit_hasIax', uinfo.getProperty('hasiax') );
-			ASTGUI.updateFieldToValue( 'edit_fxs', uinfo.getProperty('zapchan') );
+			ASTGUI.updateFieldToValue( 'edit_fxs', uinfo.getProperty(top.sessionData.DahdiChannelString) );
 			ASTGUI.updateFieldToValue( 'edit_flash', uinfo.getProperty('flash') );
 			ASTGUI.updateFieldToValue( 'edit_rxflash', uinfo.getProperty('rxflash') );
 			// CODECS
@@ -270,7 +270,7 @@ var USERS_MISC_FUNCTIONS = {
 			ASTGUI.updateFieldToValue( 'edit_cti', uinfo.getProperty('hasmanager') );
 			ASTGUI.updateFieldToValue( 'edit_isagent', uinfo.getProperty('hasagent') );
 			ASTGUI.updateFieldToValue( 'edit_pickupgroup', uinfo.getProperty('pickupgroup') );
-			zapchan_Before = uinfo.getProperty('zapchan');
+			zapchan_Before = uinfo.getProperty(top.sessionData.DahdiChannelString);
 		}else{
 			_$('new_ext').disabled = false;
 			ASTGUI.updateFieldToValue( 'codec_one', 'ulaw' );
@@ -516,10 +516,10 @@ var USERS_MISC_FUNCTIONS = {
 					x.new_action('update', u, 'signalling', sg) ;					tmp_obj['signalling'] = sg ;
 					x.new_action('update', u, 'flash',  tmp_flash) ;				tmp_obj['flash'] = tmp_flash ;
 					x.new_action('update', u, 'rxflash', tmp_rxflash ) ;				tmp_obj['rxflash'] = tmp_rxflash ;
-					x.new_action('delete', u, 'zapchan', '') ;
-					x.new_action('append', u, 'zapchan', fs );					tmp_obj['zapchan'] = fs ;
+					x.new_action('delete', u, top.sessionData.DahdiChannelString , '' ) ;
+					x.new_action('append', u, top.sessionData.DahdiChannelString, fs );					tmp_obj[top.sessionData.DahdiChannelString] = fs ;
 				}else{
-					x.new_action('delete', u, 'zapchan', '') ;					tmp_obj['zapchan'] = '' ;
+					x.new_action('delete', u, top.sessionData.DahdiChannelString, '') ;					tmp_obj[top.sessionData.DahdiChannelString] = '' ;
 				}
 
 				var codecs = '';

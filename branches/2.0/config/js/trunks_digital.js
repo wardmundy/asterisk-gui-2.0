@@ -39,7 +39,7 @@ var load_DigitalTrunksTable = function(){
 			addCell( newRow , { html:'', width:'15px' });
 			addCell( newRow , { html: c[d]['trunkname'] });
 			addCell( newRow , { html: c[d]['signalling'] }); // 
-			addCell( newRow , { html: c[d]['zapchan'] });
+			addCell( newRow , { html: c[d][top.sessionData.DahdiChannelString] });
 			addCell( newRow , { html:''} );
 		}}
 
@@ -68,12 +68,17 @@ var load_DigitalTrunksTable = function(){
 var localajaxinit = function(){
 	top.document.title = 'Manage PRI/BRI Trunks ' ;
 	var tmp_providersPage = ( parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ) ? 'trunks_sps.html' : 'trunks_providers.html';
-	ASTGUI.tabbedOptions( _$('tabbedMenu') , [
-		{url:'trunks_analog.html', desc:'Analog Trunks'} ,
-		{url: tmp_providersPage, desc:'Service Providers'} ,
-		{url:'trunks_voip.html', desc:'VOIP Trunks'} ,
-		{url:'#', desc:'T1/E1/BRI Trunks', selected:true }
-	]);
+	var t = [];
+		t.push({url:'trunks_analog.html', desc:'Analog Trunks'});
+	if( parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ){
+		t.push({url:'trunks_sps.html', desc:'Service Providers'});
+	}
+		t.push({url:'trunks_voip.html', desc:'VOIP Trunks'});
+	if( !parent.sessionData.PLATFORM.isAA50 ){
+		t.push({url:'trunks_digital.html', desc:'T1/E1/BRI Trunks', selected:true});
+	}
+	ASTGUI.tabbedOptions( _$('tabbedMenu') , t);
+
 	// show digital trunks in table_DigitalTrunks_list - parent.sessionData.pbxinfo['trunks']['pri']
 	DOM_table_DigitalTrunks_list = _$('table_DigitalTrunks_list');
 
