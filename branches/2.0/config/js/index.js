@@ -448,6 +448,7 @@ var onLogInFunctions = {
 			if( op.contains('zaptel') ){
 				sessionData.DahdiChannelString = 'zapchan' ;
 				sessionData.DahdiDeviceString = 'Zap' ;
+				sessionData.directories.app_dahdi_genconf = 'ztcfg' ;
 				sessionData.directories.app_DahdiScan = 'ztscan > ' + sessionData.directories.asteriskConfig + ASTGUI.globals.dahdiScanOutput ;
 				miscFunctions.hide_panel('misdn.html', 1);
 			}else{
