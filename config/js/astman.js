@@ -454,6 +454,10 @@ var ASTGUI = {
 	},
 
 	checkRequiredFields: function( fields ){
+		// fields is an array of fieldnames or elements
+		if(!ASTGUI.isArray(fields)){
+			return true;
+		}
 		for(var g=0; g < fields.length ; g++ ){
 			var field = fields[g];
 			if(typeof field =='string'){
