@@ -772,6 +772,7 @@ var ASTGUI = {
 		waitWhile : function(msg){
 			// ASTGUI.dialog.waitWhile('Saving...');
 			//	use this dialog when you want to inform the user about an action in progress - Ex: 'Saving...' or 'Applying CHanges..' or 'Reloading Asteisk...' etc
+			if ( typeof msg != 'string') return;
 			top.alertmsgtype = 2 ;
 			this.load_iframe(msg);
 		},
@@ -779,6 +780,7 @@ var ASTGUI = {
 		alertmsg : function(msg){
 			// ASTGUI.dialog.alertmsg('Some Alert Message');
 			//	Display custom alert message with an 'Ok' button	
+			if ( typeof msg != 'string') return;
 			top.alertmsgtype = 1 ;
 			this.load_iframe(msg);
 		},
@@ -1261,6 +1263,7 @@ var ASTGUI = {
 	listSystemFiles : function( dir , cb ){
 		// ASTGUI.listSystemFiles( dir , callBackFunction )
 		// list of files in 'dir' will be sent to callBackFunction as an array
+		if ( typeof dir != 'string') cb([]) ;
 		try{
 		this.systemCmd( top.sessionData.directories.script_ListFiles + ' ' +  dir , function(){
 			ASTGUI.loadHTML( top.sessionData.directories.output_SysInfo , function(op){
@@ -1284,6 +1287,7 @@ var ASTGUI = {
 	miscFunctions: {
 		getChunksFromManagerOutput : function( op , usf){
 			// ASTGUI.miscFunctions.getChunksFromManagerOutput( output_str ) ;
+			if ( typeof op != 'string') return [] ;
 			try{
 			var tr_Array = [];
 			var tmp_chunk = (usf) ? {} : [] ;
@@ -1320,6 +1324,7 @@ var ASTGUI = {
 		},
 
 		createConfig : function( fileName, callback){ // ASTGUI.miscFunctions.createConfig( 'filaName', function(){ } ) ;
+			if ( typeof fileName != 'string') callback() ;
 			if( parent.sessionData.PLATFORM.isAST_1_6 ){
 				var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=createconfig&filename='+ fileName , async: false }).responseText;
 				callback();
@@ -1567,6 +1572,7 @@ var ASTGUI = {
 	},
 
 	parseCLIResponse : function (op){ // op is CLI command output via http 
+		if (typeof op != 'string') return op;
 		op = op.replace(/Response: Follows/, "");
 		op = op.replace(/Privilege: Command/, "");
 		op = op.replace(/--END COMMAND--/, "");
