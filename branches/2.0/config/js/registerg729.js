@@ -77,8 +77,10 @@ var register_New_license = function(){
 			ASTGUI.systemCmdWithOutput( top.sessionData.directories.script_Registerg729 + " " + ASTGUI.getFieldValue('text_g729licensekey'), function(result){
 				ASTGUI.dialog.hide();
 				if(result.contains('SUCCESS')){
-					alert('Registration Successfull ! \n Please reboot for changes to take effect');
-					window.location.reload();
+					ASTGUI.systemCmd('save_config', function(){
+						alert('Registration Successfull ! \n Please reboot for changes to take effect');
+						window.location.reload();
+					});
 				}
 				if(result.contains('FAILED')){
 					alert('Registration FAILED ! \n' + result.withOut('FAILED'));
