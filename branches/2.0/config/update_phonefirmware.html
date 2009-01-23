@@ -27,7 +27,10 @@ var update_firmware = function(){
 		//var tmp = ASTGUI.loadHTML('./sysinfo_output.html');
 		if( tmp.contains('**Completed**') ){
 			try{
-				alert('Finished updating firmware !');
+				var ta = 'Finished downloading firmware !' +
+					'\n Please reboot the appliance for the new firmware to be effective.' +
+					'\n Note: The reboot process might take 4 to 8 minutes. '
+				alert(ta);
 				return;
 			}finally{
 				parent.ASTGUI.dialog.hide();
