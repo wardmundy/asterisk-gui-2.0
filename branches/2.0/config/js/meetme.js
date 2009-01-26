@@ -89,11 +89,17 @@ var updateMeetmesTable = function(){
 var delete_meetMe_confirm = function(room){
 	if(!confirm("Delete Conference Bridge "+ room + " ?")) { return true; }
 	var u = new listOfSynActions('extensions.conf') ;
-		u.new_action('delete', ASTGUI.contexts.CONFERENCES, 'exten', '', parent.sessionData.pbxinfo.conferences[room]['configOptions'] );
-		u.new_action('delete', ASTGUI.contexts.CONFERENCES, 'exten', '', parent.sessionData.pbxinfo.conferences[room]['adminOptions'] );
+		if( parent.sessionData.pbxinfo.conferences[room]['configOptions'] ){
+			u.new_action('delete', ASTGUI.contexts.CONFERENCES, 'exten', '', parent.sessionData.pbxinfo.conferences[room]['configOptions'] );
+		}
+		if( parent.sessionData.pbxinfo.conferences[room]['adminOptions'] ){
+			u.new_action('delete', ASTGUI.contexts.CONFERENCES, 'exten', '', parent.sessionData.pbxinfo.conferences[room]['adminOptions'] );
+		}
 		u.callActions();
 	u.clearActions('meetme.conf'); // flush u and point to a different file
-		u.new_action('delete', 'rooms', 'conf', '', parent.sessionData.pbxinfo.conferences[room]['pwdString'] );
+		if( parent.sessionData.pbxinfo.conferences[room]['pwdString'] ){
+			u.new_action('delete', 'rooms', 'conf', '', parent.sessionData.pbxinfo.conferences[room]['pwdString'] );
+		}
 		u.callActions();
 	delete parent.sessionData.pbxinfo.conferences[room] ;
 	ASTGUI.feedback( { msg:"'Conference Bridge' deleted", showfor: 3, color:'red', bgcolor:'#FFFFFF' } );
@@ -207,12 +213,20 @@ var edit_meetMe_apply = function(){
 	var new_passString = DOM_edit_Ext.value + ',' + DOM_edit_PinCode.value + ',' + DOM_edit_AdminPinCode.value ;
 
 	if( isNewBridge == false ){ // delete/update old bridge values
-		u.new_action('delete', 'default', 'exten', '', parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['configOptions'] ); // backward compatibility  with old gui
-		u.new_action('delete', ASTGUI.contexts.CONFERENCES, 'exten', '', parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['configOptions'] );
-		u.new_action('delete', ASTGUI.contexts.CONFERENCES, 'exten', '', parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['adminOptions'] );
+		if( parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['configOptions'] ){
+			u.new_action('delete', 'default', 'exten', '', parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['configOptions'] ); // backward compatibility  with old gui
+		}
+		if( parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['configOptions'] ){
+			u.new_action('delete', ASTGUI.contexts.CONFERENCES, 'exten', '', parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['configOptions'] );
+		}
+		if( parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['adminOptions'] ){
+			u.new_action('delete', ASTGUI.contexts.CONFERENCES, 'exten', '', parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['adminOptions'] );
+		}
 		u.callActions();
 		u.clearActions();
-		w.new_action('delete', 'rooms', 'conf', '', parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['pwdString'] );
+		if( parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['pwdString'] ){
+			w.new_action('delete', 'rooms', 'conf', '', parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['pwdString'] );
+		}
 		w.callActions();
 		w.clearActions();
 		parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['configOptions'] = new_MeetmeString ;
