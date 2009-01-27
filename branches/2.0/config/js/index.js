@@ -292,8 +292,12 @@ var onLogInFunctions = {
 		var resp = s.getResponseHeader("Server");
 		onLogInFunctions.setGUI_Paths();
 		onLogInFunctions.detectPlatform(resp); // <-- PLATFORM Detection
-
-		if(s.responseText.toLowerCase().match('pong')){
+		var stlc = s.responseText.toLowerCase() ;
+		if( stlc.contains('404 not found') && stlc.contains('the requested url was not found on this server') ){
+			ASTGUI.dialog.alertmsg("Please enable manager access. <BR><BR>Most often you should be able to do that by setting 'enable = yes' in manager.conf under the [general] context, and reloading asterisk.");
+			return;
+		}
+		if( stlc.match('pong') ){
 			ASTGUI.Log.Debug('Got PONG , session is active');
 
 			$('div.ui-accordion-link:eq(0)')[0].innerHTML = 'System Status';
