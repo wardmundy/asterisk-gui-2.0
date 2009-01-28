@@ -78,52 +78,55 @@ body {
 	<div id="featurecode_settings_container" class="Features_tabs">
 		<div class="lite_Heading" style="margin-top:-10px">Features Codes</div>
 		<table align="center" cellpadding="2" cellspacing="2" border="0">
-			<tr>	<td valign="top" align="right"> <input type="checkbox" id="chk_featureMap_blindxfer"></td>
-				<td> <input size="2" id="featureMap_blindxfer"> Blind Transfer (default is #)</td>
-			</tr>
-
-			<tr><td height="10"></td></tr>
-
-			<tr>	<td valign="top" align="right"> <input type="checkbox" id="chk_featureMap_disconnect"></td>
-				<td> <input size="2" id="featureMap_disconnect"> Disconnect (default is *)</td>
-			</tr>
-
-			<tr><td height="10"></td></tr>
-
+		<tr>
+			<td valign="top" align="right"><input type="checkbox" id="chk_featureMap_blindxfer"></td>
+			<td><input size="2" id="featureMap_blindxfer"> Blind Transfer (default is #)</td>
+		</tr>
+		<tr>
+			<td height="10"></td>
+		</tr>
+		<tr>
+			<td valign="top" align="right"><input type="checkbox" id="chk_featureMap_disconnect"></td>
+			<td><input size="2" id="featureMap_disconnect"> Disconnect (default is *)</td>
+		</tr>
+		<tr>
+			<td height="10"></td>
+		</tr>
 <!--			<tr>	<td valign=top align=right> <input type=checkbox id='chk_featureMap_automon'></td>
 				<td> <input size=2 id='featureMap_automon'> One Touch Record a.k.a. Touch Monitor </td>
 			</tr>-->
-
-			<tr>	<td valign="top" align="right"> <input type="checkbox" id="chk_featureMap_atxfer"></td>
-				<td> <input size="2" id="featureMap_atxfer"> Attended transfer </td>
-			</tr>
-
-			<tr>	<td valign="top" align="right"> <input type="checkbox" id="chk_featureMap_parkcall"></td>
-				<td> <input size="2" id="featureMap_parkcall"> Call Parking </td>
-			</tr>
-
+		<tr>
+			<td valign="top" align="right"><input type="checkbox" id="chk_featureMap_atxfer"></td>
+			<td><input size="2" id="featureMap_atxfer"> Attended transfer </td>
+		</tr>
+		<tr>
+			<td valign="top" align="right"><input type="checkbox" id="chk_featureMap_parkcall"></td>
+			<td><input size="2" id="featureMap_parkcall"> Call Parking </td>
+		</tr>
 		</table>
-
 	</div>
 	
 	<div id="callparking_settings_container" class="Features_tabs">
 		<div class="lite_Heading" style="margin-top:-10px">Call Parking Preferences</div>
 		<table align="center" cellpadding="2" cellspacing="2" border="0">
-			<tr>	<td align="right">Extension to Dial to Park a call:</td>
-				<td>&nbsp;<input size="4" type="text" id="parkext"></td>
-			</tr>
-			<tr>	<td align="right">What extensions to park calls on:</td>
-				<td>&nbsp;<input size="10" type="text" id="parkpos"> (Ex: '701-720')</td>
-			</tr>
-			<tr>	<td align="right">Number of seconds a call can be parked for <img src="images/tooltip_info.gif" tip="en,parking,0" class="tooltipinfo"> :</td>
-				<td>&nbsp;<input size="2" type="text" id="parkingtime"></td>
-			</tr>
+		<tr>
+			<td align="right">Extension to Dial to Park a call:</td>
+			<td>&nbsp;<input size="4" type="text" id="parkext"></td>
+		</tr>
+		<tr>
+			<td align="right">What extensions to park calls on:</td>
+			<td>&nbsp;<input size="10" type="text" id="parkpos"> (Ex: '701-720')</td>
+		</tr>
+		<tr>
+			<td align="right">Number of seconds a call can be parked for <img src="images/tooltip_info.gif" tip="en,parking,0" class="tooltipinfo"> :</td>
+			<td>&nbsp;<input size="2" type="text" id="parkingtime"></td>
+		</tr>
 		</table>
 	</div>
 
 	<div id="applicationMap_settings_container" class="Features_tabs">
 		<div class="top_buttons" style="margin-top:-10px;">
-			<span id="new" class="guiButtonNew" onclick="do_new_ApplicationMap_row"();' style="float":left'>New Application Map</span>
+			<span id="new" class="guiButtonNew" onclick="do_new_ApplicationMap_row();" style="float:left">New Application Map</span>
 			<span class="lite_Heading" style="margin-left: -150px">Application Map</span>
 		</div>
 		<table align="center" cellpadding="0" cellspacing="2" border="0" id="Table_applicationMap_definitions"></table>
@@ -132,42 +135,46 @@ body {
 	<div id="DialOptions_settings_container" class="Features_tabs">
 		<div class="lite_Heading" style="margin-left: -150px">Dial Options</div>
 		<table align="center" cellpadding="2" cellspacing="2" border="0">
-		<tr>	<td valign="top" align="right"> <input type="checkbox" id="dialoptions_t"></td>
+		<tr>
+			<td valign="top" align="right"> <input type="checkbox" id="dialoptions_t"></td>
 			<td> (t-Option) Allow the called party to transfer the calling party by sending the DTMF sequence defined on the Feature Codes page.</td>
 		</tr>
-
-		<tr><td height="10"></td></tr>
-
-		<tr>	<td valign="top" align="right"> <input type="checkbox" id="dialoptions_T"></td>
-			<td> (T-Option) Allow the calling party to transfer the called party by sending the DTMF sequence defined on the Feature Codes page.
-			</td>
+		<tr>
+			<td height="10"></td>
 		</tr>
-
-		<tr><td height="10"></td></tr>
-
-		<tr>	<td valign="top" align="right"> <input type="checkbox" id="dialoptions_h"></td>
+		<tr>
+			<td valign="top" align="right"> <input type="checkbox" id="dialoptions_T"></td>
+			<td> (T-Option) Allow the calling party to transfer the called party by sending the DTMF sequence defined on the Feature Codes page.</td>
+		</tr>
+		<tr>
+			<td height="10"></td>
+		</tr>
+		<tr>
+			<td valign="top" align="right"> <input type="checkbox" id="dialoptions_h"></td>
 			<td> (h-Option) Allow the called party to hang up by sending the DTMF sequence defined on the Feature Codes page.</td>
 		</tr>
-		
-		<tr><td height="10"></td></tr>
-
-		<tr><td valign="top" align="right"> <input type="checkbox" id="dialoptions_H"></td>
+		<tr>
+			<td height="10"></td>
+		</tr>
+		<tr>
+			<td valign="top" align="right"> <input type="checkbox" id="dialoptions_H"></td>
 			<td> (H-Option) Allow the calling party to hang up by sending the DTMF sequence defined on the Feature Codes page.</td>
 		</tr>
-
-		<tr><td height="10"></td></tr>
-
-		<tr><td valign="top" align="right"> <input type="checkbox" id="dialoptions_k"></td>
+		<tr>
+			<td height="10"></td>
+		</tr>
+		<tr>
+			<td valign="top" align="right"> <input type="checkbox" id="dialoptions_k"></td>
 			<td>(k-Option) Allow the called party to enable parking of the call by sending the DTMF sequence defined on the Feature Codes page.
 			</td>
 		</tr>
-
-		<tr><td height="10"></td></tr>
-
-		<tr><td valign="top" align="right"> <input type="checkbox" id="dialoptions_K"></td>
+		<tr>
+			<td height="10"></td>
+		</tr>
+		<tr>
+			<td valign="top" align="right"> <input type="checkbox" id="dialoptions_K"></td>
 			<td>(K-Option) Allow the calling party to enable parking of the call by sending the DTMF sequence defined on the Feature Codes page.</td>
 		</tr>
-
 		</table>
 	</div>
 	
