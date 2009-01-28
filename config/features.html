@@ -20,6 +20,15 @@
 -->
 <link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
 <style type="text/css">
+
+body {
+	background-color: #efefef;
+}
+
+#featurecode_settings_container, #callparking_settings_container, #applicationMap_settings_container, #DialOptions_settings_container {
+	display: none;
+}
+
 #Table_applicationMap_definitions {
 	border: 1px solid #666666;
 	margin-top: 5px;
@@ -50,9 +59,13 @@
 	background: #FFFFFF; 
 }
 
+.cancel_edit {
+	margin-top: 30px;
+}
+
 </style>
 
-<body bgcolor="EFEFEF">
+<body>
 <div class="iframeTitleBar"> 
 	Feature Codes & Call Parking Preferences
 	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
@@ -62,7 +75,7 @@
 
 	<div id="tabbedMenu"></div>
 	
-	<div id='featurecode_settings_container' style="display: none" class='Features_tabs'>
+	<div id='featurecode_settings_container' class='Features_tabs'>
 		<div class='lite_Heading' style="margin-top:-10px">Features Codes</div>
 		<table align="center" cellpadding=2 cellspacing=2 border=0>
 			<tr>	<td valign=top align=right> <input type=checkbox id='chk_featureMap_blindxfer'></td>
@@ -93,7 +106,7 @@
 
 	</div>
 	
-	<div id='callparking_settings_container' style="display: none" class='Features_tabs'>
+	<div id='callparking_settings_container' class='Features_tabs'>
 		<div class='lite_Heading' style="margin-top:-10px">Call Parking Preferences</div>
 		<table align="center" cellpadding=2 cellspacing=2 border=0>
 			<tr>	<td align=right>Extension to Dial to Park a call:</td>
@@ -108,7 +121,7 @@
 		</table>
 	</div>
 
-	<div id='applicationMap_settings_container' style="display: none" class='Features_tabs'>
+	<div id='applicationMap_settings_container' class='Features_tabs'>
 		<div class='top_buttons' style='margin-top:-10px;'>
 			<span id='new' class='guiButtonNew' onclick='do_new_ApplicationMap_row();' style='float:left'>New Application Map</span>
 			<span class='lite_Heading' style='margin-left: -150px'>Application Map</span>
@@ -116,7 +129,7 @@
 		<table align="center" cellpadding=0 cellspacing=2 border=0 id='Table_applicationMap_definitions'></table>
 	</div>
 
-	<div id='DialOptions_settings_container' style="display: none" class='Features_tabs'>
+	<div id='DialOptions_settings_container' class='Features_tabs'>
 		<div class='lite_Heading' style='margin-left: -150px'>Dial Options</div>
 		<table align="center" cellpadding=2 cellspacing=2 border=0>
 		<tr>	<td valign=top align=right> <input type=checkbox id='dialoptions_t'></td>
@@ -158,7 +171,7 @@
 		</table>
 	</div>
 	
-	<div style="margin-top:30px">
+	<div class="cancel_edit">
 		<span class='guiButtonCancel' id='cancel' onclick='window.location.reload();'>Cancel</span>
 		<span class='guiButtonEdit' id='save' onclick='save_changes();'>Save</span>
 	</div>
