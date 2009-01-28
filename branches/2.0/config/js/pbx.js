@@ -188,6 +188,16 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			};
 
 			var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=' + ASTGUI.globals.dahdiIncludeFile , async: false }).responseText;
+
+			var q = context2json({ configFile_output:s, context: 'general', usf:0 });
+			if( q === null ){ // if context 'general' is not found
+				ASTGUI.systemCmd( sessionData.directories.script_detectdahdi , function(){
+					sessionData.continueParsing = false ;
+					runScript_detectdahdi();
+					return;
+				});
+			}
+
 			if( s.contains('Response: Error') && s.contains('Message: Config file not found') ){
 				sessionData.continueParsing = false ;
 				ASTGUI.systemCmd( sessionData.directories.app_dahdi_genconf , function(){
@@ -198,14 +208,6 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				});
 				return;
 			}else{
-				var q = context2json({ configFile_output:s, context: 'general', usf:0 });
-				if( q === null ){ // if context 'general' is not found
-					ASTGUI.systemCmd( sessionData.directories.script_detectdahdi , function(){
-						sessionData.continueParsing = false ;
-						runScript_detectdahdi();
-						return;
-					});
-				}
 				q.each(function(line){
 					if ( !line.beginsWith('fx') ){ return ;}
 					if( line.beginsWith('fxoks=') || line.beginsWith('fxsks=') ){
