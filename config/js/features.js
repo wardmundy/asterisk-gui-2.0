@@ -206,38 +206,6 @@ var load_preferences = function(){
 
 };
 
-var localajaxinit = function(){
-	top.document.title = 'Call Parking preferences' ;
-
-	ASTGUI.tabbedOptions( _$('tabbedMenu') , [
-		{	url: '#',
-			desc: 'Feature Codes',
-			click_function: function(){ $('.Features_tabs').hide(); $('#featurecode_settings_container').show(); }
-		},{
-			url: '#',
-			desc: 'Call Parking',
-			click_function: function(){ $('.Features_tabs').hide(); $('#callparking_settings_container').show(); }
-		},{
-			url: '#',
-			desc: 'Application Map',
-			click_function: function(){ $('.Features_tabs').hide(); $('#applicationMap_settings_container').show(); }
-		},{
-			url: '#',
-			desc: 'Dial Options',
-			click_function: function(){ $('.Features_tabs').hide(); $('#DialOptions_settings_container').show(); }
-		}
-		
-	]);
-
-	try{
-		load_preferences();
-	}catch(err){
-
-	}finally{
-		$('#tabbedMenu').find('A:eq(0)').click();
-	}
-};
-
 var save_changes = function(){
 
 	var TBL = _$('Table_applicationMap_definitions');
