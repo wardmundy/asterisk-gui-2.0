@@ -59,7 +59,7 @@ var updateMeetmesTable = function(){
 		meetme_rooms.sortNumbers();
 		meetme_rooms.each( function(this_room){
 			var this_MEETME = ASTGUI.cloneObject(parent.sessionData.pbxinfo.conferences[this_room]) ;
-			var room_options = this_MEETME['configOptions'].betweenXY('|',')') ;
+			var room_options = this_MEETME['configOptions'].betweenXY(',',')') ;
 
 			var newRow = DOM_table_mml.insertRow(-1);
 			newRow.className = ((DOM_table_mml.rows.length)%2==1)?'odd':'even';
@@ -134,7 +134,7 @@ var show_MeetMe_Form = function(){
 
 	var TMP_EDIT_BRIDGE = ASTGUI.cloneObject(parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]);
 
-	var room_options = TMP_EDIT_BRIDGE['configOptions'].betweenXY('|',')') ;
+	var room_options = TMP_EDIT_BRIDGE['configOptions'].betweenXY(',',')') ;
 	var pwstr = TMP_EDIT_BRIDGE['pwdString'] ;
 	DOM_edit_Ext.value = EDIT_BRIDGE;
 	DOM_edit_Ext.disabled = true ;
@@ -203,9 +203,9 @@ var edit_meetMe_apply = function(){
 	var w = new listOfSynActions('meetme.conf') ;
 
 	var new_exten = DOM_edit_Ext.value ;
-	var new_MeetmeString = new_exten + ",1,MeetMe(${EXTEN}|" + new_MeetmeOptions.join('')  +")" ;
+	var new_MeetmeString = new_exten + ",1,MeetMe(${EXTEN}," + new_MeetmeOptions.join('')  +")" ;
 	if( ASTGUI.getFieldValue(DOM_edit_adminExtension) ){
-		var new_MeetmeString_adminOptions = DOM_edit_adminExtension.value + ",1,MeetMe(" + new_exten + "|" + new_MeetmeOptions.join('') + 'aA' +")" ;
+		var new_MeetmeString_adminOptions = DOM_edit_adminExtension.value + ",1,MeetMe(" + new_exten + "," + new_MeetmeOptions.join('') + 'aA' +")" ;
 	}else{
 		var new_MeetmeString_adminOptions = '';
 	}
