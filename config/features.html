@@ -192,7 +192,7 @@ body {
 <script src="js/jquery.autocomplete.js"></script>
 <script type="text/javascript">
 
-var localajaxinit = function(){
+$(document).ready( function() {
 	top.document.title = 'Call Parking preferences' ;
 
 	ASTGUI.tabbedOptions( _$('tabbedMenu') , [
@@ -222,6 +222,7 @@ var localajaxinit = function(){
 	}finally{
 		$('#tabbedMenu').find('A:eq(0)').click();
 	}
-};
+});
+
 </script>
 </body>
