@@ -21,7 +21,7 @@
 /*
 
 	[pagegroups]									// ASTGUI.contexts.PageGroups
-	exten => 6051,1,Macro(pagingintercom|SIP/6000&SIP/6005&SIP/6007|qd)
+	exten => 6051,1,Macro(pagingintercom,SIP/6000&SIP/6005&SIP/6007,qd)
 
 
 */
@@ -83,7 +83,7 @@ var save_pageGroup = function(){
 		if ( ASTGUI.getFieldValue(DOM_select_pageGroup_Type) == '2way' ){ tmp_options.push('d'); }
 		if ( !DOM_chk_pageGroup_beep.checked ){ tmp_options.push('q'); }
 	
-		var tmp_new_line = PAGE_EXTEN + ',1,Macro(pagingintercom|' + TEMP_members.join('&') + '|'+ tmp_options.join('') + ')' ;
+		var tmp_new_line = PAGE_EXTEN + ',1,Macro(pagingintercom,' + TEMP_members.join('&') + ','+ tmp_options.join('') + ')' ;
 	
 		var later = function(){
 			var msg = ( isNewPgGrp ) ? 'New Page/Intercom Group Created' : 'Page/Intercom Group Updated';
@@ -336,10 +336,10 @@ var localajaxinit = function(){
 		var d = context2json ({ filename: 'extensions.conf' , context: ASTGUI.contexts.PageAnExtension , usf: 0 });
 		var i = d.length;
 		while (i--) {
-			if( d[i].endsWith('|q)') ){
+			if( d[i].endsWith(',q)') ){
 				ASTGUI.updateFieldToValue( 'text_prefix_paging' , ASTGUI.parseContextLine.getExten(d[i]).lChop('_').withOut('X') );
 			}
-			if( d[i].endsWith('|qd)') ){
+			if( d[i].endsWith(',qd)') ){
 				ASTGUI.updateFieldToValue( 'text_prefix_intercom' , ASTGUI.parseContextLine.getExten(d[i]).lChop('_').withOut('X') );
 			}
 		}
@@ -358,8 +358,8 @@ var save_TAB_paging_settings = function(){
 
 
 var save_TAB_page_anExtension = function(){
-	// exten => _**XXXX,1,Macro(pagingintercom|Local/${EXTEN:2}|q)		// text_prefix_paging
-	// exten => _*#XXXX,1,Macro(pagingintercom|Local/${EXTEN:2}|qd)		// text_prefix_intercom
+	// exten => _**XXXX,1,Macro(pagingintercom,Local/${EXTEN:2},q)		// text_prefix_paging
+	// exten => _*#XXXX,1,Macro(pagingintercom,Local/${EXTEN:2},qd)		// text_prefix_intercom
 	// parent.sessionData.GUI_PREFERENCES.ue_start
 
 	var TMP_CONTEXT = ASTGUI.contexts.PageAnExtension ;
@@ -371,12 +371,12 @@ var save_TAB_page_anExtension = function(){
 	var u = new listOfSynActions('extensions.conf');
 
 	if( tmp_text_prefix_paging ){
-		var pg_exten = '_' + tmp_text_prefix_paging + tmp_X + ',1,Macro(pagingintercom|Local/${EXTEN:' + tmp_text_prefix_paging.length + '}|q)' ;
+		var pg_exten = '_' + tmp_text_prefix_paging + tmp_X + ',1,Macro(pagingintercom,Local/${EXTEN:' + tmp_text_prefix_paging.length + '},q)' ;
 		u.new_action('append', TMP_CONTEXT , 'exten', pg_exten );
 	}
 
 	if( tmp_text_prefix_intercom ){
-		var itcom_exten = '_' + tmp_text_prefix_intercom + tmp_X + ',1,Macro(pagingintercom|Local/${EXTEN:' + tmp_text_prefix_intercom.length + '}|qd)' ;
+		var itcom_exten = '_' + tmp_text_prefix_intercom + tmp_X + ',1,Macro(pagingintercom,Local/${EXTEN:' + tmp_text_prefix_intercom.length + '},qd)' ;
 		u.new_action('append', TMP_CONTEXT , 'exten', itcom_exten );
 	}
 
