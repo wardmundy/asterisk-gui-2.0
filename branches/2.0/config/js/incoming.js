@@ -68,7 +68,7 @@ var incomingRules_MiscFunctions = {
 		ASTGUI.updateFieldToValue( 'edit_itrl_pattern', ASTGUI.parseContextLine.getExten( EDIT_CONTEXT_IR_LINE ) );
 
 		$('.localext_byDid').hide();
-		if( EDIT_CONTEXT_IR_LINE.contains(',1,Goto(default|${EXTEN') ){
+		if( EDIT_CONTEXT_IR_LINE.contains(',1,Goto(default,${EXTEN') ){
 			$('.localext_byDid').show();
 			ASTGUI.updateFieldToValue( 'edit_itrl_dest', 'ByDID' );
 			var tmp_ldp = EDIT_CONTEXT_IR_LINE.betweenXY('{','}').lChop('EXTEN').lChop(':') ;
@@ -182,7 +182,7 @@ var incomingRules_MiscFunctions = {
 
 				// If is a TimeInterval Context
 				if( did_this_rule.beginsWith( 'include=' ) && did_this_rule.contains( '_' + ASTGUI.contexts.TimeIntervalPrefix ) ){
-					var THIS_TRUNK_TIMEFRAME_CONTEXT = did_this_rule.betweenXY('=', '|');
+					var THIS_TRUNK_TIMEFRAME_CONTEXT = did_this_rule.betweenXY('=', ',');
 					var THIS_TIMEFRAME = THIS_TRUNK_TIMEFRAME_CONTEXT.lChop( ASTGUI.contexts.TrunkDIDPrefix + this_trunk + '_' + ASTGUI.contexts.TimeIntervalPrefix );
 					if( ! EX_CF.hasOwnProperty( THIS_TRUNK_TIMEFRAME_CONTEXT ) ){ return ; }
 
@@ -363,7 +363,7 @@ var incomingRules_MiscFunctions = {
 
 			if( ASTGUI.getFieldValue('edit_itrl_dest') == 'ByDID' ){
 				var tmp_didXdigits = ASTGUI.getFieldValue('edit_itrl_LocalDest_Pattern') || '0' ;
-				var this_ActualRule = TMP_NEW_PATTERN + ',1,Goto(default|${EXTEN:'+  tmp_didXdigits + '}|1)';
+				var this_ActualRule = TMP_NEW_PATTERN + ',1,Goto(default,${EXTEN:'+  tmp_didXdigits + '},1)';
 			}else{
 				var this_ActualRule = TMP_NEW_PATTERN + ',1,' + ASTGUI.getFieldValue('edit_itrl_dest') ;
 			}
@@ -373,7 +373,7 @@ var incomingRules_MiscFunctions = {
 
 			if( this_tiName ){ // if 'new Incoming Rule' & a Time Interval is chosen
 				var thisRule_context = ASTGUI.contexts.TrunkDIDPrefix + this_trunk + '_' + ASTGUI.contexts.TimeIntervalPrefix + this_tiName ;
-				var NEWTF_INCLUDE_STR = 'include=' + thisRule_context + '|${' + ASTGUI.contexts.TimeIntervalPrefix + this_tiName + '}' ;
+				var NEWTF_INCLUDE_STR = 'include=' + thisRule_context + ',${' + ASTGUI.contexts.TimeIntervalPrefix + this_tiName + '}' ;
 
 				if( EX_CF.hasOwnProperty(thisRule_context) && EX_CF[thisRule_context].indexOfLike('exten=' + TMP_NEW_PATTERN + ',') != -1 ){
 					parent.ASTGUI.dialog.hide();
@@ -477,7 +477,7 @@ var incomingRules_MiscFunctions = {
 
 			if( ASTGUI.getFieldValue('edit_itrl_dest') == 'ByDID' ){
 				var tmp_didXdigits = ASTGUI.getFieldValue('edit_itrl_LocalDest_Pattern') || '0' ;
-				var this_ActualRule = ASTGUI.getFieldValue('edit_itrl_pattern') + ',' + pp  + ',Goto(default|${EXTEN:'+ tmp_didXdigits + '}|1)';
+				var this_ActualRule = ASTGUI.getFieldValue('edit_itrl_pattern') + ',' + pp  + ',Goto(default,${EXTEN:'+ tmp_didXdigits + '},1)';
 			}else{
 				var this_ActualRule = ASTGUI.getFieldValue('edit_itrl_pattern') + ',' + pp  + ',' + ASTGUI.getFieldValue('edit_itrl_dest') ;
 			}
