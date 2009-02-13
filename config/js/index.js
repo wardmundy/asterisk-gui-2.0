@@ -110,13 +110,10 @@ var onLogInFunctions = {
 			// ??
 		}else{
 			var resp_lower = resp.toLowerCase();
-			if(  resp_lower.contains("branches/1.4")  || resp_lower.contains("asterisk/1.4") ||  resp_lower.contains("svn-branch-1.4") ) {
-				sessionData.PLATFORM.isAST_1_4 = true ;
-				sessionData.PLATFORM.isAST_1_6 = false ;
-			}else if ( resp_lower.contains("branches/1.6")  || resp_lower.contains("asterisk/1.6") ||  resp_lower.contains("svn-branch-1.6") ||  resp_lower.contains("svn-trunk-")  ){
+			if ( resp_lower.contains("branches/1.6")  || resp_lower.contains("asterisk/1.6") ||  resp_lower.contains("svn-branch-1.6") ||  resp_lower.contains("svn-trunk-")  ){
 				sessionData.PLATFORM.isAST_1_4 = false ;
 				sessionData.PLATFORM.isAST_1_6 = true ;
-			}else {
+			} else { /* if system is either 1.4 or unknown */
 				sessionData.PLATFORM.isAST_1_4 = true ;
 				sessionData.PLATFORM.isAST_1_6 = false ;
 			}
