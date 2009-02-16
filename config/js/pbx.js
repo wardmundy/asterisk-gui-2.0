@@ -20,7 +20,7 @@
  */
 
 // this file is intended to be included in index.html only
-// all the functions listed here usally updates the sessionData object in index.html
+// all the functions listed here usually updates the sessionData object in index.html
 // if you are including this file in an iframe page - you are probably doing something wrong
 
 readcfg = {	// place where we tell the framework how and what to parse/read from each config file
