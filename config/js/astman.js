@@ -1501,22 +1501,39 @@ var ASTGUI = {
 			return ext.isValueInBetween(v, w);
 		},
 
-		AMPM_to_asteriskTime: function(ampmTime){ // takes ampmTime as '12:15 AM' or '11:45 PM' and returns '00:15' or '23:45'
-			//ASTGUI.miscFunctions.AMPM_to_asteriskTime('12:15 AM');
-			if( ampmTime.endsWith(' PM') ){
-				var a = ampmTime.withOut(' PM');
-				var tmp = a.split(':') ;
-				var hour = Number(tmp[0]);
-				return (hour == 12) ? hour + ':' + tmp[1] : ( hour + 12 ) + ':' + tmp[1] ;
+		/* ampmTime should be in "HH:MM [AM|PM]" */
+		AMPM_to_asteriskTime: function(ampmTime){
+			var pattern = /^\s*(\d{1,2}):(\d{2})(\s?(AM|am|PM|pm))?\s*$/;
+
+			var match = ampmTime.match(pattern);
+			if (match == null) {
+				ASTGUI.Log.Debug('ampmTime is not in a valid format.');
+				return '';
 			}
 
-			if( ampmTime.endsWith(' AM') ){
-				var a = ampmTime.withOut(' AM');
-				var tmp = a.split(':') ;
-				var hour = Number(tmp[0]);
-				return ( hour == 12 ) ? '00:' + tmp[1]  : tmp[0] + ':' + tmp[1] ;
+			hour = parseInt(match[1],10);
+			minute = parseInt(match[2], 10);
+			//match[3] is the whitespace plus match[4]
+			ampm = match[4] || null;
+
+			if (!ampm && hour < 0 || hour > 23) {
+				ASTGUI.Log.Debug('ampmTime must have its hour inbetween 0 and 23.');
+				return '';
+			} else if (ampm && hour < 0 || hour > 12) {
+				ASTGUI.Log.Debug('ampmTime must have its hour inbetween 0 and 12 if "AM|PM" exists');
+				return '';
+			} else if (ampm) {
+				if (ampm.match('[pP][mM]')) {
+					hour+=12;
+				}
 			}
-			return '';
+
+			if (minute < 0 || minute > 60) {
+				ASTGUI.Log.Debug('ampmTime must have its minute inbetween 0 and 60');
+				return '';
+			}
+
+			return hour + ':' + minute;
 		},
 		
 		asteriskTime_to_AMPM: function(atime){ // takes atime as '00:15' or '23:45' and returns '12:15 AM' or '11:45PM'
