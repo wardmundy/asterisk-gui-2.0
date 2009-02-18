@@ -1,0 +1,98 @@
+	    -------------------------------------
+	    == Asterisk-Gui Coding Assumptions ==
+	    -------------------------------------
+  This document is created with the intentions of helping those using the GUI (most likely trying to smoothly integrate) understand the rules the GUI uses in playing with Asterisk. 
+
+I. STARTUP
+  There are a few places that the GUI checks/updates when it is first loaded.
+	1. ASTERISK.CONF
+	  The GUI loads asterisk.conf and attempts to use the directories set in that config file before assigning the default directory values listed below:
+		- asteriskConfig = /etc/asterisk/
+		- astvarlibdir = /var/lib/asterisk/
+		- AGIBIN = /var/lib/asterisk/agi-bin/
+		- astspooldir = /var/spool/asterisk/
+
+	2. DEFAULT CONTEXTS IN EXTENSIONS.CONF 
+	  The GUI creates a few default dialplan contexts. On every load of the GUI it checks the contexts to verify that they match what is hardcoded in readcfg's checkEssentials function in config/js/pbx.js. If there exists any differences, the GUI overwrites what is in extensions.conf matching it with what is hardcoded in javascript. The following is a list of the contexts and the hardcoded values in javascript:
+		- [macro-stdexten]
+			exten=s,1,Set(__DYNAMIC_FEATURES=${FEATURES})
+			exten=s,2,GotoIf($["${FOLLOWME_${ARG1}}" = "1"]?5:3)
+			exten=s,3,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})
+			exten=s,4,Goto(s-${DIALSTATUS},1)
+			exten=s,5,Macro(stdexten-followme,${ARG1},${ARG2})
+			exten=s-NOANSWER,1,Voicemail(${ARG1},u)
+			exten=s-NOANSWER,2,Goto(default,s,1)
+			exten=s-BUSY,1,Voicemail(${ARG1},b)
+			exten=s-BUSY,2,Goto(default,s,1)
+			exten=_s-.,1,Goto(s-NOANSWER,1)
+			exten=a,1,VoicemailMain(${ARG1})
+		- [macro-stdexten-followme]
+			exten=s,1,Answer
+			exten=s,2,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})
+			exten=s,3,Set(__FMCIDNUM=${CALLERID(num)})
+			exten=s,4,Set(__FMCIDNAME=${CALLERID(name)})
+			exten=s,5,Followme(${ARG1},${FOLLOWMEOPTIONS})
+			exten=s,6,Voicemail(${ARG1},u)
+			exten=s-NOANSWER,1,Voicemail(${ARG1},u)
+			exten=s-BUSY,1,Voicemail(${ARG1},b)
+			exten=s-BUSY,2,Goto(default,s,1)
+			exten=_s-.,1,Goto(s-NOANSWER,1)
+			exten=a,1,VoicemailMain(${ARG1})
+		- [macro-pagingintercom]
+			exten=s,1,SIPAddHeader(Alert-Info: ${PAGING_HEADER})
+			exten=s,2,Page(${ARG1}|${ARG2})
+			exten=s,3,Hangup
+		- [asterisk_guitools] (Its actually the javascript variable: ASTGUI.contexts.guitools defined in config/js/astman.js, this is just the hardcoded value for that var)
+			exten=executecommand,1,System(${command})
+			exten=executecommand,n,Hangup()
+			exten=record_vmenu,1,Answer
+			exten=record_vmenu,n,Playback(vm-intro)
+			exten=record_vmenu,n,Record(${var1})
+			exten=record_vmenu,n,Playback(vm-saved)
+			exten=record_vmenu,n,Playback(vm-goodbye)
+			exten=record_vmenu,n,Hangup
+			exten=play_file,1,Answer
+			exten=play_file,n,Playback(${var1})
+			exten=play_file,n,Hangup
+		- [macro-trunkdial-failover-0.3] (Again, this is actually: 'macro-' + ASTGUI.contexts.dialtrunks, which is defined in config/js/astman.js)
+			exten=s,1,GotoIf($[${LEN(${FMCIDNUM})} > 6]?1-fmsetcid,1)
+			exten=s,2,GotoIf($[${LEN(${GLOBAL_OUTBOUNDCIDNAME})} > 1]?1-setgbobname,1)
+			exten=s,3,Set(CALLERID(num)=${IF($[${LEN(${CID_${CALLERID(num)}})} > 2]?${CID_${CALLERID(num)}}:)})
+			exten=s,n,GotoIf($[${LEN(${CALLERID(num)})} > 6]?1-dial,1)
+			exten=s,n,Set(CALLERID(all)=${IF($[${LEN(${CID_${ARG3}})} > 6]?${CID_${ARG3}}:${GLOBAL_OUTBOUNDCID})})
+			exten=s,n,Goto(1-dial,1)
+			exten=1-setgbobname,1,Set(CALLERID(name)=${GLOBAL_OUTBOUNDCIDNAME})
+			exten=1-setgbobname,n,Goto(s,3)
+			exten=1-fmsetcid,1,Set(CALLERID(num)=${FMCIDNUM})
+			exten=1-fmsetcid,n,Set(CALLERID(name)=${FMCIDNAME})
+			exten=1-fmsetcid,n,Goto(1-dial,1)
+			exten=1-dial,1,Dial(${ARG1})
+			exten=1-dial,n,Gotoif(${LEN(${ARG2})} > 0 ?1-${DIALSTATUS},1:1-out,1)
+			exten=1-CHANUNAVAIL,1,Dial(${ARG2})
+			exten=1-CHANUNAVAIL,n,Hangup()
+			exten=1-CONGESTION,1,Dial(${ARG2})
+			exten=1-CONGESTION,n,Hangup()
+			exten=1-out,1,Hangup()
+
+II. TRUNKS
+	1. NAMES
+	  When saving a VoIP trunk in edit_VOIPTrunk_save_go() of config/js/trunks_voip.js, the name must test against the regular expression, /[^a-zA-Z0-9\.]/. This rule isn't actually enforced, but the user must explicitly accept on each save that this is acknowledged.
+
+	2. USERS.CONF
+	  When saving a VoIP trunk to users.conf, the trunk name is saved under a metadata category called 'trunkname' and the context is named 'trunk_X' where X is the next open numerical integer in the trunk array. Its important to note that if you have a trunk_1, and trunk_3 (because trunk_2 was deleted after trunk_3 was created), a new trunk will be trunk_2 not trunk_4.
+
+	3. EXTENSIONS.CONF
+	  When saving a trunk to extensions.conf, two things happen: (1) a global variable is created in the [globals] context called trunk_X with the dial info (SIP/trunk_1, for example), and (2) two contexts are created, DID_trunk_X and DID_trunk_X_default. DID_trunk_X is defaulted to include DID_trunk_X_default. DID_trunk_X_default is default as empty.
+
+	4. OUTGOING CALLING RULES
+	  Outgoing calling rules that go to Trunks, using trunkdial-failover or not, are saved as a context with a Macro call to trunkdial-failover-0.3. The following is an example of both scenarios:
+		(1) With Failover
+			exten = 6011,1,Macro(trunkdial-failover-0.3,${trunk_3}/1${EXTEN:1},${trunk_1}/1${EXTEN:1},trunk_3,trunk_1)
+		(2) Without Failover
+			exten = 432,1,Macro(trunkdial-failover-0.3,${trunk_3}/1${EXTEN:1},,trunk_3,)
+
+III. USERS
+	1. USERS.CONF
+	  All users are stored in the users.conf config file. There are no special naming schemes, however it is important to note that since both trunks (including providers) and users are stored in users.conf the GUI differentiates them with the following rules:
+		(1) Trunks have the following conditions: hasexten and hasexten==no
+		(2) Users have the following conditions: context name doesn't begin with 'span_' or 'trunk_'
