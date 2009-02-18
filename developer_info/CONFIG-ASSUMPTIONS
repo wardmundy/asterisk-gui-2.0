@@ -74,7 +74,11 @@ I. STARTUP
 			exten=1-CONGESTION,n,Hangup()
 			exten=1-out,1,Hangup()
 
-II. TRUNKS
+II. TIME INTERVALS
+	1. EXTENSIONS.CONF
+	  When a time interval is saved to extensions.conf, its assumed that the variable follows this naming convention: "timeinterval_"+name.
+
+III. TRUNKS
 	1. NAMES
 	  When saving a VoIP trunk in edit_VOIPTrunk_save_go() of config/js/trunks_voip.js, the name must test against the regular expression, /[^a-zA-Z0-9\.]/. This rule isn't actually enforced, but the user must explicitly accept on each save that this is acknowledged.
 
@@ -91,7 +95,7 @@ II. TRUNKS
 		(2) Without Failover
 			exten = 432,1,Macro(trunkdial-failover-0.3,${trunk_3}/1${EXTEN:1},,trunk_3,)
 
-III. USERS
+IV. USERS
 	1. USERS.CONF
 	  All users are stored in the users.conf config file. There are no special naming schemes, however it is important to note that since both trunks (including providers) and users are stored in users.conf the GUI differentiates them with the following rules:
 		(1) Trunks have the following conditions: hasexten and hasexten==no
