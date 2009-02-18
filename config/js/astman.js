@@ -1516,10 +1516,10 @@ var ASTGUI = {
 			//match[3] is the whitespace plus match[4]
 			ampm = match[4] || null;
 
-			if (!ampm && hour < 0 || hour > 23) {
+			if (!ampm && (hour < 0 || hour > 23)) {
 				ASTGUI.Log.Debug('ampmTime must have its hour inbetween 0 and 23.');
 				return '';
-			} else if (ampm && hour < 0 || hour > 12) {
+			} else if (ampm && (hour < 0 || hour > 12)) {
 				ASTGUI.Log.Debug('ampmTime must have its hour inbetween 0 and 12 if "AM|PM" exists');
 				return '';
 			} else if (ampm) {
@@ -1527,10 +1527,10 @@ var ASTGUI = {
 					hour+=12;
 				}
 			}
-			hour = hour < 10 ? hour.addZero() : hour;
+			hour = (hour < 10) ? hour.addZero() : hour;
 
-			if (minute < 0 || minute > 60) {
-				ASTGUI.Log.Debug('ampmTime must have its minute inbetween 0 and 60');
+			if (minute < 0 || minute > 59) {
+				ASTGUI.Log.Debug('ampmTime must have its minute inbetween 0 and 59');
 				return '';
 			}
 			minute = minute < 10 ? minute.addZero() : minute;
