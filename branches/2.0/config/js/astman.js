@@ -1527,11 +1527,13 @@ var ASTGUI = {
 					hour+=12;
 				}
 			}
+			hour = hour < 10 ? hour.addZero() : hour;
 
 			if (minute < 0 || minute > 60) {
 				ASTGUI.Log.Debug('ampmTime must have its minute inbetween 0 and 60');
 				return '';
 			}
+			minute = minute < 10 ? minute.addZero() : minute;
 
 			return hour + ':' + minute;
 		},
@@ -1556,10 +1558,10 @@ var ASTGUI = {
 		},
 
 		GotoIftime_in_humanReadable: function( gotoiftime_str ){ 
-			//ASTGUI.miscFunctions.GotoIftime_in_humanReadable( '08:00-17:00|mon-fri|*|*' ) ; // returns a human readable form as ' 8 AM to 5 PM on Monday through Friday'
+			//ASTGUI.miscFunctions.GotoIftime_in_humanReadable( '08:00-17:00,mon-fri,*,*' ) ; // returns a human readable form as ' 8 AM to 5 PM on Monday through Friday'
 			var WEEKDAYS = {mon: 'Monday', tue: 'Tuesdays', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat:'Saturday', sun:'Sunday'};
 
-			var PIECES = gotoiftime_str.split('|') ;
+			var PIECES = gotoiftime_str.split(',') ;
 			var toreturn = [];
 			if( PIECES[0] != '*' ){
 				toreturn.push( ASTGUI.miscFunctions.asteriskTime_to_AMPM(PIECES[0].split('-')[0]) + ' to ' +  ASTGUI.miscFunctions.asteriskTime_to_AMPM(PIECES[0].split('-')[1]) );
@@ -1657,7 +1659,7 @@ var ASTGUI = {
 		},
 
 		getArgs: function(q){ // ASTGUI.parseContextLine.getArgs();
-			// expects  q  as 'exten=s,2,foo(ssssssss,ssdsd,assd)' OR 's,2,foo(ssssssss,ssdsd,assd)' OR 's,2,foo(ssssssss|ssdsd|assd)'
+			// expects  q  as 'exten=s,2,foo(ssssssss,ssdsd,assd)' OR 's,2,foo(ssssssss,ssdsd,assd)' OR 's,2,foo(ssssssss,ssdsd,assd)'
 			// OR 's,1,Answer' OR 's,n,Hangup'
 			// and   returns [ssssssss,ssdsd,assd] or [] // arguments as an array 
 			if (typeof q != 'string' || !q ) return [];
@@ -1672,10 +1674,10 @@ var ASTGUI = {
 			return this.getArgsArrayFromArgsString(x);
 		},
 
-		getArgsArrayFromArgsString: function(x){ // expects x as 'context,exten,pri' or 'context|exten|pri'
+		getArgsArrayFromArgsString: function(x){ // expects x as 'context,exten,pri' or 'context,exten,pri'
 			if (typeof x != 'string') return [];
-			if(x.contains('|') ){
-				return x.split('|');
+			if(x.contains(',') ){
+				return x.split(',');
 			}
 			if(x.contains(',') ){
 				return x.split(',');
@@ -1683,7 +1685,7 @@ var ASTGUI = {
 			return [x] ;
 		},
 
-		getArgsArrayFrom_AppWithArgs_String: function(x){ // expects x as 'goto(context,exten,pri)' or 'goto(context|exten|pri)'
+		getArgsArrayFrom_AppWithArgs_String: function(x){ // expects x as 'goto(context,exten,pri)' or 'goto(context,exten,pri)'
 			// usage : ASTGUI.parseContextLine.getArgsArrayFrom_AppWithArgs_String(x)
 			if (typeof x != 'string') return [];
 			if( !x.contains('(') ) {
@@ -1695,7 +1697,7 @@ var ASTGUI = {
 		},
 
 		toKnownContext: function(args){  // usage ASTGUI.parseContextLine.toKnownContext(y)
-			// converts args to a readable format - ex: default|6000|1 to 'user 6000'
+			// converts args to a readable format - ex: default,6000,1 to 'user 6000'
 			if(!args.length){ return ''; }
 			try{
 			if(typeof args == 'string'){
@@ -1747,7 +1749,7 @@ var ASTGUI = {
 		},
 
 		showAs : function(q){ // ASTGUI.parseContextLine.showAs(line)
-			// expects q as 'extension,priority,Goto(context|extension|1)' or 'Goto(context|extension|1)' or 'Goto(context,extension,1)'
+			// expects q as 'extension,priority,Goto(context,extension,1)' or 'Goto(context,extension,1)' or 'Goto(context,extension,1)'
 			// or 'extensions,priority,Hangup'
 			// returns - "User extension" or 'VoiceMenu extension' or 'Hangup' or 'Busy' or some string - depends on q.
 			// use this when you want to represent the action to the user
@@ -2003,7 +2005,7 @@ var ASTGUI = {
 	selectbox: {
 		selectDestinationOption: function(el, dest){ // ASTGUI.selectbox.selectDestinationOption(el,dest)
 			// selects a given destination 'dest' in select box el
-			// dest could be 'context|extention|priority' or 'context,etension,priority' or 'goto(context,etension,priority)' or 's,n,goto(context,etension,priority)'
+			// dest could be 'context,extention,priority' or 'context,etension,priority' or 'goto(context,etension,priority)' or 's,n,goto(context,etension,priority)'
 			//console.log('We are looking for "' + dest + ' " in the selectbox');
 			var args = [];
 			if ( typeof el == 'string'){
@@ -2041,9 +2043,9 @@ var ASTGUI = {
 				}
 			}
 
-			var args_v = args.join('|') ;
+			var args_v = args.join(',') ;
 			var args_c = args.join(',') ;
-			var dest_args_v = 'Goto('+ args.join('|') + ')';
+			var dest_args_v = 'Goto('+ args.join(',') + ')';
 			var dest_args_c = 'Goto('+ args.join(',') + ')' ;
 
 			for( var i=0, j = el.options.length ; i < j ; i++ ){
