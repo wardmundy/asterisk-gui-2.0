@@ -179,7 +179,7 @@
 <script src="js/jquery.date_input.js"></script>
 <script src="js/jquery.autocomplete.js"></script>
 <script type="text/javascript">
-var localajaxinit = function(){
+$(document).ready( function() {
 	top.document.title = 'Manage Time Intervals' ;
 	TI_LIST = parent.miscFunctions.getTimeIntervals();
 	ti_miscFunctions.showTable();
@@ -193,7 +193,7 @@ var localajaxinit = function(){
 
 	ASTGUI.events.add( 'ti_type_byGroupofDates', 'click' , function(){ _$('ti_type_byDayofWeek').updateStatus(); } ); 
 	ASTGUI.events.add( 'ti_type_byDayofWeek', 'click' , function(){ _$('ti_type_byGroupofDates').updateStatus(); } );
-};
+});
 </script>
 </body>
 </html>
