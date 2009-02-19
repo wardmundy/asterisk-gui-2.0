@@ -242,20 +242,3 @@ var ti_miscFunctions = {
 		}}
 	}
 };
-
-
-var localajaxinit = function(){
-	top.document.title = 'Manage Time Intervals' ;
-	TI_LIST = parent.miscFunctions.getTimeIntervals();
-	ti_miscFunctions.showTable();
-
-	ASTGUI.COMBOBOX.call( _$('edit_ti_starttime') , RMP_TBR_timeIntervals , 95 );
-	ASTGUI.COMBOBOX.call( _$('edit_ti_endtime') , RMP_TBR_timeIntervals , 95 );
-
-	ASTGUI.domActions.enableDisableByCheckBox ('ti_type_byGroupofDates', ['edit_ti_from_date', 'edit_ti_month']);
-	ASTGUI.domActions.enableDisableByCheckBox ('ti_type_byDayofWeek', ['edit_ti_dayofweek_start', 'edit_ti_dayofweek_end']);
-	ASTGUI.domActions.enableDisableByCheckBox ('edit_ti_entireday', ['edit_ti_starttime', 'edit_ti_endtime'] , true); // _$('edit_ti_entireday').updateStatus();
-
-	ASTGUI.events.add( 'ti_type_byGroupofDates', 'click' , function(){ _$('ti_type_byDayofWeek').updateStatus(); } ); 
-	ASTGUI.events.add( 'ti_type_byDayofWeek', 'click' , function(){ _$('ti_type_byGroupofDates').updateStatus(); } );
-};

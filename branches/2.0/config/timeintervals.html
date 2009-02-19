@@ -21,12 +21,6 @@
 -->
 <html>
 <head>
-<script src="js/jquery.js"></script>
-<script src="js/astman.js"></script>
-<script src="js/timeintervals.js"></script>
-<script src="js/jquery.tooltip.js"></script>
-<script src="js/jquery.date_input.js"></script>
-<script src="js/jquery.autocomplete.js"></script>
 <link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
 <style type="text/css">
 
@@ -178,5 +172,28 @@
 
 </div>
 
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<script src="js/timeintervals.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<script src="js/jquery.date_input.js"></script>
+<script src="js/jquery.autocomplete.js"></script>
+<script type="text/javascript">
+var localajaxinit = function(){
+	top.document.title = 'Manage Time Intervals' ;
+	TI_LIST = parent.miscFunctions.getTimeIntervals();
+	ti_miscFunctions.showTable();
+
+	ASTGUI.COMBOBOX.call( _$('edit_ti_starttime') , RMP_TBR_timeIntervals , 95 );
+	ASTGUI.COMBOBOX.call( _$('edit_ti_endtime') , RMP_TBR_timeIntervals , 95 );
+
+	ASTGUI.domActions.enableDisableByCheckBox ('ti_type_byGroupofDates', ['edit_ti_from_date', 'edit_ti_month']);
+	ASTGUI.domActions.enableDisableByCheckBox ('ti_type_byDayofWeek', ['edit_ti_dayofweek_start', 'edit_ti_dayofweek_end']);
+	ASTGUI.domActions.enableDisableByCheckBox ('edit_ti_entireday', ['edit_ti_starttime', 'edit_ti_endtime'] , true); // _$('edit_ti_entireday').updateStatus();
+
+	ASTGUI.events.add( 'ti_type_byGroupofDates', 'click' , function(){ _$('ti_type_byDayofWeek').updateStatus(); } ); 
+	ASTGUI.events.add( 'ti_type_byDayofWeek', 'click' , function(){ _$('ti_type_byGroupofDates').updateStatus(); } );
+};
+</script>
 </body>
 </html>
