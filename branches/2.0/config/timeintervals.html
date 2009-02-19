@@ -91,25 +91,25 @@
 
 
 <div id="div_ti_edit" STYLE="width:610; height:300;display:none;" class='dialog'>
-	<TABLE width="100%" cellpadding=0 cellspacing=0>
-	<TR class="dialog_title_tr">
-		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);">
-			<span id="div_ti_edit_title"></span></TD>
-		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
-	</TR>
-	</TABLE>
+	<table width="100%" cellpadding=0 cellspacing=0>
+	<tr class="dialog_title_tr">
+		<td class="dialog_title" onmousedown="ASTGUI.startDrag(event);">
+			<span id="div_ti_edit_title"></span></td>
+		<td class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </td>
+	</tr>
+	</table>
 
-	<TABLE	align=center cellpadding=2 cellspacing=2 border=0 width='100%' bgcolor='#FAF7F1'>
-	<TR>	<TD align="right"><nobr>Time Interval Name :</nobr></TD>
-		<TD><input id='edit_ti_name' size=32 validation='alphanumeric' required=yes></TD>
-	</TR>
-	<TR>	<TD align="right">
+	<table	align=center cellpadding=2 cellspacing=2 border=0 width='100%' bgcolor='#FAF7F1'>
+	<tr>	<td align="right"><nobr>Time Interval Name :</nobr></td>
+		<td><input id='edit_ti_name' size=32 validation='alphanumeric' required=yes></td>
+	</tr>
+	<tr>	<td align="right">
 			<input type="radio" name="titype_radio" id="ti_type_byDayofWeek">
-		</TD>
-		<TD>&nbsp;<LABEL FOR="ti_type_byDayofWeek">By day of week</LABEL></TD>
-	</TR>
-	<TR>	<TD align="right"></TD>
-		<TD>
+		</td>
+		<td>&nbsp;<LABEL FOR="ti_type_byDayofWeek">By day of week</LABEL></td>
+	</tr>
+	<tr>	<td align="right"></td>
+		<td>
 			<select id='edit_ti_dayofweek_start'>
 				<option value='mon'>Mon</option>
 				<option value='tue'>Tue</option>
@@ -129,15 +129,15 @@
 				<option value='sat'>Sat</option>
 				<option value='sun'>Sun</option>
 			</select>
-		</TD>
-	</TR>
-	<TR>	<TD align="right">
+		</td>
+	</tr>
+	<tr>	<td align="right">
 			<input type="radio" name="titype_radio" id="ti_type_byGroupofDates">
-		</TD>
-		<TD>&nbsp;<LABEL FOR="ti_type_byGroupofDates">By Days of a Month</LABEL></TD>
-	</TR>
-	<TR>	<TD></TD>
-		<TD>
+		</td>
+		<td>&nbsp;<LABEL FOR="ti_type_byGroupofDates">By Days of a Month</LABEL></td>
+	</tr>
+	<tr>	<td></td>
+		<td>
 			Date : <input size=5 id="edit_ti_from_date" class="input8">
 			Month : <select id='edit_ti_month'>
 					<option value='jan'>January</option>
@@ -155,26 +155,26 @@
 					<option value='*'>All</option>
 				</select>
 
-		</TD>
-	</TR>
-	<TR>	<TD align="right" colspan=2 height=10> </TD>	</TR>
-	<TR>	<TD align="right"><b>Time: </b></TD>
-		<TD>&nbsp;<label><input type=checkbox id='edit_ti_entireday'> Entire Day</label></TD>
-	</TR>
-	<TR>	<TD align="right"></TD>
-		<TD>&nbsp;Start Time : <input size=8 id="edit_ti_starttime" class="input8">&nbsp;End Time : <input size=8 id="edit_ti_endtime" class="input8"></TD>
-	</TR>
-	<TR>	<TD align="right" colspan=2 height=10>		</TD>	</TR>
-	</TABLE>
+		</td>
+	</tr>
+	<tr>	<td align="right" colspan=2 height=10> </td>	</tr>
+	<tr>	<td align="right"><b>Time: </b></td>
+		<td>&nbsp;<label><input type=checkbox id='edit_ti_entireday'> Entire Day</label></td>
+	</tr>
+	<tr>	<td align="right"></td>
+		<td>&nbsp;Start Time : <input size=8 id="edit_ti_starttime" class="input8">&nbsp;End Time : <input size=8 id="edit_ti_endtime" class="input8"></td>
+	</tr>
+	<tr>	<td align="right" colspan=2 height=10>		</td>	</tr>
+	</table>
 
-	<TABLE	align=center cellpadding=1 cellspacing=1 border=0 width='100%'>
-	<TR>	<TD>&nbsp;</td> </TR>
-	<TR>	<TD align=center valign=middle>
+	<table	align=center cellpadding=1 cellspacing=1 border=0 width='100%'>
+	<tr>	<td>&nbsp;</td> </tr>
+	<tr>	<td align=center valign=middle>
 			<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
 			<span class='guiButtonEdit' onclick='ti_miscFunctions.update_TI();' >Update</span>
-		</TD>
-	</TR>
-	</TABLE>
+		</td>
+	</tr>
+	</table>
 
 </div>
 
