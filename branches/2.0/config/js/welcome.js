@@ -64,7 +64,7 @@ var loadTrunks = function() {
 		addCell( newRow , { html: parent.sessionData.pbxinfo['trunks']['analog'][item]['trunkname'] } );
 		addCell( newRow , { html:'Analog'} );
 		addCell( newRow , { html:''} );
-		addCell( newRow , { html:'Ports ' + parent.sessionData.pbxinfo['trunks']['analog'][item]['zapchan'] } );
+		addCell( newRow , { html:'Ports ' + parent.sessionData.pbxinfo['trunks']['analog'][item][top.sessionData.DahdiChannelString] } );
 	});
 /* End Analog Trunks */
 
