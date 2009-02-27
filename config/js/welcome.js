@@ -589,102 +589,81 @@ manager_events.parseOutput = function(op) {
 
 		switch (event_lines[0].trim()) {
 		case 'event: agentcallbacklogin':
-			var agent = event_lines[1].split(' ')[1];	
-			var loginchan = event_lines[2].split(' ')[1];	
-			this.updateAgent("callbacklogin", agent, loginchan);
+			var eventObj = this.parseEvent(event_lines);
+			this.updateAgent("callbacklogin", eventObj.agent, eventObj.loginchan);
 			break;
 		case 'event: agentcallbacklogoff':
-			var agent = event_lines[1].split(' ')[1];	
-			var loginchan = event_lines[2].split(' ')[1];	
-			this.updateAgent("callbacklogoff", agent, loginchan);
+			var eventObj = this.parseEvent(event_lines);
+			this.updateAgent("callbacklogoff", eventObj.agent, eventObj.loginchan);
 			break;
 		case 'event: extensionstatus':
 			var eventObj = this.parseEvent(event_lines);
-			var exten = eventObj.exten;	//Exten: SIP/6000
-			var context = eventObj.context;	//Context: default
-			var status = eventObj.status;	//Status: 1
-			this.updateExtension(exten.trim(), context, status);
+			this.updateExtension(eventObj.exten.trim(), eventObj.context, eventObj.status);
 			break;
 		case 'event: hangup':
-			/* event_lines[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
-			var exten = event_lines[2].split(' ')[1].split('/')[1].split('-')[0];
-			var context = '';
-			var status = 'hangup';
-			this.updateExtension(exten.trim(),context,status);
+			var eventObj = this.parseEvent(event_lines);
+			/* exten = 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
+			var exten = eventObj.channel.split('/')[1].split('-')[0];
+			this.updateExtension(exten.trim(),'','hangup');
 			break;
 		case 'event: join':
-			/* event_lines[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
-			var exten = event_lines[2].split(' ')[1].split('/')[1].split('-')[0];
-			var cid = event_lines[3].split(' ')[1];
-			var queue = event_lines[5].split(' ')[1];		//Queue: 6501
-			var position = event_lines[6].split(' ')[1];		//Position: 1
-			this.addQueueCall(queue, exten, cid, position);
+			var eventObj = this.parseEvent(event_lines);
+			/* exten = 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
+			var exten = eventObj.channel.split('/')[1].split('-')[0];
+			this.addQueueCall(eventObj.queue, exten, eventObj.callerid, eventObj.position);
 			break;
 		case 'event: leave':
+			var eventObj = this.parseEvent(event_lines);
 			/* event_lines[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
-			var exten = event_lines[2].split(' ')[1].split('/')[1].split('-')[0];
-			var queue = event_lines[3].split(' ')[1];		//Queue: 6501
-			this.removeQueueCall(queue, exten);
+			var exten = eventObj.channel.split('/')[1].split('-')[0];
+			this.removeQueueCall(eventObj.queue, exten);
 			break;
 		case 'event: meetmejoin':
-			var chan = event_lines[2].split(' ')[1];
-			var meetme = event_lines[4].split(' ')[1];
+			var eventObj = this.parseEvent(event_lines);
+			/* event_lines[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
+			var chan = eventObj.channel.split('/')[1].split('-')[0];
 			var usernum = event_lines[5].split(' ')[1];
-			chan = chan.split('/')[1].split('-')[0];	/* SIP/6000-123 */
-
-			this.meetmeJoin(meetme, usernum, chan, 0);
+			this.meetmeJoin(eventObj.meetme, eventObj.usernum, chan, 0);
 			break;
 		case 'event: meetmeleave':
-			var chan = event_lines[2].split(' ')[1];
-			var meetme = event_lines[4].split(' ')[1];
-			var usernum = event_lines[5].split(' ')[1];
-			chan = chan.split('/')[1].split('-')[0];	/* SIP/6000-123 */
-
-			this.meetmeLeave(meetme, usernum, chan);
+			var eventObj = this.parseEvent(event_lines);
+			/* event_lines[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
+			var chan = eventObj.channel.split('/')[1].split('-')[0];
+			this.meetmeLeave(eventObj.meetme, eventObj.usernum, chan);
 			break;
 		case 'event: meetmetalking':
-			var chan = event_lines[2].split(' ')[1];
-			var meetme = event_lines[4].split(' ')[1];
-			var usernum = event_lines[5].split(' ')[1];
-			var status = event_lines[6].split(' ')[1];
-			chan = chan.split('/')[1].split('-')[0];	/* SIP/6000-123 */
-			status = status.toString() == 'on' ? 1: 0;
-
-			this.meetmeTalking(meetme, chan, status);
+			var eventObj = this.parseEvent(event_lines);
+			/* event_lines[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
+			var chan = eventObj.channel.split('/')[1].split('-')[0];
+			status = eventObj.status.toString() == 'on' ? 1: 0;
+			this.meetmeTalking(eventObj.meetme, chan, status);
 			break;
 		case 'event: newchannel':
+			var eventObj = this.parseEvent(event_lines);
 			/* event_lines[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
-			var exten = event_lines[2].split(' ')[1].split('/')[1].split('-')[0];
-			var context = '';
-			var status = event_lines[3].split(' ')[1];	/* State: Ring */
-			this.updateExtension(exten.trim(),context,status);
+			var exten = eventObj.channel.split('/')[1].split('-')[0];
+			this.updateExtension(exten.trim(), '', eventObj.state);
 			break;
 		case 'event: newstate':
+			var eventObj = this.parseEvent(event_lines);
 			/* event_lines[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
-			var exten = event_lines[2].split(' ')[1].split('/')[1].split('-')[0];
-			var context = '';
-			var status = event_lines[3].split(' ')[1];	/* State: Dialing */
-			this.updateExtension(exten.trim(),context,status);
+			var exten = eventObj.channel.split('/')[1].split('-')[0];
+			this.updateExtension(exten.trim(), '', eventObj.state);
 			break;
 		case 'event: parkedcall':
-			var exten = event_lines[2].split(' ')[1];	/* Exten: <parkexten> */
-			var chan = event_lines[3].split(' ')[1];	/* Channel: <channel> */
-			var from = event_lines[4].split(' ')[1];	/* From: <from> */
-			var timeout = event_lines[5].split(' ')[1];	/* Timeout: <timeout> */
-			var cid = event_lines[6].split(' ')[1];	/* CallerID: <cid> */
-			this.parkedCall(exten, chan, from, timeout, cid);
+			var eventObj = this.parseEvent(event_lines);
+			this.parkedCall(eventObj.exten, eventObj.channel, eventObj.from, eventObj,timeout, eventObj.callerid);
 			break;
 		case 'event: parkedcallgiveup':
 		case 'event: parkedcalltimeout':
 		case 'event: unparkedcall':
-			var exten = event_lines[2].split(' ')[1];	/* Exten: <parkexten> */
-			this.unparkedCall(exten);
+			var eventObj = this.parseEvent(event_lines);
+			this.unparkedCall(eventObj.exten);
 			break;
 		case 'event: queuememberstatus':
-			var agent = event_lines[4].split(' ')[1].split('/')[1];	//MemberName: 6000
-			var queue = event_lines[2].split(' ')[1];			//Queue: 6501
-			var status = event_lines[9].split(' ')[1];			//Status: 1
-			this.updateAgent('status_'+status.toString(), agent, queue);
+			var eventObj = this.parseEvent(event_lines);
+			var agent = eventObj.membername.split('/')[1];	//MemberName: 6000
+			this.updateAgent('status_'+eventObj.status.toString(), agent, eventObj.queue);
 			break;
 		case 'event: agentcalled':
 		case 'event: agentcomplete':
