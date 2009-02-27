@@ -276,7 +276,7 @@ var loadQueues = function() {
 
 	$('.queue:not(.template)').remove();
 
-	var queue_status = ASTGUI.cliCommand('show queues');
+	var queue_status = ASTGUI.cliCommand('queue show');
 	queue_status = parent.ASTGUI.parseCLIResponse(queue_status);
 	//ast-gui*CLI> show queues
 	//6501         has 1 calls (max unlimited) in 'ringall' strategy (0s holdtime), W:0, C:0, A:4, SL:0.0% within 0s
