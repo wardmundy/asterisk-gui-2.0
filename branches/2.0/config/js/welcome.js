@@ -872,11 +872,14 @@ manager_events.updateExtension = function(exten, context, status) {
 		break;
 	default:
 		var state = 'Unknown';
-		alert('updateExtension:\r\n'
-			+'status: '+status.toString()+'\r\n'
-			+'exten: '+exten.toString()+'\r\n'
-			+'context: '+context.toString()+'\r\n'
-		);
+		ASTGUI.Log.Debug("updateExtension :: We have encountered an unknown extension state of " + status.toString());
+		if ( top.sessionData.DEBUG_MODE ) {
+			alert('updateExtension:\r\n'
+				+'status: '+status.toString()+'\r\n'
+				+'exten: '+exten.toString()+'\r\n'
+				+'context: '+context.toString()+'\r\n'
+			);
+		}
 		break;
 	}
 
