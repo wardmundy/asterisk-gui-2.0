@@ -132,8 +132,8 @@ var loadExtensions = function() {
 		} else if ( ud.getProperty('hassip').isAstTrue() ) {
 			tmp_usertype_a.push( '&nbsp;SIP User' );
 			new_row.addClass('sip');
-		} else if( ud.getProperty('zapchan') ) {
-			tmp_usertype_a.push( 'Analog User (Port ' + ud['zapchan'] + ')' ) ;
+		} else if( ud.getProperty(top.sessionData.DahdiChannelString) ) {
+			tmp_usertype_a.push( 'Analog User (Port ' + ud[top.sessionData.DahdiChannelString] + ')' ) ;
 			new_row.addClass('analog');
 		}
 
