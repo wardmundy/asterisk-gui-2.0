@@ -596,9 +596,10 @@ manager_events.parseOutput = function(op) {
 			this.updateAgent("callbacklogoff", agent, loginchan);
 			break;
 		case 'event: extensionstatus':
-			var exten = event_lines[2].split(' ')[1];	//Exten: SIP/6000
-			var context = event_lines[3].split(' ')[1];	//Context: default
-			var status = event_lines[4].split(' ')[1];	//Status: 1
+			var eventObj = this.parseEvent(event_lines);
+			var exten = eventObj.exten;	//Exten: SIP/6000
+			var context = eventObj.context;	//Context: default
+			var status = eventObj.status;	//Status: 1
 			this.updateExtension(exten.trim(), context, status);
 			break;
 		case 'event: hangup':
