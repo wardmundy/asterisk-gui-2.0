@@ -581,8 +581,11 @@ manager_events.parseOutput = function(op) {
 		} else if (event.length == 0) {
 			continue;
 		}
+		/* this is used for manager_events.parseEvent() which was
+		 * decided to only be called in the cases that needed to
+		 * have the event parsed. This is for efficiency reasons.
+		 */
 		var event_lines = event.split('\r\n');
-
 
 		switch (event_lines[0].trim()) {
 		case 'event: agentcallbacklogin':
