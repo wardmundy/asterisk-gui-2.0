@@ -1078,10 +1078,12 @@ var after_localajaxinit = function(){
 		if(sessionData.DEBUG_MODE){
 			miscFunctions.DEBUG_START();
 			$(".debugWindow").show();
+			top.session.log = true;
 		}
 		if (top.session.log) {
 			log.init('blah');
 			$(".debugWindow").show();
+			sessionData.DEBUG_MODE = true;
 		}
 	};
 
