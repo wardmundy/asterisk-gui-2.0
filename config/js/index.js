@@ -1079,6 +1079,10 @@ var after_localajaxinit = function(){
 			miscFunctions.DEBUG_START();
 			$(".debugWindow").show();
 		}
+		if (top.session.log) {
+			log.init('blah');
+			$(".debugWindow").show();
+		}
 	};
 
 	ASTGUI.dialog.waitWhile(' Loading ...');

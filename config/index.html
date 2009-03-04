@@ -87,10 +87,11 @@ var sessionData = {
 
 </script>
 <script src="js/jquery.js"></script>
+<script src="js/tooltip.js"></script>
 <script src="js/astman.js"></script>
 <script src="js/pbx.js"></script>
+<script src="js/log.js"></script>
 <script src="js/index.js"></script>
-<script src="js/tooltip.js"></script>
 <head>
 	<title>Asterisk Configuration GUI</title>
 	<link rel="shortcut icon" href="images/favicon.ico" />
@@ -325,4 +326,18 @@ var sessionData = {
 	<div>
 </div>
 
+<script>
+	var session = {
+		debug_log: [],
+		log: true,
+		log_modes: {
+			ajax: true,
+			console: true,
+			debug: true,
+			error: true,
+			info: true,
+			warn: true
+		}
+	};
+</script>
 </body>
