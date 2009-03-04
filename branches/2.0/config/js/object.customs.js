@@ -151,6 +151,35 @@ Array.prototype.withOut = function(e) {
 	return x ;
 };
 
+/******************************************
+ * Custom methods for Javascript's Object
+ *****************************************/
+/**
+ * Get Properties As String.
+ * Gets Object's properties and returns them as a string. Use to be ASTGUI.getObjectPropertiesAsString.
+ * @returns a string of the object's properties
+ */
+Object.prototype.getProperties = function() {
+	var props = [];
+
+	for (var d in this) {
+		if (!this.hasOwnProperty(d)) {
+			continue;
+		}
+
+		if (typeof this[d] === 'object') {
+			if (this[d] instanceof Array) {
+				props.push(d + ': [' + this[d].join(',') + ']');
+			} else {
+				props.push(d + ': ' + this[d].getProperties());
+			}
+		} else {
+			props.push(d + ': ' + this[d]);
+		}
+	}
+	return '{' + props.join(' ,') + '}';
+};
+
 // String Manipulation, and other custom methods for String Objects
 String.prototype.addZero = function(){
 	return ( Number(this) < 10)? "0" + this : this;

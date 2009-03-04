@@ -25,7 +25,9 @@
  * Asterisk Manager object
  * This object contains all the methods and variables necessary to communicate with Asterisk.
  */
-var astman = {};
+var astman = {
+	rawman: '../../rawman' /**< string variable. This holds the HTTP location of rawman. Was formerly named ASTGUI.paths.rawman */
+};
 
 /**
  * Manage Asterisk's Internal Database.
@@ -35,7 +37,7 @@ astman.astdb = {
 	 * Object contain default values.
 	 */
 	defaults: {
-		dbname: "astgui"
+		dbname: 'astgui' /**< string variable. This holds the default dbname. Was formerly named ASTGUI.globals.GUI_DB */ 
 	},
 
 	/**
@@ -78,14 +80,14 @@ astman.astdb = {
 
 			var s = astman.cliCommand('database get ' + k.dbname + ' ' + k.key);
 			if (!s.contains('Value: ')) {
-				throw new Error(astman.parseCLIResponse(s));
+				throw new Error(astman.parseCLI(s));
 			}
 		} catch (err) {
 			log.error(err.message);
 			return null;
 		}
 
-		var val = astman.parseCLIResponse(s);
+		var val = astman.parseCLI(s);
 		val.trim().withOut('Value: ');
 		return val.trim();
 	},
@@ -109,7 +111,7 @@ astman.astdb = {
 				throw new Error(s);
 			}
 		
-			var op = astman.parseCLIResponse(s);
+			var op = astman.parseCLI(s);
 			if (op.trim() === '') {
 				return null;
 			}
@@ -160,4 +162,58 @@ astman.astdb = {
 		}
 		return true;
 	}
+};
+
+/**
+ * Executes a CLI Command.
+ * This function takes a string CLI command and sends it to Asterisk to be executed. This function was formerly named ASTGUI.cliCommand
+ * @param {String} cmd The CLI Command to be executed.
+ * @return the CLI output
+ */
+astman.cliCommand = function(cmd) {
+	if (typeof cmd !== 'string') {
+		log.warn('cliCommand: Expecting cmd as String');
+		return '';
+	}
+
+	log.debug('cliCommand: Executing manager command: "' + cmd + '"');
+	return this.makeSyncRequest( {action: 'command', command: cmd });
+};
+
+/**
+ * Makes a sync request.
+ * This function takes an object and makes a synchronous ajax request. This function was formerly named makeSyncRequest
+ * @param {Object} params the object containg all the parameters/options
+ * @return {String} response text from the ajax call.
+ */
+astman.makeSyncRequest = function(params) {
+	if (top.session && top.session.debug_mode) {
+		log.ajax('makeSyncRequest: AJAX Request: "' + params.getProperties() + '"');
+	}
+
+	if (typeof params !== 'object') {
+		log.error('makeSyncRequest: Expecting params to be an object.');
+		return '';
+	}
+
+	var s = $.ajax({ url: astman.rawman, data: params, async: false});
+	return s.responseText;
+};
+
+/**
+ * Parses CLI Responses.
+ * The function takes a raw CLI response and strips unnecessary info, returning only the useful info. This function use to be called ASTGUI.parseCLIResponse.
+ * @param resp The CLI Response to be parsed.
+ * @return {String} the parsed CLI responsed
+ */
+astman.parseCLI = function(resp) {
+	if (typeof resp !== 'string') {
+		return resp;
+	}
+
+	resp = resp.replace(/Response: Follows/, '');
+	resp = resp.replace(/Privilege: Command/, '');
+	resp = resp.replace(/--END COMMAND--/, '');
+
+	return resp;
 };
