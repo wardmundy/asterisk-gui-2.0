@@ -130,14 +130,14 @@ var detectHwChanges = function(){ // compare DETECTEDHARDWARE vs CONFIGUREDHARDW
 	if(configured_devices.length == detected_devices.length){
 		for(var l=0; l < configured_devices.length; l++){
 			if(configured_devices[l] != detected_devices[l]){ // devices does not match - but the number of devices match
-				ASTGUI.Log.Debug("DEVICES or basechans does not MATCHED");
+				top.log.debug("DEVICES or basechans does not MATCHED");
 				return true;
 			}
 		}
-		ASTGUI.Log.Debug("DEVICES and basechans MATCH");
+		top.log.debug("DEVICES and basechans MATCH");
 		return false;
 	}else{	
-		ASTGUI.Log.Debug("DEVICES or basechans does not MATCHED");
+		top.log.debug("DEVICES or basechans does not MATCHED");
 		return true;
 	}
 };
@@ -374,7 +374,7 @@ var loadConfigFiles = {
 	//   check if the channels in zapchan are within max and min
 	//   if yes then set the current range values
 	load_hwcfgfile: function(){ // read hwcfgfile (if exists) into CONFIGUREDHARDWARE 
-		ASTGUI.Log.Debug("load last configured hardware information, start function: loadConfigFiles.load_hwcfgfile()");
+		top.log.debug("load last configured hardware information, start function: loadConfigFiles.load_hwcfgfile()");
 		var n = config2json({filename:hwcfgfile, usf:1});
 		if( n.getOwnProperties().length == 0 ){ // if file not found or no previous hardware detected
 				hwchanged = -1;
@@ -390,23 +390,23 @@ var loadConfigFiles = {
 			}}
 			loadConfigFiles.run_detectdahdi();
 		}
-		ASTGUI.Log.Debug("end of function: loadConfigFiles.load_hwcfgfile()");
+		top.log.debug("end of function: loadConfigFiles.load_hwcfgfile()");
 	},
 
 	run_detectdahdi: function(){
-		ASTGUI.Log.Debug("start function: loadConfigFiles.run_detectdahdi()");
+		top.log.debug("start function: loadConfigFiles.run_detectdahdi()");
 
 		ASTGUI.miscFunctions.createConfig( 'applyzap.conf', function(){
 			parent.ASTGUI.systemCmd( top.sessionData.directories.app_DahdiScan , function(){ // run ztscan and then try loading ztscan.conf
 				window.setTimeout( loadConfigFiles.read_DahdiScanConf , 700 ); // leave some time for ztscan to generate ztscan.conf
 			});
-			ASTGUI.Log.Debug("end of function: loadConfigFiles.run_detectdahdi()");
+			top.log.debug("end of function: loadConfigFiles.run_detectdahdi()");
 		});
 	},
 
 	//readZtscanConf: function(){
 	read_DahdiScanConf: function(){
-		ASTGUI.Log.Debug("start function: loadConfigFiles.read_DahdiScanConf()");
+		top.log.debug("start function: loadConfigFiles.read_DahdiScanConf()");
 		var ztsc = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=' + ASTGUI.globals.dahdiScanOutput , async: false }).responseText;
 		var ztsc_Lower = ztsc.toLowerCase();
 		if( ztsc_Lower.contains('response: error') && ztsc_Lower.contains('message: config file not found') ){
@@ -486,12 +486,12 @@ var loadConfigFiles = {
 			}}
 		}}
 		if(hwchanged != -1){ hwchanged = detectHwChanges(); }
-		ASTGUI.Log.Debug("end of function: loadConfigFiles.read_DahdiScanConf()");
+		top.log.debug("end of function: loadConfigFiles.read_DahdiScanConf()");
 		loadConfigFiles.readUsersConf(); // read span_x (where T1/E1 trunks are defined)
 	},
 
 	readUsersConf: function(){
-		ASTGUI.Log.Debug("start function: loadConfigFiles.readUsersConf()");
+		top.log.debug("start function: loadConfigFiles.readUsersConf()");
 
 		var usrs = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=users.conf', async: false }).responseText;
 		var usrs_Lower = usrs.toLowerCase();
@@ -564,12 +564,12 @@ var loadConfigFiles = {
 				}
 			}}
 		})();
-		ASTGUI.Log.Debug("end of function: loadConfigFiles.readUsersConf()");
+		top.log.debug("end of function: loadConfigFiles.readUsersConf()");
 		showtable();
 	},
 
 	load_zaptel_conf: function(){
-		ASTGUI.Log.Debug("start function: loadConfigFiles.load_zaptel_conf()");
+		top.log.debug("start function: loadConfigFiles.load_zaptel_conf()");
 		// we parse zaptel.conf to get the loadzone and syncsrc for each span
 		var tmp_file = ASTGUI.globals.dahdiIncludeFile ;
 		var parseZaptelconf = function(zp){
@@ -616,7 +616,7 @@ var loadConfigFiles = {
 				parseZaptelconf(q);
 			}
 		}
-		ASTGUI.Log.Debug("end of function: loadConfigFiles.load_zaptel_conf()");
+		top.log.debug("end of function: loadConfigFiles.load_zaptel_conf()");
 	}
 };
 
@@ -959,7 +959,7 @@ var applyDigitalSettings = function(){
 
 
 var localajaxinit = function(){
-	ASTGUI.Log.Debug("Starting Loading Page digital.html .. start function: window.onload()");
+	top.log.debug("Starting Loading Page digital.html .. start function: window.onload()");
 	portsSignalling = ASTGUI.cloneObject(parent.sessionData.PORTS_SIGNALLING);
 
 	ASTGUI.dialog.waitWhile('Detecting Analog/Digital Hardware ...');
@@ -1008,7 +1008,7 @@ var localajaxinit = function(){
 	}
 
 	ASTGUI.events.add( _$('edit_DefinedChans'), "change", edit_DefinedChans_changed );
-	ASTGUI.Log.Debug("end of function: window.onload()");
+	top.log.debug("end of function: window.onload()");
 	loadConfigFiles.load_hwcfgfile(); // try to load last detected/configured hardware information
 
 };

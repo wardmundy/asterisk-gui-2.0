@@ -198,11 +198,11 @@ var applySettings = {
 
 
 var localajaxinit = function(){
-	ASTGUI.Log.Debug("Starting Loading Page hardware_aa50.html .. start function: window.onload()");
+	top.log.debug("Starting Loading Page hardware_aa50.html .. start function: window.onload()");
 	ASTGUI.dialog.waitWhile('Detecting Hardware ...');
 	top.document.title = "Analog Hardware Setup & Configuration";
 	load_currentAnalogSettings();
-	ASTGUI.Log.Debug("end of function: window.onload()");
+	top.log.debug("end of function: window.onload()");
 };
 
 
@@ -326,7 +326,7 @@ var load_currentAnalogSettings = function(){
 				parseZaptelconf(q);
 			}
 		}
-		ASTGUI.Log.Debug("end of function: loadConfigFiles.load_zaptel_conf()");
+		top.log.debug("end of function: loadConfigFiles.load_zaptel_conf()");
 	})();
 
 	(function(){ // load modprobe settings

@@ -696,8 +696,8 @@ manager_events.parseOutput = function(op) {
 		}
 	}
 	} catch (err) {
-		ASTGUI.Log.Error('Error Parsing waitevent response : manager_events.parseOutput() ');
-		ASTGUI.Log.Error(err.description);
+		top.log.error('Error Parsing waitevent response : manager_events.parseOutput() ');
+		top.log.error(err.description);
 	}
 
 	this.watch();
@@ -856,7 +856,7 @@ manager_events.updateExtension = function(exten, context, status) {
 		break;
 	default:
 		var state = 'Unknown';
-		ASTGUI.Log.Debug("updateExtension :: We have encountered an unknown extension state of " + status.toString());
+		top.log.debug("updateExtension :: We have encountered an unknown extension state of " + status.toString());
 		if ( top.sessionData.DEBUG_MODE ) {
 			alert('updateExtension:\r\n'
 				+'status: '+status.toString()+'\r\n'

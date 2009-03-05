@@ -130,14 +130,14 @@ function detectHwChanges(){ // compare DETECTEDHARDWARE vs CONFIGUREDHARDWARE
 	if(configured_devices.length == detected_devices.length){
 		for(var l=0; l < configured_devices.length; l++){
 			if(configured_devices[l] != detected_devices[l]){ // devices does not match - but the number of devices match
-				ASTGUI.Log.Debug("DEVICES or basechans does not MATCHED");
+				top.log.debug("DEVICES or basechans does not MATCHED");
 				return true;
 			}
 		}
-		ASTGUI.Log.Debug("DEVICES and basechans MATCH");
+		top.log.debug("DEVICES and basechans MATCH");
 		return false;
 	}else{	
-		ASTGUI.Log.Debug("DEVICES or basechans does not MATCHED");
+		top.log.debug("DEVICES or basechans does not MATCHED");
 		return true;
 	}
 }
@@ -343,7 +343,7 @@ var loadConfigFiles = {
 	//   check if the channels in zapchan are within max and min
 	//   if yes then set the current range values
 	load_hwcfgfile: function(){ // read hwcfgfile (if exists) into CONFIGUREDHARDWARE 
-		ASTGUI.Log.Debug("load last configured hardware information, start function: loadConfigFiles.load_hwcfgfile()");
+		top.log.debug("load last configured hardware information, start function: loadConfigFiles.load_hwcfgfile()");
 		var n = config2json({filename:hwcfgfile, usf:1});
 		if( n.getOwnProperties().length == 0 ){ // if file not found or no previous hardware detected
 				hwchanged = -1;
@@ -359,22 +359,22 @@ var loadConfigFiles = {
 			}}
 			loadConfigFiles.runZtscan();
 		}
-		ASTGUI.Log.Debug("end of function: loadConfigFiles.load_hwcfgfile()");
+		top.log.debug("end of function: loadConfigFiles.load_hwcfgfile()");
 	},
 
 	runZtscan: function(){
-		ASTGUI.Log.Debug("start function: loadConfigFiles.runZtscan()");
+		top.log.debug("start function: loadConfigFiles.runZtscan()");
 
 		ASTGUI.miscFunctions.createConfig( 'applyzap.conf', function(){
 			parent.ASTGUI.systemCmd( top.sessionData.directories.app_Ztscan , function(){ // run ztscan and then try loading ztscan.conf
 				window.setTimeout( loadConfigFiles.readZtscanConf , 700 ); // leave some time for ztscan to generate ztscan.conf
 			});
-			ASTGUI.Log.Debug("end of function: loadConfigFiles.runZtscan()");
+			top.log.debug("end of function: loadConfigFiles.runZtscan()");
 		});
 	},
 
 	readZtscanConf: function(){
-		ASTGUI.Log.Debug("start function: loadConfigFiles.readZtscanConf()");
+		top.log.debug("start function: loadConfigFiles.readZtscanConf()");
 		var ztsc = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=ztscan.conf', async: false }).responseText;
 		var ztsc_Lower = ztsc.toLowerCase();
 		if( ztsc_Lower.contains('response: error') && ztsc_Lower.contains('message: config file not found') ){
@@ -439,12 +439,12 @@ var loadConfigFiles = {
 			}}
 		}}
 		if(hwchanged != -1){ hwchanged = detectHwChanges(); }
-		ASTGUI.Log.Debug("end of function: loadConfigFiles.readZtscanConf()");
+		top.log.debug("end of function: loadConfigFiles.readZtscanConf()");
 		loadConfigFiles.readUsersConf(); // read span_x (where T1/E1 trunks are defined)
 	},
 
 	readUsersConf: function(){
-		ASTGUI.Log.Debug("start function: loadConfigFiles.readUsersConf()");
+		top.log.debug("start function: loadConfigFiles.readUsersConf()");
 
 		var usrs = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=users.conf', async: false }).responseText;
 		var usrs_Lower = usrs.toLowerCase();
@@ -513,12 +513,12 @@ var loadConfigFiles = {
 				}
 			}}
 		})();
-		ASTGUI.Log.Debug("end of function: loadConfigFiles.readUsersConf()");
+		top.log.debug("end of function: loadConfigFiles.readUsersConf()");
 		showtable();
 	},
 
 	load_zaptel_conf: function(){
-		ASTGUI.Log.Debug("start function: loadConfigFiles.load_zaptel_conf()");
+		top.log.debug("start function: loadConfigFiles.load_zaptel_conf()");
 		// we parse zaptel.conf to get the loadzone and syncsrc for each span
 		var tmp_file = ASTGUI.globals.zaptelIncludeFile;
 		var parseZaptelconf = function(zp){
@@ -572,7 +572,7 @@ var loadConfigFiles = {
 				parseZaptelconf(q);
 			}
 		}
-		ASTGUI.Log.Debug("end of function: loadConfigFiles.load_zaptel_conf()");
+		top.log.debug("end of function: loadConfigFiles.load_zaptel_conf()");
 	}
 };
 
@@ -1031,7 +1031,7 @@ function applyDigitalSettings(){
 
 
 var localajaxinit = function(){
-	ASTGUI.Log.Debug("Starting Loading Page digital.html .. start function: window.onload()");
+	top.log.debug("Starting Loading Page digital.html .. start function: window.onload()");
 	portsSignalling = ASTGUI.cloneObject(parent.sessionData.PORTS_SIGNALLING);
 
 	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_opermode', 'opermode') ;
@@ -1119,7 +1119,7 @@ var localajaxinit = function(){
 
 	ASTGUI.events.add( _$('edit_DefinedChans'), "change", edit_DefinedChans_changed );
 
-	ASTGUI.Log.Debug("end of function: window.onload()");
+	top.log.debug("end of function: window.onload()");
 
 	(function(){ // load modprobe settings
 		var c = context2json ({ filename: ASTGUI.globals.configfile , context: 'general', usf: 1 });

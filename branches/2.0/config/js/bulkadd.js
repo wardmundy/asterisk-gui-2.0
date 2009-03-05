@@ -121,7 +121,7 @@ var add_RangeOfUsers = function(){
 		}
 
 		newusers_list.push(tmp_nu);
-			ASTGUI.Log.Debug( 'adding user ' + tmp_nu);
+			top.log.debug( 'adding user ' + tmp_nu);
 			NEW_USERS[ tmp_nu ] = {} ;
 			NEW_USERS[ tmp_nu ]['fullname'] = 'User ' + tmp_nu;
 			NEW_USERS[ tmp_nu ]['cid_number'] = tmp_nu;
