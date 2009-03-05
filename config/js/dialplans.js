@@ -168,7 +168,7 @@ var load_CallingPlansTable = function(){
 					}
 				}
 			}catch(err){
-				ASTGUI.Log.Error(err.description);
+				top.log.error(err.description);
 			}
 
 			addCell( newRow , { html: dr_woPfx.join(', ') } );

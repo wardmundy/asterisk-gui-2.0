@@ -358,7 +358,7 @@ var incomingRules_MiscFunctions = {
 		}
 
 		if( isNewIR == true ){ // create new Incoming Rule
-			ASTGUI.Log.Debug("create New Incoming Rule");
+			top.log.debug("create New Incoming Rule");
 			parent.ASTGUI.dialog.waitWhile('Creating Incoming Rule ...');
 
 			if( ASTGUI.getFieldValue('edit_itrl_dest') == 'ByDID' ){
@@ -383,7 +383,7 @@ var incomingRules_MiscFunctions = {
 
 				var TMP_MYCALLBACK = function(){
 					if( !EX_CF.hasOwnProperty( thisRule_context ) ){
-						ASTGUI.Log.Debug("creating [time interval did context]");
+						top.log.debug("creating [time interval did context]");
 						x.new_action ( 'newcat', thisRule_context , '' , '' );
 					}
 	
@@ -394,7 +394,7 @@ var incomingRules_MiscFunctions = {
 						x.new_action( 'append', thisRule_context, 'exten', ASTGUI.globals.sbcid_2 );
 						x.new_action( 'append', thisRule_context, 'exten', this_ActualRule );
 					}else{
-						ASTGUI.Log.Debug("NewRule is exten=" + this_ActualRule + 'in context [' + thisRule_context + ']');
+						top.log.debug("NewRule is exten=" + this_ActualRule + 'in context [' + thisRule_context + ']');
 						x.new_action( 'append', thisRule_context, 'exten', this_ActualRule );
 					}
 
@@ -406,10 +406,10 @@ var incomingRules_MiscFunctions = {
 				};
 	
 				if( PREVIOUS.contains(NEWTF_INCLUDE_STR) ){
-					ASTGUI.Log.Debug("No need to include time interval did context in DID_trunk_x");
+					top.log.debug("No need to include time interval did context in DID_trunk_x");
 					TMP_MYCALLBACK();
 				}else{
-					ASTGUI.Log.Debug("adding 'include = time interval did context' in [DID_trunk_x]");
+					top.log.debug("adding 'include = time interval did context' in [DID_trunk_x]");
 					PREVIOUS.splice(0,0,NEWTF_INCLUDE_STR);
 					ASTGUI.miscFunctions.empty_context({ filename: 'extensions.conf', context : ASTGUI.contexts.TrunkDIDPrefix + this_trunk, cb : function(){
 						PREVIOUS.each( function( this_newPreviousLine ){

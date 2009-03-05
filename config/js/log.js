@@ -82,7 +82,7 @@ log.debug = function(msg) {
  * @param msg The message.
  * @param color The HTML hexademical color code.
  */
-log.doLog = function() {
+log.doLog = function(msg, color) {
 	if (!top.session.log) {
 		return true;
 	}

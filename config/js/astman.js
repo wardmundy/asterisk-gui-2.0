@@ -483,10 +483,10 @@ var ASTGUI = {
 		// ASTGUI.cliCommand(cmd);
 		//	Execute an asterisk CLI command and return the output
 		if( typeof cmd != 'string' ) {
-			ASTGUI.Log.Warn( 'cliCommand: Expecting cmd as String' );
+			top.log.warn( 'cliCommand: Expecting cmd as String' );
 			return '';
 		}
-		ASTGUI.Log.Debug("Executing manager command : '" + cmd + "'");
+		top.log.debug("Executing manager command : '" + cmd + "'");
 		return makeSyncRequest ( { action :'command', command: cmd } );
 	},
 
@@ -495,7 +495,7 @@ var ASTGUI = {
 		//	Get the DeviceStatus for a UserExtension
 		if( typeof usr == 'number' ) usr = String(usr);
 		if( typeof usr != 'string' ){
-			ASTGUI.Log.Warn( 'getUser_DeviceStatus: Expecting usr as String' );
+			top.log.warn( 'getUser_DeviceStatus: Expecting usr as String' );
 			return 'U';
 		}
 		var t = makeSyncRequest({ action :'ExtensionState', Exten: usr }) ;
@@ -536,7 +536,7 @@ var ASTGUI = {
 		var tr = { count_new:0 , count_old : 0 };
 		if( typeof mbox == 'number' ) mbox = String(mbox);
 		if( typeof mbox != 'string' ){
-			ASTGUI.Log.Warn( 'mailboxCount: Expecting mbox as String' );
+			top.log.warn( 'mailboxCount: Expecting mbox as String' );
 			return tr;
 		}
 		if(!mbox.contains('@')){ mbox = mbox + '@default' ; }
@@ -561,14 +561,14 @@ var ASTGUI = {
 	doTransfer : function(from, to) {
 		// ASTGUI.doTransfer(from, to)
 		//	issue channel redirect
-		ASTGUI.Log.Debug("About to transfer " + from + " to " + to);
+		top.log.debug("About to transfer " + from + " to " + to);
 		return makeSyncRequest ( { action :'redirect', channel :from, exten :to, context :'default', priority :'1' } );
 	},
 
 	doHangup : function(chan) {
 		// ASTGUI.doHangup(chan)
 		//	Hangsup a given channel
-		ASTGUI.Log.Debug("Executing hangup on channel : '" + chan + "'");
+		top.log.debug("Executing hangup on channel : '" + chan + "'");
 		return makeSyncRequest ( { action :'hangup', channel: chan } );
 	},
 
@@ -821,7 +821,7 @@ var ASTGUI = {
 			b.style.left = tmp_left + ( offsetLeft || 0 );
 			b.style.top = tmp_top + (offsetTop || 1);
 			}catch(err){
-				ASTGUI.Log.Error(err.description);
+				top.log.error(err.description);
 			}
 		},
 
@@ -834,7 +834,7 @@ var ASTGUI = {
 				ASTGUI.domActions.alignBbelowA(a,b);
 				b.style.top = b.style.top - a.offsetHeight ;
 			}catch(err){
-				ASTGUI.Log.Error(err.description);
+				top.log.error(err.description);
 			}
 		},
 
@@ -951,7 +951,7 @@ var ASTGUI = {
 				}
 			}
 			}catch(err){
-				ASTGUI.Log.Error(err.description);
+				top.log.error(err.description);
 			}
 		},
 
@@ -994,7 +994,7 @@ var ASTGUI = {
 				}
 			}
 			}catch(err){
-				ASTGUI.Log.Error(err.description);
+				top.log.error(err.description);
 			}
 		},
 
@@ -1209,7 +1209,7 @@ var ASTGUI = {
 		}
 		return '<font color=red>Unregistered</font>';
 		}catch(err){
-			ASTGUI.Log.Error(err.description);
+			top.log.error(err.description);
 		}
 	},
 
@@ -1279,7 +1279,7 @@ var ASTGUI = {
 			});
 		});
 		}catch(err){
-			ASTGUI.Log.Error(err.description);
+			top.log.error(err.description);
 			cb([]);
 		}
 	},
@@ -1318,7 +1318,7 @@ var ASTGUI = {
 
 			return tr_Array ;
 			}catch(err){
-				ASTGUI.Log.Error(err.description);
+				top.log.error(err.description);
 				return [] ;
 			}
 		},
@@ -1386,7 +1386,7 @@ var ASTGUI = {
 				});
 			}});
 			}catch(err){
-				ASTGUI.Log.Error(err.description);
+				top.log.error(err.description);
 			}
 		},
 
@@ -1409,7 +1409,7 @@ var ASTGUI = {
 				x.callActions(ct.cb);
 			//}
 			}catch(err){
-				ASTGUI.Log.Error(err.description);
+				top.log.error(err.description);
 			}
 		},
 
@@ -1447,7 +1447,7 @@ var ASTGUI = {
 
 			x.callActions(ct.cb);
 			}catch(err){
-				ASTGUI.Log.Error(err.description);
+				top.log.error(err.description);
 				ct.cb();
 			}
 		},
@@ -1478,7 +1478,7 @@ var ASTGUI = {
 
 			return [chs];
 			}catch(err){
-				ASTGUI.Log.Warn( err.description );
+				top.log.warn( err.description );
 				return [chs];
 			}
 		},
@@ -1507,7 +1507,7 @@ var ASTGUI = {
 
 			var match = ampmTime.match(pattern);
 			if (match == null) {
-				ASTGUI.Log.Debug('ampmTime is not in a valid format.');
+				top.log.debug('ampmTime is not in a valid format.');
 				return '';
 			}
 
@@ -1517,10 +1517,10 @@ var ASTGUI = {
 			ampm = match[4] || null;
 
 			if (!ampm && (hour < 0 || hour > 23)) {
-				ASTGUI.Log.Debug('ampmTime must have its hour inbetween 0 and 23.');
+				top.log.debug('ampmTime must have its hour inbetween 0 and 23.');
 				return '';
 			} else if (ampm && (hour < 0 || hour > 12)) {
-				ASTGUI.Log.Debug('ampmTime must have its hour inbetween 0 and 12 if "AM|PM" exists');
+				top.log.debug('ampmTime must have its hour inbetween 0 and 12 if "AM|PM" exists');
 				return '';
 			} else if (ampm) {
 				if (ampm.match('[pP][mM]')) {
@@ -1530,7 +1530,7 @@ var ASTGUI = {
 			hour = (hour < 10) ? hour.addZero() : hour;
 
 			if (minute < 0 || minute > 59) {
-				ASTGUI.Log.Debug('ampmTime must have its minute inbetween 0 and 59');
+				top.log.debug('ampmTime must have its minute inbetween 0 and 59');
 				return '';
 			}
 			minute = minute < 10 ? minute.addZero() : minute;
@@ -1646,7 +1646,7 @@ var ASTGUI = {
 					return q.substring(l+1);
 				}
 			}
-			ASTGUI.Log.Error( "ASTGUI.parseContextLine.getAppWithArgs() could not parse \"" + q + "\" " );
+			top.log.error( "ASTGUI.parseContextLine.getAppWithArgs() could not parse \"" + q + "\" " );
 			return '';
 		},
 
@@ -1665,7 +1665,7 @@ var ASTGUI = {
 			if (typeof q != 'string' || !q ) return [];
 			q = q.trim();
 			if ( !q.endsWith(')') || !q.contains('(') ){
-				ASTGUI.Log.Error( "ASTGUI.parseContextLine.getArgs() - No Argument found for \"" + q + "\" " );
+				top.log.error( "ASTGUI.parseContextLine.getArgs() - No Argument found for \"" + q + "\" " );
 				return [];
 			}
 			var y = ASTGUI.parseContextLine.getAppWithArgs(q);
@@ -1743,7 +1743,7 @@ var ASTGUI = {
 			}
 			return 'Goto ' + args.join() ;
 			}catch(err){
-				ASTGUI.Log.Error(err.description);
+				top.log.error(err.description);
 				return 'Goto ' + args.join() ;
 			}
 		},
@@ -1754,7 +1754,7 @@ var ASTGUI = {
 			// returns - "User extension" or 'VoiceMenu extension' or 'Hangup' or 'Busy' or some string - depends on q.
 			// use this when you want to represent the action to the user
 			if (typeof q != 'string') {
-				ASTGUI.Log.Error('ASTGUI.parseContextLine.showAs: expecting q as string');
+				top.log.error('ASTGUI.parseContextLine.showAs: expecting q as string');
 				return '??';
 			}
 			var app = ASTGUI.parseContextLine.getApp(q) ;
@@ -1869,7 +1869,7 @@ var ASTGUI = {
 		parseTrunkDialArgument: function(y){ // usage ASTGUI.parseContextLine.parseTrunkDialArgument(y)
 			// expects y as  '${trunk_1}/XXX${EXTEN:X}' OR SIP/user/XXX${EXTEN:X}
 			if( !y || typeof y != 'string') {
-				ASTGUI.Log.Error('ASTGUI.parseContextLine.parseTrunkDialArgument: expecting y as string');
+				top.log.error('ASTGUI.parseContextLine.parseTrunkDialArgument: expecting y as string');
 				return { name : '', channel : '', prepend : '', stripx : '' };
 			}
 			var WhatToDial = '';
@@ -1930,7 +1930,7 @@ var ASTGUI = {
 					}
 			*/
 			if (typeof str != 'string') {
-				ASTGUI.Log.Error('ASTGUI.parseContextLine.obCallingRule: expecting str as string');
+				top.log.error('ASTGUI.parseContextLine.obCallingRule: expecting str as string');
 				return null;
 			}
 
@@ -2011,7 +2011,7 @@ var ASTGUI = {
 			if ( typeof el == 'string'){
 				el = _$(el) ;
 				if( !el ){
-					ASTGUI.Log.Error( 'No Element by that id ' );
+					top.log.error( 'No Element by that id ' );
 					return;
 				}
 			}
@@ -2330,7 +2330,7 @@ var ASTGUI = {
 	systemCmd: function(cmd, callbackfunction){
 		// ASTGUI.systemCmd(cmd, cbf);
 		//	Execute a Unix system command
-		ASTGUI.Log.Debug("Executing System Command : '" + cmd + "'");
+		top.log.debug("Executing System Command : '" + cmd + "'");
 		var delay_cb = function(){
 			if( parent.sessionData.PLATFORM.isAA50 ){
 				setTimeout( callbackfunction , 500 );
@@ -2470,7 +2470,7 @@ var ASTGUI = {
 				}
 				break;
 			case 'radio':
-				ASTGUI.Log.Error('You are on your own with Radio Buttons');
+				top.log.error('You are on your own with Radio Buttons');
 				break ;
 			case 'select-one':
 				ASTGUI.selectbox.selectOption(el, val);
@@ -2715,10 +2715,10 @@ var makeRequest = function( params){ // for making Asynchronus requests
 	if( params.action == "updateconfig" ){
 		params.srcfilename = params.filename;
 		params.dstfilename = params.filename;
-		if(top.sessionData && top.sessionData.DEBUG_MODE ){ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
+		if(top.sessionData && top.sessionData.DEBUG_MODE ){top.log.ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
 		delete params.filename;
 	}else{
-		if(top.sessionData && top.sessionData.DEBUG_MODE ){ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
+		if(top.sessionData && top.sessionData.DEBUG_MODE ){top.log.ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
 	}
 
 	$.get(ASTGUI.paths.rawman, params, cb);
@@ -2726,7 +2726,7 @@ var makeRequest = function( params){ // for making Asynchronus requests
 
 var makeSyncRequest = function( params){ // for making synchronus requests
 	// usage ::  makeSyncRequest ( { action :'getconfig', filename: 'something.conf' } ) // no need for call back function
-	if(top.sessionData && top.sessionData.DEBUG_MODE ){ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
+	if(top.sessionData && top.sessionData.DEBUG_MODE ){top.log.ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(params) + "'");}
 	var s = $.ajax({ url: ASTGUI.paths.rawman, data: params , async: false });
 	return s.responseText;
 };
@@ -2780,7 +2780,7 @@ var context2json = function(params){
 		return toJSO( params.configFile_output );
 	};
 
-	ASTGUI.Log.Ajax("AJAX Request : reading '" +  params.filename + "'");
+	top.log.ajax("AJAX Request : reading '" +  params.filename + "'");
 
 	if( top.sessionData.FileCache.hasOwnProperty(params.filename) &&  top.sessionData.FileCache[params.filename].modified == false){ // if file is in cache and is not modified since
 		var s = top.sessionData.FileCache[params.filename].content ;
@@ -2799,9 +2799,9 @@ var context2json = function(params){
 	if(s.contains('Response: Error') && ( s.contains('Message: Config file not found') || s.contains('Message: Permission denied') ) ){
 		// return ASTGUI.globals.fnf; // return 'file not found'
 		if(s.contains('Message: Config file not found'))
-			ASTGUI.Log.Error( ' config file(' + params.filename +') not found ' );	
+			top.log.error( ' config file(' + params.filename +') not found ' );	
 		if(s.contains('Message: Permission denied'))
-			ASTGUI.Log.Error('permission denied for reading file ' + params.filename );
+			top.log.error('permission denied for reading file ' + params.filename );
 
 		return (params.usf) ? new ASTGUI.customObject : [] ;
 	}
@@ -2872,7 +2872,7 @@ var config2json = function( params ){
 		return toJSO( params.configFile_output );
 	};
 
-	ASTGUI.Log.Ajax("AJAX Request : reading '" +  params.filename + "'");
+	top.log.ajax("AJAX Request : reading '" +  params.filename + "'");
 
 	if( top.sessionData.FileCache.hasOwnProperty(params.filename) &&  top.sessionData.FileCache[params.filename].modified == false){ // if file is in cache and is not modified since
 		var s = top.sessionData.FileCache[params.filename].content ;
@@ -2886,11 +2886,11 @@ var config2json = function( params ){
 
 	if( s.contains('Response: Error') && s.contains('Message: Config file not found') ){
 		// return ASTGUI.globals.fnf; // return 'file not found'
-		ASTGUI.Log.Error( ' config file(' + params.filename +') not found ' );
+		top.log.error( ' config file(' + params.filename +') not found ' );
 		return new ASTGUI.customObject;
 	}
 	if( s.contains('Response: Error') && s.contains('Message: Permission denied') ){
-		ASTGUI.Log.Error('permission denied for reading file ' + params.filename );
+		top.log.error('permission denied for reading file ' + params.filename );
 		return new ASTGUI.customObject;
 	}
 
@@ -2952,7 +2952,7 @@ listOfSynActions.prototype = {
 
 		var cnt = "" + this.actionCount;
 		if(this.actionCount > 5){
-			ASTGUI.Log.Error('AG150'); // alert to developer
+			top.log.error('AG150'); // alert to developer
 		}
 		while(cnt.length < 6){ cnt = "0" + cnt; }
 		this.params['Action-' + cnt] = action; // jquery takes care of encodeURIComponent(action) 
@@ -2975,7 +2975,7 @@ listOfSynActions.prototype = {
 	callActions: function(){
 		if(!this.actionCount){ return 'Response: Success'; }
 		if(top.sessionData.DEBUG_MODE ){
-			ASTGUI.Log.Ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(this.params) + "'"); 
+			top.log.ajax("AJAX Request : '" + ASTGUI.getObjectPropertiesAsString(this.params) + "'"); 
 		}
 		var s = $.ajax({ url: ASTGUI.paths.rawman, data: this.params , async: false });
 		return s.responseText;
@@ -3100,7 +3100,7 @@ listOfActions.prototype = {
 		var start_sqreqs = function(st){
 			var f = treq[ 'act_' + st ];
 			if(f){
-				ASTGUI.Log.Ajax("AJAX Request : '" + pre_uri + f + "'");
+				top.log.ajax("AJAX Request : '" + pre_uri + f + "'");
 				$.ajax({ type: "GET", url: ASTGUI.paths.rawman, data: pre_uri + f , success: function(msg){
 					if( msg && typeof msg == 'string' && msg.contains('Response: Error') && msg.contains('Message:') ){
 						var err_msg = msg.afterStr('Message:');
@@ -3123,7 +3123,7 @@ listOfActions.prototype = {
 		if( top.sessionData ){
 			window.onerror = function(err, url, errcode ){ // Log any errors on this page
 				var msg = 'ErrorCode / LineNumber : ' + errcode  + '<BR> Error : ' + err + '<BR> Location: ' + url ;
-				ASTGUI.Log.Error(msg);
+				top.log.error(msg);
 				ASTGUI.dialog.hide();
 				if( top.sessionData && top.sessionData.DEBUG_MODE ){ // show alerts only in debug mode
 					var alertmsg = 'ErrorCode / LineNumber : ' + errcode  + '\n Error : ' + err + '\n Location: ' + url ;

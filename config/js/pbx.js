@@ -226,7 +226,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 	}, // end of readcfg.checkEssentials();
 
 	guiPreferencesConf: function(){ //readcfg.guiPreferencesConf();
-		ASTGUI.Log.Ajax("AJAX Request : reading '" +  ASTGUI.globals.configfile + "'");
+		top.log.ajax("AJAX Request : reading '" +  ASTGUI.globals.configfile + "'");
 		var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=' + ASTGUI.globals.configfile , async: false }).responseText;
 		if( s.contains('Response: Error') && s.contains('Message: Config file not found') ){
 			sessionData.continueParsing = false ;
@@ -369,7 +369,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				// sessionData.pbxinfo['timebasedRules'][d] = astgui_manageTimeBasedRules.parseContext( d , c[d] );
 			}
 		}}
-		ASTGUI.Log.Debug('parsed all contexts in extensions.conf');
+		top.log.debug('parsed all contexts in extensions.conf');
 		(function(){ // parse voicemenu extensions
 			var vm = c[ASTGUI.contexts.VoiceMenuExtensions] ;
 			var vm_default = c['default'] ; // Backward compatibility for old GUI
@@ -1440,7 +1440,7 @@ astgui_manageVoiceMenus = {
 				}
 			});
 		}catch(err){
-			ASTGUI.Log.Debug('Error Parsing VoiceMenu');
+			top.log.debug('Error Parsing VoiceMenu');
 		}finally{
 			return ASTGUI.toCustomObject(vm);
 		}

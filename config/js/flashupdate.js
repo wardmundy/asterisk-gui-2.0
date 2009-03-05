@@ -229,7 +229,7 @@ var call_flashupdate = function(){
 
 var onUploadForm_load = function(){
 	if(!top.sessionData.httpConf.postmappings_defined || !top.sessionData.httpConf.uploadPaths['backups'] ){
-		ASTGUI.Log.Error('AG102');
+		top.log.error('AG102');
 		$('#uploadForm_container').hide();
 		return ;
 	}
