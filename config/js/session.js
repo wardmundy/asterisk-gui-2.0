@@ -52,10 +52,10 @@ var cookies = {};
  * Get a Cookie. OM NOM NOM NOM
  * @param user Username
  */
-cookies.get = function(user) {
+cookies.get = function(varname) {
 	var ck = top.document.cookie;
 
-	if (ck.indexOf(user + '=') == -1) {
+	if (ck.indexOf(varname + '=') == -1) {
 		top.log.warn("Can't seem to find the user in a cookie, exiting.");
 		return '';
 	}
@@ -63,8 +63,8 @@ cookies.get = function(user) {
 	var cookies = ck.split(';');
 	for (var i=0; i < cookies.length; i++) {
 		var c = cookies[i].strip();
-		if (c.beginsWith(x + '=')) {
-			return c.split(x + '=')[1];
+		if (c.beginsWith(varname + '=')) {
+			return c.split(varname + '=')[1];
 		}
 	}
 
