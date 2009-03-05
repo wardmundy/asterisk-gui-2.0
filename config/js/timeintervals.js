@@ -89,7 +89,7 @@ var ti_miscFunctions = {
 				var tmp_months = _$('edit_ti_month').value ;
 			}
 
-		ti_time_str = tmp_timerange + ',' + tmp_daysofweek + ',' + tmp_daysofmonth + ',' + tmp_months ;
+		ti_time_str = tmp_timerange + parent.session.delimiter + tmp_daysofweek + parent.session.delimiter + tmp_daysofmonth + parent.session.delimiter + tmp_months ;
 
 		var u = new listOfActions('extensions.conf') ;
 		if( isNewTI == false ){
@@ -102,7 +102,7 @@ var ti_miscFunctions = {
 				if( ct.beginsWith(ASTGUI.contexts.TrunkDIDPrefix) && !ct.contains( '_' + ASTGUI.contexts.TimeIntervalPrefix ) ){
 					var this_trunk_mainDID = EXT_CNF[ct] ;
 					this_trunk_mainDID.each(function(this_line){
-						if( this_line.beginsWith('include=') && this_line.contains(ASTGUI.contexts.TrunkDIDPrefix) && this_line.contains( OLD_TI + ',${' ) ){
+						if( this_line.beginsWith('include=') && this_line.contains(ASTGUI.contexts.TrunkDIDPrefix) && this_line.contains( OLD_TI + parent.session.delimiter + '${' ) ){
 							u.new_action( 'update' , ct , 'include' , this_line.afterChar('=').replaceXY(OLD_TI,ti_name) , this_line.afterChar('=') ) ;
 						}
 					});
@@ -138,7 +138,7 @@ var ti_miscFunctions = {
 			if( ct.beginsWith(ASTGUI.contexts.TrunkDIDPrefix) && !ct.contains(ASTGUI.contexts.TimeIntervalPrefix) ){
 				var this_trunk_mainDID = EXT_CNF[ct] ;
 				this_trunk_mainDID.each(function(this_line){
-					if( this_line.beginsWith('include=') && this_line.contains(ASTGUI.contexts.TrunkDIDPrefix) && this_line.contains( ASTGUI.contexts.TimeIntervalPrefix + a+',${' ) ){
+					if( this_line.beginsWith('include=') && this_line.contains(ASTGUI.contexts.TrunkDIDPrefix) && this_line.contains( ASTGUI.contexts.TimeIntervalPrefix + a + parent.session.delimiter + '${' ) ){
 						u.new_action( 'delete' , ct , 'include' , '' , this_line.afterChar('=') ) ;
 					}
 				});
@@ -175,7 +175,7 @@ var ti_miscFunctions = {
 		ASTGUI.updateFieldToValue( 'edit_ti_name', a ); // name of time interval
 		ASTGUI.resetTheseFields( ['edit_ti_starttime', 'edit_ti_endtime', 'edit_ti_dayofweek_start', 'edit_ti_dayofweek_end', 'edit_ti_from_date', 'edit_ti_month' ] );
 
-		var PIECES = TI_LIST[a].split(',') ;
+		var PIECES = TI_LIST[a].contains(',') ? TI_LIST[a].split(',') : TI_LIST[a].split('|');
 		if( PIECES[0] != '*' ){
 			_$('edit_ti_entireday').checked = false ;
 			ASTGUI.updateFieldToValue( 'edit_ti_starttime', ASTGUI.miscFunctions.asteriskTime_to_AMPM(PIECES[0].split('-')[0] ) );

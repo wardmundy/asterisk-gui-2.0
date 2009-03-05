@@ -1042,6 +1042,14 @@ var after_localajaxinit = function(){
 		}catch(err){}
 	}
 
+	/* unfortunately, there are certain cases in 1.4 where 
+	 * both commas and pipes aren't supported, such as when
+	 * doing time intervals for includes :-/
+	 * */
+	if (!sessionData.PLATFORM.isAST_1_6) {
+		top.session.delimiter = '|';
+	}
+
 	var loadGUI = function(){
 		DOM_accordion_div = _$('accordion_div');
 		DOM_mainscreen = _$('mainscreen');
