@@ -505,7 +505,7 @@ var USERS_MISC_FUNCTIONS = {
 				tmp_obj['call-limit'] = '100' ;
 			}
 
-			if( zapchan_Before != ASTGUI.getFieldValue('edit_fxs') ){ 	ASTGUI.cookies.setCookie( 'require_restart' , 'yes' );	}
+			if( zapchan_Before != ASTGUI.getFieldValue('edit_fxs') ){ 	top.cookies.set( 'require_restart' , 'yes' );	}
 			(function(){
 				var fs = ASTGUI.getFieldValue('edit_fxs');
 				if(fs){

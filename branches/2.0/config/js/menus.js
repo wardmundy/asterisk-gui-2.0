@@ -723,7 +723,7 @@ var updateVoiceMenus_Table = function(){
 var localajaxinit = function(){
 	top.document.title = 'Voice Menus Configuration' ;
 
-	var am = ASTGUI.cookies.getCookie('advancedmode');
+	var am = top.cookies.get('advancedmode');
 	if( am && am == 'yes' ){
 		ASTGUI.selectbox.append('newStep_select_action', 'Custom App', 'CustomApp');
 	}

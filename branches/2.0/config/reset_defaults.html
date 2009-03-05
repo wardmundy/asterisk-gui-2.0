@@ -34,7 +34,7 @@ var reset_factory = function(){
 	if(parent.sessionData.PLATFORM.isAA50 ){
 		var after = function(){
 			parent.ASTGUI.dialog.hide();
-			ASTGUI.cookies.setCookie( 'configFilesChanged' , 'no' ); // ignore any previous changes -- skip calling save_config
+			top.cookies.set( 'configFilesChanged' , 'no' ); // ignore any previous changes -- skip calling save_config
 			parent.miscFunctions.reboot_pbx({
 				msg: 'You appliance has been reset to <i>\'factory defaults\' </i> ',
 				btnNo_text : 'Later'

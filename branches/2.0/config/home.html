@@ -62,7 +62,7 @@ function doLogin(){
 		DOM_secret.blur();
 		parent.ASTGUI.dialog.waitWhile(' <font color=#005119><b>Login Success</b></font>');
 		ASTGUI.feedback({msg:'Login Success', showfor: 4 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
-		parent.ASTGUI.cookies.setCookie('username', DOM_username.value );
+		top.cookies.set('username', DOM_username.value );
 
 		if( DOM_secret.value == 'password'){
 			ASTGUI.feedback({msg:'Your are using the default password.<BR> Please choose a new password', showfor: 7 , color: '#672b13'}) ;
@@ -102,7 +102,7 @@ var home_miscFunctions = {
 
 
 var updatePassword = function(){
-	var CURRENT_Username = top.ASTGUI.cookies.getCookie('username');
+	var CURRENT_Username = top.cookies.get('username');
 	var u = new listOfSynActions('manager.conf') ;
 
 	var newp = ASTGUI.getFieldValue('new_password');
