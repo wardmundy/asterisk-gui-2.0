@@ -112,13 +112,13 @@ var check_flashupdateresult = function(){
 var flashupdate_success = function(){
 	parent.ASTGUI.dialog.hide();
 	ASTGUI.feedback( { msg:'Firmware image copied', showfor:5 });
-	ASTGUI.cookies.setCookie('firmware_reboot','yes');
+	top.cookies.set('firmware_reboot','yes');
 	_$('fstatus').innerHTML = 'Finished copying firmware';
 	parent.ASTGUI.yesOrNo({
 		hideNo: true,
 		msg: "Finished copying firmware <BR> Click 'Ok' to reboot your appliance. <BR><BR> Note: reboot might take 5 to 8 minutes while upgrading firmware" ,
 		ifyes: function(){
-			if( parent.sessionData.PLATFORM.isAA50 && ASTGUI.cookies.getCookie('configFilesChanged') == 'yes' ){
+			if( parent.sessionData.PLATFORM.isAA50 && top.cookies.get('configFilesChanged') == 'yes' ){
 				parent.ASTGUI.dialog.waitWhile('Rebooting !');
 				setTimeout( function(){
 						parent.ASTGUI.dialog.hide();
@@ -126,12 +126,12 @@ var flashupdate_success = function(){
 							msg: 'You have unsaved changes !! <BR>Do you want to save these changes before rebooting ?' ,
 							ifyes: function(){
 								ASTGUI.systemCmd ('save_config', function(){
-									ASTGUI.cookies.setCookie( 'configFilesChanged' , 'no' );
+									top.cookies.set( 'configFilesChanged' , 'no' );
 									ASTGUI.systemCmd ('reboot', parent.miscFunctions.AFTER_REBOOT_CMD );
 								});
 							},
 							ifno:function(){
-								ASTGUI.cookies.setCookie( 'configFilesChanged' , 'no' );
+								top.cookies.set( 'configFilesChanged' , 'no' );
 								ASTGUI.systemCmd ('reboot', parent.miscFunctions.AFTER_REBOOT_CMD );
 							},
 							title : 'Save changes before reboot ?',

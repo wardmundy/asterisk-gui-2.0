@@ -122,7 +122,7 @@ var onLogInFunctions = {
 
 	check_ReadWritePermissions : function(){
 		// We write a random context in http.conf and read it back to make sure we have manager read/write permissions 
-		//if( ASTGUI.cookies.getCookie('rwaccess') == 'yes' ){
+		//if( top.cookies.get('rwaccess') == 'yes' ){
 		//	return true;
 		//}
 		var rand = 'test_' + Math.round(100000*Math.random());
@@ -134,7 +134,7 @@ var onLogInFunctions = {
 
 		var http_conf = config2json({ filename:'http.conf', usf:1 });
 		if( !http_conf.hasOwnProperty(rand) || !http_conf[rand].hasOwnProperty(wa) || http_conf[rand][wa] !='yes' ){
-			ASTGUI.cookies.removeCookie('rwaccess');
+			top.cookies.remove('rwaccess');
 			return false; // no read/write access to the GUI
 		}
 
@@ -204,12 +204,12 @@ var onLogInFunctions = {
 		u.clearActions();
 		u.new_action('delcat', rand , '', '') ;
 		u.callActions();
-		ASTGUI.cookies.setCookie( 'rwaccess' , 'yes' );
+		top.cookies.set( 'rwaccess' , 'yes' );
 
 		if( sessionData.PLATFORM.isAST_1_6 ){
 			// make sure originate privilege is defined in asterisk 1.6
 			// This was introduced in Asterisk 1.6 and users upgrading from 1.4 do not have this
-			var tmp_managerUser = ASTGUI.cookies.getCookie('username') ;
+			var tmp_managerUser = top.cookies.get('username') ;
 			var manager_conf = config2json({ filename:'manager.conf', usf:1 });
 			if( manager_conf[tmp_managerUser].hasOwnProperty('write') ){
 				var write_value = manager_conf[tmp_managerUser]['write'];
@@ -490,7 +490,7 @@ var onLogInFunctions = {
 		}
 		$('div.ui-accordion-link').show(); // finally show all panels
 		$('#ptopbuttons').show();
-		if( ASTGUI.cookies.getCookie('configFilesChanged') == 'yes' ){
+		if( top.cookies.get('configFilesChanged') == 'yes' ){
 			$('#applyChanges_Button').show();
 		}else{
 			$('#applyChanges_Button').hide();
@@ -611,7 +611,7 @@ var miscFunctions = {
 	},
 
 	show_advancedMode : function(){
-		var am = ASTGUI.cookies.getCookie('advancedmode');
+		var am = top.cookies.get('advancedmode');
 		if( am && am == 'yes' ){
 			$(".AdvancedMode").show();
 		}else{
@@ -621,12 +621,12 @@ var miscFunctions = {
 	},
 
 	flip_advancedmode: function(){
-		var am = ASTGUI.cookies.getCookie('advancedmode');
+		var am = top.cookies.get('advancedmode');
 		if( am && am == 'yes' ){
-			ASTGUI.cookies.removeCookie('advancedmode');
+			top.cookies.remove('advancedmode');
 			$(".AdvancedMode").hide();
 		}else{
-			ASTGUI.cookies.setCookie( 'advancedmode' , 'yes' );
+			top.cookies.set( 'advancedmode' , 'yes' );
 			$(".AdvancedMode").show();
 		}
 		miscFunctions.resizeMainIframe();
@@ -643,7 +643,7 @@ var miscFunctions = {
 			var t = ASTGUI.cliCommand('module reload');
 		}
 		u.style.display = 'none';
-		ASTGUI.cookies.removeCookie('configFilesChanged');
+		top.cookies.remove('configFilesChanged');
 		ASTGUI.feedback({msg:'Asterisk Reloaded !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
 
 		if(sessionData.PLATFORM.isAA50 ){
@@ -652,9 +652,9 @@ var miscFunctions = {
 		}else{
 			if(cb)cb();
 		}
-		if( ASTGUI.cookies.getCookie('require_restart') == 'yes'){
+		if( top.cookies.get('require_restart') == 'yes'){
 			ASTGUI.dialog.alertmsg('The changes you made requires a restart. <BR> Your hardware might not work properly until you reboot !!');
-			ASTGUI.cookies.removeCookie('require_restart');
+			top.cookies.remove('require_restart');
 		}
 	},
 
@@ -662,7 +662,7 @@ var miscFunctions = {
 		// Object to store all sequence of functions that should execute on logout
 		// example if appliance - need to save changes before logout 
 		confirmlogout : function(){
-			if( sessionData.PLATFORM.isAA50 && ASTGUI.cookies.getCookie('configFilesChanged') == 'yes' ){
+			if( sessionData.PLATFORM.isAA50 && top.cookies.get('configFilesChanged') == 'yes' ){
 
 				parent.ASTGUI.yesOrNo({
 					msg: 'You have unsaved changes !! <BR>Do you want to apply these changes before logging out ?' ,
@@ -827,8 +827,8 @@ var miscFunctions = {
 			}
 		};
 
-		var fr = ASTGUI.cookies.getCookie('firmware_reboot')
-		ASTGUI.cookies.removeCookie('firmware_reboot');
+		var fr = top.cookies.get('firmware_reboot')
+		top.cookies.remove('firmware_reboot');
 		if( fr == 'yes') {
 			count_down(480);
 		}else{
@@ -840,7 +840,7 @@ var miscFunctions = {
 		parent.ASTGUI.yesOrNo({
 			msg: (opt && opt.msg) || 'Note: Rebooting appliance will terminate any active calls.' ,
 			ifyes: function(){
-				if( sessionData.PLATFORM.isAA50 && ASTGUI.cookies.getCookie('configFilesChanged') == 'yes' ){
+				if( sessionData.PLATFORM.isAA50 && top.cookies.get('configFilesChanged') == 'yes' ){
 					parent.ASTGUI.dialog.waitWhile('Rebooting !');
 					setTimeout( function(){
 							parent.ASTGUI.dialog.hide();

@@ -2700,7 +2700,7 @@ jQuery.extend({
 					if( s.url.contains('&srcfilename=http.conf&') ){
 
 					}else{
-						ASTGUI.cookies.setCookie( 'configFilesChanged' , 'yes' );
+						top.cookies.set( 'configFilesChanged' , 'yes' );
 						parent.$('#applyChanges_Button').show();
 					}
 				}

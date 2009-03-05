@@ -136,7 +136,7 @@ var new_ATRNK_save_go = function(){
 	}
 
 	if( zapchan_Before != scs ){
-		ASTGUI.cookies.setCookie( 'require_restart' , 'yes' );
+		top.cookies.set( 'require_restart' , 'yes' );
 	}
 
 	if( ASTGUI.getFieldValue('edit_trunkName') ){

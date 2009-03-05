@@ -103,7 +103,7 @@ function setaslocal( filename ){
 	if(!confirm("Set '"+ filename +"' as the Default TimeZone ?")){ return ; }
 	ASTGUI.systemCmd( "rm /etc/localtime ; /bin/ln -s " + upload_Path + filename + " /etc/localtime" , function(){
 		ASTGUI.feedback( { msg:'Default Timezone set to '+ filename + ' !', showfor:2 });
-		ASTGUI.cookies.setCookie( 'configFilesChanged' , 'yes' );
+		top.cookies.set( 'configFilesChanged' , 'yes' );
 		parent.$('#applyChanges_Button').show();
 		alert("you have to click 'Apply Changes' and restart the appliance for this change to take effect");
 		window.location.reload();

@@ -86,11 +86,12 @@ var sessionData = {
 };
 
 </script>
+<script src="js/log.js"></script>
+<script src="js/session.js"></script>
 <script src="js/jquery.js"></script>
 <script src="js/tooltip.js"></script>
 <script src="js/astman.js"></script>
 <script src="js/pbx.js"></script>
-<script src="js/log.js"></script>
 <script src="js/index.js"></script>
 <head>
 	<title>Asterisk Configuration GUI</title>
@@ -325,19 +326,4 @@ var sessionData = {
 		<span class='button_t1' onclick='onLogInFunctions.makePings.makeRetryPing();'> Retry </span>
 	<div>
 </div>
-
-<script>
-	var session = {
-		debug_log: [],
-		log: false,
-		log_modes: {
-			ajax: true,
-			console: true,
-			debug: true,
-			error: true,
-			info: true,
-			warn: true
-		}
-	};
-</script>
 </body>
