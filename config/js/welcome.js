@@ -455,7 +455,7 @@ var loadConferenceRooms = function() {
 	var conf_body = $('#sys_status_meetme > .body');
 	var active_conferences = {};
 
-	var show_chans = ASTGUI.cliCommand('core show channels concise');
+	var show_chans = ASTGUI.cliCommand('show channels concise');
 	// DAHDI/pseudo-1529934219!default!s!1!Rsrvd!(None)!!!!3!1086!(None)
 	// SIP/6001-081f6500!DLPN_users!6300!1!Up!MeetMe!6300|MIx!6001!!3!1086!(None)
 	show_chans = parent.ASTGUI.parseCLIResponse(show_chans);

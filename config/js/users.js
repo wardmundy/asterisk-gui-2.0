@@ -462,7 +462,7 @@ var USERS_MISC_FUNCTIONS = {
 				};
 				var newuser_settings = ASTGUI.toCustomObject( { fullname : ASTGUI.getFieldValue('edit_fullname'), registersip: 'no', host: 'dynamic', callgroup : '1' } );
 				parent.ASTGUI.dialog.waitWhile(' Saving... ');
-				parent.astgui_manageusers.addUser( NU_EXT, newuser_settings , cb );
+				top.pbx.users.add( NU_EXT, newuser_settings, cb);
 				return;
 		}else{
 			///////////////////

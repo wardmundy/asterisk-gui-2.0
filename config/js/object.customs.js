@@ -324,6 +324,40 @@ String.prototype.withOut = function(k){
 	return this.split(k).join('');
 };
 
+/**
+ * Validates Dates
+ * validates that this string is of formats: '05' or '02-18'
+ * @return boolean
+ */
+String.prototype.valiDate = function() { /* get it?? */
+	if (this.length > 5) {
+		/* max format length is '12-31', 5 chars */
+		return false;
+	} else if (this.length > 2 && this[2] != '-') {
+		return false;
+	}
+
+	var splits = this.split('-');
+
+	if (splits.length > 1) {
+		/* when parsing dates, make sure you are using base 10
+		 * parseInt likes to think in octals when numbers
+		 * have leading zeros like, 05 */
+		var month = parseInt(splits[0], 10);
+		var day = parseInt(splits[1], 10);
+	} else {
+		var day = parseInt(this, 10);
+	}
+
+	if (month && (month > 12 || month < 0)) {
+		return false;
+	}
+
+	if (day && (day < 0 || day > 31)) {
+		return false;
+	}
+};
+
 
 Number.prototype.addZero = function(){
 return ( this < 10)? "0" + String(this) : String(this);
