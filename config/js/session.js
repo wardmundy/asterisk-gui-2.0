@@ -26,6 +26,7 @@
  */
 var session = {
 	debug_log: [], /**< array holding all the logging */
+	delimiter: ',', /**< extensions.conf delimiter, used only in special cases */
 	log: false, /**< boolean toggling logging */
 	/**
 	 * Logging Modes.
