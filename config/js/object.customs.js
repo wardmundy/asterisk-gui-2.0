@@ -172,7 +172,7 @@ getProperties = function(obj) {
 			if (obj[d] instanceof Array) {
 				props.push(d + ': [' + obj[d].join(',') + ']');
 			} else {
-				props.push(d + ': ' + obj[d].getProperties());
+				props.push(d + ': ' + getProperties(obj[d]));
 			}
 		} else {
 			props.push(d + ': ' + obj[d]);
