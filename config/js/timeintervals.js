@@ -44,85 +44,77 @@ var ti_miscFunctions = {
 	},
 
 	update_TI : function(){ // ti_miscFunctions.update_TI();
-		var tmp_thisTIName = ASTGUI.getFieldValue('edit_ti_name');
-		if( isNewTI ){
-			for ( var i in TI_LIST){ if( TI_LIST.hasOwnProperty(i) ){
-				if ( i.toLowerCase() == tmp_thisTIName.toLowerCase() ){
-					ASTGUI.highlightField('edit_ti_name', "A Time Interval already exists by this name !");
-					return;
-				}
-			}}
-		}else{
-			for ( var i in TI_LIST ){ if( TI_LIST.hasOwnProperty(i) ){
-				if ( EDIT_TI.toLowerCase() != tmp_thisTIName.toLowerCase() && i.toLowerCase() == tmp_thisTIName.toLowerCase() ){
-					ASTGUI.highlightField ( 'edit_ti_name', "A Time Interval already exists by this name !" ) ;
-					return;
-				}
-			}}
+		var newname = $('#edit_ti_name').val();
+
+		if (newname === '') {
+			ASTGUI.highlightField('edit_ti_name', 'Time Interval name is empty');
 		}
 
-
-		var ti_name = ASTGUI.contexts.TimeIntervalPrefix + tmp_thisTIName ;
-		var ti_time_str = ''; // tmp_timerange + tmp_daysofweek + tmp_daysofmonth + tmp_months
-			if( _$('edit_ti_entireday').checked ){
-				var tmp_timerange = '*' ;
-			}else{
-				var tmp_timerange = ASTGUI.miscFunctions.AMPM_to_asteriskTime( _$('edit_ti_starttime').value ) + '-' + ASTGUI.miscFunctions.AMPM_to_asteriskTime( _$('edit_ti_endtime').value ) ;
+		for (var ti in TI_LIST) {
+			if (!TI_LIST.hasOwnProperty(ti)) {
+				continue;
 			}
 
-			if( _$('ti_type_byDayofWeek').checked ){
-				var tmp_daysofweek = _$('edit_ti_dayofweek_start').value + '-' +  _$('edit_ti_dayofweek_end').value  ;
-				var tmp_daysofmonth = '*' ;
-				var tmp_months = '*';
-			}else{
-				var tmp_daysofweek = '*' ;
+			if (isNewTI && ti.toLowerCase() === newname.toLowerCase()) {
+				ASTGUI.highlightField('edit_ti_name', 'A Time Interval already exists by this name!');
+				return;
 			}
 
-			if( _$('ti_type_byGroupofDates').checked ){
-				var tmp_daysofmonth = _$('edit_ti_from_date').value ;
-
-				if ( ! ti_miscFunctions.check_ifDatesAreValid(tmp_daysofmonth) ) {
-					ASTGUI.highlightField('edit_ti_from_date', "Invalid Date range !");
-					return;
-				}
-
-				var tmp_months = _$('edit_ti_month').value ;
+			if (!isNewTI && EDIT_TI.toLowerCase() !== newname.toLowerCase() && ti.toLowerCase() === newname.toLowerCase()) {
+				ASTGUI.highlightField('edit_ti_name', 'A Time Interval already exists by this name!');
+				return;
 			}
-
-		ti_time_str = tmp_timerange + parent.session.delimiter + tmp_daysofweek + parent.session.delimiter + tmp_daysofmonth + parent.session.delimiter + tmp_months ;
-
-		var u = new listOfActions('extensions.conf') ;
-		if( isNewTI == false ){
-			var OLD_TI = ASTGUI.contexts.TimeIntervalPrefix + EDIT_TI; // timeinterval_'edit_ti'
-			u.new_action( 'delete' , 'globals' , OLD_TI , '','' ) ;
-			////////////////////////////////////
-			var EXT_CNF = config2json({filename:'extensions.conf', usf:0 }) ; 
-			for( var ct in EXT_CNF){ if( EXT_CNF.hasOwnProperty(ct) ){
-				// update any lines in any [DID_Trunkx] that are like "include = DID_trunkx_timeinterval_'a', ..."
-				if( ct.beginsWith(ASTGUI.contexts.TrunkDIDPrefix) && !ct.contains( '_' + ASTGUI.contexts.TimeIntervalPrefix ) ){
-					var this_trunk_mainDID = EXT_CNF[ct] ;
-					this_trunk_mainDID.each(function(this_line){
-						if( this_line.beginsWith('include=') && this_line.contains(ASTGUI.contexts.TrunkDIDPrefix) && this_line.contains( OLD_TI + parent.session.delimiter + '${' ) ){
-							u.new_action( 'update' , ct , 'include' , this_line.afterChar('=').replaceXY(OLD_TI,ti_name) , this_line.afterChar('=') ) ;
-						}
-					});
-				}
-				// rename any contexts that are like [DID_trunkx_timeinterval_a]
-				if( ct.beginsWith(ASTGUI.contexts.TrunkDIDPrefix) && ct.endsWith( OLD_TI ) ){
-					u.new_action( 'renamecat', ct , "", ct.replace(OLD_TI, ti_name)) ;
-				}
-			}}
 		}
 
-		u.new_action( 'update' , 'globals' , ti_name , ti_time_str );
-		u.callActions( function(){
-			if( isNewTI == false ){
-				ASTGUI.feedback( { msg:"Updated time interval !", showfor: 3, color:'green', bgcolor:'#FFFFFF' } );
-			}else{
-				ASTGUI.feedback( { msg:"created time interval '" + tmp_thisTIName + "' !", showfor: 3, color:'green', bgcolor:'#FFFFFF' } );
+		var interval = {};
+		interval.time = '*';
+		interval.weekdays = '*';
+		interval.days = '*';
+		interval.months = '*';
+
+		/* if 'Entire Day' isn't checked */
+		if (!$('#edit_ti_entireday:checked').length) {
+			var start = $('#edit_ti_starttime').val();
+			var end = $('#edit_ti_endtime').val();
+
+			var starttime = ASTGUI.miscFunctions.AMPM_to_asteriskTime(start) || '00:00';
+			var endtime = ASTGUI.miscFunctions.AMPM_to_asteriskTime(end) || '24:00';
+
+			if (starttime !== '00:00' || endtime !== '24:00') {
+				interval.time = starttime + '-' + endttime;
 			}
-			window.location.reload();
-		});
+		}
+
+		if (!$('#edit_ti_byDayofWeek:selected').length) {
+			interval.weekdays = $('#edit_ti_dayofweek_start').val() + '-' + $('#edit_ti_dayofweek_end').val();
+		}
+
+		if ($('#ti_type_byGroupofDates:selected').length) {
+			interval.days = $('#edit_ti_from_date').val();
+
+			if (!interval.days.valiDate()) {
+				ASTGUI.highlightField('edit_ti_from_date', 'Invalid Date Range!');
+				return;
+			}
+
+			interval.months = $('#edit_ti_month').val();
+		}
+
+		if (isNewTI) {
+			var resp = parent.pbx.time_intervals.add(newname, interval);
+		} else {
+			var resp = parent.pbx.time_intervals.edit(EDIT_TI, newname, interval);
+		}
+
+		if (!resp) {
+			top.log.error('Error updating Time Interval');
+			ASTGUI.feedback({ msg: 'ERROR UPDATING!', showfor: 3, color: 'red', bgcolor: '#ffffff'});
+			return;
+		}
+
+		ASTGUI.feedback({ msg: "Created time interval '" + newname + "'!", showfor: 3, color:'green', bgcolor:'#FFFFFF'});
+		window.location.reload();
+
 	},
 
 	delete_TI : function(a){ // ti_miscFunctions.delete_TI

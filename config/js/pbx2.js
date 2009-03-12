@@ -56,8 +56,8 @@ pbx.calling_rules.add = function(name, dp) {
 	var ext_conf = new listOfSynActions('extensions.conf');
 
 	if (!sessionData.pbxinfo.callingRules.hasOwnProperty(name)) {
-		ext_conf.new_action('delcat', name '', ''); /* for good measure :) */
-		ext_conf.new_action('newcat', name '', '');
+		ext_conf.new_action('delcat', name, '', ''); /* for good measure :) */
+		ext_conf.new_action('newcat', name, '', '');
 		sessionData.pbxinfo.callingRules[name] = [];
 	}
 
@@ -95,7 +95,7 @@ pbx.calling_rules.edit = function(name, current, edition) {
 	}
 
 	var ext_conf = new listOfSynActions('extensions.conf');
-	ext_conf.new_action('update', name, 'exten', edition.lChop('exten='), current.lChop('exten=');
+	ext_conf.new_action('update', name, 'exten', edition.lChop('exten='), current.lChop('exten='));
 
 	var resp = ext_conf.callActions();
 	if (!resp.contains('Response: Success')) {
@@ -203,7 +203,7 @@ pbx.conferences.load = function() {
 		var options = line.afterChar('=');
 		var params = options.betweenXY('|',')');
 		
-		if (params.contains('a') && params.contains('A')) [
+		if (params.contains('a') && params.contains('A')) {
 			exten = ASTGUI.parseContextLine.getArgs(line)[0];
 		}
 
@@ -307,7 +307,7 @@ pbx.queues.load = function() {
 
 	cxt.each(function(line) {
 		if (!line.beginsWith('exten=')) {
-			continue;
+			return;
 		}
 
 		var exten = ASTGUI.parseContextLine.getExten(line);
@@ -346,7 +346,7 @@ pbx.time_intervals.add = function(name, interval) {
 	if (!name) {
 		top.log.error('pbx.time_intervals.add: name is empty.');
 		return false;
-	} else if (typeof interval !== 'undefined') {
+	} else if (typeof interval === 'undefined') {
 		top.log.error('pbx.time_intervals.add: interval is undefined.');
 		return false;
 	}
@@ -370,7 +370,7 @@ pbx.time_intervals.add = function(name, interval) {
 	if (!this.validate.time(interval.time)) {
 		top.log.error('pbx.time_intervals.add: invalid time.');
 		return false;
-	} else if (!this.validate.weekdays(interval.weekdays)) {
+	} else if (!this.validate.weekday(interval.weekdays)) {
 		top.log.error('pbx.time_intervals.add: invalid days of the week.');
 		return false;
 	} else if (!this.validate.day(interval.days)) {
@@ -388,9 +388,10 @@ pbx.time_intervals.add = function(name, interval) {
 		+ interval.months.toString();
 
 	/* update extensions.conf */
-	var ext_conf = new listOfActions('extensions.conf');
+	var ext_conf = new listOfSynActions('extensions.conf');
+	ext_conf.new_action('update', 'globals', ASTGUI.contexts.TimeIntervalPrefix + name, value);
 
-	var resp = ext_cont.new_action('update', 'globals', name, value);
+	var resp = ext_conf.callActions();
 	if (!resp.contains('Response: Success')) {
 		top.log.error('pbx.time_intervals.add: error updating extensions.conf');
 		return false;
@@ -398,6 +399,94 @@ pbx.time_intervals.add = function(name, interval) {
 
 	/* TODO: add new time interval to gui cache */
 
+	ASTGUI.feedback({ msg: 'Created time interval!', showfor: 3, color: 'green', bgcolor: '#ffffff'});
+	return true;
+};
+
+/**
+ * Edit a Time Interval.
+ * @param oldname Old Name of the Interval.
+ * @param newname New Name of the Interval.
+ * @param interval contains: time, weekdays, days, months
+ * @return boolean on success.
+ */
+pbx.time_intervals.edit = function(oldname, newname, interval) {
+	/* check the basics */
+	if (!name) {
+		top.log.error('pbx.time_intervals.add: name is empty.');
+		return false;
+	} else if (typeof interval !== 'undefined') {
+		top.log.error('pbx.time_intervals.add: interval is undefined.');
+		return false;
+	}
+
+	/* validate the name */
+	if (newname.contains(' ')) {
+		top.log.error('pbx.time_intervals.add: name contains spaces.');
+		return false;
+	}
+
+	/* set defaults. can't loop through members, that assumes they exist. */
+	interval.time = interval.time || '*';
+	interval.weekdays = interval.weekdays || '*';
+	interval.days = interval.days || '*';
+	interval.months = interval.months || '*';
+
+	/* validate all the args */
+	if (!this.validate.time(interval.time)) {
+		top.log.error('pbx.time_intervals.add: invalid time.');
+		return false;
+	} else if (!this.validate.weekday(interval.weekdays)) {
+		top.log.error('pbx.time_intervals.add: invalid days of the week.');
+		return false;
+	} else if (!this.validate.day(interval.days)) {
+		top.log.error('pbx.time_intervals.add: invalid day.');
+		return false;
+	} else if (!this.validate.month(interval.months)) {
+		top.log.error('pbx.time_intervals.add: invalid month.');
+		return false;
+	}
+
+	/* create the time interval string */
+	var value = interval.time.toString() + top.session.delimiter
+		+ interval.weekdays.toString() + top.session.delimiter
+		+ interval.days.toString() + top.session.delimiter
+		+ interval.months.toString();
+
+	/* update extensions.conf */
+	var actions = new listOfSynActions('extensions.conf');
+	actions.new_action('delete', 'globals', ASTGUI.contexts.TimeIntervalPrefix + oldname, '', '');
+
+	var exten_conf = config2json({filename:'extensions.conf', usf:0});
+	for (var cxt in exten_conf) {
+		if (!exten_conf.hasOwnProperty(cxt)) {
+			continue;
+		}
+
+		if (cxt.beginsWith(ASTGUI.contexts.TrunkDIDPrefix) && !cxt.contains('_' + ASTGUI.contexts.TimeInteralPrefix)) {
+			var lines = exten_conf[cxt];
+			lines.each(function(line) {
+				if (line.beginsWith('include=') && line.contains(ASTGUI.contexts.TrunkDIDPrefix) && (line.contains(oldname + ',${') || line.contains(oldname + '|${'))) {
+					actions.new_action('update', cxt, 'include', line.afterChar('=').replaceXY(oldname, newname), line.afterChar('='));
+				}
+			});
+		}
+
+		if (cxt.beginsWith(ASTGUI.contexts.TrunkDIDPrefix) && cxt.endsWith(oldname)) {
+			actions.new_action('renamecat', cxt, '', cxt.replace(oldname, newname));
+		}
+	}
+
+	actions.new_action('update', 'globals', ASTGUI.contexts.TimeIntervalPrefix + newname, value);
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.time_intervals.add: error updating extensions.conf');
+		return false;
+	}
+
+	/* TODO: add new time interval to gui cache */
+
+	ASTGUI.feedback({ msg: 'Updated time interval!', showfor: 3, color: 'green', bgcolor: '#ffffff'});
 	return true;
 };
 
@@ -531,7 +620,7 @@ pbx.time_intervals.validate.weekday = function(week) {
  * Trunks object.
  */
 pbx.trunks = {
-	trunk_types = ['analog', 'bri', 'iax', 'pri', 'provider', 'sip']
+	trunk_types: ['analog', 'bri', 'iax', 'pri', 'provider', 'sip']
 };
 
 /**
@@ -733,7 +822,7 @@ pbx.trunks.getName = function(trunk) {
  * @param trunk.
  * @return provider type.
  */
-pbx.trunks.getProviderType = function(trunk) [
+pbx.trunks.getProviderType = function(trunk) {
 	if (!sessionData.pbxinfo.trunks.providers.hasOwnProperty(trunk)) {
 		top.log.error('pbx.trunks.getProviderType: ' + trunk + ' is not a provider.');
 		return '';

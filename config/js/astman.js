@@ -1561,7 +1561,7 @@ var ASTGUI = {
 			//ASTGUI.miscFunctions.GotoIftime_in_humanReadable( '08:00-17:00,mon-fri,*,*' ) ; // returns a human readable form as ' 8 AM to 5 PM on Monday through Friday'
 			var WEEKDAYS = {mon: 'Monday', tue: 'Tuesdays', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat:'Saturday', sun:'Sunday'};
 
-			var PIECES = gotoiftime_str.split(',') ;
+			var PIECES = gotoiftime_str.contains(',') ? gotoiftime_str.split(',') : gotoiftime_str.split('|') ;
 			var toreturn = [];
 			if( PIECES[0] != '*' ){
 				toreturn.push( ASTGUI.miscFunctions.asteriskTime_to_AMPM(PIECES[0].split('-')[0]) + ' to ' +  ASTGUI.miscFunctions.asteriskTime_to_AMPM(PIECES[0].split('-')[1]) );
