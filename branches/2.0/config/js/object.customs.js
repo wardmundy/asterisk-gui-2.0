@@ -157,24 +157,25 @@ Array.prototype.withOut = function(e) {
 /**
  * Get Properties As String.
  * Gets Object's properties and returns them as a string. Use to be ASTGUI.getObjectPropertiesAsString.
+ * Its important to note that the Object shouldn't EVER be prototype'd, it breaks Object as a hash.
  * @returns a string of the object's properties
  */
-Object.prototype.getProperties = function() {
+getProperties = function(obj) {
 	var props = [];
 
-	for (var d in this) {
-		if (!this.hasOwnProperty(d)) {
+	for (var d in obj) {
+		if (!obj.hasOwnProperty(d)) {
 			continue;
 		}
 
-		if (typeof this[d] === 'object') {
-			if (this[d] instanceof Array) {
-				props.push(d + ': [' + this[d].join(',') + ']');
+		if (typeof obj[d] === 'object') {
+			if (obj[d] instanceof Array) {
+				props.push(d + ': [' + obj[d].join(',') + ']');
 			} else {
-				props.push(d + ': ' + this[d].getProperties());
+				props.push(d + ': ' + obj[d].getProperties());
 			}
 		} else {
-			props.push(d + ': ' + this[d]);
+			props.push(d + ': ' + obj[d]);
 		}
 	}
 	return '{' + props.join(' ,') + '}';
@@ -356,6 +357,8 @@ String.prototype.valiDate = function() { /* get it?? */
 	if (day && (day < 0 || day > 31)) {
 		return false;
 	}
+
+	return true;
 };
 
 
