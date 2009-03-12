@@ -491,6 +491,46 @@ pbx.time_intervals.edit = function(oldname, newname, interval) {
 };
 
 /**
+ * Delete a Time Interval.
+ * @param name.
+ * @return boolean on success.
+ */
+pbx.time_intervals.remove = function(name) {
+	if (!name) {
+		top.log.warn('pbx.time_intervals.remove: Name is empty.');
+		return false;
+	}
+
+	var actions = new listOfSynActions('extensions.conf');
+	actions.new_action('delete', 'globals', t, '', '');
+
+	var exten_conf = config2json({filename: 'extensions.conf', usf:0});
+	for (var cxt in exten_conf) {
+		if (!exten_conf.hasOwnProperty(cxt)) {
+			continue;
+		}
+
+		if (cxt.beginsWith(ASTGUI.contexts.TrunkDIDPrefix) && !cxt.contains(ASTGUI.contexts.TimeIntervalPrefix)) {
+			var did = exten_conf[cxt];
+			did.each(function(line) {
+				if (line.beginsWith('include=') && line.contains(ASTGUI.contexts.TrunkDIDPrefix) && line.contains(ASTGUI.contexts.TimeIntervalPrefix)) {
+					actions.new_action('delete', cxt, 'include', '', line.afterChar('='));
+				}
+			});
+		}
+	}
+
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.time_intervals.remove: error updating extensions.conf.');
+		return false;
+	}
+
+
+	return true;
+};
+
+/**
  * Validater object.
  * Holds members funcs that validate various formats
  * needed for time_intervals.
@@ -595,17 +635,19 @@ pbx.time_intervals.validate.weekday = function(week) {
 		return true;
 	}
 
-	if (week.contains('-') && week[2] !== '-') {
+	if (week.contains('-') && week[3] !== '-') {
 		return false;
-	} else if (week[2] === '-') {
+	} else if (week[3] === '-') {
 		var first = week.split('-')[0];
 		var second = week.split('-')[1];
 
 		if (!this.days.contains(first) || !this.days.contains(second)) {
+			alert('zonoes!');
 			return false;
 		}
 	} else {
 		if (!this.days.contains(week)) {
+			alert('zonoes 2.0!');
 			return false;
 		}
 
