@@ -188,7 +188,7 @@ astman.cliCommand = function(cmd) {
  */
 astman.makeSyncRequest = function(params) {
 	if (top.session && top.session.debug_mode) {
-		log.ajax('makeSyncRequest: AJAX Request: "' + params.getProperties() + '"');
+		log.ajax('makeSyncRequest: AJAX Request: "' + getProperties(param) + '"');
 	}
 
 	if (typeof params !== 'object') {

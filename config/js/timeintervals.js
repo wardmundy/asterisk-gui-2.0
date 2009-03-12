@@ -81,17 +81,18 @@ var ti_miscFunctions = {
 			var endtime = ASTGUI.miscFunctions.AMPM_to_asteriskTime(end) || '24:00';
 
 			if (starttime !== '00:00' || endtime !== '24:00') {
-				interval.time = starttime + '-' + endttime;
+				interval.time = starttime + '-' + endtime;
 			}
 		}
 
-		if (!$('#edit_ti_byDayofWeek:selected').length) {
+		if ($('#ti_type_byDayofWeek:checked').val()) {
 			interval.weekdays = $('#edit_ti_dayofweek_start').val() + '-' + $('#edit_ti_dayofweek_end').val();
 		}
 
-		if ($('#ti_type_byGroupofDates:selected').length) {
+		if ($('#ti_type_byGroupofDates:checked').val()) {
 			interval.days = $('#edit_ti_from_date').val();
 
+			interval.days = interval.days.toString();
 			if (!interval.days.valiDate()) {
 				ASTGUI.highlightField('edit_ti_from_date', 'Invalid Date Range!');
 				return;
@@ -112,7 +113,7 @@ var ti_miscFunctions = {
 			return;
 		}
 
-		ASTGUI.feedback({ msg: "Created time interval '" + newname + "'!", showfor: 3, color:'green', bgcolor:'#FFFFFF'});
+		ASTGUI.feedback({ msg: "Time Interval '" + newname + "' " + ((isNewTI) ? "created" : "edited") + "!", showfor: 3, color:'green', bgcolor:'#FFFFFF'});
 		window.location.reload();
 
 	},

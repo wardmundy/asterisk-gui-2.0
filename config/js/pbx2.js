@@ -412,10 +412,10 @@ pbx.time_intervals.add = function(name, interval) {
  */
 pbx.time_intervals.edit = function(oldname, newname, interval) {
 	/* check the basics */
-	if (!name) {
+	if (!newname) {
 		top.log.error('pbx.time_intervals.add: name is empty.');
 		return false;
-	} else if (typeof interval !== 'undefined') {
+	} else if (typeof interval === 'undefined') {
 		top.log.error('pbx.time_intervals.add: interval is undefined.');
 		return false;
 	}
@@ -477,7 +477,7 @@ pbx.time_intervals.edit = function(oldname, newname, interval) {
 		}
 	}
 
-	actions.new_action('update', 'globals', ASTGUI.contexts.TimeIntervalPrefix + newname, value);
+	actions.new_action('append', 'globals', ASTGUI.contexts.TimeIntervalPrefix + newname, value);
 	var resp = actions.callActions();
 	if (!resp.contains('Response: Success')) {
 		top.log.error('pbx.time_intervals.add: error updating extensions.conf');
@@ -595,9 +595,9 @@ pbx.time_intervals.validate.weekday = function(week) {
 		return true;
 	}
 
-	if (week.contains('-') && week[3] !== '-') {
+	if (week.contains('-') && week[2] !== '-') {
 		return false;
-	} else if (week[3] === '-') {
+	} else if (week[2] === '-') {
 		var first = week.split('-')[0];
 		var second = week.split('-')[1];
 

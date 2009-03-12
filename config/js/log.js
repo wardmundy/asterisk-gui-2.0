@@ -88,7 +88,7 @@ log.doLog = function(msg, color) {
 	}
 
 	if (typeof msg === 'object') {
-		msg = 'OBJECT: ' + msg.getProperties();
+		msg = 'OBJECT: ' + getProperties(msg);
 	}
 
 	var now = new Date();
