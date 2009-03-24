@@ -2332,6 +2332,10 @@ var ASTGUI = {
 		//	Execute a Unix system command
 		top.log.debug("Executing System Command : '" + cmd + "'");
 		var delay_cb = function(){
+			if (typeof callbackfunction !== 'function') {
+				return;
+			}
+
 			if( parent.sessionData.PLATFORM.isAA50 ){
 				setTimeout( callbackfunction , 500 );
 			}else{
