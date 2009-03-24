@@ -248,10 +248,207 @@ pbx.conferences.load = function() {
 };
 /*---------------------------------------------------------------------------*/
 
+/*---------------------------------------------------------------------------*/
 /**
- * Dial Plans object.
+ * Calling Plans object.
  */
-pbx.dial_plans = {};
+pbx.call_plans = {};
+
+/**
+ * Add a Calling Plan.
+ * @param name Calling Plan name.
+ * @param callplan The Calling Plan.
+ * @param callback Callback function.
+ * @return boolean of success.
+ */
+pbx.call_plans.add = function(name, callplan, callback) {
+	if (!name) {
+		top.log.warn('pbx.call_plans.add: name is empty.');
+		return false;
+	} else if (!callplan) {
+		top.log.warn('pbx.call_plans.add: callplan is empty.');
+		return false;
+	} else if (!callplan.includes) {
+		top.log.warn('pbx.call_plans.add: callplan.includes is empty.');
+		return false;
+	}
+
+	var actions = new listOfSynActions('extensions.conf');
+	actions.new_action('delcat', name, '', '');
+	actions.new_action('newcat', name, '', '');
+
+	callplan.includes.each(function(cxt) {
+		actions.new_action('append', name, 'include', cxt);
+	});
+
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.call_plans.add: Error updating extensions.conf.');
+		return false;
+	}
+
+	sessionData.pbxinfo.callingPlans[name] = callplan;
+	if (callback) {
+		callback();
+	}
+
+	return true;
+};
+
+/**
+ * List Call Plans.
+ * @return array of Call Plans.
+ */
+pbx.call_plans.list = function() {
+	var list = [];
+
+	for (var x in sessionData.pbxinfo.callingPlans) {
+		if (!sessionData.pbxinfo.callingPlans.hasOwnProperty(x)) {
+			continue;
+		}
+
+		list.push(x);
+	}
+
+	return list;
+};
+
+/**
+ * Get Next Available Calling Plan.
+ * @return next available calling plan.
+ */
+pbx.call_plans.nextAvailable = function() {
+	var numbers = [];
+	var cxt = ASTGUI.contexts.CallingPlanPrefix + 'DialPlan';
+	var plans = this.list();
+
+	plans.each(function(plan) {
+		if (!plan.beginsWith(cxt)) {
+			return;
+		}
+
+		var num = Number(plan.lChop(cxt));
+		if (!isNaN(num)) {
+			numbers.push(num);
+		}
+	});
+
+	return 'DialPlan' + numbers.firstAvailable(1);
+};
+
+/**
+ * Parse Call Plans context.
+ * @param cxt Calling Plans context.
+ * @return object of calling plan
+ */
+pbx.call_plans.parse = function(cxt) {
+	if (!cxt) {
+		top.log.warn('pbx.call_plans.parse: cxt is empty.');
+		return null;
+	}
+
+	var dp = {};
+	dp.includes = [];
+
+	cxt.each(function(line) {
+		if (line.beginsWith('include=')) {
+			dp.includes.push(line.afterChar('='));
+		}
+	});
+
+	return dp;
+};
+
+/**
+ * Remove a Calling Plan.
+ * @param name The Calling Plan name.
+ * @return boolean of success.
+ */
+pbx.call_plans.remove = function(name) {
+	if (!name) {
+		top.log.warn('pbx.call_plans.remove: name is empty.');
+		return false;
+	}
+
+	var actions = new listOfSynActions('extensions.conf');
+	actions.new_action('delcat', name, '', '');
+
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.call_plans.remove: Error updating extensions.conf');
+		return false;
+	}
+
+	delete sessionData.pbxinfo.callingPlans[name];
+	return true;
+};
+
+/**
+ * The Calling Rules object.
+ * This object holds all the methods and members to manipulate calling rules
+ * inside a calling plan.
+ */
+pbx.call_plans.rules = {};
+
+/**
+ * Add a Calling Rule.
+ * @param callplan The Calling Plan.
+ * @param rule The Calling Rule to add.
+ * @return boolean of success.
+ */
+pbx.call_plans.rules.add = function(callplan, rule) {
+	if (!callplan) {
+		top.log.warn('pbx.call_plans.rules.remove: Callplan is empty.');
+		return false;
+	} else if (!rule) {
+		top.log.warn('pbx.call_plans.rules.remove: Rule is empty.');
+		return false;
+	}
+
+	var actions = new listOfSynActions('extensions.conf');
+	actions.new_action('append', callplan, 'include', rule);
+
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.eror('pbx.call_plans.rules.add: Error updating extensions.conf');
+		return false;
+	}
+
+	sessionData.pbxinfo.callingPlans[callplan].includes.push(rule);
+	return true;
+};
+
+/**
+ * Delete a Calling Rule.
+ * @param callplan The Calling Plan to delete from.
+ * @param rule The Calling Rule to delete.
+ * @return boolean of success.
+ */
+pbx.call_plans.rules.remove = function(callplan, rule) {
+	if (!callplan) {
+		top.log.warn('pbx.call_plans.rules.remove: Callplan is empty.');
+		return false;
+	} else if (!rule) {
+		top.log.warn('pbx.call_plans.rules.remove: Rule is empty.');
+		return false;
+	}
+
+	var actions = new listOfSynActions('extensions.conf');
+	actions.new_action('delete', callplan, 'include', '', rule);
+
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.call_plans.rules.remove: Error updating extensions.conf.');
+		return false;
+	}
+
+	/* TODO: This is ugly, surely there is a better way */
+	if (sessionData.pbxinfo.callingPlans[callplan].includes) {
+		sessionData.pbxinfo.callingPlans[callplan].includes = sessionData.pbxinfo.callingPlans[callplan].includes.withOut(rule);
+	}
+	return true;
+};
+/*---------------------------------------------------------------------------*/
 
 /**
  * Directory object.
@@ -273,10 +470,81 @@ pbx.hardware = {};
  */
 pbx.moh = {};
 
+/*---------------------------------------------------------------------------*/
 /**
  * Paging object.
  */
 pbx.paging = {};
+
+/**
+ * Add a Page Group.
+ * @param line New Page Group Line.
+ * @param callback Callback function.
+ * @return boolean of success.
+ */
+pbx.paging.add = function(line, callback) {
+	if (!line) {
+		top.log.warn('pbx.paging.add: Line is empty.');
+		return false;
+	}
+
+	var actions = new listOfSynActions('extensions.conf');
+	actions.new_action('append', ASTGUI.contexts.PageGroups, 'exten', line);
+
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.paging.add: Error updating extensions.conf.');
+		return false;
+	}
+
+	this.updateCache(callback);
+	return true;
+};
+
+/**
+ * List Page Groups.
+ * @return an array of page groups.
+ */
+pbx.paging.list = function() {
+	var cxt = sessionData.pbxinfo['pagegroups'];
+	var extens = [];
+	cxt.each(function(line) {
+		var exten = ASTGUI.parseContextLine.getExten(line);
+		if (exten) {
+			extens.push(exten);
+		}
+	});
+
+	return extens;
+};
+
+/**
+ * Delete a Page Group.
+ * @param exten The Page Group extension.
+ * @param callback The Callback function.
+ * @return boolean of success.
+ */
+pbx.paging.remove = function(exten, callback) {
+	var cache = this.updatePGsCache;
+	ASTGUI.misFunctions.delete_LinesLike({ 
+		context_name: ASTGUI.contexts.PageGroups, 
+		beginsWithArr: ['exten=' + pgexten + ','], 
+		filename: 'extensions.conf', 
+		hasThisString: 'Macro(', 
+		cb: function(){AF(cb);}
+	});
+};
+
+/**
+ * Update Page Group Cache.
+ * @param callback Callback Function
+ */
+pbx.paging.updateCache = function(callback) {
+	setTimeout(function() {
+		sessionData.pbxinfo['pagegroups'] = context2json({filename: 'extensions.conf', context: ASTGUI.contexts.PageGroups, usf:0});
+	}, 1000);
+};
+/*---------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -324,10 +592,196 @@ pbx.queues.load = function() {
 };
 /*---------------------------------------------------------------------------*/
 
+/*---------------------------------------------------------------------------*/
 /**
  * Ring Groups object.
  */
 pbx.ring_groups = {};
+
+/**
+ * Add a new Ring Group.
+ * @param name Ring Group name.
+ * @param rg Ring Group object.
+ * @param callback Callback function.
+ * @return boolean on success.
+ */
+pbx.ring_groups.add = function(name, rg, callback) {
+	name = name || this.next();
+	rg.fallback = rg.fallback || 'Hangup';
+	var ignore = (rg.ignore) ? '${DIALOPTIONS}i' : '${DIALOPTIONS}';
+
+	var actions = new listOfSynActions('extensions.conf');
+	actions.new_action('newcat', name, '', '');
+	actions.new_action('append', name, 'exten', 's,1,NoOp(' + rg.NAME + ')');
+
+	if (rg.strategy === 'ringinorder') {
+		rg.members.each(function(member) {
+			actions.new_action('append', name, 'exten', 's,n,Dial(' + member + ',' + rg.ringtime + ',' + ignore + ')');
+		});
+	} else {
+		if (rg.members.length) {
+			actions.new_action('append', name, 'exten', 's,n,Dial(' + rg.members.join('&') + ',' + rg.ringtime + ',' + ignore + ')');
+		}
+	}
+
+	actions.new_action('append', name, 'exten', 's,n,' + rg.fallback);
+
+	var resp = actions.callActions();
+
+	if (!rest.contains('Response: Success')) {
+		top.log.error('pbx.ring_groups.add: error updating extensions.conf');
+		return false;
+	}
+
+	if (rg.extension) {
+		actions.clearActions();
+		actions.new_action('append', ASTGUI.contexts.RingGroupExtensions, 'exten', rg.extension + ',1,Goto(' + name + ',s,1)');
+		actions.callActions();
+	}
+	
+	sessionData.pbxinfo.ringgroups[name] = rg;
+	callback();
+	return true;
+};
+
+/**
+ * List Ring Groups.
+ * @return array of ring groups.
+ */
+pbx.ring_groups.list = function() {
+	var list = [];
+	var rgs = sessionData.pbxinfo.ringgroups;
+
+	for (var rg in rgs) {
+		if (rgs.hasOwnProperty(rg)) {
+			list.push(rg);
+		}
+	}
+
+	return list;
+};
+
+/**
+ * Parse Ring Groups' context.
+ * @param cxt_name Context name.
+ * @param cxt Context.
+ * @param extens Ring Group extensions.
+ * @return ring group object.
+ */
+pbx.ring_groups.parse = function(cxt_name, cxt, extens) {
+	if (!cxt_name) {
+		top.log.error('pbx.ring_groups.parse: cxt_name is empty.');
+		return null;
+	} else if (!cxt) {
+		top.log.error('pbx.ring_groups.parse: cxt is empty.');
+		return null;
+	} else if (!extens) {
+		top.log.error('pbx.ring_groups.parse: extens is empty.');
+		return null;
+	}
+
+	var rg = new ASTGUI.customObject;
+	rg.name = '';
+	rg.members = [];
+	rg.strategy = '';
+	rg.ignore = true;
+
+	if (cxt[0].contains('exten=s,1') && cxt[0].toLowerCase().contains('noop(')) {
+		/* TODO: this is clearly a bad assumption for those who might want
+		 * to edit this ring group. We need to strengthen this */
+		rg.name = cxt[0].betweenXY('(', ')');
+		cxt.splice(0,1);
+	} else {
+		rg.name = 'RingGroup ' + cxt_name.withOut(ASTGUI.contexts.RingGroupPrefix);
+	}
+
+	var dialcount = 0;
+	cxt.each(function(line) {
+		/* check for old gui ring group name */
+		if (line.beginsWith('gui_ring_groupname=')) {
+			rg.name = line.afterChar('=');
+			return;
+		}
+
+		if (line.toLowerCase().contains('dial(')) {
+			dialcount++;
+			var args = ASTGUI.parseContextLine.getArgs(line);
+			if (args[0].contains('&')) {
+				rg.members = rg.members.concat(args[0].split('&'));
+			} else {
+				rg.members.push(args[0]);
+			}
+
+			rg.ringtime = args[1];
+			rg.ignore = (args[2] && args[2].contains('i')) ? true : false;
+		}
+	});
+
+	rg.strategy = (dialcount > 1) ? 'ringinorder' : 'ringall';
+	var lastline = cxt[cxt.length-1].toLowerCase();
+	if (!lastline.contains('dial(') && lastline.beginsWith('exten=s,n')) {
+		rg.fallback = cxt[cxt.length-1].split('=s,n,')[1];
+	}
+
+	for (var a=0; a<extens.length; a++) {
+		if (extens[a].contains(cxt_name + '|') && extens[a].contains(cxt_name + ',')) {
+			rg.extension = ASTGUI.parseContextLine.getExten(extens[a]);
+			break;
+		}
+	}
+
+	return rg;
+};
+
+/**
+ * Next available ring group number.
+ * @return next available ring group number.
+ */
+pbx.ring_groups.next = function() {
+	var x = [];
+	var y = this.list();
+
+	y.each(function(rg) {
+		if (rg.beginsWith(ASTGUI.contexts.RingGroupPrefix)) {
+			x.push(rg.split(ASTGUI.contexts.RingGroupPrefix)[1]);
+		}
+	});
+
+	if (!x.length) {
+		return ASTGUI.contexts.RingGroupPrefix + '1';
+	}
+
+	return ASTGUI.contexts.RingGroupPrefix + x.firstAvailable();
+};
+
+/**
+ * Delete a ring group.
+ * @param name Name of Ring Group.
+ * @return boolean on success.
+ */
+pbx.ring_groups.remove = function(name) {
+	var actions = new listOfSynActions('extensions.conf');
+	actions.new_action('delcat', name, '', '');
+
+	if (sessionData.pbxinfo.ringgroups[name].extension) {
+		var exten = sessionData.pbxinfo.ringgroups[name].extension;
+		actions.new_action('delete', ASTGUI.contexts.RingGroupExtensions, 'exten', '', exten + ',1,Goto(' + name + ',s,1)');
+
+		if (sessionData.pbxinfo.ringgroups[name].hasOwnProperty('isOLDRG') && sessionData.pbxinfo.ringgroups[name].isOLDRG === true) {
+			actions.new_action('delete', 'default', 'exten', '', exten + ',1,Goto(' + name + '|s|1)');
+		}
+	}
+
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.ring_groups.remove: error updating extensions.conf');
+		return false;
+	}
+
+	delete sessionData.pbxinfo.ringgroups[name];
+	return true;
+};
+/*---------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -526,7 +980,7 @@ pbx.time_intervals.remove = function(name) {
 		return false;
 	}
 
-
+	ASTGUI.feedback({ msg: 'Deleted time interval!', showfor: 3, color: 'green', bgcolor: '#ffffff'});
 	return true;
 };
 
@@ -642,12 +1096,10 @@ pbx.time_intervals.validate.weekday = function(week) {
 		var second = week.split('-')[1];
 
 		if (!this.days.contains(first) || !this.days.contains(second)) {
-			alert('zonoes!');
 			return false;
 		}
 	} else {
 		if (!this.days.contains(week)) {
-			alert('zonoes 2.0!');
 			return false;
 		}
 
@@ -1161,12 +1613,150 @@ pbx.users.remove = function(params) {
 		}
 	});
 };
+
+/**
+ * Get a User's Status.
+ * copied from ASTGUI.getUser_DeviceStatus.
+ * @param user The User's Extension.
+ * @return [FBUR] depending on the status
+ */
+pbx.users.state = function(user) {
+	user = (typeof user === 'number') ? String(user) : user;
+	if (typeof user !== 'string') {
+		top.log.warn('pbx.users.state: Expecting user to be a String.');
+		return 'U';
+	}
+
+	var req = top.astman.makeSyncRequest({action: 'ExtensionState', Exten: user});
+	switch(true) {
+		case t.contains('Status: 0'): /* No Device is Busy/InUse */
+			return 'F';
+		case t.contains('Status: 1'): /* 1+ Devices Busy/InUse */
+		case t.contains('Status: 2'): /* all Devices Busy/InUse */
+			return 'B';
+		case t.contains('Status: 8'): /* all Devices Ringing */
+			return 'R';
+		case t.contains('Status: 4'): /* All devices unavailable/unregistered */
+		default:
+			return 'U';
+	}
+};
+
+/**
+ * Get a User's Status Image.
+ * copied from ASTGUI.getUser_DeviceStatus.
+ * @param state [OPTIONAL] if the state already exists give it to us!
+ * @param user [OPTIONAL] if the state already exists give it to us!
+ * @return html for img
+ */
+pbx.users.stateImage = function(obj) {
+	var state;
+	if (obj.state) {
+		state = obj.state;
+	} else if (obj.user) {
+		state = this.state(user);
+	} else {
+		top.log.error('pbx.users.stateImage: neither state nor user were present in params.');
+		return '<img src="images/status_gray.png" border="0" />';
+	}
+
+	switch(state) {
+		case 'F': /* Available */
+			return '<img src="images/status_green.png" border="0" />';
+		case 'B': /* Busy */
+			return '<img src="images/status_red.png" border="0" />';
+		case 'R': /* Ringing */
+			return '<img src="images/status_orange.png" border="0" />';
+		case 'U': /* Unavailable */
+		default:
+			return '<img src="images/status_gray.png" border="0" />';
+	}
+};
 /*---------------------------------------------------------------------------*/
 
+/*---------------------------------------------------------------------------*/
 /**
  * VoiceMail Groups object.
  */
 pbx.vm_groups = {};
+
+/**
+ * Add a VM Group.
+ * @param exten VM Group extension.
+ * @param group VM Group.
+ * @return boolean of success.
+ */
+pbx.vm_groups.add = function(exten, group) {
+	var lines = [];
+	lines[0] = exten + ',1,NoOp(' + group.label + ')';
+	lines[1] = exten + ',2,VoiceMail(' + group.mailboxes.join('@default&') + '@default' + ')';
+
+	var actions = new listOfSynActions('extensions.conf');
+	for (var i=0; i<lines.length; i++) {
+		actions.new_action('append', ASTGUI.contexts.VoiceMailGroups, 'exten', line[i]);
+	}
+
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.vm_groups.add: Error updating extensions.conf');
+		return false;
+	}
+
+	sessionData.pbxinfo['vmgroups'][exten] = group;
+};
+
+/**
+ * Parse VM Group Context.
+ * @param cxt VM Group Context.
+ * @return boolean of success.
+ */
+pbx.vm_groups.parse = function(cxt) {
+	if (!cxt) {
+		top.log.warn('pbx.vm_groups.parse: cxt is empty.');
+		return false;
+	}
+
+	cxt.each(function(line) {
+		var exten = ASTGUI.parseContextLine.getExten(line);
+		if (!sessionData.pbxinfo.vmgroups.hasOwnProperty(exten)) {
+			sessionData.pbxinfo.vmgroups[exten] = new ASTGUI.customObject;
+			sessionData.pbxinfo.vmgroups[exten].label = '';
+			sessionData.pbxinfo.vmgroups[exten].mailboxes = [];
+		}
+
+		if (line.toLowerCase().contains('noop(')) {
+			var name = line.getNoOp();
+			sessionData.pbxinfo.vmgroups[exten].label = name;
+		} else if (line.toLowerCase().contains('voicemail(')) {
+			var members = ASTGUI.parseContextLine.getArgs(line)[0];
+			members.split('&').each(function(member) {
+				member = member.trim();
+				if (member) {
+					sessionData.pbxinfo.vmgroups[exten].mailboxes.push(member.beforeChar('@').trim());
+				}
+			});
+		}
+	});
+
+	return true;
+};
+
+/**
+ * Remove VM Group.
+ * @param exten VM Group Exten to delete.
+ * @return boolean of success.
+ */
+pbx.vm_groups.remove = function(exten) {
+	ASTGUI.miscFunctions.delete_LinesLike({
+		context_name: ASTGUI.contexts.VoiceMailGroups,
+		beginsWithArr: ['exten=' + exten + ',', 'exten=' + exten + ' ,'],
+		filename: 'extensions.conf',
+		cb: function(){}
+	});
+
+	delete sessionData.pbxinfo.vmgroups[exten];
+};
+/*---------------------------------------------------------------------------*/
 
 /**
  * Voicemail object.
