@@ -19,10 +19,6 @@
  * at the top of the source tree.
  *
 -->
-<script src="js/jquery.js"></script>
-<script src="js/astman.js"></script>
-<script src="js/users.js"></script>
-<script src="js/jquery.tooltip.js"></script>
 <link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
 <style type="text/css">
 	.no_obcid { 
@@ -495,4 +491,31 @@
 	<form name="buynow_form" id="buynow_form" action="http://www.digium.com/en/ecosystem/partners/partners.php" method="post"></form>
 </div>
 
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<script src="js/users.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		top.document.title = "Manage User Extensions";
+		if (!ASTGUI.miscFunctions.alertIfRangeisNotdefined('ue_start', 'ue_end', 'Users')) {
+			$('.top_buttons').hide();
+			return;
+		}
+		
+		$('#new_ext')
+			.keyup(function() {
+				$('#edit_callerid_span').html(this.value);
+			})
+			.change(function() {
+				$('#edit_callerid_span').html(this.value);
+		});
+
+		USERS_MISC_FUNCTIONS.load_users_table();
+
+		$('#whereToBuy_button').tooltip({ delay: 0.9, showURL: false, top: 15, left: -300});
+
+		USERS_MISC_FUNCTIONS.initialize_formFields();
+	});
+</script>
 </body>
