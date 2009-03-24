@@ -23,21 +23,6 @@ var EXTENSION_EDIT;
 var zapchan_Before = '';
 var MULTI_FIELDS = ['edit_check_multiple_obcid','edit_multiple_obcid','edit_check_multiple_dialplan','edit_multiple_dialplan','edit_check_multiple_hasvoicemail','edit_multiple_hasvoicemail','edit_check_multiple_vmsecret', 'edit_multiple_vmCHoice1', 'edit_multiple_vmCHoice2', 'edit_multiple_vmsecret', 'edit_check_multiple_hassip', 'edit_multiple_hassip', 'edit_check_multiple_hasiax', 'edit_multiple_hasiax', 'edit_check_multiple_allow',  'edit_multiple_codec_one', 'edit_multiple_codec_two', 'edit_multiple_codec_three', 'edit_multiple_codec_fourth', 'edit_multiple_codec_fifth', 'edit_check_multiple_flashrxflash',  'edit_multiple_flash', 'edit_multiple_rxflash', 'edit_check_multiple_secret', 'edit_multiple_seCHoice1', 'edit_multiple_seCHoice2', 'edit_multiple_secret', 'edit_check_multiple_nat',  'edit_multiple_nat', 'edit_check_multiple_canreinvite', 'edit_multiple_canreinvite', 'edit_check_multiple_dtmfmode',  'edit_multiple_dtmfmode', 'edit_check_multiple_insecure',  'edit_multiple_insecure', 'edit_check_multiple_3waycalling',  'edit_multiple_3waycalling', 'edit_check_multiple_indirectory',  'edit_multiple_indirectory', 'edit_check_multiple_callwaiting',  'edit_multiple_callwaiting', 'edit_check_multiple_cti',  'edit_multiple_cti', 'edit_check_multiple_isagent',  'edit_multiple_isagent', 'edit_check_multiple_pickupgroup',  'edit_multiple_pickupgroup'];
 
-
-var localajaxinit = function(){
-	top.document.title = 'Manage User Extensions ' ;
-	if( !ASTGUI.miscFunctions.alertIfRangeisNotdefined('ue_start','ue_end', 'Users') ){
-		$('.top_buttons').hide();
-		return;
-	}
-
-	$('#new_ext').keyup(function(){ $('#edit_callerid_span').html(this.value); }).change(function(){ $('#edit_callerid_span').html(this.value); });
-
-	USERS_MISC_FUNCTIONS.load_users_table();
-	$('#whereToBuy_button').tooltip({delay:0.9,showURL:false,top:15,left:-300});
-	setTimeout( function(){ USERS_MISC_FUNCTIONS.initialize_formFields(); }, 10 );
-};
-
 var USERS_MISC_FUNCTIONS = {
 	show_UserEdit_normal : function(){ // USERS_MISC_FUNCTIONS.show_UserEdit_normal();
 		$('#edit_User_Advanced_DIV').hideWithBg();
