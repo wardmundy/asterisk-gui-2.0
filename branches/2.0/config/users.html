@@ -72,6 +72,24 @@
 		cursor: default;
 	}
 
+	.top_buttons > span.guiButton, .top_buttons > span.guiButtonNew, .top_buttons > span.guiButtonDelete {
+		float: left;
+	}
+
+	.top_buttons > span.lite_Heading {
+		margin-left: 80px;
+	}
+
+	#whereToBuy_button {
+		float: right;
+		margin-right: 30px;
+	}
+
+	#edit_userExtension_div {
+		display: none;
+		width: 750px;
+	}
+
 </style>
 
 <body bgcolor="#EFEFEF">
@@ -79,19 +97,19 @@
 	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
 </div>
 	<div class='top_buttons'>
-		<span id='new' class='guiButtonNew' onclick='USERS_MISC_FUNCTIONS.NEW_USER_FORM();' style='float:left'>Create New User</span>
-		<span class='guiButton' onclick='USERS_MISC_FUNCTIONS.EDIT_SELECTEDUSERs_FORM();' style='float:left'>Modify Selected Users</span>
-		<span class='guiButtonDelete' onclick='USERS_MISC_FUNCTIONS.DELETE_SELECTED_USERS();' style='float:left'>Delete Selected Users</span>
+		<span id='new' class='guiButtonNew' onclick='USERS_MISC_FUNCTIONS.NEW_USER_FORM();'>Create New User</span>
+		<span class='guiButton' onclick='USERS_MISC_FUNCTIONS.EDIT_SELECTEDUSERs_FORM();'>Modify Selected Users</span>
+		<span class='guiButtonDelete' onclick='USERS_MISC_FUNCTIONS.DELETE_SELECTED_USERS();'>Delete Selected Users</span>
 
-		<span class='guiButton' style='float:right; margin-right:30px;' onclick='buynow_action();' id='whereToBuy_button' tip="en,users,98">Where to Buy</span>
-		<span class='lite_Heading' style='margin-left: 80px'> List of User Extensions </span>
+		<span class='guiButton' onclick='buynow_action();' id='whereToBuy_button' tip="en,users,98">Where to Buy</span>
+		<span class='lite_Heading'> List of User Extensions </span>
 	</div>
 
 <div id='table_userslist_container'>
 <table id='table_userslist' cellpadding=0 cellspacing=0 border=0 align=center></table>
 </div>
 
-<div id="edit_userExtension_div" STYLE="width:750; display: none;" class='dialog'>
+<div id="edit_userExtension_div" class='dialog'>
 	<TABLE width="100%" cellpadding=0 cellspacing=0>
 	<TR class="dialog_title_tr">
 		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);"><span id="edit_userExtension_div_title"></span></TD>
