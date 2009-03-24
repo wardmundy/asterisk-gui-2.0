@@ -1585,33 +1585,57 @@ pbx.users.list = function() {
  * @param user The user.
  * @param vmdel Optional, default = false. Boolean to delete vms or not.
  * @param callback Optional, default = null. The callback function after deleting a user.
+ * @return boolean of success.
  */
 pbx.users.remove = function(params) {
-	var u = new listOfSynActions('users.conf');
-	u.new_action('delcat', params.user, '', '');
-	u.callActions();
+	if (typeof params !== 'object') {
+		top.log.error('pbx.users.remove: Expecting params to be an object.');
+		return false;
+	} else if (typeof params.user === 'undefined') {
+		top.log.error('pbx.users.remove: params.user is empty.');
+		return false;
+	} else if (params.vmdel === 'undefined') {
+		top.log.error('pbx.users.remove: params.vmdel is empty.');
+		return false;
+	}
 
-	u.clearActions('extensions.conf');
-	u.new_action('delete', 'globals', ASTGUI.globals.odcidUsrPrefix + user, '');
-	u.callActions();
+	var actions = new listOfSynActions('users.conf');
+	actions.new_action('delcat', params.user, '', '');
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.users.remove: Error removing ' + params.user + ' from users.conf.');
+		return false;
+	}
 
-	delete sessionData.pbxinfo['users'][user];
+	actions.clearActions('extensions.conf');
+	actions.new_action('delete', 'globals', ASTGUI.globals.odcidUsrPrefix + params.user, '');
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.users.remove: Error removing global var: "' + ASTGUI.globals.odcidUsrPrefix + params.user + '" from extensions.conf.');
+		return false;
+	}
+
+	delete sessionData.pbxinfo['users'][params.user];
 
 	var qs_x = new listOfActions('queues.conf');
 	var qs = config2json({filename: 'queues.conf', usf:0});
 	for (var i in qs) {
-		if (qs[q].contains('member=Agent/' + user) ) {
-			qs_x.new_action('delete', i, 'member', '', 'Agent/' + user);
+		if (!qs.hasOwnProperty(i)) {
+			continue;
+		}
+
+		if (qs[i].contains('member=Agent/' + params.user) ) {
+			qs_x.new_action('delete', i, 'member', '', 'Agent/' + params.user);
 		}
 	}
 
 	qs_x.callActions(function() {
 		if (params.vmdel) {
-			ASTGUI.systemCmd('rm ' + top.sessionData.directories.voicemails_dir + user + ' -rf', params.callback);
-		} else {
-			params.callback();
-		}
+			ASTGUI.systemCmd('rm ' + top.sessionData.directories.voicemails_dir + params.user + ' -rf', function(){});
+		} 
 	});
+
+	params.callback();
 };
 
 /**

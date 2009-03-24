@@ -86,7 +86,7 @@ var USERS_MISC_FUNCTIONS = {
 
 	initialize_formFields : function(){ // USERS_MISC_FUNCTIONS.initialize_formFields();
 		//Load dialplans into 'edit_user_dialplan'
-		var dps = parent.astgui_manageCallPlans.listPlans() ;
+		var dps = parent.pbx.call_plans.list() ;
 		dps.each(function(plan){
 			var t = plan.withOut(ASTGUI.contexts.CallingPlanPrefix);
 			ASTGUI.selectbox.append( 'edit_user_dialplan' , t, plan);
@@ -145,7 +145,7 @@ var USERS_MISC_FUNCTIONS = {
 	load_users_table : function(){ // USERS_MISC_FUNCTIONS.load_users_table
 		var TBL = _$('table_userslist') ;
 		var addCell = ASTGUI.domActions.tr_addCell; // temporarily store the function
-		var ul = parent.astgui_manageusers.listOfUsers();  ul = ul.sortNumbers( );
+		var ul = parent.pbx.users.list();  ul = ul.sortNumbers( );
 		if(!ul.length){
 			ASTGUI.domActions.clear_table( TBL );
 			var newRow = TBL.insertRow(-1);
@@ -289,7 +289,7 @@ var USERS_MISC_FUNCTIONS = {
 	},
 
 	NEW_USER_FORM : function(){ // USERS_MISC_FUNCTIONS.NEW_USER_FORM();
-		var dps = parent.astgui_manageCallPlans.listPlans() ;
+		var dps = parent.pbx.call_plans.list() ;
 		if(!dps.length){
 			ASTGUI.yesOrNo (
 				{	msg: "No DialPlans defined !! <BR><BR> A dialplan is required for creating new users. <BR> You will now be redirected to the 'Manage DialPlans' page.",
@@ -360,7 +360,7 @@ var USERS_MISC_FUNCTIONS = {
 		if (!confirm('Are you sure you want to delete the selected user - ' + a + ' ?')) { return; }
 		var yn = confirm("Delete user's voicemail box too ?" );
 		parent.ASTGUI.dialog.waitWhile(' deleting user ' + a );
-		parent.astgui_manageusers.deleteuser(a , yn , reload_page );
+		parent.pbx.users.remove({user: a , vmdel: yn , callback: reload_page});
 	},
 
 	DELETE_SELECTED_USERS : function(){ // USERS_MISC_FUNCTIONS.DELETE_SELECTED_USERS();
@@ -385,7 +385,7 @@ var USERS_MISC_FUNCTIONS = {
 		var delete_firstUser = function(){
 			//var yn = confirm("Delete voicemail box for user " + sel_users[0] + " ?" );
 			parent.ASTGUI.dialog.waitWhile(' deleting user ' + sel_users[0] );
-			parent.astgui_manageusers.deleteuser(sel_users[0] , true , after_deletingFirstUser);
+			parent.pbx.users.remove({user: sel_users[0] , vmdel: true , callback: after_deletingFirstUser});
 		};
 
 		parent.ASTGUI.dialog.waitWhile(' Deleting selected users .... ');
@@ -393,7 +393,7 @@ var USERS_MISC_FUNCTIONS = {
 	},
 
 	check_duplicate_lineNumber : function(){ // USERS_MISC_FUNCTIONS.check_duplicate_lineNumber()  check if another user has the same mac address and line number
-		var ul = parent.astgui_manageusers.listOfUsers();
+		var ul = parent.pbx.users.list();
 		for( var f=0 ; f < ul.length ; f++ ){
 			var uinfo = parent.sessionData.pbxinfo.users[ ul[f] ];
 			if( !isNewUSER && EXTENSION_EDIT == ul[f] ){
