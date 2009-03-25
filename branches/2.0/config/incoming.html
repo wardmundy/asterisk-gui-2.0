@@ -18,10 +18,6 @@
  * at the top of the source tree.
  *
 -->
-<script src="js/jquery.js"></script>
-<script src="js/astman.js"></script>
-<script src="js/incoming.js"></script>
-<script src="js/jquery.tooltip.js"></script>
 <link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
 <style type="text/css">
 
@@ -103,4 +99,53 @@
 		</TABLE>
 	</div>
 
+<script src="js/jquery.js"></script>
+<script src="js/astman.js"></script>
+<script src="js/incoming.js"></script>
+<script src="js/jquery.tooltip.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		top.document.title = "Incoming Calling Rules";
+		
+		incomingRules_MiscFunctions.listAllRulesInTable();
+
+		/* Populate Time Intervals <select> */
+		var itrl_tf = $('#edit_itrl_tf');
+		var list = parent.pbx.time_intervals.list();
+		for (var ti in list) {
+			if (!list.hasOwnProperty(ti)) {
+				continue;
+			}
+
+			itrl_tf.append($('<option>').html(ti).val(list[ti]));
+		};
+		itrl_tf.append($('<option>').html('None (no Time Intervals matched)').val(''));
+		delete itrl_tf;
+		delete list;
+
+		/* Populate Destinations <select> */
+		var dest = $('#edit_itrl_dest');
+		var list = parent.miscFunctions.getAllDestinations();
+		for (var d in list) {
+			if (!list.hasOwnProperty(d)) {
+				continue;
+			}
+
+			dest.append($('<option>').html(d).val(list[d]));
+		}
+		dest.append($('<option>').html('Local Extension by DID').val('ByDID'));
+
+		/* now lets add some events!! */
+		dest.change(function() {
+			if (this.val() === 'ByDID') {
+				$('.localext_byDid').show();
+			} else {
+				$('.localext_byDid').hide();
+			}
+		});
+		$('#edit_itrl_trunk').click(function() {
+			incomingRules_MiscFunctions.enableDisablePattern();
+		});
+	});
+</script>
 </body>
