@@ -118,7 +118,7 @@ var incomingRules_MiscFunctions = {
 
 	listAllRulesInTable : function(){ // incomingRules_MiscFunctions.listAllRulesInTable();
 		EX_CF = config2json({filename:'extensions.conf', usf:0 });
-		var t = parent.astgui_managetrunks.listofAllTrunks();
+		var t = parent.pbx.trunks.list();
 
 		if ( !t.length ){
 
@@ -142,7 +142,7 @@ var incomingRules_MiscFunctions = {
 
 		var TMP_FORSORT = [];
 		t.each( function(item){
-			TMP_FORSORT.push( parent.astgui_managetrunks.misc.getTrunkName(item) + STRING_SEPERATOR +  item);
+			TMP_FORSORT.push( parent.pbx.trunks.getName(item) + STRING_SEPERATOR +  item);
 		});
 
 		TMP_FORSORT.sort();
@@ -150,7 +150,7 @@ var incomingRules_MiscFunctions = {
 			var a = this_str.split(STRING_SEPERATOR); // a[0] is trunkname , a[1] is trunk 
 			var this_trunk = a[1];
 			var this_trunk_label = a[0];
-			var ttype = parent.astgui_managetrunks.misc.getTrunkType( this_trunk );
+			var ttype = parent.pbx.trunks.getType(this_trunk);
 			var defaultContext_ContextName = ASTGUI.contexts.TrunkDIDPrefix + this_trunk + ASTGUI.contexts.TrunkDefaultSuffix ;
 
 			ASTGUI.selectbox.append('edit_itrl_trunk', this_trunk_label , this_trunk );
@@ -327,7 +327,7 @@ var incomingRules_MiscFunctions = {
 			_$('edit_itrl_pattern').disabled = false;
 			return ;
 		}
-		var ttype = parent.astgui_managetrunks.misc.getTrunkType(tn);
+		var ttype = parent.pbx.trunks.getType(tn);
 		_$('edit_itrl_pattern').disabled = (ttype == 'analog') ? true : false;
 		if( ttype == 'analog' ){
 			_$('edit_itrl_pattern').value = 's'  ;
@@ -352,7 +352,7 @@ var incomingRules_MiscFunctions = {
 		var this_tiName = ASTGUI.getFieldValue('edit_itrl_tf') ;
 		var TMP_NEW_PATTERN = ASTGUI.getFieldValue('edit_itrl_pattern');
 
-		if( ASTGUI.getFieldValue('edit_itrl_dest') == 'ByDID' && parent.astgui_managetrunks.misc.getTrunkType(this_trunk) == 'analog' ){
+		if( ASTGUI.getFieldValue('edit_itrl_dest') == 'ByDID' && parent.pbx.trunks.getType(this_trunk) == 'analog' ){
 			ASTGUI.feedback ({ msg: 'Local Extension by DID is not applicable for Analog Trunks !' , showfor:3,  color:'red' });
 			return ;
 		}
@@ -387,7 +387,7 @@ var incomingRules_MiscFunctions = {
 						x.new_action ( 'newcat', thisRule_context , '' , '' );
 					}
 	
-					var this_ttype = parent.astgui_managetrunks.misc.getTrunkType(this_trunk) ;
+					var this_ttype = parent.pbx.trunks.getType(this_trunk) ;
 					if( this_ttype == 'analog' && TMP_NEW_PATTERN == 's' ){
 						this_ActualRule = TMP_NEW_PATTERN + ',3,' + ASTGUI.getFieldValue('edit_itrl_dest') ;
 						x.new_action( 'append', thisRule_context, 'exten', ASTGUI.globals.sbcid_1 );
@@ -439,7 +439,7 @@ var incomingRules_MiscFunctions = {
 				}
 
 				if( TMP_NEW_PATTERN == 's' || TMP_NEW_PATTERN == '_X.' ){
-					var this_ttype = parent.astgui_managetrunks.misc.getTrunkType(this_trunk) ;
+					var this_ttype = parent.pbx.trunks.getType(this_trunk) ;
 					if( this_ttype == 'analog' && TMP_NEW_PATTERN == 's' ){
 						var this_ActualRule = TMP_NEW_PATTERN + ',3,' + ASTGUI.getFieldValue('edit_itrl_dest') ;
 						PREVIOUS_DEFAULT_CONTEXT.push('exten=' + ASTGUI.globals.sbcid_1 );
