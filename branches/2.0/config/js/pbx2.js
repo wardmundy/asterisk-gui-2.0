@@ -945,6 +945,23 @@ pbx.time_intervals.edit = function(oldname, newname, interval) {
 };
 
 /**
+ * List all Time Intervals.
+ * @return an object of all the time intervals.
+ */
+pbx.time_intervals.list = function() {
+	var list = new ASTGUI.customObject;
+
+	var globals = context2json({filename: 'extensions.conf', context: 'globals', usf:0});
+	for (var i=0; i<globals.length; i++) {
+		if (globals[i].beginsWith(ASTGUI.contexts.TimeIntervalsPrefix)) {
+			list[globals[i].lChop(ASTGUI.contexts.TimeIntervalPrefix).beforeChar('=')] = globals[i].afterChar('=');
+		}
+	}
+
+	return list;
+};
+
+/**
  * Delete a Time Interval.
  * @param name.
  * @return boolean on success.
