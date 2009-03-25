@@ -39,6 +39,7 @@ pbx.calling_rules = {};
  * @return boolean of success
  */
 pbx.calling_rules.add = function(name, dp) {
+	/* lets make sure we get all the necessary args */
 	if (!name) {
 		top.log.warn('pbx.calling_rules.add: name is not defined');
 		return false;
@@ -47,29 +48,32 @@ pbx.calling_rules.add = function(name, dp) {
 		return false;
 	}
 
+	/* lets make sure that the name begins with the prefix */
 	if (!name.beginsWith(ASTGUI.contexts.CallingRulePrefix)) {
 		name = ASTGUI.contexts.CallingRulePrefix + name;
 	}
 
+	/* chop chop! */
 	dp = dp.lChop('exten=');
 
+	/* add actions to update extensions.conf */
 	var ext_conf = new listOfSynActions('extensions.conf');
-
 	if (!sessionData.pbxinfo.callingRules.hasOwnProperty(name)) {
 		ext_conf.new_action('delcat', name, '', ''); /* for good measure :) */
 		ext_conf.new_action('newcat', name, '', '');
 		sessionData.pbxinfo.callingRules[name] = [];
 	}
-
 	ext_conf.new_action('append', name, 'exten', dp);
+	
+	/* update extensions.conf */
 	var resp = ext_conf.callActions();
-
 	if (!resp.contains('Response: Success')) {
 		top.log.error('pbx.calling_rules.add: error adding ' + name + ' to extensions.conf');
 		top.log.error(resp);
 		return false;
 	}
 
+	/* now update cache and go! */
 	sessionData.pbxinfo.callingRules[name].push('exten=' + dp);
 	return true;
 };
