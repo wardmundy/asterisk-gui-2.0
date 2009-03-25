@@ -491,26 +491,3 @@ var incomingRules_MiscFunctions = {
 		}
 	}
 };
-
-
-
-var localajaxinit = function(){
-	top.document.title = 'Incoming Calling Rules' ;
-	incomingRules_MiscFunctions.listAllRulesInTable();
-
-	var TI_LIST = parent.miscFunctions.getTimeIntervals() ;
-	ASTGUI.selectbox.populateArray( 'edit_itrl_tf', TI_LIST.getOwnProperties() );
-	ASTGUI.selectbox.append( 'edit_itrl_tf' , 'None (no TimeIntervals matched)' , '' );
-	ASTGUI.selectbox.populateArray( 'edit_itrl_dest' ,  parent.miscFunctions.getAllDestinations() );
-	ASTGUI.selectbox.append( 'edit_itrl_dest' , 'Local Extension by DID' , 'ByDID' );
-	ASTGUI.events.add( 'edit_itrl_trunk' , 'click' , incomingRules_MiscFunctions.enableDisablePattern );
-
-	ASTGUI.events.add( 'edit_itrl_dest', 'change' , function(){
-		if( _$('edit_itrl_dest').value == 'ByDID' ){
-			$('.localext_byDid').show();
-		}else{
-			$('.localext_byDid').hide();
-		}
-	});
-	//'edit_itrl_trunk', 'edit_itrl_tf', 'edit_itrl_pattern', 'edit_itrl_dest'
-};
