@@ -117,7 +117,7 @@
 				continue;
 			}
 
-			itrl_tf.append($('<option>').html(ti).val(list[ti]));
+			itrl_tf.append($('<option>').html(ti).val(ti));
 		};
 		itrl_tf.append($('<option>').html('None (no Time Intervals matched)').val(''));
 		delete itrl_tf;
@@ -126,18 +126,14 @@
 		/* Populate Destinations <select> */
 		var dest = $('#edit_itrl_dest');
 		var list = parent.miscFunctions.getAllDestinations();
-		for (var d in list) {
-			if (!list.hasOwnProperty(d)) {
-				continue;
-			}
-
-			dest.append($('<option>').html(d).val(list[d]));
+		for (var d=0; d<list.length; d++) {
+			dest.append($('<option>').html(list[d].optionText).val(list[d].optionValue));
 		}
 		dest.append($('<option>').html('Local Extension by DID').val('ByDID'));
 
 		/* now lets add some events!! */
 		dest.change(function() {
-			if (this.val() === 'ByDID') {
+			if ($(this).val() === 'ByDID') {
 				$('.localext_byDid').show();
 			} else {
 				$('.localext_byDid').hide();
