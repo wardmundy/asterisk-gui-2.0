@@ -101,24 +101,27 @@ var incomingRules_MiscFunctions = {
 		var TMP_CONTEXT = ALC.split(STRING_SEPERATOR)[1] ;
 		var TMP_LINE = ALC.split(STRING_SEPERATOR)[0] ;
 
-		if( TMP_LINE.afterChar('=').beginsWith('s,') ){
-			ASTGUI.miscFunctions.delete_LinesLike({ context_name : TMP_CONTEXT, beginsWithArr: ['exten=s,'] , filename: 'extensions.conf', cb: function(){
-				ASTGUI.feedback( { msg: 'deleted Incoming Rule !', showfor: 2 , color: 'blue', bgcolor: '#FFFFFF' } );
-				window.location.reload();
-			}});
-		}else{
-			var H = new listOfSynActions('extensions.conf') ;
-			H.new_action( 'delete', TMP_CONTEXT , TMP_LINE.beforeChar('=') , '' , TMP_LINE.afterChar('=') ) ;
-			H.callActions();
-			
-			ASTGUI.feedback( { msg: 'deleted Incoming Rule !', showfor: 2 , color: 'blue', bgcolor: '#FFFFFF' } );
-			window.location.reload();
+		var resp = top.pbx.trunks.rules.remove({cxt: TMP_CONTEXT, line: TMP_LINE});
+		if (!resp) {
+			ASTGUI.feedback({ 
+				color: 'red',
+				msg: 'Error removing Calling Rule.',
+				showfor: 2
+			});
+		} else {
+			ASTGUI.feedback({ 
+				color: 'green',
+				msg: 'Deleted Incoming Rule.',
+				showfor: 2
+			});
 		}
+
+		return;
 	},
 
 	listAllRulesInTable : function(){ // incomingRules_MiscFunctions.listAllRulesInTable();
 		EX_CF = config2json({filename:'extensions.conf', usf:0 });
-		var t = parent.pbx.trunks.list();
+		var t = parent.pbx.trunks.list() || [];
 
 		if ( !t.length ){
 
@@ -351,6 +354,10 @@ var incomingRules_MiscFunctions = {
 		var this_trunk = ASTGUI.getFieldValue('edit_itrl_trunk');
 		var this_tiName = ASTGUI.getFieldValue('edit_itrl_tf') ;
 		var TMP_NEW_PATTERN = ASTGUI.getFieldValue('edit_itrl_pattern');
+		var dest = $('#edit_itrl_dest').val();
+		var local_dest = $('#edit_itrl_LocalDest_Pattern option:selected').text();
+		var time_int_name = $('#edit_itrl_tf option:selected').text();
+		time_int_name = (time_int_name.contains('no Time Intervals')) ? '' : time_int_name;
 
 		if( ASTGUI.getFieldValue('edit_itrl_dest') == 'ByDID' && parent.pbx.trunks.getType(this_trunk) == 'analog' ){
 			ASTGUI.feedback ({ msg: 'Local Extension by DID is not applicable for Analog Trunks !' , showfor:3,  color:'red' });
@@ -358,135 +365,27 @@ var incomingRules_MiscFunctions = {
 		}
 
 		if( isNewIR == true ){ // create new Incoming Rule
-			top.log.debug("create New Incoming Rule");
+			top.log.debug("create new Incoming Rule");
 			parent.ASTGUI.dialog.waitWhile('Creating Incoming Rule ...');
 
-			if( ASTGUI.getFieldValue('edit_itrl_dest') == 'ByDID' ){
-				var tmp_didXdigits = ASTGUI.getFieldValue('edit_itrl_LocalDest_Pattern') || '0' ;
-				var this_ActualRule = TMP_NEW_PATTERN + ',1,Goto(default,${EXTEN:'+  tmp_didXdigits + '},1)';
-			}else{
-				var this_ActualRule = TMP_NEW_PATTERN + ',1,' + ASTGUI.getFieldValue('edit_itrl_dest') ;
+			if (parent.pbx.trunks.rules.add({trunk: this_trunk, name: time_int_name, time_interval: time_int_name, dest: dest, pattern: TMP_NEW_PATTERN, digits: local_dest})) {
+				ASTGUI.feedback({ msg: 'Added!', showfor: 2, color: 'blue', bgcolor: '#ffffff'});
+				window.location.reload();
 			}
 
-			var x = new listOfActions( 'extensions.conf' );
-			var PREVIOUS = EX_CF[ ASTGUI.contexts.TrunkDIDPrefix + this_trunk ];
-
-			if( this_tiName ){ // if 'new Incoming Rule' & a Time Interval is chosen
-				var thisRule_context = ASTGUI.contexts.TrunkDIDPrefix + this_trunk + '_' + ASTGUI.contexts.TimeIntervalPrefix + this_tiName ;
-				var NEWTF_INCLUDE_STR = 'include=' + thisRule_context + ',${' + ASTGUI.contexts.TimeIntervalPrefix + this_tiName + '}' ;
-
-				if( EX_CF.hasOwnProperty(thisRule_context) && EX_CF[thisRule_context].indexOfLike('exten=' + TMP_NEW_PATTERN + ',') != -1 ){
-					parent.ASTGUI.dialog.hide();
-					alert('An incoming rule already exists for this pattern in the selected Time Interval');
-					return;
-				}
-
-				var TMP_MYCALLBACK = function(){
-					if( !EX_CF.hasOwnProperty( thisRule_context ) ){
-						top.log.debug("creating [time interval did context]");
-						x.new_action ( 'newcat', thisRule_context , '' , '' );
-					}
-	
-					var this_ttype = parent.pbx.trunks.getType(this_trunk) ;
-					if( this_ttype == 'analog' && TMP_NEW_PATTERN == 's' ){
-						this_ActualRule = TMP_NEW_PATTERN + ',3,' + ASTGUI.getFieldValue('edit_itrl_dest') ;
-						x.new_action( 'append', thisRule_context, 'exten', ASTGUI.globals.sbcid_1 );
-						x.new_action( 'append', thisRule_context, 'exten', ASTGUI.globals.sbcid_2 );
-						x.new_action( 'append', thisRule_context, 'exten', this_ActualRule );
-					}else{
-						top.log.debug("NewRule is exten=" + this_ActualRule + 'in context [' + thisRule_context + ']');
-						x.new_action( 'append', thisRule_context, 'exten', this_ActualRule );
-					}
-
-					x.callActions( function(){
-						parent.ASTGUI.dialog.hide();
-						ASTGUI.feedback( { msg: 'Updated !', showfor: 2 , color: 'blue', bgcolor: '#FFFFFF' } );
-						window.location.reload();
-					});
-				};
-	
-				if( PREVIOUS.contains(NEWTF_INCLUDE_STR) ){
-					top.log.debug("No need to include time interval did context in DID_trunk_x");
-					TMP_MYCALLBACK();
-				}else{
-					top.log.debug("adding 'include = time interval did context' in [DID_trunk_x]");
-					PREVIOUS.splice(0,0,NEWTF_INCLUDE_STR);
-					ASTGUI.miscFunctions.empty_context({ filename: 'extensions.conf', context : ASTGUI.contexts.TrunkDIDPrefix + this_trunk, cb : function(){
-						PREVIOUS.each( function( this_newPreviousLine ){
-							x.new_action ( 'append' , ASTGUI.contexts.TrunkDIDPrefix + this_trunk , this_newPreviousLine.beforeChar('=') , this_newPreviousLine.afterChar('=') ) ;
-						});
-						TMP_MYCALLBACK();
-					} });
-				}
-			}else{ // if 'new Incoming Rule' & NO time interval is picked (default DID_trunk_X_default )
-				var thisRule_context = ASTGUI.contexts.TrunkDIDPrefix + this_trunk + ASTGUI.contexts.TrunkDefaultSuffix;
-				var NEWTF_INCLUDE_STR = '';
-
-				if( EX_CF.hasOwnProperty(thisRule_context) && EX_CF[thisRule_context].indexOfLike('exten=' + TMP_NEW_PATTERN + ',') != -1 ){
-					parent.ASTGUI.dialog.hide();
-					alert('An incoming rule already exists for this pattern in the selected Time Interval');
-					return;
-				}
-
-				if ( EX_CF.hasOwnProperty(thisRule_context) ){
-					var PREVIOUS_DEFAULT_CONTEXT = EX_CF[thisRule_context] ;
-				}else{
-					var PREVIOUS_DEFAULT_CONTEXT = [] ;
-					x.new_action('newcat', thisRule_context, '', '');
-					if( EX_CF[ASTGUI.contexts.TrunkDIDPrefix + this_trunk].indexOf('include=' + thisRule_context) == -1 ){
-						x.new_action('append', ASTGUI.contexts.TrunkDIDPrefix + this_trunk , 'include', thisRule_context);
-					}
-				}
-
-				if( TMP_NEW_PATTERN == 's' || TMP_NEW_PATTERN == '_X.' ){
-					var this_ttype = parent.pbx.trunks.getType(this_trunk) ;
-					if( this_ttype == 'analog' && TMP_NEW_PATTERN == 's' ){
-						var this_ActualRule = TMP_NEW_PATTERN + ',3,' + ASTGUI.getFieldValue('edit_itrl_dest') ;
-						PREVIOUS_DEFAULT_CONTEXT.push('exten=' + ASTGUI.globals.sbcid_1 );
-						PREVIOUS_DEFAULT_CONTEXT.push('exten=' + ASTGUI.globals.sbcid_2 );
-						PREVIOUS_DEFAULT_CONTEXT.push('exten=' + this_ActualRule ); // make sure that the 's' would always end up at the bottom of all rules
-					}else{
-						PREVIOUS_DEFAULT_CONTEXT.push('exten=' + this_ActualRule ); // make sure that the s/_X. would always end up at the bottom of all rules
-					}
-				}else{
-					PREVIOUS_DEFAULT_CONTEXT.unshift('exten=' + this_ActualRule );
-				}
-
-				var someCallBack = function(){
-					PREVIOUS_DEFAULT_CONTEXT.each( function( this_newPreviousLine ){
-						x.new_action( 'append' , thisRule_context , this_newPreviousLine.beforeChar('=') , this_newPreviousLine.afterChar('=') ) ;
-					});
-					x.callActions( function(){
-						parent.ASTGUI.dialog.hide();
-						ASTGUI.feedback( { msg: 'Updated !', showfor: 2 , color: 'blue', bgcolor: '#FFFFFF' } );
-						window.location.reload();
-					});
-				};
-
-				if ( EX_CF.hasOwnProperty(thisRule_context) ){
-					ASTGUI.miscFunctions.empty_context ({ filename: 'extensions.conf', context : thisRule_context , cb : someCallBack });
-				}else{
-					someCallBack();
-				}
-
-			}
-
+			parent.ASTGUI.dialog.hide();
 		}else{ // edit/update existing incoming rule
-
-			var pp = ASTGUI.parseContextLine.getPriority(EDIT_CONTEXT_IR_LINE);
-
-			if( ASTGUI.getFieldValue('edit_itrl_dest') == 'ByDID' ){
-				var tmp_didXdigits = ASTGUI.getFieldValue('edit_itrl_LocalDest_Pattern') || '0' ;
-				var this_ActualRule = ASTGUI.getFieldValue('edit_itrl_pattern') + ',' + pp  + ',Goto(default,${EXTEN:'+ tmp_didXdigits + '},1)';
-			}else{
-				var this_ActualRule = ASTGUI.getFieldValue('edit_itrl_pattern') + ',' + pp  + ',' + ASTGUI.getFieldValue('edit_itrl_dest') ;
+			var resp = parent.pbx.trunks.rules.edit({
+				line: EDIT_CONTEXT_IR_LINE, 
+				dest: dest, 
+				digits: local_dest, 
+				cxt: EDIT_CONTEXT_IR,
+				pattern: TMP_NEW_PATTERN
+			});
+			if (resp) {
+				ASTGUI.feedback( { msg: 'Updated !', showfor: 2 , color: 'blue', bgcolor: '#FFFFFF' } );
 			}
 
-			var u = new listOfSynActions('extensions.conf') ;
-			u.new_action( 'update' , EDIT_CONTEXT_IR , 'exten' , this_ActualRule , EDIT_CONTEXT_IR_LINE.afterChar('=') );
-			u.callActions();
-
-			ASTGUI.feedback( { msg: 'Updated !', showfor: 2 , color: 'blue', bgcolor: '#FFFFFF' } );
 			window.location.reload();
 		}
 	}

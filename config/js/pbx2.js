@@ -1661,6 +1661,45 @@ pbx.trunks.rules.edit = function(params) {
 
 	return true;
 };
+
+/**
+ * Delete a Incoming Rule.
+ * @param cxt The rule context.
+ * @param line The actual line context.
+ * @return boolen of success.
+ */
+pbx.trunks.rules.remove = function(params) {
+	if (!params) {
+		top.log.error('pbx.trunks.rules.remove: params is empty.');
+		return false;
+	} else if (!params.cxt) {
+		top.log.error('pbx.trunks.rules.remove: params.cxt is empty.');
+		return false;
+	} else if (!params.line) {
+		top.log.error('pbx.trunks.rules.remove: params.line is empty.');
+		return false;
+	}
+
+	if (params.line.afterChar('=').beginsWith('s,')) {
+		ASTGUI.miscFunctions.delete_LinesLike({
+			beginsWithArr: ['exten=s,'],
+			context_name: params.cxt,
+			filename: 'extensions.conf',
+			cb: {}
+		});
+	} else {
+		var actions = listOfSynActions('extensions.conf');
+		actions.new_action('delete', params.cxt, params.line.beforeChar('='), '', params.line.afterChar('='));
+
+		var resp = actions.callActions();
+		if (!resp.contains('Response: Success')) {
+			top.log.error('pbx.trunks.rules.remove: Error removing from extensions.conf.');
+			return false;
+		}
+	}
+
+	return true;
+};
 /*---------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------*/
