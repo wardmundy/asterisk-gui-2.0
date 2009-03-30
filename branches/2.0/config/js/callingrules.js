@@ -68,6 +68,8 @@ var edit_CR_form = function(a,b){
 			ASTGUI.selectbox.selectOption(DOM_new_crl_fotrunk, tmp_cr.secondTrunk );
 			DOM_new_crl_fotr_stripx.value = tmp_cr.stripdigits_secondTrunk ;
 			DOM_new_crl_fotr_prepend.value = tmp_cr.secondPrepend ;
+		} else {
+			DOM_new_crl_foChkbx.checked = false;
 		}
 		en_db_fofields();
 	}
@@ -306,7 +308,7 @@ var new_crl_save_go = function(){
 		}
 	}else{
 		var t1 = ASTGUI.getFieldValue(DOM_new_crl_trunk);
-		var t2 = ASTGUI.getFieldValue(DOM_new_crl_fotrunk);
+		var t2 = (DOM_new_crl_foChkbx.checked) ? ASTGUI.getFieldValue(DOM_new_crl_fotrunk) : '';
 		if( _$('new_crl_foChkbx').checked && t1 == t2 ){
 			ASTGUI.feedback( { msg:'Failover trunk can not be same as the primary trunk !', showfor: 3, color:'red' });
 			DOM_new_crl_fotrunk.focus();
