@@ -957,7 +957,7 @@ pbx.time_intervals.list = function() {
 
 	var globals = context2json({filename: 'extensions.conf', context: 'globals', usf:0});
 	for (var i=0; i<globals.length; i++) {
-		if (globals[i].beginsWith(ASTGUI.contexts.TimeIntervalsPrefix)) {
+		if (globals[i].beginsWith(ASTGUI.contexts.TimeIntervalPrefix)) {
 			list[globals[i].lChop(ASTGUI.contexts.TimeIntervalPrefix).beforeChar('=')] = globals[i].afterChar('=');
 		}
 	}
@@ -1381,8 +1381,9 @@ pbx.trunks.getType = function(trunk) {
 pbx.trunks.list = function(types) {
 	var trunks = [];
 	if (typeof types === 'undefined') {
-		top.log.warn('pbx.trunks.list: types is undefined');
-		return null;
+		top.log.warn('pbx.trunks.list: types is undefined, listing all instead.');
+		var types = {};
+		types.all = true;
 	}
 
 	if (types.all) {
@@ -1418,6 +1419,8 @@ pbx.trunks.list = function(types) {
 			top.log.error('pbx.trunks.list: ' + err);
 		}
 	}
+
+	return trunks;
 };
 
 /**
@@ -1488,6 +1491,171 @@ pbx.trunks.remove = function(trunk) {
 		}
 	} catch(err) {
 		top.log.error(err);
+		return false;
+	}
+
+	return true;
+};
+
+/**
+ * Incoming Calling Rules.
+ */
+pbx.trunks.rules = {};
+
+/**
+ * Add an incoming calling rule.
+ * @param trunk The trunk.
+ * @param dest The destination.
+ * @param pattern The extension pattern.
+ * @param time_interval [optional] The time interval.
+ * @param digits [optional] The 'x' in '${EXTEN:x}', for when dest === 'ByDID'.
+ * @return boolean on success.
+ */
+pbx.trunks.rules.add = function(params) {
+	/* check to make sure we got everything */
+	if (typeof params !== 'object') {
+		top.log.error('pbx.trunks.rules.add: Expecting params to be an object.');
+		return false;
+	} else if (!params.trunk) {
+		top.log.error('pbx.trunks.rules.add: params.trunk not found.');
+		return false;
+	} else if (!params.dest) {
+		top.log.error('pbx.trunks.rules.add: params.dest not found.');
+		return false;
+	} else if (!params.pattern) {
+		top.log.error('pbx.trunks.rules.add: params.pattern not found.');
+		return false;
+	} else if (params.dest === 'ByDID' && !params.digits) {
+		top.log.error('pbx.trunks.rules.add: Destination is ByDID, but params.digits is not found.');
+		return false;
+	}
+
+	/* just delete time_interval if its empty */
+	if (params.time_interval === '') {
+		delete params.time_interval
+	}
+
+	/* easier to type/use */
+	var delim = top.session.delimiter;
+
+	/* lets form the cxt and include line, depending on time_interval or not */
+	var cxt = ASTGUI.contexts.TrunkDIDPrefix + params.trunk;
+	var include = 'include=';
+	if (params.time_interval) {
+		cxt += '_' + ASTGUI.contexts.TimeIntervalPrefix + params.time_interval;
+		include += cxt + delim + '${' + ASTGUI.contexts.TimeIntervalPrefix + params.time_interval + '}';
+	} else {
+		cxt += ASTGUI.contexts.TrunkDefaultSuffix;
+		include += cxt;
+	}
+
+	/* kk, now lets form the rule */
+	var trunk_type = parent.pbx.trunks.getType(params.trunk);
+	var prior = (trunk_type === 'analog' && params.pattern === 's') ? '3' : '1';
+	var rule = params.pattern + delim + prior + delim;
+	rule += (params.dest === 'ByDID') ? 'Goto(default,${EXTEN:'+params.digits+'}'+delim+'1)' : params.dest;
+
+	/* TODO: cache this on load, this isn't optimal even to call it on page load */
+	var extens_conf = config2json({filename: 'extensions.conf', usf:0});
+
+	/* lets make sure this incoming rule doesn't already exist */
+	if (extens_conf.hasOwnProperty(cxt) && extens_conf[cxt].indexOfLike('exten=' + params.pattern + ',') != -1) {
+		parent.ASTGUI.dialog.hide();
+		top.log.error('pbx.trunks.rules.add: incoming calling rule with this pattern already exists.');
+		/* i don't like this one bit...but am just copying for now... */
+		alert('An incoming rule already exists for this pattern in the selected Time Interval.');
+		return false;
+	}
+
+	/* potentially large request, TODO: use listOfActions instead, but not until it returns response */
+	var actions = new listOfSynActions('extensions.conf');
+
+	/* if the main trunk context doesn't already have the include line, lets add it */
+	var trunk_cxt = extens_conf[ASTGUI.contexts.TrunkDIDPrefix + params.trunk];
+	if (!trunk_cxt.contains(include) && params.time_interval) {
+		actions.new_action('delete', ASTGUI.contexts.TrunkDIDPrefix + params.trunk, 'include', '');
+		/* add time interval includes at the front */
+		trunk_cxt.splice(0,0,include);
+		trunk_cxt.each(function(line) {
+			if (line.beforeChar('=') !== 'include') {
+				return;
+			}
+			actions.new_action('append', ASTGUI.contexts.TrunkDIDPrefix + params.trunk, line.beforeChar('='), line.afterChar('='));
+		});
+	} else if (!trunk_cxt.contains(include)) {
+		/* add default includes at the end */
+		actions.new_action('append', ASTGUI.contexts.TrunkDIDPrefix + params.trunk, 'include', include.afterChar('='));
+	}
+
+	/* create the context if it doesn't exist */
+	if (!extens_conf.hasOwnProperty(cxt)) {
+		actions.new_action('newcat', cxt, '', '');
+	}
+
+	/* lets append the rule to the cxt, special CID for analog&catchall */
+	if (prior === '3') {
+		actions.new_action('append', cxt, 'exten', ASTGUI.globals.sbcid_1);
+		actions.new_action('append', cxt, 'exten', ASTGUI.globals.sbcid_2);
+	}
+	actions.new_action('append', cxt, 'exten', rule);
+
+	/* calling the actions! */
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.trunks.rules.add: Error adding to extensions.conf.');
+		top.log.error(resp);
+		return false;
+	}
+
+	return true;
+};
+
+/**
+ * Edit a Incoming Calling rule
+ * @param line current calling rule dialplan.
+ * @param dest The destination.
+ * @param cxt The context to edit.
+ * @param pattern The extension pattern.
+ * @param digits [optional] The 'x' in '${EXTEN:x}', for when dest === 'ByDID'.
+ * @return boolean on success.
+ */
+pbx.trunks.rules.edit = function(params) {
+	/* check to make sure we got everything */
+	if (typeof params !== 'object') {
+		top.log.error('pbx.trunks.rules.add: Expecting params to be an object.');
+		return false;
+	} else if (!params.line) {
+		top.log.error('pbx.trunks.rules.add: params.line not found.');
+		return false;
+	} else if (!params.cxt) {
+		top.log.error('pbx.trunks.rules.add: params.cxt not found.');
+		return false;
+	} else if (!params.dest) {
+		top.log.error('pbx.trunks.rules.add: params.dest not found.');
+		return false;
+	} else if (!params.pattern) {
+		top.log.error('pbx.trunks.rules.add: params.pattern not found.');
+		return false;
+	} else if (params.dest === 'ByDID' && !params.digits) {
+		top.log.error('pbx.trunks.rules.add: Destination is ByDID, but params.digits is not found.');
+		return false;
+	}
+
+	/* easier to type/use */
+	var delim = top.session.delimiter;
+
+	/* kk, now lets form the rule */
+	var prior = ASTGUI.parseContextLine.getPriority(params.line);
+	var rule = params.pattern + delim + prior + delim;
+	rule += (params.dest === 'ByDID') ? 'Goto(default,${EXTEN:'+params.digits+'}'+delim+'1)' : params.dest;
+
+	var actions = new listOfSynActions('extensions.conf');
+	actions.new_action('update', params.cxt, 'exten', rule, params.line.afterChar('='));
+
+	var resp = actions.callActions();
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.trunks.rules.edit: Error updating extensions.conf.');
+		top.log.error(resp);
 		return false;
 	}
 
