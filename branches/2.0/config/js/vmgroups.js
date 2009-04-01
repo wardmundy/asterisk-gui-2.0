@@ -27,7 +27,7 @@ var localajaxinit = function(){
 	var addCell = ASTGUI.domActions.tr_addCell;
 
 	(function(){ // load list of all voicemail boxes available on the system as checkboxes in 'edit_includeCheckboxes_div'
-		var g = parent.astgui_manageusers.listOfUsers();
+		var g = parent.pbx.users.list();
 		var f = [];
 		g.each( function(this_user){
 			if( parent.sessionData.pbxinfo['users'][this_user].getProperty('hasvoicemail').isAstTrue() ){
@@ -136,7 +136,7 @@ var vmgroups_miscFunctions = {
 
 	save_VMGroup : function(){ // vmgroups_miscFunctions.save_VMGroup(exten)
 		if( isNEW_VMG == false ){ // delete the previous vmg
-			parent.astgui_manageVMgroups.deleteVMGroup(EDIT_VMG);
+			parent.pbx.vm_groups.remove(EDIT_VMG);
 		}
 
 		if ( !ASTGUI.checkRequiredFields([ 'edit_vmgroup_exten' , 'edit_vmgroup_label' ]) ) return ;
@@ -161,7 +161,7 @@ var vmgroups_miscFunctions = {
 			a.label = ASTGUI.getFieldValue('edit_vmgroup_label');
 			a.mailboxes = ASTGUI.domActions.get_checked( vmg_chkbxClass );
 
-		parent.astgui_manageVMgroups.addVMGroup( vm_exten , a );
+		parent.pbx.vm_groups.add(vm_exten, a);
 
 		ASTGUI.feedback( { msg: 'Changes Saved !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' } );
 		window.location.reload();
@@ -169,7 +169,7 @@ var vmgroups_miscFunctions = {
 
 	delete_VMG : function(vmgexten){ // vmgroups_miscFunctions.delete_VMG(exten)
 		if( !confirm('Delete VoiceMail Group ' + vmgexten + ' ?') ) return;
-		parent.astgui_manageVMgroups.deleteVMGroup(vmgexten);
+		parent.pbx.vm_groups.remove(vmgexten);
 		setTimeout( function(){
 				ASTGUI.feedback({ msg: 'VoiceMail Group Deleted !', showfor: 3 , color: 'red', bgcolor: '#FFFFFF' });
 				window.location.reload();

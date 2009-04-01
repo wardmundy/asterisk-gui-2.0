@@ -91,12 +91,12 @@ var save_pageGroup = function(){
 			parent.ASTGUI.dialog.hide();
 			window.location.reload();
 		};
-		parent.astgui_managePageGroups.addPageGroup( tmp_new_line, later );
+		parent.pbx.paging.add( tmp_new_line, later );
 	};
 
 	if( !isNewPgGrp ){ // if editing existing ring group
 		parent.ASTGUI.dialog.waitWhile(' Saving... ');
-		parent.astgui_managePageGroups.deletePageGroup( PgGrp_EDITING, tmp_after );
+		parent.pbx.paging.remove( PgGrp_EDITING, tmp_after );
 	}else{
 		parent.ASTGUI.dialog.waitWhile(' Saving... ');
 		tmp_after();
@@ -178,7 +178,7 @@ var resetFields = function(){
 var delete_pageGroup_confirm = function(d){
 	if (!confirm('Delete Page/Intercom Group ?')) { return; }
 	parent.ASTGUI.dialog.waitWhile(' Saving... ');
-	parent.astgui_managePageGroups.deletePageGroup(d, function(){
+	parent.pbx.paging.remove(d, function(){
 		ASTGUI.feedback({ msg:'Page/Intercom Group deleted', showfor:2 });
 		parent.ASTGUI.dialog.hide();
 		window.location.reload();
@@ -282,7 +282,7 @@ var localajaxinit = function(){
 	})();
 	try{
 		(function (){
-			var t = parent.astgui_manageusers.listOfUsers();
+			var t = parent.pbx.users.list();
 			t.each(function(usr){	
 				if( parent.sessionData.pbxinfo['users'][usr]['hassip']  && parent.sessionData.pbxinfo['users'][usr]['hassip'] == 'yes' ){
 					listOfDialDevices.push( 'SIP/' + usr );

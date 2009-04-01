@@ -281,7 +281,7 @@ var edit_queue_apply = function(){
 
 
 var load_agents_checkboxes = function(){
-	var ul = parent.astgui_manageusers.listOfUsers();
+	var ul = parent.pbx.users.list();
 	var ul_agents = {};
 	var agent_count = 0 ;
 	ul.each(function(user){
