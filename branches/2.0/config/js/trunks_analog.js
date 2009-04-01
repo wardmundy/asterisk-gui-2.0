@@ -42,7 +42,7 @@ var checkChannels = function(channels){
 var disable_usedChannels = function(trunk){ // trunk is (optional, used while editing a trunk, for new trunk leave blank)
 	// FXOS -- list of all Analog channels
 	var used = [];
-	var c = parent.astgui_managetrunks.listOfAnalogTrunks();
+	var c = parent.pbx.trunks.list({analog: true});
 	c.each(function(item){
 		if(trunk && trunk == item ) return;
 		used = used.concat( ASTGUI.miscFunctions.chanStringToArray(parent.sessionData.pbxinfo['trunks']['analog'][item][DAHDICHANNELSTRING]) ) ;
@@ -156,7 +156,7 @@ var new_ATRNK_save_go = function(){
 			tmp_object[fld] = ASTGUI.getFieldValue( _$(fld) );
 		});
 
-		parent.astgui_managetrunks.addAnalogTrunk( tmp_object , cbf ) ;
+		parent.pbx.trunks.add('analog', tmp_object , cbf ) ;
 		return;
 	}
 
@@ -209,7 +209,7 @@ var update_AnalogTrunksTable = function(){
 		newRow.appendChild(ntd);
 		DOM_new_agtrnk_button.style.display = 'none';
 
-		var c = parent.astgui_managetrunks.listOfAnalogTrunks();
+		var c = parent.pbx.trunks.list({analog: true});
 		if(!c.length){return;}
 	}
 
@@ -222,7 +222,7 @@ var update_AnalogTrunksTable = function(){
 	})();
 
 	(function (){
-		var c = parent.astgui_managetrunks.listOfAnalogTrunks();
+		var c = parent.pbx.trunks.list({analog: true});
 		c.each( function(item){
 			 tmp = "<span class='guiButton' onclick=\"selectedTrunk_editOptions_form('" + item +"')\">Edit</span>" + 
 				"<span class='guiButtonDelete' onclick=\"delete_trunk_confirm('" + item +"')\">Delete</span>" ;
@@ -247,7 +247,7 @@ var delete_trunk_confirm = function(a){
 
 	var trunk_name = parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK].getProperty('trunkname') || EDIT_TRUNK ;
 	if(!confirm("Delete trunk '"+ trunk_name + "' ?")) { return true; }
-	if( parent.astgui_managetrunks.deletetrunk(EDIT_TRUNK) ){ 
+	if( parent.pbx.trunks.remove(EDIT_TRUNK) ){ 
 		ASTGUI.feedback({msg:'Deleted Analog trunk ' + "'" + trunk_name + "'" , showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
 		window.location.reload();
 	};
@@ -274,7 +274,7 @@ var localajaxinit = function(){
 		}
 		ASTGUI.tabbedOptions( _$('tabbedMenu') , t);
 
-		var y = parent.astgui_manageusers.listOfUsers();
+		var y = parent.pbx.users.list();
 		y.each( function(user){
 			if( parent.sessionData.pbxinfo.users[user].getProperty('hasvoicemail').isAstTrue() ){
 				ASTGUI.selectbox.append('mailbox', user, user);
