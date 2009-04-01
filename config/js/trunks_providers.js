@@ -107,7 +107,7 @@ providers_MiscFunctions = {
 
 	delete_ProviderForm : function(e){ // providers_MiscFunctions.delete_ProviderForm(e);
 		if( !confirm('Are you sure you want to delete this Service Provider trunk ?') ){ return; }
-		if( parent.astgui_managetrunks.deletetrunk(e) ){ window.location.reload(); };
+		if( parent.pbx.trunks.remove(e) ){ window.location.reload(); };
 	},
 	
 	updateProvider : function(){
@@ -162,7 +162,7 @@ providers_MiscFunctions = {
 		}
 
 		if( !trunkname ){
-			trunkname = parent.astgui_managetrunks.misc.nextAvailableTrunk_x() ;
+			trunkname = parent.pbx.trunks.nextAvailTrunk() ;
 		}
 		var ct = ASTGUI.contexts.TrunkDIDPrefix + trunkname ;
 

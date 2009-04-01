@@ -76,7 +76,7 @@ var show_Edit_Trunk = function(){
 	} else {
 		$('#TR_trunktype').hide();
 		$('#TR_contextbasis').hide();
-		var ttype = parent.astgui_managetrunks.misc.getTrunkType(EDIT_TRUNK) ;
+		var ttype = parent.pbx.trunks.getType(EDIT_TRUNK);
 		var tinfo = parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK];
 
 		DOM_edit_VOIPTrunk_Type.disabled = true;
@@ -171,14 +171,14 @@ var edit_VOIPTrunk_save_go = function(){
 	// New Trunk
 		var tcv = edit_VOIPTrunk_Context_Basis.value;  /* How do we assign context name ? */
 		if (tcv == 'FromUser') {
-			var tmp_ttype = parent.astgui_managetrunks.misc.getTrunkType( DOM_edit_VOIPTrunk_Username.value );
+			var tmp_ttype = parent.pbx.trunks.getType(DOM_edit_VOIPTrunk_Username.value);
 			if( tmp_ttype ){
 				ASTGUI.highlightField( DOM_edit_VOIPTrunk_Username , "Another trunk exists with this name !!" );
 				return;
 			}
 		}
 		else if (tcv == 'FromProvider') {
-			var tmp_ttype = parent.astgui_managetrunks.misc.getTrunkType( ASTGUI.getFieldValue('edit_VOIPTrunk_Providername') );
+			var tmp_ttype = parent.pbx.trunks.getType(ASTGUI.getFieldValue('edit_VOIPTrunk_Providername'));
 			if( tmp_ttype ){
 				ASTGUI.highlightField( 'edit_VOIPTrunk_Providername' , "Another trunk exists with this name !!" );
 				return;
@@ -199,9 +199,9 @@ var edit_VOIPTrunk_save_go = function(){
 			window.location.reload();
 		};
 
-		if(ttv =='SIP'){ parent.astgui_managetrunks.addSIPTrunk( trp , cbf,
+		if(ttv =='SIP'){ parent.pbx.trunks.add('sip', trp , cbf,
 						DOM_edit_VOIPTrunk_Context_Basis.value ) ; }
-		if(ttv =='IAX'){ parent.astgui_managetrunks.addIAXTrunk( trp , cbf,
+		if(ttv =='IAX'){ parent.pbx.trunks.add('iax', trp , cbf,
 						DOM_edit_VOIPTrunk_Context_Basis.value ) ; }
 
 	}else if(isNewTrunk == false){
@@ -214,7 +214,7 @@ var edit_VOIPTrunk_save_go = function(){
 			if( ASTGUI.getFieldValue('codec_fourth') ){ codecs = codecs + ',' + ASTGUI.getFieldValue('codec_fourth') }
 			if( ASTGUI.getFieldValue('codec_fifth') ){ codecs = codecs + ',' + ASTGUI.getFieldValue('codec_fifth') }
 
-		var ttype = parent.astgui_managetrunks.misc.getTrunkType(EDIT_TRUNK) ;
+		var ttype = parent.pbx.trunks.getType(EDIT_TRUNK);
 		var x = new listOfActions('users.conf');
 		var v = new listOfActions('extensions.conf') ;
 
@@ -336,10 +336,10 @@ var edit_VOIPTrunk_save_go = function(){
 var delete_trunk_confirm = function(ET){
 	EDIT_TRUNK = ET ;
 	if(!EDIT_TRUNK){return;}
-	var ttype = parent.astgui_managetrunks.misc.getTrunkType(EDIT_TRUNK) ;
+	var ttype = parent.pbx.trunks.getType(EDIT_TRUNK);
 	var tmp_name = parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['trunkname'] + ' -- ' + EDIT_TRUNK ;
 	if(! confirm(' Delete VOIP trunk "' + tmp_name + '" ?' ) ){return;}
-	parent.astgui_managetrunks.deletetrunk(EDIT_TRUNK) ;
+	parent.pbx.trunks.remove(EDIT_TRUNK);
 	ASTGUI.feedback( { msg:'deleted VOIP Trunk ' + tmp_name, showfor: 5, color:'red', bgcolor:'#FFFFFF' } );
 	window.location.reload();
 };
@@ -358,9 +358,9 @@ var load_VOIPTrunksTable = function (){
 	})();
 	(function (){
 		var c = [] ;
-		var d = c.concat( parent.astgui_managetrunks.listOfSIPTrunks() , parent.astgui_managetrunks.listOfIAXTrunks() );
+		var d = parent.pbx.trunks.list({sip: true, iax: true});
 		d.each(function(item){
-			var ttype = parent.astgui_managetrunks.misc.getTrunkType(item) ;
+			var ttype = parent.pbx.trunks.getType(item);
 			var newRow = DOM_table_VOIPTrunks_list.insertRow(-1);
 			newRow.className = ((DOM_table_VOIPTrunks_list.rows.length)%2==1)?'odd':'even';
 
@@ -416,7 +416,7 @@ var localajaxinit = function(){
 			this.optionValue = '' ;
 		};
 
-		var y = parent.astgui_manageusers.listOfUsers();
+		var y = parent.pbx.users.list();
 		y.each(function(user){
 			var f = new destination;
 			f.optionText = f.optionValue = user ;
