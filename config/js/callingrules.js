@@ -108,10 +108,10 @@ var load_DOMelements = function(){
 		ASTGUI.events.add( DOM_new_crl_foChkbx, 'change' , en_db_fofields);
 		ASTGUI.events.add( DOM_new_cr_button , 'click' ,  newCallingRule_form);
 
-		var t = parent.astgui_managetrunks.listofAllTrunks();
+		var t = parent.pbx.trunks.list();
 		var TMP_FORSORT = [];
 		t.each(function(item){
-			TMP_FORSORT.push( parent.astgui_managetrunks.misc.getTrunkName(item) + ':::::::' +  item);
+			TMP_FORSORT.push( parent.pbx.trunks.getName(item) + ':::::::' +  item);
 		});
 		TMP_FORSORT.sort();
 		TMP_FORSORT.each( function(this_str){
@@ -188,8 +188,8 @@ var update_CRLSTable = function(){
 				addCell( newRow , { html: tmp_cr.pattern });
 
 				if( tmp_cr.hasOwnProperty('firstTrunk') ){
-					addCell( newRow , { html: tmp_cr.firstTrunk ? ( parent.astgui_managetrunks.misc.getTrunkName(tmp_cr.firstTrunk) || '<i><font color=red>Invalid Trunk</font></i>' ) : '<i><font color=red>None Assigned</font></i>' });
-					addCell( newRow , { html: tmp_cr.secondTrunk ? ( parent.astgui_managetrunks.misc.getTrunkName(tmp_cr.secondTrunk) || '<i><font color=red>Invalid Trunk</font></i>' ): '<i>None Selected</i>' });
+					addCell( newRow , { html: tmp_cr.firstTrunk ? ( parent.pbx.trunks.getName(tmp_cr.firstTrunk) || '<i><font color=red>Invalid Trunk</font></i>' ) : '<i><font color=red>None Assigned</font></i>' });
+					addCell( newRow , { html: tmp_cr.secondTrunk ? ( parent.pbx.trunks.getName(tmp_cr.secondTrunk) || '<i><font color=red>Invalid Trunk</font></i>' ): '<i>None Selected</i>' });
 				}else{
 					addCell( newRow , { html:  '<i><font color=blue>Local Destination : ' + ASTGUI.parseContextLine.showAs(tmp_cr.destination) + '</font></i>', align: 'left', colspan : 2 });
 				}
@@ -346,13 +346,12 @@ var new_crl_save_go = function(){
 	}
 
 	if( isNew ){
-		parent.astgui_manageCallingRules.createCallingRule( DOM_new_crl_name.value , as)
+		parent.pbx.calling_rules.add( DOM_new_crl_name.value , as)
 		ASTGUI.feedback( { msg:'CallingRule Created !', showfor:2, color:'green' });
 		window.location.reload();
 	}else{
-		//parent.astgui_manageCallingRules.update( EDIT_CR, DOM_new_crl_name.value , cr_object ) ;
 		parent.ASTGUI.dialog.waitWhile(' Updating ...');
- 		parent.astgui_manageCallingRules.updateCallingRule( EDIT_CR, EDIT_CR_RULE, as )
+ 		parent.pbx.calling_rules.edit( EDIT_CR, EDIT_CR_RULE, as )
 		ASTGUI.feedback( { msg:'Calling Rule Updated !', showfor:2, color:'green' });
 		parent.ASTGUI.dialog.hide();
 		window.location.reload();
@@ -361,7 +360,7 @@ var new_crl_save_go = function(){
 
 var delete_CR_confirm = function(a,b){
 	if( !confirm('Delete Calling Rule ?') ) return;
-	parent.astgui_manageCallingRules.deleteCallingRule(a,b);
+	parent.pbx.calling_rules.remove(a,b);
 	ASTGUI.feedback( { msg:'Calling Rule Deleted !', showfor:2, color:'red' });
 	window.location.reload();
 };

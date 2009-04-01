@@ -322,7 +322,7 @@ var localajaxinit = function() {
 	parent.ASTGUI.systemCmd(top.sessionData.directories.script_mastercsvexists, function (){
 		var content = ASTGUI.loadHTML("./Master.csv"); /* "./" is good enough. */
 		records = content.split("\n");
-		var intDest = parent.astgui_manageusers.listOfUsers();
+		var intDest = parent.pbx.users.list();
 
 		for(var i=0;i<records.length;i++) {
 			records[i] = splitCSV(records[i]); /* cannot use records[i].split(","); */

@@ -73,7 +73,7 @@ function localajaxinit(){
 	ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
 	loadDOMelements();
 
-	var cusers = parent.astgui_manageusers.listOfUsers();
+	var cusers = parent.pbx.users.list();
 	var op_tmp ;
 	cusers.each(function(user){
 		op_tmp = 'Goto(default,' + user + ',1)';

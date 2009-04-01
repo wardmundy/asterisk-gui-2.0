@@ -36,10 +36,10 @@ var loadTrunks = function() {
 	REGISTRY_OUTPUT.iax2 = ASTGUI.parseCLIResponse(t) ;
 	t = parent.ASTGUI.cliCommand('sip show registry') ;
 	REGISTRY_OUTPUT.sip = ASTGUI.parseCLIResponse(t) ;
-	var d = [].concat( parent.astgui_managetrunks.listOfSIPTrunks() , parent.astgui_managetrunks.listOfIAXTrunks() );
+	var d = parent.pbx.trunks.list({sip: true, iax: true});
 
 	d.each( function(item){
-		var ttype = parent.astgui_managetrunks.misc.getTrunkType(item) ;
+		var ttype = parent.pbx.trunks.getType(item);
 		var newRow = TBL.insertRow(-1);
 		newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
 
@@ -55,7 +55,7 @@ var loadTrunks = function() {
 /* End IAX and SIP Trunks */
 
 /* Analog Trunks */
-	var c = parent.astgui_managetrunks.listOfAnalogTrunks();
+	var c = parent.pbx.trunks.list({analog: true});
 	c.each(function(item){
 		var newRow = TBL.insertRow(-1);
 		newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
@@ -72,7 +72,7 @@ var loadTrunks = function() {
 	var d = parent.sessionData.pbxinfo.trunks.providers ;
 	for(var e in d){ if(d.hasOwnProperty(e)){
 
-			var ttype = parent.astgui_managetrunks.misc.getTrunkType(e) ;
+			var ttype = parent.pbx.trunks.getType(e);
 			var newRow = TBL.insertRow(-1) ;
 			newRow.className = ((TBL.rows.length)%2==1)?'odd':'even';
 			var reg = ASTGUI.getTrunkStatus(REGISTRY_OUTPUT, e, ttype) ;
@@ -115,7 +115,7 @@ var loadExtensions = function() {
 
 	/* List all User Extensions */
 	var exten_tbody = $("#extensions_list > tbody");
-	var ul = parent.astgui_manageusers.listOfUsers();
+	var ul = parent.pbx.users.list();
 	ul = ul.sortNumbers( );
 	ul.each(function(user){ // list each user in table
 		var ud = parent.sessionData.pbxinfo.users[user];

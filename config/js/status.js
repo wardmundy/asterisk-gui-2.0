@@ -46,7 +46,7 @@ var show_Edit_ChannelHangup = function(chan) {
 var localajaxinit = function(){
 	top.document.title = 'Monitor active calls' ;
 
-	var ul = parent.astgui_manageusers.listOfUsers();
+	var ul = parent.pbx.users.list();
 	ul.sort();
 	ul.each( function(user) {
 		ASTGUI.selectbox.append('USERS', user, user);
