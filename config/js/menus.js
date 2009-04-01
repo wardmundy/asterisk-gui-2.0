@@ -492,7 +492,7 @@ var VoiceMenus_miscFunctions = {
 var delete_voiceMenu_confirm = function(a){
 	if (!confirm('delete selected voicemenu ?')) { return; }
 	EDIT_VMENU = a ;
-	parent.astgui_manageVoiceMenus.deleteMenu(EDIT_VMENU);
+	parent.pbx.voice_menus.remove(EDIT_VMENU);
 	window.location.reload();
 };
 
@@ -548,10 +548,10 @@ var voiceMenu_saveChanges = function(){
 	}
 
 	if( isNewVmenu == true ){
-		var vmenu_name = parent.astgui_manageVoiceMenus.nextAvailableVM_x();
+		var vmenu_name = parent.pbx.voice_menus.next();
 	}else{
 		var vmenu_name = EDIT_VMENU ;
-		parent.astgui_manageVoiceMenus.deleteMenu( vmenu_name );
+		parent.pbx.voice_menus.remove( vmenu_name );
 	}
 
 	var after = function(){
@@ -561,7 +561,7 @@ var voiceMenu_saveChanges = function(){
 	vm.steps.push( 'NoOp(' + vm.comment + ')' );
 	vm.steps = vm.steps.concat( CURRENT_ACTIONS );
 	vm.alias_exten = ASTGUI.getFieldValue('vmenu_ext');
-	parent.astgui_manageVoiceMenus.addMenu( vmenu_name, vm , after );
+	parent.pbx.voice_menus.add( vmenu_name, vm , after );
 };
 
 var show_createNewMenu_Form = function(){
@@ -761,10 +761,10 @@ var localajaxinit = function(){
 	})();
 
 	(function(){
-		var t = ASTGUI.cloneObject( parent.astgui_managetrunks.listofAllTrunks() ) ;
+		var t = ASTGUI.cloneObject( parent.pbx.trunks.list() ) ;
 		var TMP_FORSORT = [];
 		t.each(function(item){
-			TMP_FORSORT.push( parent.astgui_managetrunks.misc.getTrunkName(item) + ':::::::' +  item);
+			TMP_FORSORT.push( parent.pbx.trunks.getName(item) + ':::::::' +  item);
 		});
 		TMP_FORSORT.sort();
 		var trunks_selectbox = _$('newstep_dial_ViaTrunk');
@@ -780,7 +780,7 @@ var localajaxinit = function(){
 			ASTGUI.selectbox.append('newstep_mohClass', this_class, this_class );
 		});
 
-		var c = parent.astgui_manageCallPlans.listPlans() ;
+		var c = parent.pbx.call_plans.list() ;
 		c.each(function(plan){
 			ASTGUI.selectbox.append('newstep_disaContext', plan.withOut( ASTGUI.contexts.CallingPlanPrefix ) , plan );
 		});
