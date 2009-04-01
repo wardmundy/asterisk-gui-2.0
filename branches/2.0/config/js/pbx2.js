@@ -1139,7 +1139,7 @@ pbx.time_intervals.validate.weekday = function(week) {
  * Trunks object.
  */
 pbx.trunks = {
-	trunk_types: ['analog', 'bri', 'iax', 'pri', 'provider', 'sip']
+	trunk_types: ['analog', 'bri', 'iax', 'pri', 'providers', 'sip']
 };
 
 /**
@@ -1407,7 +1407,7 @@ pbx.trunks.list = function(types) {
 		}
 
 		if (!sessionData.pbxinfo.trunks.hasOwnProperty(type)) {
-			top.log.debug('pbx.trunks.list: ' + type + 'is not a type of trunk.');
+			top.log.debug('pbx.trunks.list: ' + type + ' is not a type of trunk.');
 			continue;
 		}
 
