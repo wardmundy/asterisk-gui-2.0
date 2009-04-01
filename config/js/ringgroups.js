@@ -92,7 +92,7 @@ var save_rg = function(){
 
 	var RG_EXTEN = ASTGUI.getFieldValue( DOM_text_rgExten );
 	if( !isNewRG ){ // if editing existing ring group
-		parent.astgui_manageRingGroups.deleteRg(RG_EDITING) ;
+		parent.pbx.ring_groups.remove(RG_EDITING);
 	}else{ // if is a new ring group
 		if( parent.miscFunctions.ifExtensionAlreadyExists(RG_EXTEN) ){
 			ASTGUI.highlightField(DOM_text_rgExten , 'Extension already exists');
@@ -127,7 +127,7 @@ var save_rg = function(){
 		$(DOM_ringgroup_editdiv).hide();
 		window.location.reload();
 	};
-	parent.astgui_manageRingGroups.createNewRg( tmp_obj, later, RG_EDITING ) ;
+	parent.pbx.ring_groups.add(RG_EDITING, tmp_obj, later);
 };
 
 
@@ -214,7 +214,7 @@ var resetFields = function(){
 
 var delete_rg_confirm = function(d){
 	if (!confirm('Delete RingGroup ?')) { return; }
-	parent.astgui_manageRingGroups.deleteRg(d) ;
+	parent.pbx.ring_groups.remove(d) ;
 	ASTGUI.feedback( { msg:'Ring Group deleted', showfor:2 });
 	window.location.reload();
 };
@@ -285,7 +285,7 @@ var localajaxinit = function(){
 	loadDOMelements();
 	
 	(function (){
-		var t = parent.astgui_manageusers.listOfUsers();
+		var t = parent.pbx.users.list();
 		t.each(function(usr){	
 			if( parent.sessionData.pbxinfo['users'][usr]['hassip']  && parent.sessionData.pbxinfo['users'][usr]['hassip'] == 'yes' ){
 				listOfDialDevices.push( 'SIP/' + usr );

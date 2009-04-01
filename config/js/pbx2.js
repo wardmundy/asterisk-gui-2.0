@@ -635,8 +635,7 @@ pbx.ring_groups.add = function(name, rg, callback) {
 	actions.new_action('append', name, 'exten', 's,n,' + rg.fallback);
 
 	var resp = actions.callActions();
-
-	if (!rest.contains('Response: Success')) {
+	if (!resp.contains('Response: Success')) {
 		top.log.error('pbx.ring_groups.add: error updating extensions.conf');
 		return false;
 	}
