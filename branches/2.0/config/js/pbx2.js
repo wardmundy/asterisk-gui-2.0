@@ -1168,8 +1168,8 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 		delete trunk.zapchan;
 		delete trunk.dahdichan;
 
-		name = astgui_managetrunks.misc.nextAvailableTrunk_x();
-		group = astgui_managetrunks.misc.nextAvailableGroup();
+		name = this.nextAvailTrunk();
+		group = this.nextAvailGroup();
 
 		trunk.signalling = '';
 		trunk.channel = '';
@@ -1188,7 +1188,7 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 		}
 
 		if (basis === 'GUIAssigned') {
-			name = astgui_managetrunks.misc.nextAvailableTrunk_x();
+			name = this.nextAvailTrunk();
 		} else if (basic === 'FromProvider') {
 			name = trunk.trunkname;
 		}

@@ -1138,14 +1138,13 @@ var ASTGUI = {
 		} ;
 		*/
 		// trunkname == trunkname as trunk_x 
-		//var ttype = parent.astgui_managetrunks.misc.getTrunkType(trunkname) ;
 		try{
 		var this_IP = '';
 		if(!ttype || ( ttype != 'sip' && ttype != 'iax' && ttype != 'providers' ) ){ return '--'; }
 		if( ttype == 'providers' ){
 			var uname = parent.sessionData.pbxinfo.trunks[ttype][trunkname]['username'];
 			var host = parent.sessionData.pbxinfo.trunks[ttype][trunkname]['host'];
-			ttype = parent.astgui_managetrunks.misc.getProviderTrunkType(trunkname); // find 'sip' or 'iax'
+			ttype = parent.pbx.trunks.getProviderType(trunkname); // find 'sip' or 'iax'
 			if ( ttype != 'sip' && ttype != 'iax'){
 				return '--';
 			}
