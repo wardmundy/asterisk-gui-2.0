@@ -38,7 +38,7 @@ var show_EditDialPlan_form = function(k){
 };
 
 var delete_DP_confirm = function(k){
-	var ul = parent.astgui_manageusers.listOfUsers();
+	var ul = parent.pbx.users.list();
 	for( var f=0 ; f < ul.length ; f++ ){
 		if( parent.sessionData.pbxinfo.users[ ul[f] ].getProperty('context') == k ){
 			ASTGUI.feedback( { msg:'Can not delete dialplan !<BR> The selected Dial Plan is in use by one or more users.', showfor:3, color:'red' } );
@@ -48,7 +48,7 @@ var delete_DP_confirm = function(k){
 
 	if( !confirm(' Delete DialPlan ' + k.withOut(ASTGUI.contexts.CallingPlanPrefix) + '?' ) ){ return; }
 	parent.ASTGUI.dialog.waitWhile(' Applying Changes ...');
-	parent.astgui_manageCallPlans.deletePlan(k);
+	parent.pbx.call_plans.remove(k);
 	var after = function(){
 		ASTGUI.feedback( { msg: 'deleted DialPlan !', showfor: 2 , color: 'blue', bgcolor: '#FFFFFF' } );
 		parent.ASTGUI.dialog.hide();
@@ -67,7 +67,7 @@ var edit_DP_save_go = function(){
 	var dp_name = DOM_edit_dlpn_name.value;
 
 	if( isNewDP ){ // check if there is already a DialPlan by this name
-		var tmp_dps = parent.astgui_manageCallPlans.listPlans() ;
+		var tmp_dps = parent.pbx.call_plans.list() ;
 		if( tmp_dps.contains( ASTGUI.contexts.CallingPlanPrefix + dp_name ) ){
 			ASTGUI.feedback( { msg:' DialPlan name already in use ! <BR> Please choose another name.', showfor: 3, color:'red' } );
 			DOM_edit_dlpn_name.focus();
@@ -88,23 +88,23 @@ var edit_DP_save_go = function(){
 	var add = function(){
 		if( isNewDP == false && dp_name != EDIT_DP){ // if dialplan name is changed, update any users context who have this dialplan
 			(function(){
-				var ul = parent.astgui_manageusers.listOfUsers();
+				var ul = parent.pbx.users.list();
 				ul.each(
 					function(user){
 						if( parent.sessionData.pbxinfo.users[user].context == EDIT_DP ){
 							var t = ASTGUI.contexts.CallingPlanPrefix + dp_name ;
-							parent.astgui_manageusers.editUserProperty({ user:user , property: 'context', value: t });
+							parent.pbx.users.edit(user, {context: t });
 						}
 					}
 				);
 			})();
 		}
-		parent.astgui_manageCallPlans.addPlan(dp_name, dp , after );
+		parent.pbx.call_plans.add(dp_name, dp , after );
 	};
 	if(isNewDP){
 		add();
 	}else{
-		parent.astgui_manageCallPlans.deletePlan(EDIT_DP);
+		parent.pbx.call_plans.remove(EDIT_DP);
 		setTimeout(add, 700);
 	}
 
@@ -115,7 +115,7 @@ var resetEditForm = function(){
 		_$('Edit_dialog_title').innerHTML = 'Create New DialPlan';
 		ASTGUI.domActions.unCheckAll( cr_chkbxClass );
 		ASTGUI.domActions.checkSelected( cr_chkbxClass, ASTGUI.includeContexts ) ;
-		DOM_edit_dlpn_name.value = parent.astgui_manageCallPlans.nextAvailableDP() ;
+		DOM_edit_dlpn_name.value = parent.pbx.call_plans.nextAvailable() ;
 		return ;
 	}
 
@@ -148,7 +148,7 @@ var load_CallingPlansTable = function(){
 	})();	
 
 	(function (){
-		var c = parent.astgui_manageCallPlans.listPlans() ;
+		var c = parent.pbx.call_plans.list() ;
 		c.each(function(plan){
 			var newRow = DOM_table_DialPlans_list.insertRow(-1);
 			newRow.className = ((DOM_table_DialPlans_list.rows.length)%2==1)?'odd':'even';

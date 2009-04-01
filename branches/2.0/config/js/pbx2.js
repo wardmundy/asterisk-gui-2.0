@@ -277,6 +277,10 @@ pbx.call_plans.add = function(name, callplan, callback) {
 		return false;
 	}
 
+	if (!name.beginsWith(ASTGUI.contexts.CallingPlanPrefix)) {
+		name = ASTGUI.contexts.CallingPlanPrefix + name;
+	}
+
 	var actions = new listOfSynActions('extensions.conf');
 	actions.new_action('delcat', name, '', '');
 	actions.new_action('newcat', name, '', '');
