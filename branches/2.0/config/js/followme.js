@@ -25,7 +25,7 @@ var FOLLOWME_OPTIONS = '';
 var load_users_table = function(){
 	var TBL = _$('table_userslist') ;
 	var addCell = ASTGUI.domActions.tr_addCell;
-	var ul = parent.astgui_manageusers.listOfUsers();  ul = ul.sortNumbers( );
+	var ul = parent.pbx.users.list();  ul = ul.sortNumbers( );
 
 	if(!ul.length){
 		ASTGUI.domActions.clear_table(TBL);
@@ -135,7 +135,7 @@ var localajaxinit = function(){
 		}
 		_$('FMU_moh').selectedIndex = -1;
 
-		var c = parent.astgui_manageCallPlans.listPlans() ;
+		var c = parent.pbx.call_plans.list() ;
 		var tmp_pfx = ASTGUI.contexts.CallingPlanPrefix ;
 		for( var c_t = 0 ; c_t < c.length ; c_t++ ){
 			ASTGUI.selectbox.append( 'FMU_context' , c[c_t].withOut(tmp_pfx) , c[c_t] );
@@ -260,7 +260,7 @@ var followMe_MiscFunctions = {
 
 	load_LocalExtensionsList : function(){ //  followMe_MiscFunctions.load_LocalExtensionsList()
 		ASTGUI.selectbox.clear('FMU_newNumber_local');
-		var ul = parent.astgui_manageusers.listOfUsers();  ul = ul.sortNumbers( );
+		var ul = parent.pbx.users.list();  ul = ul.sortNumbers( );
 		ul.each( function(user){
 			ASTGUI.selectbox.append('FMU_newNumber_local', user + ' ' + parent.sessionData.pbxinfo.users[user].getProperty('fullname') , user);
 		});

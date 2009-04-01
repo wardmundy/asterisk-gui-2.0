@@ -50,7 +50,7 @@ var localajaxinit = function(){
 var create_NEW_USERS = function(){
 	var addUser_OR_reloadGUI = function(){
 		var tmp_first_user = newusers_list[0];
-		parent.astgui_manageusers.addUser( tmp_first_user , NEW_USERS[tmp_first_user] , function(){
+		parent.pbx.users.add( tmp_first_user , NEW_USERS[tmp_first_user] , function(){
 			newusers_list.splice(0,1);
 			if( newusers_list.length ){
 				addUser_OR_reloadGUI();

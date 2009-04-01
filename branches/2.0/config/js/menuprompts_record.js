@@ -144,7 +144,7 @@ var localajaxinit = function(){
 	var newvmenu_ext = _$('newvmenu_ext');
 	var playVmenu_ext = _$('playVmenu_ext');
 	var _rft = _$('recfilesTable');
-	var ul = parent.astgui_manageusers.listOfUsers();  ul = ul.sortNumbers();
+	var ul = parent.pbx.users.list();  ul = ul.sortNumbers();
 	ul.each( function(user){ // list each user in table
 		ASTGUI.selectbox.append(newvmenu_ext , user , user );
 		ASTGUI.selectbox.append(playVmenu_ext , user , user );
