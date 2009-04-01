@@ -372,15 +372,15 @@ var onLogInFunctions = {
 			}
 
 			try{
-				astgui_manageConferences.loadMeetMeRooms();
+				pbx.conferences.load();
 			}catch(er){
-				top.log.error('Error in astgui_manageConferences.loadMeetMeRooms()');
+				top.log.error('Error in pbx.conferences.load()');
 			}
 
 			try{
-				astgui_manageQueues.loadQueues();
+				pbx.queues.load();
 			}catch(er){
-				top.log.error('Error in astgui_manageQueues.loadQueues()');
+				top.log.error('Error in pbx.queues.load()');
 			}
 
 			try{
@@ -877,7 +877,7 @@ var miscFunctions = {
 	// for Example - in incoming calls, Voicemenus, RingGroups etc.
 	// this function navigates through all properties of sessionData.pbxinfo and returns an Array of Objects with all the possible destinations
 		var tmp = [] ;
-		var y = astgui_manageusers.listOfUsers();
+		var y = pbx.users.list();
 			y.each(function(user){
 				tmp.push({ optionText: 'User Extension -- ' + user , optionValue: 'Goto(default,' + user + ',1)' });
 
@@ -926,7 +926,7 @@ var miscFunctions = {
 				var rg_name = sessionData.pbxinfo.ringgroups[rg].NAME || rg ;
 				tmp.push({ optionText: 'Ring Group -- ' + rg_name , optionValue: 'Goto('+ rg +',s,1)' });
 			});
-		var y = astgui_managePageGroups.getPGsList();
+		var y = pbx.page_groups.list();
 			y.each(function(pge){
 				tmp.push({ optionText: 'Page Group -- ' + pge , optionValue: 'Goto('+ ASTGUI.contexts.PageGroups +','+ pge +',1)' });
 			});
@@ -970,7 +970,7 @@ var miscFunctions = {
 	getAllExtensions : function(){ // miscFunctions.getAllExtensions() - returns Array of all Extensions
 		var tmp = [] ;
 		try{
-			tmp = tmp.concat( astgui_manageusers.listOfUsers() );
+			tmp = tmp.concat( pbx.users.list() );
 			if( sessionData.pbxinfo['localextensions'].hasOwnProperty('VoiceMailMain') ){
 				tmp.push( ASTGUI.parseContextLine.getExten( sessionData.pbxinfo['localextensions']['VoiceMailMain'] ) ) ;
 			}
@@ -998,7 +998,7 @@ var miscFunctions = {
 						tmp.push( tmp_thisRg.extension );
 					}
 				} );
-			tmp = tmp.concat( astgui_managePageGroups.getPGsList() );
+			tmp = tmp.concat( pbx.page_groups.list() );
 			var tmp_LE = ASTGUI.cloneObject(sessionData.pbxinfo['localextensions']);
 			if( tmp_LE.getProperty('defaultDirectory') ){
 				tmp.push( tmp_LE.getProperty('defaultDirectory') );
