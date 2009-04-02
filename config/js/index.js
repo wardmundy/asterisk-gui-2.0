@@ -926,7 +926,7 @@ var miscFunctions = {
 				var rg_name = sessionData.pbxinfo.ringgroups[rg].NAME || rg ;
 				tmp.push({ optionText: 'Ring Group -- ' + rg_name , optionValue: 'Goto('+ rg +',s,1)' });
 			});
-		var y = pbx.page_groups.list();
+		var y = pbx.paging.list();
 			y.each(function(pge){
 				tmp.push({ optionText: 'Page Group -- ' + pge , optionValue: 'Goto('+ ASTGUI.contexts.PageGroups +','+ pge +',1)' });
 			});
