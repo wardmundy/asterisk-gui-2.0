@@ -93,9 +93,9 @@
 	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
 </div>
 	<div class='top_buttons'>
-		<span id='new' class='guiButtonNew' onclick='USERS_MISC_FUNCTIONS.NEW_USER_FORM();'>Create New User</span>
-		<span class='guiButton' onclick='USERS_MISC_FUNCTIONS.EDIT_SELECTEDUSERs_FORM();'>Modify Selected Users</span>
-		<span class='guiButtonDelete' onclick='USERS_MISC_FUNCTIONS.DELETE_SELECTED_USERS();'>Delete Selected Users</span>
+		<span id='new' class='guiButtonNew' onclick='NEW_USER_FORM();'>Create New User</span>
+		<span class='guiButton' onclick='EDIT_SELECTEDUSERs_FORM();'>Modify Selected Users</span>
+		<span class='guiButtonDelete' onclick='DELETE_SELECTED_USERS();'>Delete Selected Users</span>
 
 		<span class='guiButton' onclick='buynow_action();' id='whereToBuy_button' tip="en,users,98">Where to Buy</span>
 		<span class='lite_Heading'> List of User Extensions </span>
@@ -109,7 +109,7 @@
 	<TABLE width="100%" cellpadding=0 cellspacing=0>
 	<TR class="dialog_title_tr">
 		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);"><span id="edit_userExtension_div_title"></span></TD>
-		<TD width="120"><span id='User_AdvancedEditButton' class='guiButton' onclick='USERS_MISC_FUNCTIONS.show_UserEdit_Advanced();'>Advanced Edit</span></TD>
+		<TD width="120"><span id='User_AdvancedEditButton' class='guiButton' onclick='show_UserEdit_Advanced();'>Advanced Edit</span></TD>
 		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
 	</TR>
 	</TABLE>
@@ -243,7 +243,7 @@
 				<legend>&nbsp;Other Options</legend>
 				<TABLE> <TR>	<TD>
 						<input type='checkbox' id='edit_3wayCalling'>
-						<label for='edit_3wayCalling'>3-Way Calling</label>
+						<label for='edit_3wayCalling'>3-Way Calling (analog)</label>
 						<img src="images/tooltip_info.gif" tip="en,users,14" class='tooltipinfo'>
 						&nbsp;&nbsp;&nbsp;&nbsp;
 						&nbsp;&nbsp;&nbsp;&nbsp;
@@ -253,7 +253,7 @@
 						&nbsp;&nbsp;&nbsp;&nbsp;
 						&nbsp;&nbsp;&nbsp;&nbsp;
 						<input type='checkbox' id='edit_callWaiting'>
-						<label for='edit_callWaiting'>Call Waiting</label>
+						<label for='edit_callWaiting'>Call Waiting (analog)</label>
 						<img src="images/tooltip_info.gif" tip="en,users,13" class='tooltipinfo'>
 						<br>
 						<input type='checkbox' id='edit_cti'>
@@ -280,7 +280,7 @@
 
 	<TR>	<TD align=center height=50 valign=middle>
 			<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
-			<span class='guiButtonEdit' onclick='USERS_MISC_FUNCTIONS.SAVE_USER_FORM();'>Update</span>
+			<span class='guiButtonEdit' onclick='SAVE_USER_FORM();'>Update</span>
 		</TD>
 	</TR>
 	</TABLE>
@@ -459,7 +459,7 @@
 		</TR>
 		<TR>	<TD align=center valign=middle colspan=2>
 				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
-				<span class='guiButtonEdit' onclick='USERS_MISC_FUNCTIONS.save_multiple_users();'>Update</span>
+				<span class='guiButtonEdit' onclick='save_multiple_users();'>Update</span>
 			</TD>
 		</TR>
 	</TABLE>
@@ -479,8 +479,8 @@
 			</TD>
 		</TR>
 		<TR>	<TD align=center height=50 valign=middle>
-				<span class='guiButtonCancel' onclick='USERS_MISC_FUNCTIONS.show_UserEdit_normal();'>Cancel</span>
-				<span class='guiButtonEdit' onclick='USERS_MISC_FUNCTIONS.save_User_Advanced();'>Update</span>
+				<span class='guiButtonCancel' onclick='show_UserEdit_normal();'>Cancel</span>
+				<span class='guiButtonEdit' onclick='save_User_Advanced();'>Update</span>
 			</TD>
 		</TR>
 	</TABLE>
@@ -511,11 +511,11 @@
 				$('#edit_callerid_span').html(this.value);
 		});
 
-		USERS_MISC_FUNCTIONS.load_users_table();
+		load_users_table();
 
 		$('#whereToBuy_button').tooltip({ delay: 0.9, showURL: false, top: 15, left: -300});
 
-		USERS_MISC_FUNCTIONS.initialize_formFields();
+		initialize_formFields();
 	});
 </script>
 </body>
