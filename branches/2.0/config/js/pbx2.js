@@ -565,7 +565,7 @@ pbx.queues = {};
  * @return boolean of success.
  */
 pbx.queues.load = function() {
-	var cxt = context2json({ filename: 'extensions.conf', context: ASTGUI.contexts.QUEUES, usf:o});
+	var cxt = context2json({ filename: 'extensions.conf', context: ASTGUI.contexts.QUEUES, usf:0});
 	if (cxt === null) {
 		top.log.info('pbx.queues.load: context not found, lets create it!');
 		var ext_conf = new listofSynActions('extensions.conf');
