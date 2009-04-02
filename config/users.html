@@ -90,14 +90,14 @@
 
 <body bgcolor="#EFEFEF">
 <div class="iframeTitleBar"> User Extensions on PBX 
-	<span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+	<span class='refresh_icon'>&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
 </div>
 	<div class='top_buttons'>
-		<span id='new' class='guiButtonNew' onclick='NEW_USER_FORM();'>Create New User</span>
-		<span class='guiButton' onclick='EDIT_SELECTEDUSERs_FORM();'>Modify Selected Users</span>
-		<span class='guiButtonDelete' onclick='DELETE_SELECTED_USERS();'>Delete Selected Users</span>
+		<span id='new' class='guiButtonNew'>Create New User</span>
+		<span class='guiButton' id="modify_users">Modify Selected Users</span>
+		<span class='guiButtonDelete'>Delete Selected Users</span>
 
-		<span class='guiButton' onclick='buynow_action();' id='whereToBuy_button' tip="en,users,98">Where to Buy</span>
+		<span class='guiButton' id='whereToBuy_button' tip="en,users,98">Where to Buy</span>
 		<span class='lite_Heading'> List of User Extensions </span>
 	</div>
 
@@ -109,7 +109,7 @@
 	<TABLE width="100%" cellpadding=0 cellspacing=0>
 	<TR class="dialog_title_tr">
 		<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);"><span id="edit_userExtension_div_title"></span></TD>
-		<TD width="120"><span id='User_AdvancedEditButton' class='guiButton' onclick='show_UserEdit_Advanced();'>Advanced Edit</span></TD>
+		<TD width="120"><span id='User_AdvancedEditButton' class='guiButton'>Advanced Edit</span></TD>
 		<TD class="dialog_title_X" onclick="ASTGUI.hideDrag(event);"> X </TD>
 	</TR>
 	</TABLE>
@@ -495,6 +495,7 @@
 <script src="js/astman.js"></script>
 <script src="js/users.js"></script>
 <script src="js/jquery.tooltip.js"></script>
+<script src="js/jquery.delegate-1.1.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
 		top.document.title = "Manage User Extensions";
@@ -510,6 +511,29 @@
 			.change(function() {
 				$('#edit_callerid_span').html(this.value);
 		});
+		$('span.refresh_icon').click(function() {
+			window.location.reload();
+		});
+		$('div.top_buttons')
+			.delegate('click', '.guiButtonNew', function() {
+				NEW_USER_FORM();
+				return false;
+			})
+			.delegate('click', '#modify_users', function() {
+				EDIT_SELECTEDUSERs_FORM();
+				return false;
+			})
+			.delegate('click', '.guiButtonDelete', function() {
+				DELETE_SELECTED_USERS();
+				return false;
+			})
+			.delegate('click', '#whereToBuy_button', function() {
+				buynow_action();
+				return false;
+		});
+		$('#User_AdvancedEditButton').click(function() {
+			show_User_Edit_Advanced();
+		)};
 
 		load_users_table();
 
