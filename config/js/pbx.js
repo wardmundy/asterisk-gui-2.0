@@ -59,7 +59,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					],
 					'macro-pagingintercom' : [
 						'exten=s,1,SIPAddHeader(Alert-Info: ${PAGING_HEADER})',
-						'exten=s,2,Page(${ARG1}|${ARG2})',
+						'exten=s,2,Page(${ARG1},${ARG2})',
 						'exten=s,3,Hangup'
 					]
 				};
