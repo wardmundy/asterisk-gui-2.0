@@ -1138,7 +1138,8 @@ pbx.time_intervals.validate.weekday = function(week) {
  * Trunks object.
  */
 pbx.trunks = {
-	trunk_types: ['analog', 'bri', 'iax', 'pri', 'providers', 'sip']
+	trunk_types: ['analog', 'bri', 'iax', 'pri', 'providers', 'sip'],
+	tech: {analog: 'DAHDI', bri: 'DAHDI', iax: 'IAX2', pri:'DAHDI', sip: 'SIP'}
 };
 
 /**
@@ -1154,6 +1155,7 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	var ct = '';
 	var group = '';
 	var name = trunk.username;
+	var tech = this.tech[type];
 
 	/* The first thing we must do is verify required vars and
 	 * do some general prep work depending on type */
@@ -1210,12 +1212,12 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	trunk.group = group || null;
 	//DahdiChannelString ???
 	trunk.hasexten = 'no';
-	trunk.hasiax = trunk.hasiax || 'no';
-	trunk.hassip = trunk.hassip || 'no';
-	trunk.registeriax = trunk.hasiax || 'no';	/* same conditions as hasiax */
-	trunk.registersip = (trunk.host === 'dynamic' && trunk.hassip) ? 'no' : 'yes';
-	trunk.trunkname = (trunk.trunkname) ? trunk.trunkname.guiMetaData() : '';
-	trunk.trunkstyle = (type === 'analog') ? type.guiMetaData() : 'voip'.guiMetaData();
+	trunk.hasiax = (type === 'iax') ? 'yes' : 'no';
+	trunk.hassip = (type === 'sip') ? 'yes' : 'no';
+	trunk.registeriax = (type === 'iax') ? 'yes' : 'no';	/* same conditions as hasiax */
+	trunk.reigstersip = (trunk.host === 'dynamic' && type === 'sip') ? 'yes' : 'no';
+	trunk.trunkname = trunk.trunkname || '';
+	trunk.trunkstyle = (type === 'analog') ? type : 'voip';
 
 	/* Initializing astman interactions */
 	var users_conf = new listOfActions();
@@ -1225,24 +1227,22 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	users_conf.new_action('newcat', name, '', '');
 
 	/* now, lets iterate thru and append to the trunk context! */
+	sessionData.pbxinfo.trunks[type][name] = {};
 	for (var v in trunk) {
-		if (!trunk.hasOwnProperty(v)) {
+		if (!trunk.hasOwnProperty(v) || v === 'allow' || v === 'disallow') {
 			continue;
 		}
 
 		sessionData.pbxinfo.trunks[type][name][v] = trunk[v];
 		users_conf.new_action('append', name, v, trunk[v]);
 	}
+	sessionData.pbxinfo.trunks[type][name]['allow'] = trunk['allow'];
+	users_conf.new_action('append', name, 'allow', trunk['allow']);
+	sessionData.pbxinfo.trunks[type][name]['disallow'] = trunk['disallow'];
+	users_conf.new_action('append', name, 'disallow', trunk['disallow']);
 
-	var resp = users_conf.callActions();
-
-	/* Not good! an error!! */
-	if (!resp.contains('Response: Success')) {
-		top.log.error('pbx.trunks.add: error adding trunk to users.conf');
-		top.log.error(resp);
-		delete sessionData.pbxinfo.trunks[type][name];
-		return false;
-	}
+	/* TODO: get listOfActions to return a response so we know everythings ok! */
+	users_conf.callActions(function(){});
 
 	/* users.conf changes down, now to add to extensions.conf */
 	var ext_conf = new listOfSynActions('extensions.conf');
@@ -1252,7 +1252,8 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	ext_conf.new_action('delcat', ct + ASTGUI.contexts.TrunkDefaultSuffix, '' ,'');
 	ext_conf.new_action('newcat', ct + ASTGUI.contexts.TrunkDefaultSuffix, '', '');
 	ext_conf.new_action('append', ct, 'include', ct + ASTGUI.contexts.TrunkDefaultSuffix);
-	ext_conf.new_action('update', 'globals', trunk, this.technology[type] + '/' + name);
+	/* not going to work for analog vv */
+	ext_conf.new_action('update', 'globals', name, tech + '/' + name);
 
 	resp = '';
 	resp = ext_conf.callActions();
@@ -1272,6 +1273,7 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	}
 
 	callback();
+	return true;
 };
 
 /**
@@ -1462,7 +1464,7 @@ pbx.trunks.nextAvailTrunk = function() {
 		}
 	});
 
-	return (!x.length) ? 'trunk_1' : 'trunk_' + numbers.firstAvailable();
+	return (!numbers.length) ? 'trunk_1' : 'trunk_' + numbers.firstAvailable();
 };
 
 /**
@@ -1479,12 +1481,12 @@ pbx.trunks.remove = function(trunk) {
 	var actions = new listOfSynActions('extensions.conf');
 	actions.new_action('delete', 'globals', trunk, '');
 
-	for (var trunk in exts) {
-		if (!exts.hasOwnProperty(trunk)) {
+	for (var ext in exts) {
+		if (!exts.hasOwnProperty(ext) || !ext.contains(ASTGUI.contexts.TrunkDIDPrefix + trunk)) {
 			continue;
 		}
 
-		actions.new_action('delcat', trunk, '', '');
+		actions.new_action('delcat', ext, '', '');
 	}
 	actions.callActions();
 

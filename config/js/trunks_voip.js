@@ -199,10 +199,17 @@ var edit_VOIPTrunk_save_go = function(){
 			window.location.reload();
 		};
 
-		if(ttv =='SIP'){ parent.pbx.trunks.add('sip', trp , cbf,
-						DOM_edit_VOIPTrunk_Context_Basis.value ) ; }
-		if(ttv =='IAX'){ parent.pbx.trunks.add('iax', trp , cbf,
-						DOM_edit_VOIPTrunk_Context_Basis.value ) ; }
+		if (ttv =='SIP') { 
+			var retval = parent.pbx.trunks.add('sip', trp, cbf, DOM_edit_VOIPTrunk_Context_Basis.value);
+		} else if (ttv =='IAX') { 
+			var retval = parent.pbx.trunks.add('iax', trp, cbf, DOM_edit_VOIPTrunk_Context_Basis.value);
+		}
+
+		if (retval) {
+			ASTGUI.feedback( { msg:'added voip trunk ' + tmp_username, showfor: 5, color:'red', bgcolor:'#ffffff' } );
+			window.location.reload();
+		}
+
 
 	}else if(isNewTrunk == false){
 	// Edit Existing Trunk
