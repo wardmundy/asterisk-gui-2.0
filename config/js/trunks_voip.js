@@ -200,9 +200,9 @@ var edit_VOIPTrunk_save_go = function(){
 		};
 
 		if (ttv =='SIP') { 
-			var retval = parent.pbx.trunks.add('sip', trp, cbf, DOM_edit_VOIPTrunk_Context_Basis.value);
+			var retval = parent.pbx.trunks.add('sip', trp, cbf, tcv);
 		} else if (ttv =='IAX') { 
-			var retval = parent.pbx.trunks.add('iax', trp, cbf, DOM_edit_VOIPTrunk_Context_Basis.value);
+			var retval = parent.pbx.trunks.add('iax', trp, cbf, tcv);
 		}
 
 		if (retval) {
