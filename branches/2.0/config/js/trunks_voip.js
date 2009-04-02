@@ -169,7 +169,7 @@ var edit_VOIPTrunk_save_go = function(){
 
 	if( isNewTrunk == true ) {
 	// New Trunk
-		var tcv = DOM_edit_VOIPTrunk_Context_Basis.value;  /* How do we assign context name ? */
+		var tcv = $('edit_VOIPTrunk_Context_Basis').val();  /* How do we assign context name ? */
 		if (tcv == 'FromUser') {
 			var tmp_ttype = parent.pbx.trunks.getType(DOM_edit_VOIPTrunk_Username.value);
 			if( tmp_ttype ){
