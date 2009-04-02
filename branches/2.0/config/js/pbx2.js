@@ -1191,7 +1191,7 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 
 		if (basis === 'GUIAssigned') {
 			name = this.nextAvailTrunk();
-		} else if (basic === 'FromProvider') {
+		} else if (basis === 'FromProvider') {
 			name = trunk.trunkname;
 		}
 		break;
