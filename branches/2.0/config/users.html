@@ -505,7 +505,13 @@
 			$('.top_buttons').hide();
 			return;
 		}
+
+		/* lets init everything */
+		$('#whereToBuy_button').tooltip({ delay: 0.9, showURL: false, top: 15, left: -300});
+		load_users_table();
+		initialize_formFields();
 		
+		/* lets add some event handlers/delegators */
 		$('#new_ext')
 			.keyup(function() {
 				$('#edit_callerid_span').html(this.value);
@@ -536,12 +542,21 @@
 		$('#User_AdvancedEditButton').click(function() {
 			show_User_Edit_Advanced();
 		});
-
-		load_users_table();
-
-		$('#whereToBuy_button').tooltip({ delay: 0.9, showURL: false, top: 15, left: -300});
-
-		initialize_formFields();
+		$('#edit_fxs').change(function() {
+			/* lets disable all the inputs that are analog only if
+			 * there is no analog stations */
+			if ($('#edit_fxs option:selected').text() === 'None') {
+				$('#edit_3wayCalling').attr('disabled', 'disabled');
+				$('label[for=edit_3wayCalling]').css('color', '#555555');
+				$('#edit_callWaiting').attr('disabled', 'disabled');
+				$('label[for=edit_callWaiting]').css('color', '#555555');
+			} else {
+				$('#edit_3wayCalling').removeAttr('disabled');
+				$('label[for=edit_3wayCalling]').css('color', 'inherit');
+				$('#edit_callWaiting').removeAttr('disabled');
+				$('label[for=edit_callWaiting]').css('color', 'inherit');
+			}
+		}).change();
 	});
 </script>
 </body>
