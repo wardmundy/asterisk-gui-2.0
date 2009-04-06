@@ -2081,7 +2081,7 @@ pbx.voice_menus.add = function(name, menu, callback) {
 	actions.new_action('delcat', name, '', '');
 	actions.new_action('newcat', name, '', '');
 
-	new_menu.includes.each( function(item) {
+	menu.includes.each( function(item) {
 		actions.new_action('append', name, 'include', item);
 	});
 
@@ -2093,9 +2093,11 @@ pbx.voice_menus.add = function(name, menu, callback) {
 		actions.new_action('append', ASTGUI.contexts.VoiceMenuExtensions, 'exten', menu.alias_exten);
 	}
 
+	var i=1;
 	menu.steps.each( function(step) {
 		if (!step.beginsWith('s,')) {
-			step = 's,' + (i+1) + ',' + step;
+			step = 's,' + (i) + ',' + step;
+			i++;
 		}
 
 		actions.new_action('append', name, 'exten', step);
