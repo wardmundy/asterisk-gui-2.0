@@ -91,12 +91,12 @@ var VoiceMenus_miscFunctions = {
 				});
 				x.callActions( function(){
 					ASTGUI.dialog.waitWhile('Updated VoiceMenu information <BR> Reloading GUI ... ');
-					setTimeout( function(){ top.window.location.reload(); } , 2000 );
+					setTimeout( function(){ window.location.reload(); } , 2000 );
 				});
 			}});
 		}catch(err){
 			alert("Error saving VoiceMenu");
-			top.window.location.reload();
+			window.location.reload();
 		}
 	},
 
