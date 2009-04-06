@@ -289,6 +289,7 @@ var NEW_USER_FORM = function(){ // NEW_USER_FORM();
 	_$('edit_userExtension_div_title').innerHTML = 'Create New User';
 	ASTGUI.feedback( { msg: 'Create New User !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' } );
 	RESET_USER_FORM_FIELDS();
+	$('#edit_fxs').change(); /* disable/enabled 3-way/callwaiting based on analog */
 	$('#edit_userExtension_div').showWithBg();
 	$('#User_AdvancedEditButton').hide();
 };
@@ -300,6 +301,7 @@ var EDIT_USER_FORM = function(a){ // EDIT_USER_FORM();
 	ASTGUI.feedback( { msg: 'Edit User Extension !', showfor: 2 , color: 'green', bgcolor: '#FFFFFF' } );
 	_$('edit_userExtension_div_title').innerHTML = 'Edit User Extension - ' + a ;
 	RESET_USER_FORM_FIELDS();
+	$('#edit_fxs').change(); /* disable/enabled 3-way/callwaiting based on analog */
 	$('#edit_userExtension_div').showWithBg();
 	try{_$('edit_userExtension_div').scrollIntoView(true);}catch(err){}
 };
