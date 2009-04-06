@@ -120,7 +120,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['voicemail'] .en[12] = "<B>Play Envelope:</B> Turn on/off playing introductions about each message when accessing them from the voicemail application.";
 	tooltips['voicemail'] .en[13] = "<B> Max Greeting:</B> Set the maximum number of seconds for a User's voicemail greeting.";
 	tooltips['voicemail'] .en[15] = "<B> Direct VoiceMail Dial:</B> Check this to enable direct voicemail dial. For instance, if John's extension is 6001, you would be able to directly dial into John's voicemailbox by dialing #6001 to leave him a message.";
-	tooltips['voicemail'] .en[16] = "<b>SMTP Server</b> The IP address or hostname of an SMTP server that the AA50 may connect to, without authentication, in order to send e-mail notifications of your voicemails; i.e. mail.yourcompany.com";
+	tooltips['voicemail'] .en[16] = "<b>SMTP Server</b> The IP address or hostname of an SMTP server that this may connect to, without authentication, in order to send e-mail notifications of your voicemails; i.e. mail.yourcompany.com";
 	tooltips['voicemail'] .en[17] = "<b>Port</b> The port number on which the SMTP server is running; generally port 25.";
 
 
