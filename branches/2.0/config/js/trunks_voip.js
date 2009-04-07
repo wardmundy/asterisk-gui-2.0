@@ -91,6 +91,7 @@ var show_Edit_Trunk = function(){
 		ASTGUI.updateFieldToValue( 'trunk_fromuser' , tinfo.getProperty('fromuser') );
 		ASTGUI.updateFieldToValue( 'trunk_authuser' , tinfo.getProperty('authuser') );
 		ASTGUI.updateFieldToValue( 'trunk_insecure' , tinfo.getProperty('insecure') );
+		ASTGUI.updateFieldToValue( 'trunk_outboundproxy' , tinfo.getProperty('outboundproxy') );
 
 		if( tinfo.getProperty('allow') == 'all'){
 			ASTGUI.updateFieldToValue( 'codec_one', 'ulaw' );
@@ -119,8 +120,10 @@ var show_Edit_Trunk = function(){
 
 		// remote MWI stuff (only for SIP trunks)
 			if ( ttype == 'sip' ){
+				$('#outboundproxy_field').show();
 				$('.editTrunk_Field_ermwi').show();
 			}else{
+				$('#outboundproxy_field').hide();
 				$('.editTrunk_Field_ermwi').hide();
 			}
 			(function(){
@@ -233,6 +236,8 @@ var edit_VOIPTrunk_save_go = function(){
 
 		var old_trunkUsername = parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['username'] ;
 
+		x.new_action('update', EDIT_TRUNK, 'outboundproxy', $('#trunk_outboundproxy').val());
+		parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['outboundproxy'] = $('#trunk_outboundproxy').val();
 		x.new_action('update', EDIT_TRUNK , 'host', ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Hostname) );
 			parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['host'] = ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Hostname) ;
 
