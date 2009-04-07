@@ -1215,7 +1215,7 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	trunk.hasiax = (type === 'iax') ? 'yes' : 'no';
 	trunk.hassip = (type === 'sip') ? 'yes' : 'no';
 	trunk.registeriax = (type === 'iax') ? 'yes' : 'no';	/* same conditions as hasiax */
-	trunk.reigstersip = (trunk.host === 'dynamic' && type === 'sip') ? 'yes' : 'no';
+	trunk.registersip = (trunk.host !== 'dynamic' && type === 'sip') ? 'yes' : 'no';
 	trunk.trunkname = trunk.trunkname || '';
 	trunk.trunkstyle = (type === 'analog') ? type : 'voip';
 
