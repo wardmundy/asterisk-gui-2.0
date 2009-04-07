@@ -1185,7 +1185,7 @@ var ASTGUI = {
 		// cli output of 'sip show registry' shows only a part of long usernames
 		// We should use action: status like we do for active channel monitoring.
 		
-		var uname_lc = uname.toLowerCase().substr(0,10);
+		var uname_lc = uname.toLowerCase();
 
 		for(var i = 0; i < lines.length; i++) {
 			var line_orig = lines[i];
@@ -1198,7 +1198,7 @@ var ASTGUI = {
 				switch(vals[3]) {
 				case 'registered':
 				case 'Registered':
-					return '<font color="green">registered</font>';
+					return '<font color="green">'+vals[3]+'</font>';
 				default:
 					return '<font color="red">'+vals[3]+'</font>';
 				}
