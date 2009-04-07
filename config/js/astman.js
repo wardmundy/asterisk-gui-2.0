@@ -1188,25 +1188,23 @@ var ASTGUI = {
 		var uname_lc = uname.toLowerCase().substr(0,10);
 
 		for(var i = 0; i < lines.length; i++) {
+			var line_orig = lines[i];
 			var line = lines[i].trim().toLowerCase();
-			if (!line || line.beginsWith('host') ){ continue; }
+			if (!line || line.beginsWith('host') ) { 
+				continue; 
+			}
 			if( ( line.beginsWith(host+':') || ( this_IP && line.beginsWith(this_IP + ' ') ) )  && line.contains( ' ' + uname_lc + ' ' ) ){
-				if( line.contains(' registered') ){
-					return '<font color=green>Registered</font>' ;
-				}else if( line.contains('auth. sent') ){
-					return '<font color=red>Waiting for Authentication</font>';
-				}else if( line.contains('request sent') ){
-					return '<font color=red>Request Sent</font>';
-				}else if( line.contains('rejected') ){
-					return '<font color=red>Rejected</font>';
-				}else if( line.contains('unregistered') ){
-					return '<font color=red>Unregistered</font>';
-				}else{
-					return '<font color=red>Unregistered</font>';
+				var vals = line_orig.split(/[ \t][ \t]*/); /* Host, Username, Refresh, State, Reg.Time */
+				switch(vals[3]) {
+				case 'registered':
+				case 'Registered':
+					return '<font color="green">registered</font>';
+				default:
+					return '<font color="red">'+vals[3]+'</font>';
 				}
 			}
 		}
-		return '<font color=red>Unregistered</font>';
+		return '<font color=red>Unrecognized Trunk</font>';
 		}catch(err){
 			top.log.error(err.description);
 		}
