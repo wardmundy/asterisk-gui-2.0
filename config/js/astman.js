@@ -1163,13 +1163,18 @@ var ASTGUI = {
 			var s = t.split('\n');
 			for(var i=0; i < s.length; i++ ){
 				var line = s[i];
-				if(line.contains('Addr->IP') ){ // if line is  'Addr->IP     : 68.62.219.197 Port 5060'
+				if(line.contains('Addr->IP') && !line.contains('(Unspecified)')){ // if line is  'Addr->IP     : 68.62.219.197 Port 5060'
 					var tmp = line.afterChar(':'); // tmp = '68.62.219.197 Port 5060' ;
 					var tmp2 = tmp.split(' Port ');
 					IP = tmp2.join(':');
 					IP = IP.trim();
 					this_IP = IP;
 					return;
+				} else if (line.contains('Defaddr->IP')) {
+					var loc = line.afterChar(':').split(' Port ');
+					IP = loc.join(':');
+					IP = IP.trim();
+					this_IP = IP;
 				}
 			}
 		})();
@@ -1193,14 +1198,15 @@ var ASTGUI = {
 			if (!line || line.beginsWith('host') ) { 
 				continue; 
 			}
-			if( ( line.beginsWith(host+':') || ( this_IP && line.beginsWith(this_IP + ' ') ) )  && line.contains( ' ' + uname_lc + ' ' ) ){
+			if((line.beginsWith(host) || (this_IP && line.beginsWith(this_IP + ' ')))  && line.contains(' ' + uname_lc + ' ')) {
 				var vals = line_orig.split(/[ \t][ \t]*/); /* Host, Username, Refresh, State, Reg.Time */
-				switch(vals[3]) {
+				var state = (ttype === 'sip') ? vals[4] : vals[5];
+				switch(state) {
 				case 'registered':
 				case 'Registered':
-					return '<font color="green">'+vals[3]+'</font>';
+					return '<font color="green">'+state+'</font>';
 				default:
-					return '<font color="red">'+vals[3]+'</font>';
+					return '<font color="red">'+state+'</font>';
 				}
 			}
 		}
