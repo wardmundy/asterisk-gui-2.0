@@ -1173,9 +1173,9 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 		name = this.nextAvailTrunk();
 		group = this.nextAvailGroup();
 
-		trunk.signalling = '';
-		trunk.channel = '';
-		var zap_channels = ASTGUI.miscFunctions.chanStringToArray(chans);
+		delete trunk.signalling;
+		delete trunk.channel;
+		var channels = ASTGUI.miscFunctions.chanStringToArray(chans);
 
 		trunk[parent.sessionData.DahdiChannelString] = chans;
 
@@ -1239,9 +1239,11 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	users_conf.new_action('append', name, 'allow', trunk['allow']);
 
 	if (type === 'analog') {
-		zap_channels.each(function(ch) {
+		channels.each(function(ch) {
 			var ls = ASTGUI.cloneObject(sessionData.PORTS_SIGNALLING.ls);
 			var sg = (ls.contains(ch)) ? 'fxs_ls' : 'fxs_ks';
+			trunk.signalling = sg;
+			trunk.channel = ch;
 			users_conf.new_action('append', name, 'signalling', sg);
 			users_conf.new_action('append', name, 'channel', ch);
 		});
