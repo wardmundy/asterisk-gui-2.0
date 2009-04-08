@@ -1236,10 +1236,10 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 		sessionData.pbxinfo.trunks[type][name][v] = trunk[v];
 		users_conf.new_action('append', name, v, trunk[v]);
 	}
-	sessionData.pbxinfo.trunks[type][name]['allow'] = trunk['allow'];
-	users_conf.new_action('append', name, 'allow', trunk['allow']);
 	sessionData.pbxinfo.trunks[type][name]['disallow'] = trunk['disallow'];
 	users_conf.new_action('append', name, 'disallow', trunk['disallow']);
+	sessionData.pbxinfo.trunks[type][name]['allow'] = trunk['allow'];
+	users_conf.new_action('append', name, 'allow', trunk['allow']);
 
 	/* TODO: get listOfActions to return a response so we know everythings ok! */
 	users_conf.callActions(function(){});
