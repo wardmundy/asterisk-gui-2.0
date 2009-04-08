@@ -1200,7 +1200,8 @@ var ASTGUI = {
 			}
 			if((line.beginsWith(host) || (this_IP && line.beginsWith(this_IP + ' ')))  && line.contains(' ' + uname_lc + ' ')) {
 				var vals = line_orig.split(/[ \t][ \t]*/); /* Host, Username, Refresh, State, Reg.Time */
-				var state = (ttype === 'sip') ? vals[4] : vals[5];
+				var sip_index = parent.sessionData.PLATFORM.isAST_1_6_1 ? 4 : 3;
+				var state = (ttype === 'sip') ? vals[sip_index] : vals[5];
 				switch(state) {
 				case 'registered':
 				case 'Registered':
@@ -1212,7 +1213,7 @@ var ASTGUI = {
 		}
 		return '<font color=red>Unrecognized Trunk</font>';
 		}catch(err){
-			top.log.error(err.description);
+			top.log.error(err);
 		}
 	},
 
