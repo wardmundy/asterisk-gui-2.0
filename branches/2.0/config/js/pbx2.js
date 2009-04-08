@@ -1176,10 +1176,8 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 		trunk.signalling = '';
 		trunk.channel = '';
 		var zap_channels = ASTGUI.miscFunctions.chanStringToArray(chans);
-		zap_channels.each(function(ch) {
-			var ls = ASTGUI.cloneObject(sessionData.PORTS_SIGNALLING.ls);
-			var sg = (ls.contains(ch)) ? 'fxs_ls' : 'fxs_ks';
-		});
+
+		trunk[parent.sessionData.DahdiChannelString] = chans;
 
 		break;
 	case 'iax':
@@ -1210,7 +1208,6 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	trunk.context = ct || '';
 	trunk.disallow = 'all';
 	trunk.group = group || null;
-	//DahdiChannelString ???
 	trunk.hasexten = 'no';
 	trunk.hasiax = (type === 'iax') ? 'yes' : 'no';
 	trunk.hassip = (type === 'sip') ? 'yes' : 'no';
@@ -1240,6 +1237,15 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	users_conf.new_action('append', name, 'disallow', trunk['disallow']);
 	sessionData.pbxinfo.trunks[type][name]['allow'] = trunk['allow'];
 	users_conf.new_action('append', name, 'allow', trunk['allow']);
+
+	if (type === 'analog') {
+		zap_channels.each(function(ch) {
+			var ls = ASTGUI.cloneObject(sessionData.PORTS_SIGNALLING.ls);
+			var sg = (ls.contains(ch)) ? 'fxs_ls' : 'fxs_ks';
+			users_conf.new_action('append', name, 'signalling', sg);
+			users_conf.new_action('append', name, 'channel', ch);
+		});
+	}
 
 	/* TODO: get listOfActions to return a response so we know everythings ok! */
 	users_conf.callActions(function(){});
