@@ -1166,7 +1166,7 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 			return false;
 		}
 
-		chans = trunk.zapchan || trunk.dahdichan;
+		chans = trunk.dahdichan || trunk.zapchan;
 		delete trunk.zapchan;
 		delete trunk.dahdichan;
 
@@ -1439,7 +1439,6 @@ pbx.trunks.nextAvailGroup = function() {
 
 	if (!trunks.length) {
 		top.log.warn('pbx.trunks.nextAvailGroup: no trunks');
-		return null;
 	}
 
 	trunks.each(function(trunk) {
