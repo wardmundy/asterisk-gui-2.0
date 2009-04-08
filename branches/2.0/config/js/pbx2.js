@@ -1175,7 +1175,7 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 
 		trunk.signalling = '';
 		trunk.channel = '';
-		var zap_channels = ASTGUI.miscFunctions.chanStringtoArray(chans);
+		var zap_channels = ASTGUI.miscFunctions.chanStringToArray(chans);
 		zap_channels.each(function(ch) {
 			var ls = ASTGUI.cloneObject(sessionData.PORTS_SIGNALLING.ls);
 			var sg = (ls.contains(ch)) ? 'fxs_ls' : 'fxs_ks';
