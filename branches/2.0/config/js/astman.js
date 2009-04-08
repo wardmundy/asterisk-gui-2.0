@@ -1181,8 +1181,10 @@ var ASTGUI = {
 
 		if(ttype=='iax'){
 			var lines = registry.iax2.split('\n');
+			uname = uname.substring(0,10);
 		}else if(ttype=='sip'){
 			var lines = registry.sip.split('\n');
+			uname = uname.substring(0,12);
 		}
 
 		//var uname_lc = uname.toLowerCase();
