@@ -24,7 +24,7 @@ parent.sessionData.pbxinfo.voicemenus[voicemenu-custom-1] = {  // ASTGUI.context
 	alias_exten : '6070,1,Goto(voicemenu-custom-1|s|1)' ,   // line as read from [ASTGUI.contexts.VoiceMenuExtensions] context
 	includes : ['default'] , // contexts included in this voicemenu
 	steps : [ 's,1,Answer',  's,2,Wait(1)',  's,3,Background(thank-you-for-calling)' ]  , // sequence of steps - the 's' extension
-	keypressEvents : {
+	keypress_events : {
 		// key press events - assumption is that each key press action is defined in a single line 
 		// 	all priorities greater than 1 are ignored
 		// if you want a sequence of steps to be executed on a keypress 
@@ -532,7 +532,7 @@ var voiceMenu_saveChanges = function(){
 		alias_exten: '',
 		includes: [],
 		steps: [],
-		keypressEvents: {}
+		keypress_events: {}
 	};
 	vm = ASTGUI.toCustomObject(vm) ;
 	if( _$('vmenu_dialOther').checked ){
@@ -542,7 +542,7 @@ var voiceMenu_saveChanges = function(){
 	if(_$('vmenu_allowKeyPressEvents').checked){
 		['0','1','2','3','4','5','6','7','8','9','*','#','t','i'].each( function(this_key){
 			if ( _$( 'keyPress_' + this_key ).KPE ){
-				vm.keypressEvents[this_key] = _$( 'keyPress_' + this_key ).KPE ;
+				vm.keypress_events[this_key] = _$( 'keyPress_' + this_key ).KPE ;
 			}
 		} );
 	}
@@ -596,9 +596,9 @@ var edit_voiceMenu_form = function(this_menu){
 	(function(){
 		var kpe = false;
 		['0','1','2','3','4','5','6','7','8','9','*','#','t','i'].each( function(this_key){
-			if ( THIS_VM.keypressEvents[this_key] ){
-				_$( 'keyPress_' + this_key ).innerHTML = ASTGUI.parseContextLine.showAs(THIS_VM.keypressEvents[this_key]) ;
-				_$( 'keyPress_' + this_key ).KPE = THIS_VM.keypressEvents[this_key] ;
+			if ( THIS_VM.keypress_events[this_key] ){
+				_$( 'keyPress_' + this_key ).innerHTML = ASTGUI.parseContextLine.showAs(THIS_VM.keypress_events[this_key]) ;
+				_$( 'keyPress_' + this_key ).KPE = THIS_VM.keypress_events[this_key] ;
 				kpe = true;
 			}else{
 				_$( 'keyPress_' + this_key ).innerHTML = '--';
@@ -701,7 +701,7 @@ var updateVoiceMenus_Table = function(){
 			var hasKeyPresssEvents = function(){
 				var u = ['0','1','2','3','4','5','6','7','8','9','*','#','t','i'] ;
 				for( var i = 0 ; i < u.length ; i++ ){
-					if( THIS_VM.hasOwnProperty('keypressEvents') && THIS_VM.keypressEvents.hasOwnProperty(u[i]) && THIS_VM.keypressEvents[u[i]].trim() ){
+					if( THIS_VM.hasOwnProperty('keypress_events') && THIS_VM.keypress_events.hasOwnProperty(u[i]) && THIS_VM.keypress_events[u[i]].trim() ){
 						return 'Yes';
 					}
 				}
