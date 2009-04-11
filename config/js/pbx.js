@@ -334,7 +334,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			}
 			if( d.beginsWith(ASTGUI.contexts.VoiceMenuPrefix) ){ // if context is a voicemenu 
 				sessionData.pbxinfo['voicemenus'][d] = new ASTGUI.customObject; // create new object for this voicemenu
-				sessionData.pbxinfo['voicemenus'][d] = astgui_manageVoiceMenus.parseContext( c[d] );
+				sessionData.pbxinfo['voicemenus'][d] = pbx.voice_menus.parse(c[d]);
 				continue;
 			}
 
