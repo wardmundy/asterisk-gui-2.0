@@ -459,6 +459,96 @@ pbx.call_plans.rules.remove = function(callplan, rule) {
 /*---------------------------------------------------------------------------*/
 
 /**
+ * Dial Options object.
+ */
+pbx.dial_options = {
+	opts: '', /* a place to store the current dial options */
+	varname: 'DIALOPTIONS'
+};
+
+/**
+ * add a Dial Option.
+ * @param option
+ * @return boolean of success
+ */
+pbx.dial_options.add = function(opt) {
+
+	/* lets get the globals context */
+	var globals = context2json({
+		filename: 'extensions.conf',
+		context: 'globals',
+		usf: 1
+	});
+
+	/* ok, now assign it to the cache */
+	this.opts = globals[this.varname];
+
+	/* check if our opt already exists, if not lets add! */
+	if (this.opts.contains(opt)) {
+		top.log.debug('pbx.dial_options.add: ' + opt + ' already exists in ' + this.varname + '.');
+		return true;
+	}
+	this.opts = this.opts + opt.toString();
+
+	/* time to update Asterisk configs! */
+	var actions = listOfSynActions('extensions.conf');
+	actions.new_action('update', 'globals', this.varname, this.opts);
+	var resp = actions.callActions();
+
+	/* log errors and remove opt, on failure */
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.dial_options.add: Error updating extensions.conf');
+		top.log.error(resp);
+		var regex = new RegExp(opt, 'g');
+		this.opts = this.opts.replace(regex,'');
+		return false;
+	}
+
+	return true;
+};
+
+/**
+ * remove a Dial Option.
+ * @param option
+ * @return boolean of success
+ */
+pbx.dial_options.remove = function(opt) {
+
+	/* lets get the globals context */
+	var globals = context2json({
+		filename: 'extensions.conf',
+		context: 'globals',
+		usf: 1
+	});
+
+	/* ok, now assign it to the cache */
+	this.opts = globals[this.varname];
+
+	/* check if opt is in dial options and then remove it */
+	if (!this.opts.contains(opt)) {
+		top.log.debug('pbx.dial_options.remove: ' + this.varname + ' already doesn\'t contain ' + opt + '.');
+		return true;
+	}
+	var regex = new RegExp(opt, 'g');
+	this.opts = this.opts.replace(regex,'');
+
+	/* time to update Asterisk configs! */
+	var actions = listOfSynActions('extensions.conf');
+	actions.new_action('update', 'globals', this.varname, this.opts);
+	var resp = actions.callActions();
+
+	/* log errors and add opt back on failure */
+	if (!resp.contains('Response: Success')) {
+		top.log.error('pbx.dial_options.remove: Error updating extensions.conf');
+		top.log.error(resp);
+		this.opts = this.opts + opt.toString();
+		return false;
+	}
+
+	return true;
+};
+
+/**
  * Directory object.
  */
 pbx.directory = {};
