@@ -1867,7 +1867,7 @@ pbx.users.add = function(exten, info, callback) {
  * @param info An object holding the var and vals of properties to be edited.
  */
 pbx.users.edit = function(user, info) {
-	if (!sessionData.pbxinfo['users'][p.user]) {
+	if (!sessionData.pbxinfo['users'][user]) {
 		top.log.debug('pbx.users.edit: User not found, exiting.');
 		return false;
 	}
