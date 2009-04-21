@@ -20,7 +20,7 @@
  */
 // Realtime options - 'rtautoclear','rtcachefriends','rtsavesysname','rtupdate','ignoreregexpire'
 
-var fieldnames = ['allowexternaldomains' ,'allowguest' ,'allowoverlap' ,'allowsubscribe' ,'allowtransfer' ,'alwaysauthreject' ,'autodomain' ,'bindaddr' ,'bindport' ,'callevents' ,'canreinvite' ,'checkmwi' ,'compactheaders' ,'context' ,'defaultexpiry', 'domain' ,'dtmfmode' ,'dumphistory' ,'externhost' ,'externip' ,'externrefresh' ,'fromdomain' ,'g726nonstandard','jbenable' ,'jbforce' ,'jbimpl' ,'jblog' ,'jbmaxsize' ,'jbresyncthreshold' ,'language' ,'localnet' ,'maxcallbitrate' ,'maxexpiry' ,'minexpiry' ,'mohinterpret' ,'mohsuggest' ,'nat' ,'notifyringing' ,'pedantic' ,'progressinband' ,'promiscredir' ,'realm' ,'recordhistory' ,'register' ,'registerattempts' ,'registertimeout' ,'relaxdtmf' , 'rtpholdtimeout' ,'rtptimeout' ,'sendrpid' ,'sipdebug' ,'srvlookup' ,'subscribecontext' ,'t1min' ,'t38pt_udptl' ,'tos_audio' ,'tos_sip' ,'tos_video' ,'trustrpid' ,'useragent' ,'usereqphone' ,'videosupport'] ;
+var fieldnames = ['allowexternaldomains' ,'allowguest' ,'allowoverlap' ,'allowsubscribe' ,'allowtransfer' ,'alwaysauthreject' ,'autodomain' ,'bindaddr' ,'bindport' ,'callevents' ,'canreinvite' ,'checkmwi' ,'compactheaders' ,'context' ,'defaultexpiry', 'domain' ,'dtmfmode' ,'dumphistory' ,'externhost' ,'externip' ,'externrefresh' ,'fromdomain' ,'g726nonstandard','jbenable' ,'jbforce' ,'jbimpl' ,'jblog' ,'jbmaxsize' ,'jbresyncthreshold' ,'language' ,'localnet' ,'maxcallbitrate' ,'maxexpiry' ,'minexpiry' ,'mohinterpret' ,'mohsuggest', 'mwi_from', 'nat' ,'notifyringing' ,'pedantic' ,'progressinband' ,'promiscredir' ,'realm' ,'recordhistory' ,'register' ,'registerattempts' ,'registertimeout' ,'relaxdtmf' , 'rtpholdtimeout' ,'rtptimeout' ,'sendrpid' ,'sipdebug' ,'srvlookup' ,'subscribecontext' ,'t1min' ,'t38pt_udptl' ,'tos_audio' ,'tos_sip' ,'tos_video' ,'trustrpid' ,'useragent' ,'usereqphone' ,'videosupport'] ;
 
 
 var localajaxinit = function(){
@@ -38,7 +38,7 @@ var localajaxinit = function(){
 		};
 
 		var t = [
-			{url:'#', desc:'General', click_function: function(){ hideall(); $('#sipoptions_general').show(); }  } ,
+			{url:'#', desc:'General', click_function: function(){ hideall(); $('#sipoptions_general').show(); if (parent.sessionData.PLATFORM.isABE || parent.sessionData.PLATFORM.isAA50) { $('#mwi_from_container').show(); } else { $('#mwi_from_container').hide(); }}  } ,
 			{url:'#', desc:'TOS', click_function: function(){ hideall(); $('#sipoptions_tos').show(); }  } ,
 			{url:'#', desc:'DebugNotify', click_function: function(){ hideall(); $('#sipoptions_debugNotify').show(); }  } ,
 			{url:'#', desc:'NAT', click_function: function(){ hideall(); $('#sipoptions_nat').show(); }  } ,
