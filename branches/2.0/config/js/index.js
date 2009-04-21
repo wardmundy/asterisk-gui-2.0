@@ -108,6 +108,9 @@ var onLogInFunctions = {
 				};
 			}
 			// ??
+		}else if (sessionData.PLATFORM.isUpDog) {
+			$('div[page="feditor.html"]').empty();
+			$('div[page="cli.html"]').empty();
 		}else{
 			var resp_lower = resp.toLowerCase();
 			if ( resp_lower.contains("branches/1.6")  || resp_lower.contains("asterisk/1.6") ||  resp_lower.contains("svn-branch-1.6") ||  resp_lower.contains("svn-trunk-")  ){
