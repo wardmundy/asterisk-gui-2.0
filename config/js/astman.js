@@ -1617,11 +1617,13 @@ var ASTGUI = {
 			// use this when you want to get the pattern from a calling rule
 			// expects q as 'exten=_X.,1,foo' or '_X.,1,foo'
 			//	and returns _X.
-			if (typeof q != 'string') return '';
-			if( !q || !q.contains(',') ) { return ''; }
+			if (typeof q != 'string') {
+				return '';
+			}
+
 			if( q.match('exten=') ){
 				return q.split('exten=')[1].split(',')[0];
-			}else{
+			} else {
 				return q.split(',')[0];
 			}
 		},
