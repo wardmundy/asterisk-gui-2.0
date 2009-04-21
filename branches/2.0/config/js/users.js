@@ -193,9 +193,15 @@ var load_users_table = function(){ // load_users_table
 };
 
 var RESET_USER_FORM_FIELDS = function(){ // RESET_USER_FORM_FIELDS();
-	ASTGUI.resetTheseFields( ['new_ext','edit_fullname','edit_user_dialplan','edit_OutBoundCallerid','edit_hasvoicemail','edit_vmsecret','edit_email','edit_hasSip','edit_hasIax','edit_fxs','edit_flash','edit_rxflash','codec_one','codec_two','codec_three','codec_fourth','codec_fifth','macaddress','linenumber','edit_secret','edit_nat','edit_canreinvite','edit_dtmfmode','edit_insecure','edit_3wayCalling','edit_inDirectory','edit_callWaiting','edit_cti','edit_isagent','edit_pickupgroup','edit_linekeys'] );
+	ASTGUI.resetTheseFields( ['new_ext','edit_fullname','edit_user_dialplan','edit_OutBoundCallerid','edit_hasvoicemail','edit_vmsecret','edit_email','edit_hasSip','edit_hasIax','edit_fxs','edit_flash','edit_rxflash','codec_one','codec_two','codec_three','codec_fourth','codec_fifth','macaddress','linenumber','edit_secret','edit_nat','edit_canreinvite','edit_dtmfmode','edit_insecure', 'edit_mwifrom', 'edit_3wayCalling','edit_inDirectory','edit_callWaiting','edit_cti','edit_isagent','edit_pickupgroup','edit_linekeys'] );
 	_$('edit_fxs').selectedIndex = 0; _$('codec_one').selectedIndex = 0; _$('codec_two').selectedIndex = 0; _$('codec_three').selectedIndex = 0; _$('codec_fourth').selectedIndex = 0; 
 	_$('codec_fifth').selectedIndex = 0; _$('linenumber').selectedIndex = 0; _$('edit_pickupgroup').selectedIndex = 0;
+
+	if (parent.sessionData.PLATFORM.isABE || parent.sessionData.PLATFORM.isAA50) {
+		$('#mwi_from').show();
+	} else {
+		$('#mwi_from').hide();
+	}
 
 	ASTGUI.updateFieldToValue( 'edit_user_dialplan', parent.sessionData.GUI_PREFERENCES.getProperty('default_dialplan') );
 
@@ -244,6 +250,7 @@ var RESET_USER_FORM_FIELDS = function(){ // RESET_USER_FORM_FIELDS();
 		ASTGUI.updateFieldToValue( 'edit_canreinvite', uinfo.getProperty('canreinvite') );
 		ASTGUI.updateFieldToValue( 'edit_dtmfmode', uinfo.getProperty('dtmfmode') );
 		ASTGUI.updateFieldToValue( 'edit_insecure', uinfo.getProperty('insecure') );
+		ASTGUI.updateFieldToValue( 'edit_mwifrom', uinfo.getProperty('mwi_from') );
 		ASTGUI.updateFieldToValue( 'edit_3wayCalling', uinfo.getProperty('threewaycalling') );
 		ASTGUI.updateFieldToValue( 'edit_inDirectory', uinfo.getProperty('hasdirectory') );
 		ASTGUI.updateFieldToValue( 'edit_callWaiting', uinfo.getProperty('callwaiting') );
@@ -479,6 +486,9 @@ var SAVE_USER_FORM = function(){ // SAVE_USER_FORM();
 		x.new_action('update', u, 'canreinvite', 	ASTGUI.getFieldValue('edit_canreinvite') );	tmp_obj['canreinvite'] = ASTGUI.getFieldValue('edit_canreinvite') ;
 		x.new_action('update', u, 'dtmfmode', 		ASTGUI.getFieldValue('edit_dtmfmode') );	tmp_obj['dtmfmode'] = ASTGUI.getFieldValue('edit_dtmfmode') ;
 		x.new_action('update', u, 'insecure', 		ASTGUI.getFieldValue('edit_insecure') );	tmp_obj['insecure'] = ASTGUI.getFieldValue('edit_insecure') ;
+	if (parent.sessionData.PLATFORM.isABE || parent.sessionData.PLATFORM.isAA50) {
+		x.new_action('update', u, 'mwi_from', 		ASTGUI.getFieldValue('edit_mwifrom') );	tmp_obj['mwi_from'] = ASTGUI.getFieldValue('edit_mwifrom') ;
+	}
 		x.new_action('update', u, 'pickupgroup', 	ASTGUI.getFieldValue('edit_pickupgroup') );	tmp_obj['pickupgroup'] = ASTGUI.getFieldValue('edit_pickupgroup') ;
 
 		var tmp_cl = parent.sessionData.pbxinfo.users[u].getProperty('call-limit') ;
