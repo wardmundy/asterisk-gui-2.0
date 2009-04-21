@@ -674,6 +674,12 @@ img.loadTrunks, img.loadQueues {
 			loadQueues();
 			return false;
 	});
+	$('#sys_status_meetme')
+		.delegate('click', '.actions .kick', function() {
+			alert('kick!');
+		}).delegate('click', '.actions .mute', function() {
+			alert('mute!');
+	});
 	$('#extensions_sections')
 		.delegate('click','.section', function () {
 			var title;
