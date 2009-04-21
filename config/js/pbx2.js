@@ -1654,8 +1654,8 @@ pbx.trunks.rules.add = function(params) {
 	/* kk, now lets form the rule */
 	var trunk_type = parent.pbx.trunks.getType(params.trunk);
 	var prior = (trunk_type === 'analog' && params.pattern === 's') ? '3' : '1';
-	var rule = params.pattern + delim + prior + delim;
-	rule += (params.dest === 'ByDID') ? 'Goto(default,${EXTEN:'+params.digits+'}'+delim+'1)' : params.dest;
+	var rule = params.pattern + ',' + prior + ',';
+	rule += (params.dest === 'ByDID') ? 'Goto(default'+ delim + '${EXTEN:'+params.digits+'}'+delim+'1)' : params.dest;
 
 	/* TODO: cache this on load, this isn't optimal even to call it on page load */
 	var extens_conf = config2json({filename: 'extensions.conf', usf:0});
@@ -1724,19 +1724,19 @@ pbx.trunks.rules.add = function(params) {
 pbx.trunks.rules.edit = function(params) {
 	/* check to make sure we got everything */
 	if (typeof params !== 'object') {
-		top.log.error('pbx.trunks.rules.add: Expecting params to be an object.');
+		top.log.error('pbx.trunks.rules.edit: Expecting params to be an object.');
 		return false;
 	} else if (!params.line) {
-		top.log.error('pbx.trunks.rules.add: params.line not found.');
+		top.log.error('pbx.trunks.rules.edit: params.line not found.');
 		return false;
 	} else if (!params.cxt) {
-		top.log.error('pbx.trunks.rules.add: params.cxt not found.');
+		top.log.error('pbx.trunks.rules.edit: params.cxt not found.');
 		return false;
 	} else if (!params.dest) {
-		top.log.error('pbx.trunks.rules.add: params.dest not found.');
+		top.log.error('pbx.trunks.rules.edit: params.dest not found.');
 		return false;
 	} else if (!params.pattern) {
-		top.log.error('pbx.trunks.rules.add: params.pattern not found.');
+		top.log.error('pbx.trunks.rules.edit: params.pattern not found.');
 		return false;
 	} else if (params.dest === 'ByDID' && !params.digits) {
 		top.log.error('pbx.trunks.rules.add: Destination is ByDID, but params.digits is not found.');
@@ -1748,8 +1748,8 @@ pbx.trunks.rules.edit = function(params) {
 
 	/* kk, now lets form the rule */
 	var prior = ASTGUI.parseContextLine.getPriority(params.line);
-	var rule = params.pattern + delim + prior + delim;
-	rule += (params.dest === 'ByDID') ? 'Goto(default,${EXTEN:'+params.digits+'}'+delim+'1)' : params.dest;
+	var rule = params.pattern + ',' + prior + ',';
+	rule += (params.dest === 'ByDID') ? 'Goto(default'+delim+'${EXTEN:'+params.digits+'}'+delim+'1)' : params.dest;
 
 	var actions = new listOfSynActions('extensions.conf');
 	actions.new_action('update', params.cxt, 'exten', rule, params.line.afterChar('='));
