@@ -61,7 +61,7 @@ var localajaxinit = function(){
 	var disallowed = false;
 	var real_codecs;
 	ASTGUI.CODECSLIST.populateCodecsList(_$('allow'));
-	if( c.hasOwnProperty('allow') ){ real_codecs = c['array']; }
+	if( c.hasOwnProperty('allow') ){ real_codecs = c['allow']; }
 	if( c.hasOwnProperty('disallow') ) { disallowed = c['disallow'].split(','); } 
 	var default_selected = ['ulaw','alaw','gsm'];
 	default_selected.each( function(val) {
