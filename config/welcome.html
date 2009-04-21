@@ -354,164 +354,6 @@ img.loadTrunks, img.loadQueues {
 </style>
 <!-- End Initial CSS -->
 
-<!-- Initial Javascript -->
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/jquery.ui.core.js"></script>
-<script type="text/javascript" src="js/jquery.ui.draggable.js"></script>
-<script type="text/javascript" src="js/jquery.ui.sortable.js"></script>
-<script type="text/javascript" src="js/jquery.ui.tabs.js"></script>
-<script type="text/javascript" src="js/jquery.delegate-1.1.js"></script>
-<script type="text/javascript" src="js/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="js/jquery.tablesorter.pager.js"></script>
-<script type="text/javascript" src="js/astman.js"></script>
-<script type="text/javascript" src="js/welcome.js"></script>
-<script type="text/javascript" src="js/sysinfo.js"></script>
-<script type="text/javascript">
-
- /* This function will be called when the page has completed loading */
- $(document).ready(function() {
-
-	/* jQuery sortable init for content sections */
- 	$('#sysstat_right_container, #sysstat_left_container').sortable({
-		axis: 'y',
-		cancel: '.minimaxi, .loadTrunks, .loadQueues',
-		cursor: 'move',
-		forcePlaceholderSize: true,
-		handle: 'div.handle',
-		items: '> div.content',
-		placeholder: 'placeholder'
-	});
-
-	/* jQuery tabs init */
-	$("#sys_status_info .body > ul").tabs().bind('tabsselect', function (e, ui) {
-		switch($(ui.panel).attr('id')) {
-		case 'info_general':
-			getsysinfohtml();
-			break;
-		case 'info_network':
-			$(ui.panel).empty();
-			ASTGUI.systemCmdWithOutput( 'ifconfig', function(output) {
-				$('<pre></pre>').html(output).appendTo(ui.panel);
-			});
-			break;
-		case 'info_memory':
-			$(ui.panel).empty();
-			ASTGUI.systemCmdWithOutput( 'free' , function(output){
-				$('<pre></pre>').html(output).appendTo(ui.panel);
-			});
-			break;
-		case 'info_disk':
-			$(ui.panel).empty();
-			ASTGUI.systemCmdWithOutput( 'df -k' , function(output){
-				$('<pre></pre>').html(output).appendTo(ui.panel);
-			});
-			if(parent.sessionData.PLATFORM.isAA50) {
-				try{
-					percentage_usage(output);
-				}catch(err){
-					top.log.debug( '<B>Error Trying to calculate CF usage %');
-				}
-			}
-			break;
-		default:
-			break;
-		}
-	});
-	getsysinfohtml(); //pre-load general information as its not automatically triggered
-
-	/* Event Delegation */
-	$('body')
-		.delegate('click','.minimaxi', function () {
-			$(this).parent().parent().children(".body").toggle();
-			if ($(this).html() == "[ - ]") {
-				$(this).html("[ + ]");
-			} else {
-				$(this).html("[ - ]");
-			}
-			return false;
-		})
-		.delegate('click','img.loadTrunks', function () {
-			loadTrunks();
-			return false;
-		})
-		.delegate('click','img.loadQueues', function () {
-			loadQueues();
-			return false;
-	});
-	$('#extensions_sections')
-		.delegate('click','.section', function () {
-			var title;
-			if ( (title = $(this).attr('title')) != 'all') {
-				//set all to inactive
-				$(this).siblings('span:first[title=all]').removeClass('active');
-				extension_loads['all'] = false;
-
-				//toggle active for title
-				var has_class = $(this).toggleClass('active').hasClass('active');
-				extension_loads[title] = has_class?true:false;
-
-				//traverse sections and show or hide appropriately
-				$(this).siblings('[title!=all]').andSelf().each( function() {
-					var show = $(this).hasClass('active');
-					var title = $(this).attr('title');
-					
-					if (show) {
-						$('#extensions_list .'+title).show();
-					} else {
-						$('#extensions_list .'+title).hide();
-					}
-				});
-
-				if (extension_loads['sip'] || extension_loads['iax']) {
-					$('#extensions_list .sip.iax').show();
-				}
-			} else {
-				$(this).addClass('active');
-				$(this).siblings('span').each( function() {
-					$(this).removeClass('active');
-					var title = $(this).attr('title');
-					extension_loads[title] = false;
-				});
-				$('#extensions_list').find('.sip, .iax, .analog, .feature').show();
-			}
-			
-			var title = $(this).attr('title');
-			extension_loads[title] = extension_loads[title]?true:false;
-	});
-
-	setTimeout(loadTrunks, 1);
-	loadExtensions();
-	setTimeout(loadQueues, 1);
-	setTimeout(loadConferenceRooms, 1);
-	setTimeout(loadParkingLot, 1);
-
-	/* jQuery Tablesorter init */
-	/* this requires a rewrite of the loadExtensions and loadTrunks */
-		$("#extensions_list").tablesorter({
-			cancelSelection: true,
-			cssAsc: "header_sort_up",
-			cssDesc: "header_sort_down",
-			widgets: ['zebra']
-		});
-
-		$("#parking_lot_list").tablesorter({
-			cancelSelection: true,
-			cssAsc: "header_sort_up",
-			cssDesc: "header_sort_down",
-			widgets: ['zebra']
-		});
-
-	manager_events.watch();
-
-	/* countUp and countDown tickers */
-	setTimeout(countHtml,1000);
-	setTimeout(countSecs,1000);
-
-	return;
- });
-
-</script>
-<!-- End Initial Javascript -->
 
 <body>
 	<div class="iframeTitleBar">
@@ -748,4 +590,162 @@ img.loadTrunks, img.loadQueues {
 	<div id="sysstat_ftr_container">
 		<div id="sysstat_sys_events"></div>
 	</div>
+<!-- Initial Javascript -->
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.ui.core.js"></script>
+<script type="text/javascript" src="js/jquery.ui.draggable.js"></script>
+<script type="text/javascript" src="js/jquery.ui.sortable.js"></script>
+<script type="text/javascript" src="js/jquery.ui.tabs.js"></script>
+<script type="text/javascript" src="js/jquery.delegate-1.1.js"></script>
+<script type="text/javascript" src="js/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="js/jquery.tablesorter.pager.js"></script>
+<script type="text/javascript" src="js/astman.js"></script>
+<script type="text/javascript" src="js/welcome.js"></script>
+<script type="text/javascript" src="js/sysinfo.js"></script>
+<script type="text/javascript">
+
+ /* This function will be called when the page has completed loading */
+ $(document).ready(function() {
+
+	/* jQuery sortable init for content sections */
+ 	$('#sysstat_right_container, #sysstat_left_container').sortable({
+		axis: 'y',
+		cancel: '.minimaxi, .loadTrunks, .loadQueues',
+		cursor: 'move',
+		forcePlaceholderSize: true,
+		handle: 'div.handle',
+		items: '> div.content',
+		placeholder: 'placeholder'
+	});
+
+	/* jQuery tabs init */
+	$("#sys_status_info .body > ul").tabs().bind('tabsselect', function (e, ui) {
+		switch($(ui.panel).attr('id')) {
+		case 'info_general':
+			getsysinfohtml();
+			break;
+		case 'info_network':
+			$(ui.panel).empty();
+			ASTGUI.systemCmdWithOutput( 'ifconfig', function(output) {
+				$('<pre></pre>').html(output).appendTo(ui.panel);
+			});
+			break;
+		case 'info_memory':
+			$(ui.panel).empty();
+			ASTGUI.systemCmdWithOutput( 'free' , function(output){
+				$('<pre></pre>').html(output).appendTo(ui.panel);
+			});
+			break;
+		case 'info_disk':
+			$(ui.panel).empty();
+			ASTGUI.systemCmdWithOutput( 'df -k' , function(output){
+				$('<pre></pre>').html(output).appendTo(ui.panel);
+			});
+			if(parent.sessionData.PLATFORM.isAA50) {
+				try{
+					percentage_usage(output);
+				}catch(err){
+					top.log.debug( '<B>Error Trying to calculate CF usage %');
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	});
+	getsysinfohtml(); //pre-load general information as its not automatically triggered
+
+	/* Event Delegation */
+	$('body')
+		.delegate('click','.minimaxi', function () {
+			$(this).parent().parent().children(".body").toggle();
+			if ($(this).html() == "[ - ]") {
+				$(this).html("[ + ]");
+			} else {
+				$(this).html("[ - ]");
+			}
+			return false;
+		})
+		.delegate('click','img.loadTrunks', function () {
+			loadTrunks();
+			return false;
+		})
+		.delegate('click','img.loadQueues', function () {
+			loadQueues();
+			return false;
+	});
+	$('#extensions_sections')
+		.delegate('click','.section', function () {
+			var title;
+			if ( (title = $(this).attr('title')) != 'all') {
+				//set all to inactive
+				$(this).siblings('span:first[title=all]').removeClass('active');
+				extension_loads['all'] = false;
+
+				//toggle active for title
+				var has_class = $(this).toggleClass('active').hasClass('active');
+				extension_loads[title] = has_class?true:false;
+
+				//traverse sections and show or hide appropriately
+				$(this).siblings('[title!=all]').andSelf().each( function() {
+					var show = $(this).hasClass('active');
+					var title = $(this).attr('title');
+					
+					if (show) {
+						$('#extensions_list .'+title).show();
+					} else {
+						$('#extensions_list .'+title).hide();
+					}
+				});
+
+				if (extension_loads['sip'] || extension_loads['iax']) {
+					$('#extensions_list .sip.iax').show();
+				}
+			} else {
+				$(this).addClass('active');
+				$(this).siblings('span').each( function() {
+					$(this).removeClass('active');
+					var title = $(this).attr('title');
+					extension_loads[title] = false;
+				});
+				$('#extensions_list').find('.sip, .iax, .analog, .feature').show();
+			}
+			
+			var title = $(this).attr('title');
+			extension_loads[title] = extension_loads[title]?true:false;
+	});
+
+	setTimeout(loadTrunks, 1);
+	loadExtensions();
+	setTimeout(loadQueues, 1);
+	setTimeout(loadConferenceRooms, 1);
+	setTimeout(loadParkingLot, 1);
+
+	/* jQuery Tablesorter init */
+	/* this requires a rewrite of the loadExtensions and loadTrunks */
+		$("#extensions_list").tablesorter({
+			cancelSelection: true,
+			cssAsc: "header_sort_up",
+			cssDesc: "header_sort_down",
+			widgets: ['zebra']
+		});
+
+		$("#parking_lot_list").tablesorter({
+			cancelSelection: true,
+			cssAsc: "header_sort_up",
+			cssDesc: "header_sort_down",
+			widgets: ['zebra']
+		});
+
+	manager_events.watch();
+
+	/* countUp and countDown tickers */
+	setTimeout(countHtml,1000);
+	setTimeout(countSecs,1000);
+
+	return;
+ });
+
+</script>
+<!-- End Initial Javascript -->
 </body>
