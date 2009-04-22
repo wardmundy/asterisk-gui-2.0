@@ -529,6 +529,9 @@ var loadConferenceRooms = function() {
 			tmp.contents().find(".status").html('Not In Use');
 			tmp.contents().find(".time").html("00:00");
 			tmp.contents().find(".members > .list > tbody").empty().html('<tr><td colspan="4">No Active Members</td></tr>');
+			tmp.find('.minimaxi').html('[ + ]');
+			tmp.find('.body').hide();
+
 		}
 
 		tmp.removeClass("template");
@@ -854,7 +857,7 @@ manager_events.updateExtension = function(exten, context, state) {
 		break;
 	case 'up':	/* Up */
 		var state = 'Up';
-		exten_status_img.attr('src','images/status_green.png');
+		exten_status_img.attr('src','images/status_red.png');
 		break;
 	default:
 		top.log.debug("updateExtension :: We have encountered an unknown extension state of " + state.toString());
@@ -911,6 +914,8 @@ manager_events.meetmeJoin = function (meetme, user_num, chan) {
 		conf = $('#conf_'+meetme.toString());
 		conf.find('.status').html('1 User');
 		conf.find('.time').addClass('count_html_up').html('00:00');
+		conf.find('.body').show();
+		conf.find('.minimaxi').html('[ - ]');
 	} else {
 		conf = $('#conf_'+meetme.toString());
 		var status = conf.contents().find('.status').html();
@@ -931,6 +936,8 @@ manager_events.meetmeLeave = function (meetme, user_num, chan) {
 		conf.find(".status").html('Not In Use');
 		conf.find(".time").removeClass('count_html_up').html("00:00");
 		conf.find(".members > .list > tbody").empty().html('<tr><td colspan="4">No Active Members</td></tr>');
+		conf.find('.body').hide();
+		conf.find('.minimaxi').html('[ + ]');
 	} else {
 		conf = $('#conf_'+meetme.toString());
 		var status = conf.contents().find('.status').html();
