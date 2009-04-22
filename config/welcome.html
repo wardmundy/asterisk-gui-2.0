@@ -742,6 +742,15 @@ img.loadTrunks, img.loadQueues {
 			cssDesc: "header_sort_down",
 			widgets: ['zebra']
 		});
+	
+	/* set vars that determine which name to use for manager events */
+	mgr.newchannel = {};
+	mgr.newchannel.channelstate = (top.sessionData.PLATFORM.isAST_1_6) ? 'channelstatedesc' : 'state';
+	mgr.newcallerid = {};
+	mgr.newcallerid.calleridnum = (top.sessionData.PLATFORM.isAST_1_6) ? 'calleridnum' : 'callerid';
+	mgr.newstate = {};
+	mgr.newstate.channelstate = (top.sessionData.PLATFORM.isAST_1_6) ? 'channelstatedesc' : 'state';
+	
 
 	manager_events.watch();
 
