@@ -23,6 +23,7 @@ var REGISTRY_OUTPUT = {};
 var manager_events = {};
 var manager_timers = {};
 var extension_loads = { all: true, analog: true, features: true, iax: true, sip: true };
+var mgr = {};
 
 var loadTrunks = function() {
 	EX_CF = config2json({filename:'extensions.conf', usf:0 });
@@ -598,7 +599,7 @@ manager_events.parseOutput = function(op) {
 			break;
 		case 'event: extensionstatus':
 			var eventObj = this.parseEvent(event_lines);
-			this.updateExtension(eventObj.exten.trim(), eventObj.context, eventObj.status);
+			this.updateExtension(eventObj.exten.trim(), eventObj.context, eventObj['_status']);
 			break;
 		case 'event: hangup':
 			var eventObj = this.parseEvent(event_lines);
@@ -635,20 +636,20 @@ manager_events.parseOutput = function(op) {
 			var eventObj = this.parseEvent(event_lines);
 			/* event_lines[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
 			var chan = eventObj.channel.split('/')[1].split('-')[0];
-			status = eventObj.status.toString() == 'on' ? 1: 0;
-			this.meetmeTalking(eventObj.meetme, chan, status);
+			state = eventObj['_status'].toString() == 'on' ? true : false;
+			this.meetmeTalking(eventObj.meetme, chan, state);
 			break;
 		case 'event: newchannel':
 			var eventObj = this.parseEvent(event_lines);
 			/* event_lines[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
 			var exten = eventObj.channel.split('/')[1].split('-')[0];
-			this.updateExtension(exten.trim(), '', eventObj.state);
+			this.updateExtension(exten.trim(), '', eventObj[mgr.newchannel.channelstate]);
 			break;
 		case 'event: newstate':
 			var eventObj = this.parseEvent(event_lines);
 			/* event_lines[2]= 'Channel: Zap/2-1' or 'Channel: SIP/101-3f3f' */
 			var exten = eventObj.channel.split('/')[1].split('-')[0];
-			this.updateExtension(exten.trim(), '', eventObj.state);
+			this.updateExtension(exten.trim(), '', eventObj[mgr.newstate.channelstate]);
 			break;
 		case 'event: parkedcall':
 			var eventObj = this.parseEvent(event_lines);
@@ -663,7 +664,7 @@ manager_events.parseOutput = function(op) {
 		case 'event: queuememberstatus':
 			var eventObj = this.parseEvent(event_lines);
 			var agent = eventObj.membername.split('/')[1];	//MemberName: 6000
-			this.updateAgent('status_'+eventObj.status.toString(), agent, eventObj.queue);
+			this.updateAgent('status_'+eventObj['_status'].toString(), agent, eventObj.queue);
 			break;
 		case 'event: agentcalled':
 		case 'event: agentcomplete':
@@ -690,6 +691,7 @@ manager_events.parseOutput = function(op) {
 		case 'event: reload':
 		case 'event: shutdown':
 		case 'event: userevent':
+			break;
 		default:
 			//console.log(event[3]);
 			break;
@@ -697,7 +699,7 @@ manager_events.parseOutput = function(op) {
 	}
 	} catch (err) {
 		top.log.error('Error Parsing waitevent response : manager_events.parseOutput() ');
-		top.log.error(err.description);
+		throw(err);
 	}
 
 	this.watch();
@@ -793,9 +795,9 @@ manager_events.removeQueueCall = function (queue, exten) {
 	$('#queue_'+queue.toString()+' .users_agents').html(innerHTML.replace(/[0-9][0-9]*(?= calls,)/,calls));
 };
 
-manager_events.updateExtension = function(exten, context, status) {
+manager_events.updateExtension = function(exten, context, state) {
 	var exten_status_img = $('#exten_status_'+exten.toString()+' img');
-	switch(status.toString()) {
+	switch(state.toString()) {
 	case '-1':	/* Invalid */
 		var state = 'Invalid';
 		exten_status_img.attr('src','images/status_gray.png');
@@ -847,19 +849,18 @@ manager_events.updateExtension = function(exten, context, status) {
 		exten_status_img.attr('src','images/status_red.png');
 		break;
 	case 'rsrvd':	/* Reserved */
-		//var state = 'Reserved';
-		//exten_status_img.attr('src','images/status_red.png');
+		var state = 'Reserved';
+		exten_status_img.attr('src','images/status_red.png');
 		break;
 	case 'up':	/* Up */
-		//var state = 'Up';
-		//exten_status_img.attr('src','images/status_green.png');
+		var state = 'Up';
+		exten_status_img.attr('src','images/status_green.png');
 		break;
 	default:
-		var state = 'Unknown';
-		top.log.debug("updateExtension :: We have encountered an unknown extension state of " + status.toString());
+		top.log.debug("updateExtension :: We have encountered an unknown extension state of " + state.toString());
 		if ( top.sessionData.DEBUG_MODE ) {
 			alert('updateExtension:\r\n'
-				+'status: '+status.toString()+'\r\n'
+				+'status: '+state.toString()+'\r\n'
 				+'exten: '+exten.toString()+'\r\n'
 				+'context: '+context.toString()+'\r\n'
 			);
@@ -952,6 +953,8 @@ manager_events.parseEvent = function(event_lines) {
 	for (var i=0; i<event_lines.length; i++) {
 		var line = event_lines[i];
 		line = line.split(': ');
+		/* 'status' is a reserved term in javascript....dangit */
+		line[0] = (line[0] === 'status') ? '_status' : line[0];
 		eventObj[line[0]] = line[1];
 	}
 
