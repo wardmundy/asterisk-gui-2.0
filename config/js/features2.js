@@ -246,7 +246,7 @@ var load = function() {
 
 	if (amap_table.find('tr:not(.template)').length === 0) {
 		var row = $('<tr>').attr('colspan', '7').html('No Application Maps Defined.');
-		table.append(row);
+		amap_table.append(row);
 	}
 
 }
