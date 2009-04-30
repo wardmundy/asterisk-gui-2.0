@@ -63,6 +63,9 @@ var VoiceMenus_miscFunctions = {
 
 	show_VMenuEdit_Advanced : function(){
 		parent.ASTGUI.dialog.waitWhile('Loading ..') ;
+		if (EDIT_VMENU === '') {
+			EDIT_VMENU = top.pbx.voice_menus.next();
+		}
 		$('#edit_VM_Advanced_DIV').showWithBg();
 		$('#div_vmenu_edit').hideWithBg();
 		_$('edit_VM_Advanced_DIV_Title').innerHTML = '[' + EDIT_VMENU + ']' ;
@@ -81,20 +84,29 @@ var VoiceMenus_miscFunctions = {
 		parent.ASTGUI.dialog.waitWhile('Saving ..') ;
 
 		try{
-			ASTGUI.miscFunctions.empty_context({ filename:'extensions.conf', context : EDIT_VMENU, cb : function(){
-				var x = new listOfActions('extensions.conf');
-		
-				var vmenu_lines = ASTGUI.getFieldValue('edit_VM_Advanced_details') ;
-				vmenu_lines = vmenu_lines.split('\n');
-				vmenu_lines.each( function(this_line){
-					x.new_action( 'append', EDIT_VMENU , this_line.beforeChar('=') , this_line.afterChar('=') );
-				});
-				x.callActions( function(){
-					ASTGUI.dialog.waitWhile('Updated VoiceMenu information <BR> Reloading GUI ... ');
-					setTimeout( function(){ window.location.reload(); } , 2000 );
-				});
-			}});
+			ASTGUI.miscFunctions.empty_context({ filename:'extensions.conf', context : EDIT_VMENU, cb : function(){}});
+			var x = new listOfActions('extensions.conf');
+	
+			var vmenu_lines = ASTGUI.getFieldValue('edit_VM_Advanced_details') ;
+			vmenu_lines = vmenu_lines.split('\n');
+			vmenu_lines.each( function(this_line){
+				if (!this_line.contains('=') && !this_line[0] !== ';') {
+					parent.ASTGUI.dialog.hide();
+					parent.ASTGUI.feedback({ msg:'All lines must be "exten=XXX,N,App()" format', showfor: 5});
+					$('#edit_VM_Advanced_details').addClass('inputValidationFailed').focus();
+					throw('error');
+				}
+				x.new_action( 'append', EDIT_VMENU , this_line.beforeChar('=') , this_line.afterChar('=') );
+			});
+			x.callActions( function(){
+				ASTGUI.dialog.waitWhile('Updated VoiceMenu information <BR> Reloading GUI ... ');
+				setTimeout( function(){ window.location.reload(); } , 2000 );
+			});
 		}catch(err){
+			if (err === 'error') {
+				return;
+			}
+
 			alert("Error saving VoiceMenu");
 			window.location.reload();
 		}

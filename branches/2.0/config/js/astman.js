@@ -1415,7 +1415,7 @@ var ASTGUI = {
 				x.callActions(ct.cb);
 			//}
 			}catch(err){
-				top.log.error(err.description);
+				top.log.error(err.message);
 			}
 		},
 
