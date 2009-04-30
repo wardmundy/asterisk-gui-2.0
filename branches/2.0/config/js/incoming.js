@@ -116,6 +116,7 @@ var incomingRules_MiscFunctions = {
 			});
 		}
 
+		window.location.reload();
 		return;
 	},
 
