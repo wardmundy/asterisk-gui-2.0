@@ -17,12 +17,15 @@ input:focus {
 	background-color:#FFC58A;
 }
 
-input.inputValidationFailed {
-	font-size : 115%;
+input.inputValidationFailed, textarea.inputValidationFailed {
 	font-weight:bold;
 	border:2px solid #541B1F; 
 	padding : 1px 0px 2px 2px;
 	background-color:#F3A68F;
+}
+
+input.inputValidationFailed {
+	font-size : 115%;
 }
 
 .input8 {
