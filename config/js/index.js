@@ -1002,6 +1002,10 @@ var miscFunctions = {
 						tmp.push( tmp_thisRg.extension );
 					}
 				} );
+			var y = sessionData.pbxinfo.queues.getOwnProperties();
+				y.each( function( item ){
+					tmp.push( item );
+				} );
 			tmp = tmp.concat( pbx.page_groups.list() );
 			var tmp_LE = ASTGUI.cloneObject(sessionData.pbxinfo['localextensions']);
 			if( tmp_LE.getProperty('defaultDirectory') ){
