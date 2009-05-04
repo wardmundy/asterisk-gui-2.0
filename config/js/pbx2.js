@@ -640,6 +640,7 @@ pbx.paging.remove = function(exten, callback) {
 pbx.paging.updateCache = function(callback) {
 	setTimeout(function() {
 		sessionData.pbxinfo['pagegroups'] = context2json({filename: 'extensions.conf', context: ASTGUI.contexts.PageGroups, usf:0});
+		callback();
 	}, 1000);
 };
 /*---------------------------------------------------------------------------*/
