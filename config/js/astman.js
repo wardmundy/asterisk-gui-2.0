@@ -1509,7 +1509,7 @@ var ASTGUI = {
 
 		/* ampmTime should be in "HH:MM [AM|PM]" */
 		AMPM_to_asteriskTime: function(ampmTime){
-			var pattern = /^\s*(\d{1,2}):(\d{2})(\s?(AM|am|PM|pm))?\s*$/;
+			var pattern = /^\s*(\d{1,2})(:(\d{2}))?\s*(\s?(AM|am|PM|pm))?\s*$/;
 
 			var match = ampmTime.match(pattern);
 			if (match == null) {
@@ -1518,9 +1518,9 @@ var ASTGUI = {
 			}
 
 			hour = parseInt(match[1],10);
-			minute = parseInt(match[2], 10);
+			minute = parseInt(match[3], 10) || 0;
 			//match[3] is the whitespace plus match[4]
-			ampm = match[4] || null;
+			ampm = match[5] || null;
 
 			if (!ampm && (hour < 0 || hour > 23)) {
 				top.log.debug('ampmTime must have its hour inbetween 0 and 23.');
@@ -1528,10 +1528,10 @@ var ASTGUI = {
 			} else if (ampm && (hour < 0 || hour > 12)) {
 				top.log.debug('ampmTime must have its hour inbetween 0 and 12 if "AM|PM" exists');
 				return '';
-			} else if (ampm) {
-				if (ampm.match('[pP][mM]')) {
-					hour+=12;
-				}
+			} else if (ampm && ampm.match('[pP][mM]')) {
+				hour+=12;
+			} else if (ampm && ampm.match('[aA][mM]') && hour === 12) {
+				hour = 0;
 			}
 			hour = (hour < 10) ? hour.addZero() : hour;
 
