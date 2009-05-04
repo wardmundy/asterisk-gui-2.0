@@ -623,13 +623,13 @@ pbx.paging.list = function() {
  * @return boolean of success.
  */
 pbx.paging.remove = function(exten, callback) {
-	var cache = this.updatePGsCache;
-	ASTGUI.misFunctions.delete_LinesLike({ 
+	var cache = this.updateCache;
+	ASTGUI.miscFunctions.delete_LinesLike({ 
 		context_name: ASTGUI.contexts.PageGroups, 
-		beginsWithArr: ['exten=' + pgexten + ','], 
+		beginsWithArr: ['exten=' + exten + ','], 
 		filename: 'extensions.conf', 
 		hasThisString: 'Macro(', 
-		cb: function(){AF(cb);}
+		cb: function(){cache(callback);}
 	});
 };
 
