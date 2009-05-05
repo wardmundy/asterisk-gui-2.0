@@ -64,6 +64,13 @@ var edit_DP_save_go = function(){
 	if( !ASTGUI.checkRequiredFields([ DOM_edit_dlpn_name ]) ){
 		return ;
 	}
+
+	if (DOM_edit_dlpn_name.value.length > 70) {
+		ASTGUI.feedback({ msg: 'Dialplan name is too long. Please keep it under 70 chars.', showfor: 3, color: 'red'});
+		DOM_edit_dlpn_name.focus();	
+		return;
+	}
+
 	var dp_name = DOM_edit_dlpn_name.value;
 
 	if( isNewDP ){ // check if there is already a DialPlan by this name
