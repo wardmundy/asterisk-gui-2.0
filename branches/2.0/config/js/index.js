@@ -1006,7 +1006,7 @@ var miscFunctions = {
 				y.each( function( item ){
 					tmp.push( item );
 				} );
-			tmp = tmp.concat( pbx.page_groups.list() );
+			tmp = tmp.concat( pbx.paging.list() );
 			var tmp_LE = ASTGUI.cloneObject(sessionData.pbxinfo['localextensions']);
 			if( tmp_LE.getProperty('defaultDirectory') ){
 				tmp.push( tmp_LE.getProperty('defaultDirectory') );
