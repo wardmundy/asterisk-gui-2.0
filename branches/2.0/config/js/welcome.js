@@ -22,7 +22,7 @@
 var REGISTRY_OUTPUT = {};
 var manager_events = {};
 var manager_timers = {};
-var extension_loads = { all: true, analog: true, features: true, iax: true, sip: true };
+var extension_loads = { all: true, analog: false, features: false, iax: false, sip: false };
 var mgr = {};
 
 var loadTrunks = function() {
@@ -123,6 +123,7 @@ var loadExtensions = function() {
 		var tmp_usertype_a = [];
 		var new_row = $('<tr></tr>');
 
+		/* check to see if the extension has iax and sip */
 		if( ud.getProperty('hassip').isAstTrue() && ud.getProperty('hasiax').isAstTrue() ) {
 			tmp_usertype_a.push( 'SIP/IAX User' );
 			new_row.addClass('iax');
@@ -133,7 +134,10 @@ var loadExtensions = function() {
 		} else if ( ud.getProperty('hassip').isAstTrue() ) {
 			tmp_usertype_a.push( '&nbsp;SIP User' );
 			new_row.addClass('sip');
-		} else if( ud.getProperty(top.sessionData.DahdiChannelString) ) {
+		}
+
+		/* check seperately if it has analog */
+		if (ud.getProperty(top.sessionData.DahdiChannelString) !== '') {
 			tmp_usertype_a.push( 'Analog User (Port ' + ud[top.sessionData.DahdiChannelString] + ')' ) ;
 			new_row.addClass('analog');
 		}
@@ -146,9 +150,9 @@ var loadExtensions = function() {
 		}
 
 		if( !ud.getProperty('context') || ! parent.sessionData.pbxinfo.callingPlans[ud.getProperty('context')] ){
-			var tmp_userstring = '<u>' + user + '</u> <font color=red>*No DialPlan assigned</font>' ;
+			var tmp_userstring = user + '<font color=red>*No DialPlan assigned</font>' ;
 		}else{
-			var tmp_userstring = '<u>' + user + '</u>' ;
+			var tmp_userstring = user;
 		}
 
 		$("<td></td>").html(ASTGUI.getUser_DeviceStatus_Image(user)).attr("id","exten_status_"+user).appendTo(new_row);

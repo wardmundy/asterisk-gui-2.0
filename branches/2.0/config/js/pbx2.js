@@ -2048,7 +2048,7 @@ pbx.vm_groups.add = function(exten, group) {
 
 	var actions = new listOfSynActions('extensions.conf');
 	for (var i=0; i<lines.length; i++) {
-		actions.new_action('append', ASTGUI.contexts.VoiceMailGroups, 'exten', line[i]);
+		actions.new_action('append', ASTGUI.contexts.VoiceMailGroups, 'exten', lines[i]);
 	}
 
 	var resp = actions.callActions();
