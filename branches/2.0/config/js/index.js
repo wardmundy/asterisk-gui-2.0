@@ -842,7 +842,7 @@ var miscFunctions = {
 
 	reboot_pbx: function( opt ){ // miscFunctions.reboot_pbx
 		parent.ASTGUI.yesOrNo({
-			msg: (opt && opt.msg) || 'Note: Rebooting appliance will terminate any active calls.' ,
+			msg: (opt && opt.msg) || 'Note: Rebooting Asterisk will terminate any active calls.' ,
 			ifyes: function(){
 				if( sessionData.PLATFORM.isAA50 && top.cookies.get('configFilesChanged') == 'yes' ){
 					parent.ASTGUI.dialog.waitWhile('Rebooting !');
