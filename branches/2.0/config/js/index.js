@@ -811,7 +811,7 @@ var miscFunctions = {
 		onLogInFunctions.makePings.stop();
 		var count_down = function(n){
 			if(n){
-				if( n > 60 ){
+				if( n > 120 ){
 					setTimeout( function(){ n = n-5; count_down(n); } , 5000 );
 					var m = ' ' + String(parseInt(n/60,10)) + ':' + String(n%60) + ' Seconds';
 				}else{
