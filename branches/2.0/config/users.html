@@ -178,9 +178,9 @@
 							<img src="images/tooltip_info.gif" tip="en,users,5" class='tooltipinfo'>
 
 
-							flash <img src="images/tooltip_info.gif" tip="en,users,30" class='tooltipinfo'>:
+							<label for="edit_flash">flash</label> <img src="images/tooltip_info.gif" tip="en,users,30" class='tooltipinfo'>:
 								<input id='edit_flash' size=4>
-							rxflash <img src="images/tooltip_info.gif" tip="en,users,31" class='tooltipinfo'>:
+							<label for="edit_rxflash">rxflash</label> <img src="images/tooltip_info.gif" tip="en,users,31" class='tooltipinfo'>:
 								<input id='edit_rxflash' size=4>
 						</TD>
 					</TR>
@@ -549,16 +549,17 @@
 		$('#edit_fxs').change(function() {
 			/* lets disable all the inputs that are analog only if
 			 * there is no analog stations */
+			var changes = ['3wayCalling', 'callWaiting', 'flash', 'rxflash'];
 			if ($('#edit_fxs option:selected').text() === 'None') {
-				$('#edit_3wayCalling').attr('disabled', 'disabled');
-				$('label[for=edit_3wayCalling]').css('color', '#555555');
-				$('#edit_callWaiting').attr('disabled', 'disabled');
-				$('label[for=edit_callWaiting]').css('color', '#555555');
+				for (var i=0; i<changes.length; i++) {
+					$('#edit_'+changes[i]).attr('disabled', 'disabled');
+					$('label[for=edit_'+changes[i]+']').css('color', '#555555');
+				}
 			} else {
-				$('#edit_3wayCalling').removeAttr('disabled');
-				$('label[for=edit_3wayCalling]').css('color', 'inherit');
-				$('#edit_callWaiting').removeAttr('disabled');
-				$('label[for=edit_callWaiting]').css('color', 'inherit');
+				for (var i=0; i<changes.length; i++) {
+					$('#edit_'+changes[i]).removeAttr('disabled');
+					$('label[for=edit_'+changes[i]+']').css('color', 'inherit');
+				}
 			}
 		}).change();
 	});
