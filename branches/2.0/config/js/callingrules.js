@@ -351,7 +351,7 @@ var new_crl_save_go = function(){
 		window.location.reload();
 	}else{
 		parent.ASTGUI.dialog.waitWhile(' Updating ...');
- 		parent.pbx.calling_rules.edit( EDIT_CR, EDIT_CR_RULE, as )
+ 		parent.pbx.calling_rules.edit( EDIT_CR, EDIT_CR_RULE, 'exten='+as )
 		ASTGUI.feedback( { msg:'Calling Rule Updated !', showfor:2, color:'green' });
 		parent.ASTGUI.dialog.hide();
 		window.location.reload();
