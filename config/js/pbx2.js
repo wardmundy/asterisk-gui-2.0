@@ -153,6 +153,7 @@ pbx.calling_rules.remove = function(name, dp) {
 		sessionData.pbxinfo.callingRules[name] = ASTGUI.cloneObject(sessionData.pbxinfo.callingRules[name]).withOut('exten=' + dp);
 	} else {
 		top.log.warn('pbx.calling_rules.remove: ' + name + ' exists, but does not contain ' + dp + '.');
+		return false;
 	}
 
 	return true;
@@ -1821,6 +1822,10 @@ pbx.users = {};
  * @param callback The callback function once the user has been added.
  */
 pbx.users.add = function(exten, info, callback) {
+	if (!info) {
+		top.log.error('pbx.users.add: info was undefined.');
+		return false;
+	}
 	info = ASTGUI.toCustomObject(info);
 
 	var disallow = info.getProperty('disallow') || 'all';
