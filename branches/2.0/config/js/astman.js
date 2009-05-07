@@ -1687,8 +1687,8 @@ var ASTGUI = {
 			if(x.contains(',') ){
 				return x.split(',');
 			}
-			if(x.contains(',') ){
-				return x.split(',');
+			if(x.contains('|') ){
+				return x.split('|');
 			}
 			return [x] ;
 		},
@@ -1791,7 +1791,7 @@ var ASTGUI = {
 				if ( args[0] && args[1] && args[0] == 'no-password' ){
 					return 'DISA using context ' + args[1] + ' (no password)';
 				}
-				return 'DISA ' + ( args[0] && ' using password ' + args[0] ) + ( args[1] && ' against context ' + args[1] ) ;
+				return 'DISA using password ' + args[0] + ' against context ' + args[1];
 			}
 
 			if( all_LC == "background" ){
