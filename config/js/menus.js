@@ -436,7 +436,11 @@ var VoiceMenus_miscFunctions = {
 				break;
 			case 'DialViaTrunk':
 				var tmp_trunkName = ASTGUI.getFieldValue('newstep_dial_ViaTrunk');
-				newstep =  'Macro('+ ASTGUI.contexts.dialtrunks + ',${' + tmp_trunkName + '}/'+ ASTGUI.getFieldValue('newstep_dial_ThisNumber') +',,'+ tmp_trunkName + ',)' ;
+				var tmp_extern_num = ASTGUI.getFieldValue('newstep_dial_ThisNumber');
+				if (!parent.ASTGUI.validateFields([_$('newstep_dial_ThisNumber')])) {
+					return;
+				}
+				newstep =  'Macro('+ ASTGUI.contexts.dialtrunks + ',${' + tmp_trunkName + '}/'+ tmp_extern_num +',,'+ tmp_trunkName + ',)' ;
 				break;
 			case 'UserEvent':
 				var tmp_EventName = ASTGUI.getFieldValue('newstep_UserEvent_eventname');
