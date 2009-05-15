@@ -617,12 +617,12 @@ var validate = function(val, chks) {
 		}
 	}
 
-	if (chks.keypress && val !== '' && !val.match(/[0-9#*][0-9#*]*/)) {
+	if (chks.keypress && val !== '' && !val.match(/^[0-9#\*][0-9#\*]*$/)) {
 		top.log.error('validate: val should only contain 0-9, #, or *.');
 		throw TypeError('Invalid: This should only contain 0-9, #, or *.');
 	}
 
-	if (chks.aststr && !val.match(/[a-zA-Z0-9_-][a-zA-Z0-9_-]*/)) {
+	if (chks.aststr && !val.match(/^[a-zA-Z0-9_-][a-zA-Z0-9_-]*$/)) {
 		top.log.error('validate: val should only contain a-z, A-Z, 0-9, _, or -.');
 		throw TypeError('Invalid: This should only contain a-z, A-Z, 0-9, _, or -');
 	}
