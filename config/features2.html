@@ -340,7 +340,7 @@
 				} else {
 					var obj = $(this).parents('tr');
 					var vari = $(this).parents('td').attr('class');
-					var val = $(this).text();
+					var val = $(this).val();
 					if (validateAmap(obj, {variable: vari, value: val}, false)) {
 						$(this).parents('td').siblings('.buttons').children('.save').show();
 					} else {
