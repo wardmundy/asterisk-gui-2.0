@@ -451,24 +451,29 @@ var validateAmap = function(obj, params, focus) {
 		switch(params.variable) {
 		case 'name':
 			params.name = params.value;
+			break;
 		case 'digits':
 			params.digits = params.value;
+			break;
 		case 'app_name':
 			params.app_name = params.value;
+			break;
 		default:
 		}	
+		delete params.variable;
+		delete params.value;
 	}
 	/* lets validate all the variables before we send */
 	try {
-		if (params.name) {
+		if (typeof params.name !== 'undefined') {
 			vali = 'name';
 			validate(params.name, {notnull: true, str: true, aststr: true});
 		}
-		if (params.digits) {
+		if (typeof params.digits !== 'undefined') {
 			vali = 'digits';
 			validate(params.digits, {notnull: true, num: true});
 		}
-		if (params.app_name) {
+		if (typeof params.app_name !== 'undefined') {
 			vali = 'app_name';
 			validate(params.app_name, {notnull: true, str: true});
 		}
@@ -577,7 +582,7 @@ var validate = function(val, chks) {
 	}
 
 	/* make sure val is a num */
-	if (chks.num && isNaN(val)) {
+	if (chks.num && !val.toString().match(/^[0-9][0-9]*$/)) {
 		top.log.error('validate: val needs to be a number.');
 		throw TypeError('Invalid: This needs to be a number.');
 	}
