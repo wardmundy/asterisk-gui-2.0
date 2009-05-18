@@ -73,6 +73,16 @@ edit_funcs['parkext'] = function(val) {
 	/* lets validate */
 	validate(val, {num: true, positive: true, extens: true});
 
+	/* custom validation to make sure it doesn't step over parkpos */
+	var parkpos = $('#parkpos').val();
+	parkpos = parkpos.split('-');
+	parkpos[0] = parseInt(parkpos[0], 10);
+	parkpos[1] = parseInt(parkpos[1], 10);
+	/* return error if parkpos is properly defined and val is inbetween the parkpos numbers */
+	if (!isNaN(parkpos[0]) && !isNaN(parkpos[1]) && val >= parkpos[0] && val <= parkpos[1]) {
+		throw RangeError('Invalid: Conflicts with Parked Call extensions (' + parkpos[0] + '-' + parkpos[1] + ').');
+	}
+
 	/* kk, all good, now update asterisk and go */
 	return sendUpdate({cxt: 'general', name: 'parkext', val: val});
 };
@@ -612,8 +622,8 @@ var validate = function(val, chks) {
 				continue;
 			}
 
-			var start = gui_conf[pref + '_start'];
-			var end = gui_conf[pref + '_end'];
+			var start = parseInt(gui_conf[pref + '_start'], 10);
+			var end = parseInt(gui_conf[pref + '_end'], 10);
 
 			if (val >= start && val <= end) {
 				top.log.warn('validate: conflicts with ' + pref + '.');
