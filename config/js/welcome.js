@@ -206,7 +206,7 @@ var loadExtensions = function() {
 		}
 
 		if( tmp ){
-			var tmp_voicemails = '<u>' + tmp + '</u>' ;
+			var tmp_voicemails = tmp;
 		}else{
 			var tmp_voicemails = '-- <font color=red>*No Extension assigned</font>' ;
 		}
@@ -247,7 +247,7 @@ var loadExtensions = function() {
 	(function(){
 		var tmp = parent.sessionData.pbxinfo['localextensions'].getProperty('defaultDirectory') ;
 		if( tmp ){
-			var tmp_dirExten = '<u>' + tmp + '</u>' ;
+			var tmp_dirExten = tmp;
 		}else{
 			var tmp_dirExten = '-- <font color=red>*No Extension assigned</font>' ;
 		}
