@@ -457,7 +457,7 @@ var onLogInFunctions = {
 				sessionData.directories.app_DahdiScan = 'ztscan > ' + sessionData.directories.asteriskConfig + ASTGUI.globals.dahdiScanOutput ;
 				miscFunctions.hide_panel('misdn.html', 1);
 			}else{
-				miscFunctions.hide_panel('misdn.html', -1);
+				miscFunctions.hide_panel('misdn.html', 1);
 			}
 
 			ASTGUI.systemCmd( sessionData.directories.app_DahdiScan , onLogInFunctions.updatePanels4Platform );
