@@ -1,11 +1,12 @@
 /*
  * Asterisk-GUI	- an Asterisk configuration interface
  *
- * hardware.html functions
+ * hardware_dahdi.html functions
  *
  * Copyright (C) 2006-2009, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
+ * Ryan Brindley <ryan@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
