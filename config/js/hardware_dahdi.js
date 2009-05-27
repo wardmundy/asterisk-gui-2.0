@@ -725,10 +725,149 @@ var applySettings = {
 	generate_zaptel: function(){
 		parent.ASTGUI.systemCmd( top.sessionData.directories.script_generateZaptel + " applysettings" , function(){
 			parent.sessionData.REQUIRE_RESTART = ( HAS_ANALOGHARDWARE || HAS_DIGITALHARDWARE )? true : false;
-			storeDetectedHardware();
+			applySettings.saveOpermodeSettings();
 			return true ;
 
 		});
+	},
+
+	saveOpermodeSettings: function() {
+		ASTGUI.dialog.waitWhile('saving...');
+		var u = new listOfSynActions(ASTGUI.globals.configfile);
+
+		/* ok, lets update the configfile is the values are set */
+		if ($('#enable_disable_checkbox_opermode:checked').val() !== null) {
+			u.new_action('update', 'general', 'opermode', $('#opermode').val());
+		}
+
+		if ($('#enable_disable_checkbox_alawoverride:checked').val() !== null){
+			u.new_action('update', 'general', 'alawoverride', $('#alawoverride').val());
+		}
+
+		if( $('#enable_disable_checkbox_fxshonormode:checked').val() !== null ){
+			u.new_action('update', 'general', 'fxshonormode', $('#fxshonormode').val());
+		}
+
+		if( $('#enable_disable_checkbox_boostringer:checked').val() !== null ){
+			u.new_action('update', 'general', 'boostringer', $('#boostringer').val());
+		}
+
+		u.new_action('update', 'general', 'ZAPMODULE_NAME', $('#zap_moduleName').val());
+		u.callActions();
+		u.clearActions();
+
+		if( $('#enable_disable_checkbox_mwimode:checked').val() !== null ){
+			u.new_action('update', 'general', 'mwimode', $('#mwimode').val());
+			if( ASTGUI.getFieldValue('mwimode') == 'NEON' ){
+				u.new_action('update', 'general', 'neonmwi_level', $('#neonmwi_level').val());
+				u.new_action('update', 'general', 'neonmwi_offlimit', $('#neonmwi_offlimit').val());
+			}
+		}
+
+		if( $('#enable_disable_checkbox_lowpower:checked').val() !== null ){
+			u.new_action('update', 'general', 'lowpower', $('#lowpower').val());
+		}
+
+		if( $('#enable_disable_checkbox_fastringer:checked').val() !== null ){
+			u.new_action('update', 'general', 'fastringer', $('#fastringer').val());
+		}
+
+		if( $('#enable_disable_checkbox_fwringdetect:checked').val() !== null ){
+			u.new_action('update', 'general', 'fwringdetect', $('#fwringdetect').val());
+		}
+
+		u.callActions();
+		u.clearActions();
+	
+		ASTGUI.dialog.waitWhile('updating modprobe.conf ...');
+		var cmd1 = "cp /etc/asterisk/modprobe_default /etc/modprobe.conf";
+		var params = "options " + $('#zap_moduleName').val();
+
+		if( $('#enable_disable_checkbox_opermode:checked').val() !== null ){
+			var h = $('#opermode').val();
+				if(h){ params += " opermode=" + h; }
+		}
+
+		if( _$('enable_disable_checkbox_alawoverride').checked ){
+			h = $('#alawoverride').val();
+			if(h){ params += " alawoverride=" + h; }
+		}
+
+		if( _$('enable_disable_checkbox_fxshonormode').checked ){
+		h = $('#fxshonormode').val();
+			if(h){ params += " fxshonormode=" + h; }
+		}
+
+		if( _$('enable_disable_checkbox_boostringer').checked ){
+			h = $('#boostringer').val();
+			if(h){ params += " boostringer=" + h; }
+		}
+
+		if( _$('enable_disable_checkbox_lowpower').checked ){
+			h = $('#lowpower').val();
+			if(h){ params += " lowpower=" + h; }
+		}
+
+		if( _$('enable_disable_checkbox_fastringer').checked ){
+			h = $('#fastringer').val();
+			if(h){ params += " fastringer=" + h; }
+		}
+
+		if( _$('enable_disable_checkbox_fwringdetect').checked ){
+			h = $('#fwringdetect').val();
+			if(h == '1'){ params += " fwringdetect=" + h; }
+		}
+
+		if( _$('enable_disable_checkbox_mwimode').checked ){
+			if( $('#mwimode').val()== 'NEON'){
+				params += " neonmwi_monitor=1";
+				var h = $('#neonmwi_level').val();
+				if(h){ params += ' neonmwi_level=' + h ; }
+				var h = $('#neonmwi_offlimit').val();
+				if(h){ params += ' neonmwi_offlimit=' + h ; }
+			}else{
+				params += " neonmwi_monitor=0";
+			}
+		}
+	
+		var cmd2 = "echo \"" + params + "\" >> /etc/modprobe.conf ";
+	
+		var update_usersConf = function(){
+			// update MWI settings in users.conf
+			var u = new listOfSynActions('users.conf');
+			if( $('#enable_disable_checkbox_mwimode:checked').val() !== null ){
+				if( $('#mwimode').val()== 'FSK'){
+					u.new_action('update', 'general' , 'mwimonitor', 'fsk');
+					u.new_action('update', 'general' , 'mwilevel', '512');
+					u.new_action('update', 'general' , 'mwimonitornotify', '__builtin__');
+				}
+				if( $('#mwimode').val()== 'NEON'){
+					u.new_action('delete', 'general' , 'mwilevel', '','');
+					u.new_action('update', 'general' , 'mwimonitor', 'neon');
+					u.new_action('update', 'general' , 'mwimonitornotify', '__builtin__');
+				}
+			}
+			u.callActions();
+			ASTGUI.dialog.hide();
+			ASTGUI.feedback( { msg:"updated settings !!", showfor: 3 });
+
+			storeDetectedHardware();
+		};
+	
+		if( !ASTGUI.getFieldValue('zap_moduleName') ){
+			ASTGUI.dialog.hide();
+			ASTGUI.feedback( { msg:"updated settings !!", showfor: 3 });
+			storeDetectedHardware();
+			return;
+		}
+
+		ASTGUI.systemCmd( cmd1, function(){ 
+			ASTGUI.systemCmd( cmd2, function(){ 
+				ASTGUI.dialog.waitWhile('updating Analog Trunks with MWI settings ...');
+				update_usersConf();
+			});
+		});
+		
 	},
 
 	updateUsersConf: function(){
