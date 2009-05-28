@@ -181,6 +181,10 @@ getProperties = function(obj) {
 	return '{' + props.join(' ,') + '}';
 };
 
+var getProperty = function(obj, p) {
+	return (obj.hasOwnProperty(p)) ? obj[p] : '';
+};
+
 // String Manipulation, and other custom methods for String Objects
 String.prototype.addZero = function(){
 	return ( Number(this) < 10)? "0" + this : this;

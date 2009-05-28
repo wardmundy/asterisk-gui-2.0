@@ -83,24 +83,24 @@ var show_Edit_Trunk = function(){
 		DOM_edit_VOIPTrunk_Context_Basis.disabled = true;
 		DOM_edit_VOIPTrunk_DIV_Title.innerHTML = 'Edit ' + ttype.toUpperCase() + ' trunk ' + EDIT_TRUNK;
 		ASTGUI.updateFieldToValue( DOM_edit_VOIPTrunk_Type, ttype.toUpperCase() );
-		ASTGUI.updateFieldToValue( DOM_edit_VOIPTrunk_Hostname , tinfo.getProperty('host') );
-		ASTGUI.updateFieldToValue( DOM_edit_VOIPTrunk_Username , tinfo.getProperty('username') );
-		ASTGUI.updateFieldToValue( DOM_edit_VOIPTrunk_Password , tinfo.getProperty('secret') );
-		ASTGUI.updateFieldToValue( 'edit_VOIPTrunk_Providername' , tinfo.getProperty('trunkname') );
-		ASTGUI.updateFieldToValue( 'trunk_fromdomain' , tinfo.getProperty('fromdomain') );
-		ASTGUI.updateFieldToValue( 'trunk_fromuser' , tinfo.getProperty('fromuser') );
-		ASTGUI.updateFieldToValue( 'trunk_authuser' , tinfo.getProperty('authuser') );
-		ASTGUI.updateFieldToValue( 'trunk_insecure' , tinfo.getProperty('insecure') );
-		ASTGUI.updateFieldToValue( 'trunk_outboundproxy' , tinfo.getProperty('outboundproxy') );
+		ASTGUI.updateFieldToValue( DOM_edit_VOIPTrunk_Hostname , getProperty(tinfo, 'host') );
+		ASTGUI.updateFieldToValue( DOM_edit_VOIPTrunk_Username , getProperty(tinfo, 'username') );
+		ASTGUI.updateFieldToValue( DOM_edit_VOIPTrunk_Password , getProperty(tinfo, 'secret') );
+		ASTGUI.updateFieldToValue( 'edit_VOIPTrunk_Providername' , getProperty(tinfo, 'trunkname') );
+		ASTGUI.updateFieldToValue( 'trunk_fromdomain' , getProperty(tinfo, 'fromdomain') );
+		ASTGUI.updateFieldToValue( 'trunk_fromuser' , getProperty(tinfo, 'fromuser') );
+		ASTGUI.updateFieldToValue( 'trunk_authuser' , getProperty(tinfo, 'authuser') );
+		ASTGUI.updateFieldToValue( 'trunk_insecure' , getProperty(tinfo, 'insecure') );
+		ASTGUI.updateFieldToValue( 'trunk_outboundproxy' , getProperty(tinfo, 'outboundproxy') );
 
-		if( tinfo.getProperty('allow') == 'all'){
+		if( getProperty(tinfo, 'allow') == 'all'){
 			ASTGUI.updateFieldToValue( 'codec_one', 'ulaw' );
 			ASTGUI.updateFieldToValue( 'codec_two', 'alaw' );
 			ASTGUI.updateFieldToValue( 'codec_three', 'gsm' );
 			ASTGUI.updateFieldToValue( 'codec_fourth', 'g726' );
 			ASTGUI.updateFieldToValue( 'codec_fifth', 'g722' );
 		}else{
-			var codecs_tmp = tinfo.getProperty('allow').split(',') ;
+			var codecs_tmp = getProperty(tinfo, 'allow').split(',') ;
 			ASTGUI.updateFieldToValue( 'codec_one', (codecs_tmp[0] && codecs_tmp[0].trim()) || '' );
 			ASTGUI.updateFieldToValue( 'codec_two', (codecs_tmp[1] && codecs_tmp[1].trim()) || '' );
 			ASTGUI.updateFieldToValue( 'codec_three', (codecs_tmp[2] && codecs_tmp[2].trim()) || '' );
@@ -111,11 +111,11 @@ var show_Edit_Trunk = function(){
 		/* Don't allow editing field if the asterisk [context] is based on it. */
 		DOM_edit_VOIPTrunk_Username.disabled = false;
 		_$('edit_VOIPTrunk_Providername').disabled = false;
-		if (EDIT_TRUNK == tinfo.getProperty('username')) DOM_edit_VOIPTrunk_Username.disabled = true;
-		if (EDIT_TRUNK == tinfo.getProperty('trunkname')) _$('edit_VOIPTrunk_Providername').disabled = true;
+		if (EDIT_TRUNK == getProperty(tinfo, 'username')) DOM_edit_VOIPTrunk_Username.disabled = true;
+		if (EDIT_TRUNK == getProperty(tinfo, 'trunkname')) _$('edit_VOIPTrunk_Providername').disabled = true;
 
 		var c = context2json({ filename:'extensions.conf', context: 'globals' , usf: 1 });
-		ASTGUI.updateFieldToValue( 'trunk_obcid', c.getProperty(ASTGUI.globals.obcidUsrPrefix + EDIT_TRUNK) );
+		ASTGUI.updateFieldToValue( 'trunk_obcid', getProperty(c, ASTGUI.globals.obcidUsrPrefix + EDIT_TRUNK) );
 
 
 		// remote MWI stuff (only for SIP trunks)
@@ -144,7 +144,7 @@ var show_Edit_Trunk = function(){
 				}
 
 				for( var this_user in d ){ if( d.hasOwnProperty(this_user) ){
-					if ( d[this_user].getProperty('mailbox').contains('MailboxStore') &&  d[this_user].getProperty('mailbox').contains(ruser) ){
+					if (getProperty(d[this_user], 'mailbox').contains('MailboxStore') &&  getProperty(d[this_user], 'mailbox').contains(ruser) ){
 						ASTGUI.updateFieldToValue( 'edit_ERMWI_luser' , this_user );
 						EDIT_TRUNK_luser = this_user;
 					}

@@ -89,7 +89,7 @@ providers_MiscFunctions = {
 					newRow.className = ((DOM_table_SPS_list.rows.length)%2==1)?'odd':'even';
 					addCell( newRow , { html: ''} );
 					addCell( newRow , { html: d[e]['trunkname'] });
-					addCell( newRow , { html: d[e].getProperty('username') || '--' });
+					addCell( newRow , { html: getProperty(d[e], 'username') || '--' });
 					addCell( newRow , { html: d[e]['host'] });
 					tmp = "<span class='guiButton' onclick=\"providers_MiscFunctions.show_EditProviderForm('" + e +"')\">Edit</span>" + 
 						"<span class='guiButtonDelete' onclick=\"providers_MiscFunctions.delete_ProviderForm('" + e +"')\">Delete</span>" ;
