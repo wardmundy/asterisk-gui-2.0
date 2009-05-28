@@ -236,7 +236,11 @@ var edit_VOIPTrunk_save_go = function(){
 
 		var old_trunkUsername = parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['username'] ;
 
-		x.new_action('update', EDIT_TRUNK, 'outboundproxy', $('#trunk_outboundproxy').val());
+		if ($('#trunk_outboundproxy').val() !== '') {
+			x.new_action('update', EDIT_TRUNK, 'outboundproxy', $('#trunk_outboundproxy').val());
+		} else {
+			x.new_action('delete', EDIT_TRUNK, 'outboundproxy', '');
+		}
 		parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['outboundproxy'] = $('#trunk_outboundproxy').val();
 		x.new_action('update', EDIT_TRUNK , 'host', ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Hostname) );
 			parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['host'] = ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Hostname) ;

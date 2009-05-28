@@ -1284,6 +1284,7 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 		} else if (basis === 'FromProvider') {
 			name = trunk.trunkname;
 		}
+
 		break;
 	default:
 		break;
