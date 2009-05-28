@@ -81,7 +81,7 @@ var selectedTrunk_editOptions_form = function(w){
 	checkChannels( parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK][DAHDICHANNELSTRING] );
 	zapchan_Before = parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK][DAHDICHANNELSTRING];
 	var ct = ASTGUI.contexts.TrunkDIDPrefix + EDIT_TRUNK ;
-	ASTGUI.updateFieldToValue( 'edit_trunkName' ,  parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK].getProperty('trunkname') );
+	ASTGUI.updateFieldToValue('edit_trunkName', getProperty(parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK], 'trunkname'));
 	getPreviousVolumeForChannelsofThisTrunk( EDIT_TRUNK );
 	Electrical_Fields.each( function(fld){
 		var fld_value = parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK][fld] || '' ;
@@ -90,7 +90,7 @@ var selectedTrunk_editOptions_form = function(w){
 
 	var variablename =  ASTGUI.globals.obcidUsrPrefix + EDIT_TRUNK ;
 	var c = context2json({ filename:'extensions.conf', context: 'globals' , usf: 1 });
-	ASTGUI.updateFieldToValue( 'trunk_obcid', c.getProperty(variablename) );
+	ASTGUI.updateFieldToValue( 'trunk_obcid', getProperty(c, variablename) );
 
 	$('#HIDE_OnNEW_0').show();
 	if( parent.sessionData.PLATFORM.isAA50 ){
@@ -245,7 +245,7 @@ var update_AnalogTrunksTable = function(){
 var delete_trunk_confirm = function(a){
 	EDIT_TRUNK = a;
 
-	var trunk_name = parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK].getProperty('trunkname') || EDIT_TRUNK ;
+	var trunk_name = getProperty(parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK], 'trunkname') || EDIT_TRUNK ;
 	if(!confirm("Delete trunk '"+ trunk_name + "' ?")) { return true; }
 	if( parent.pbx.trunks.remove(EDIT_TRUNK) ){ 
 		ASTGUI.feedback({msg:'Deleted Analog trunk ' + "'" + trunk_name + "'" , showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
@@ -276,7 +276,7 @@ var localajaxinit = function(){
 
 		var y = parent.pbx.users.list();
 		y.each( function(user){
-			if( parent.sessionData.pbxinfo.users[user].getProperty('hasvoicemail').isAstTrue() ){
+			if( getProperty(parent.sessionData.pbxinfo.users[user], 'hasvoicemail').isAstTrue() ){
 				ASTGUI.selectbox.append('mailbox', user, user);
 			}
 		});
