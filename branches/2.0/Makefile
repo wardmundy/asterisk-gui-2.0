@@ -116,9 +116,9 @@ $(SUBDIRS):
 	@$(MAKE) -C $@
 
 config:
-	@cp /usr/share/doc/asterisk-gui/init.d/rc.asterisk-gui /etc/rc.d/init.d/asterisk-gui
-	@chmod 755 /etc/rc.d/init.d/asterisk-gui
-	@chkconfig --add asterisk-gui
+	@cp init.d/rc.asterisk-gui $(DESTDIR)/etc/rc.d/init.d/asterisk-gui
+	@chmod 755 $(DESTDIR)/etc/rc.d/init.d/asterisk-gui
+	@if [ -z "$(DESTDIR)" ]; then chkconfig --add asterisk-gui; fi
 	@echo " +-------- Asterisk-GUI Config Complete -------+"
 	@echo " + The Asterisk-GUI has been added to your     +"
 	@echo " + services:                                   +"
