@@ -20,6 +20,7 @@ var exten_conf;
 var feat_conf;
 var gui_conf;
 var amap_table = $('#application_map_list tbody');
+var amap_enabled = [];
 var amap_orig_name;
 var vals = {};
 var dial_options;
@@ -255,7 +256,7 @@ var load = function() {
 	}
 
 	if (amap_table.find('tr:not(.template)').length === 0) {
-		var row = $('<tr>').attr('colspan', '7').html('No Application Maps Defined.');
+		var row = $('<tr>').attr('colspan', '7').addClass('noapps').html('No Application Maps Defined.');
 		amap_table.append(row);
 	}
 
@@ -272,7 +273,7 @@ var listAmap = function(name) {
 		var amap_fields = ['', 'self', '', ''];
 	}
 
-	if (!amap_table.find('tr').length || (amap_table.find('tr').length && amap_table.find('tr:first').hasClass('noapps'))) {
+	if (!amap_table.find('tr').length || (amap_table.find('tr').length && amap_table.find('tr.noapps'))) {
 		amap_table.find('tr:not(.template)').remove();
 	}
 
