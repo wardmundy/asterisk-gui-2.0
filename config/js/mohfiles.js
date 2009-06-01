@@ -146,6 +146,9 @@ var manage_moh = {
 					IFRAME_CREATED = true;
 				}
 				$('#uploadForm_container').show();
+				if (top.sessionData.PLATFORM.isABE) {
+					$('#uploadForm_container').hide();
+				}
 				$('#thispageContent').show();
 				parent.ASTGUI.dialog.hide();
 			}
