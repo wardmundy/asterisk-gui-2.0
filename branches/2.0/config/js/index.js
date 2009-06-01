@@ -1045,9 +1045,6 @@ var after_localajaxinit = function(){
 	}
 
 	if( sessionData.PLATFORM.isABE ){ // ABE-1600
-		try{
-			miscFunctions.hide_panel('mohfiles.html', -1);
-		}catch(err){}
 	}
 
 	var loadGUI = function(){
