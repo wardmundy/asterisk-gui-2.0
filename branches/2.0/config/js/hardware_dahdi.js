@@ -983,10 +983,10 @@ var applySettings = {
 			tmp2 = (bchanstring)? ",":"";
 			tmp3 = (dchanstring)? ",":"";
 			var ppp = calc_bchan_fxx(k);
-			if ( !SPANS[k]['signalling'].beginsWith('pri') ){
+			if ( SPANS[k]['signalling'].beginsWith('pri') ){
 				if(SPANS[k]['signalling'].beginsWith('fx')){ 
 					var qqq = (SPANS[k]['signalling']).replace('_',''); // zaptel.conf uses fxoks instead of fxo_ks
-				}else{
+				} else {
 					var qqq = 'e&m'; // zaptel.conf uses fxoks instead of fxo_ks
 				}
 
