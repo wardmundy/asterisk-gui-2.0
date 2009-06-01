@@ -125,7 +125,7 @@ var manage_moh = {
 				ASTGUI.domActions.tr_addCell( newRow , { html: 'Options' , align:'center'});
 	
 				for( var i = 0 ; i < sndfiles.length ; i++){
-					if( !sndfiles[i].beginsWith( ASTGUI.contexts.mohdirPrefix ) ){
+					if( !sndfiles[i].beginsWith( ASTGUI.contexts.mohdirPrefix ) && (sndfiles[i].endsWith('.mp3') || sndfiles[i].endsWith('.wav') || sndfiles[i].endsWith('.gsm')) ){
 						addrow_totable( sndfiles[i].stripTags(), i );
 					}
 				}
