@@ -481,7 +481,7 @@ var validateAmap = function(obj, params, focus) {
 		}
 		if (typeof params.digits !== 'undefined') {
 			vali = 'digits';
-			validate(params.digits, {notnull: true, num: true});
+			validate(params.digits, {notnull: true, keypress: true});
 		}
 		if (typeof params.app_name !== 'undefined') {
 			vali = 'app_name';
