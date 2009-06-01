@@ -65,7 +65,7 @@ var localajaxinit = function(){
 	if( c.hasOwnProperty('disallow') ) { disallowed = c['disallow'].split(','); } 
 	var default_selected = ['ulaw','alaw','gsm'];
 	default_selected.each( function(val) {
-		if (!disallowed.contains(val)) {
+		if (!disallowed.contains(val) && !c.hasOwnProperty('allow')) {
 			real_codecs = real_codecs + "," + val;
 		}
 	});
