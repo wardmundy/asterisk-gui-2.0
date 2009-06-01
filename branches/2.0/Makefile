@@ -115,6 +115,16 @@ _all: makeopts $(SUBDIRS)
 $(SUBDIRS):
 	@$(MAKE) -C $@
 
+config:
+	@cp /usr/share/doc/asterisk-gui/init.d/rc.asterisk-gui /etc/rc.d/init.d/asterisk-gui
+	@chmod 755 /etc/rc.d/init.d/asterisk-gui
+	@chkconfig --add asterisk-gui
+	@echo " +-------- Asterisk-GUI Config Complete -------+"
+	@echo " + The Asterisk-GUI has been added to your     +"
+	@echo " + services:                                   +"
+	@echo " + service <asterisk-gui> {start|stop|restart} +"
+	@echo " +---------------------------------------------+"
+
 checkconfig:
 	@echo " --- Checking Asterisk configuration to see if it will support the GUI ---"
 	@echo -n "* Checking for http.conf: "
