@@ -296,4 +296,4 @@ makeopts: configure
 	@echo "****"
 	@exit 1
 
-.PHONY: clean all install _all _install checkconfig distclean $(SUBDIRS_CLEAN) $(SUBDIRS_INSTALL) $(SUBDIRS)
+.PHONY: config clean all install _all _install checkconfig distclean $(SUBDIRS_CLEAN) $(SUBDIRS_INSTALL) $(SUBDIRS)
