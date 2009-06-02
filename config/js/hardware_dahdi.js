@@ -240,12 +240,12 @@ var editSPAN = function(l){ // show values for SPAN l in the edit_span dialog bo
 
 	if ( Number(SPANS[l]['totchans']) == 31 ){
 		ASTGUI.selectbox.append(_$('editspan_fac'),'CCS/HDB3', 'CCS/HDB3');
-		ASTGUI.selectbox.append(_$('editspan_fac'),'CCS/CRC4/HDB3', 'CCS/CRC4/HDB3');
+		ASTGUI.selectbox.append(_$('editspan_fac'),'CCS/HDB3/CRC4', 'CCS/HDB3/CRC4');
 	}
 
 	if(SPANS[l]['framing'] && SPANS[l]['coding']) {
 		if( SPANS[l]['framing'] == 'CCS/CRC4' ){
-			ASTGUI.selectbox.selectOption( _$('editspan_fac') , 'CCS/CRC4/HDB3' );
+			ASTGUI.selectbox.selectOption( _$('editspan_fac') , 'CCS/HDB3/CRC4' );
 		}else{
 			ASTGUI.selectbox.selectOption( _$('editspan_fac') , SPANS[l]['framing'] + '/' + SPANS[l]['coding'] );
 		}
@@ -668,7 +668,7 @@ var updateSpanInfo = function(){
 	}
 
 	var b = String(CURRENT_SPAN);
-	if( _$('editspan_fac').value == 'CCS/CRC4/HDB3' ){
+	if( _$('editspan_fac').value == 'CCS/HDB3/CRC4' ){
 		SPANS[b]['framing'] = 'CCS/CRC4';
 		SPANS[b]['coding'] = 'HDB3';
 	}else{
@@ -975,7 +975,7 @@ var applySettings = {
 			firstpart = "span";
 			/* XXX Timing source for card is being set to zero? */
 			/* LBO is being set to 0 */
-			SPANS[k]['fac'] = SPANS[k]['framing'] + '/' + SPANS[k]['coding'];
+			SPANS[k]['fac'] = SPANS[k]['framing'] + ',' + SPANS[k]['coding'];
 			if(SPANS[k]['lbo'] == "") { SPANS[k]['lbo'] = 0; }
 			if(SPANS[k]['syncsrc'] == "") { SPANS[k]['syncsrc'] = 1; }
 			secondpart = k + "," + SPANS[k]['syncsrc']  + "," + SPANS[k]['lbo'] + "," + SPANS[k]['fac'].toLowerCase().replace("/", ",");
