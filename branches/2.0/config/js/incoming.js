@@ -186,7 +186,7 @@ var incomingRules_MiscFunctions = {
 
 				// If is a TimeInterval Context
 				if( did_this_rule.beginsWith( 'include=' ) && did_this_rule.contains( '_' + ASTGUI.contexts.TimeIntervalPrefix ) ){
-					var THIS_TRUNK_TIMEFRAME_CONTEXT = did_this_rule.betweenXY('=', ',');
+					var THIS_TRUNK_TIMEFRAME_CONTEXT = did_this_rule.betweenXY('=', top.session.delimiter);
 					var THIS_TIMEFRAME = THIS_TRUNK_TIMEFRAME_CONTEXT.lChop( ASTGUI.contexts.TrunkDIDPrefix + this_trunk + '_' + ASTGUI.contexts.TimeIntervalPrefix );
 					if( ! EX_CF.hasOwnProperty( THIS_TRUNK_TIMEFRAME_CONTEXT ) ){ return ; }
 
