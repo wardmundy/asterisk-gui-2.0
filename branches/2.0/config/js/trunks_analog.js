@@ -88,6 +88,11 @@ var selectedTrunk_editOptions_form = function(w){
 		ASTGUI.updateFieldToValue( _$(fld) ,  fld_value );
 	} );
 
+	if (parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['callerid'] != 'asreceived') {
+		ASTGUI.updateFieldToValue(_$('dummy_customCid'), parent.sessionData.pbxinfo.trunks.analog[EDIT_TRUNK].callerid);
+		ASTGUI.updateFieldToValue( _$('dummy_callerid'), 'custom');
+	}
+
 	var variablename =  ASTGUI.globals.obcidUsrPrefix + EDIT_TRUNK ;
 	var c = context2json({ filename:'extensions.conf', context: 'globals' , usf: 1 });
 	ASTGUI.updateFieldToValue( 'trunk_obcid', getProperty(c, variablename) );
@@ -155,6 +160,12 @@ var new_ATRNK_save_go = function(){
 		Electrical_Fields.each(function(fld){
 			tmp_object[fld] = ASTGUI.getFieldValue( _$(fld) );
 		});
+
+		if ($('#dummy_callerid').val() == 'asreceived') {
+			tmp_object['callerid'] = 'asreceived';
+		} else {
+			tmp_object['callerid'] = $('#dummy_customCid').val();
+		}
 
 		parent.pbx.trunks.add('analog', tmp_object , cbf ) ;
 		return;
@@ -291,6 +302,12 @@ var save_electrical = function(){
 	Electrical_Fields.each(function(fld){
 		x.new_action('update', EDIT_TRUNK , fld , ASTGUI.getFieldValue( _$(fld) ) ) ;
 	});
+
+	if ($('#dummy_callerid').val() == 'asreceived') {
+		x.new_action('update', EDIT_TRUNK, 'callerid', 'asreceived');
+	} else {
+		x.new_action('update', EDIT_TRUNK, 'callerid', $('#dummy_customCid').val());
+	}
 
 	var after = function(){
 		parent.ASTGUI.dialog.hide();
