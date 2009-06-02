@@ -965,7 +965,7 @@ var applySettings = {
 	// navigate through the SPANS object and save it to the applyzap.conf, 
 	// then call a script which will generate zaptel.conf from it and asks the user to restart his machine
 		parent.ASTGUI.dialog.waitWhile('Saving Changes ...');
-		var fxx={}, bchanstring = '', dchanstring = '', context = 'general';
+		var fxx={}, bchanstring = '', dchanstring = '', hardhdlc = '', context = 'general';
 		var totalchans = 0, firstpart , secondpart, tmp2 , tmp3;
 
 		var x = new listOfActions(); x.filename('applyzap.conf');
@@ -995,9 +995,12 @@ var applySettings = {
 				}else{
 					fxx[ qqq ] = ppp;
 				}
-			}else{
+			}else if (SPANS[k]['signalling'].beginsWith('pri')) {
 				bchanstring += tmp2 + ppp;
 				dchanstring += tmp3 + SPANS[k]['reserved_ch'];
+			} else {
+				bchanstring += tmp2 + ppp;
+				hardhdlc += tmp3 + SPANS[k]['reserved_ch'];
 			}
 			SPANS[k]['dahdichanstring'] = ppp;
 		}}}
@@ -1006,6 +1009,7 @@ var applySettings = {
 
 		if(bchanstring.strip()){ x.new_action('append', context, 'bchan', bchanstring); }
 		if(dchanstring.strip()){ x.new_action('append', context, 'dchan', dchanstring); }
+		if(hardhdlc.strip()){ x.new_action('append', context, 'hardhdlc', hardhdlc); }
 
 		// write back any actual analog ports
 		parent.sessionData.PORTS_SIGNALLING.ls = []; // reset previous signalling data
