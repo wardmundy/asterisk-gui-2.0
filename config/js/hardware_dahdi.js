@@ -19,8 +19,8 @@
  * at the top of the source tree.
  *
  */
-///////  var MODULE_NAME = 'wctdm24xxp';
-///////  var DRIVERS_LIST = [ 'tor2','wcb4xxp', 'wcfxo', 'wct1xxp', 'wct4xxp', 'wctc4xxp', 'wctdm24xxp', 'wctdm', 'wcte11xp', 'wcte12xp', 'wcusb', 'xpp_usb' ];
+var MODULE_NAME = 'wctdm24xxp';
+var DRIVERS_LIST = [ 'tor2','wcb4xxp', 'wcfxo', 'wct1xxp', 'wct4xxp', 'wctc4xxp', 'wctdm24xxp', 'wctdm', 'wcte11xp', 'wcte12xp', 'wcusb', 'xpp_usb' ];
 
 var SPANS = {};
 
@@ -736,19 +736,19 @@ var applySettings = {
 		var u = new listOfSynActions(ASTGUI.globals.configfile);
 
 		/* ok, lets update the configfile is the values are set */
-		if ($('#enable_disable_checkbox_opermode:checked').val() !== null) {
+		if ($('#enable_disable_checkbox_opermode:checked').val() != null) {
 			u.new_action('update', 'general', 'opermode', $('#opermode').val());
 		}
 
-		if ($('#enable_disable_checkbox_alawoverride:checked').val() !== null){
+		if ($('#enable_disable_checkbox_alawoverride:checked').val() != null){
 			u.new_action('update', 'general', 'alawoverride', $('#alawoverride').val());
 		}
 
-		if( $('#enable_disable_checkbox_fxshonormode:checked').val() !== null ){
+		if( $('#enable_disable_checkbox_fxshonormode:checked').val() != null ){
 			u.new_action('update', 'general', 'fxshonormode', $('#fxshonormode').val());
 		}
 
-		if( $('#enable_disable_checkbox_boostringer:checked').val() !== null ){
+		if( $('#enable_disable_checkbox_boostringer:checked').val() != null ){
 			u.new_action('update', 'general', 'boostringer', $('#boostringer').val());
 		}
 
@@ -756,7 +756,7 @@ var applySettings = {
 		u.callActions();
 		u.clearActions();
 
-		if( $('#enable_disable_checkbox_mwimode:checked').val() !== null ){
+		if( $('#enable_disable_checkbox_mwimode:checked').val() != null ){
 			u.new_action('update', 'general', 'mwimode', $('#mwimode').val());
 			if( ASTGUI.getFieldValue('mwimode') == 'NEON' ){
 				u.new_action('update', 'general', 'neonmwi_level', $('#neonmwi_level').val());
@@ -764,15 +764,15 @@ var applySettings = {
 			}
 		}
 
-		if( $('#enable_disable_checkbox_lowpower:checked').val() !== null ){
+		if( $('#enable_disable_checkbox_lowpower:checked').val() != null ){
 			u.new_action('update', 'general', 'lowpower', $('#lowpower').val());
 		}
 
-		if( $('#enable_disable_checkbox_fastringer:checked').val() !== null ){
+		if( $('#enable_disable_checkbox_fastringer:checked').val() != null ){
 			u.new_action('update', 'general', 'fastringer', $('#fastringer').val());
 		}
 
-		if( $('#enable_disable_checkbox_fwringdetect:checked').val() !== null ){
+		if( $('#enable_disable_checkbox_fwringdetect:checked').val() != null ){
 			u.new_action('update', 'general', 'fwringdetect', $('#fwringdetect').val());
 		}
 
@@ -1148,6 +1148,48 @@ var localajaxinit = function(){
 	}
 
 	ASTGUI.events.add( _$('edit_DefinedChans'), "change", edit_DefinedChans_changed );
+	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_opermode', 'opermode') ;
+	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_mwimode', 'mwimode') ;
+	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_fwringdetect', 'fwringdetect') ;
+	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_lowpower', 'lowpower') ;
+	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_fastringer', 'fastringer') ;
+	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_boostringer', 'boostringer') ;
+	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_fxshonormode', 'fxshonormode') ;
+	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_alawoverride', 'alawoverride') ;
+	ASTGUI.COMBOBOX.call( _$('zap_moduleName'), DRIVERS_LIST, 195);
+
+	var config = context2json ({
+		filename: ASTGUI.globals.configfile, 
+		context: 'general', 
+		usf: 1
+	});
+	ASTGUI.updateFieldToValue('zap_moduleName', config.getProperty('ZAPMODULE_NAME') || MODULE_NAME);
+	ASTGUI.updateFieldToValue('opermode', config.getProperty('opermode'));
+	_$('enable_disable_checkbox_opermode').checked = (config.getProperty('opermode')) ? true : false ;
+	_$('enable_disable_checkbox_opermode').updateStatus();
+	ASTGUI.updateFieldToValue('alawoverride', config.getProperty('alawoverride'));
+	_$('enable_disable_checkbox_alawoverride').checked = (config.getProperty('alawoverride')) ? true : false ;
+	_$('enable_disable_checkbox_alawoverride').updateStatus();
+	ASTGUI.updateFieldToValue('fxshonormode', config.getProperty('fxshonormode'));
+	_$('enable_disable_checkbox_fxshonormode').checked = (config.getProperty('fxshonormode')) ? true : false ;
+	_$('enable_disable_checkbox_fxshonormode').updateStatus();
+	ASTGUI.updateFieldToValue('boostringer', config.getProperty('boostringer'));
+	_$('enable_disable_checkbox_boostringer').checked = (config.getProperty('boostringer')) ? true : false ;
+	_$('enable_disable_checkbox_boostringer').updateStatus();
+	ASTGUI.updateFieldToValue('lowpower', config.getProperty('lowpower'));
+	_$('enable_disable_checkbox_lowpower').checked = (config.getProperty('lowpower')) ? true : false ;
+	_$('enable_disable_checkbox_lowpower').updateStatus();
+	ASTGUI.updateFieldToValue('fastringer', config.getProperty('fastringer'));
+	_$('enable_disable_checkbox_fastringer').checked = (config.getProperty('fastringer')) ? true : false ;
+	_$('enable_disable_checkbox_fastringer').updateStatus();
+	ASTGUI.updateFieldToValue('fwringdetect', config.getProperty('fwringdetect'));
+	_$('enable_disable_checkbox_fwringdetect').checked = (config.getProperty('fwringdetect')) ? true : false ;
+	_$('enable_disable_checkbox_fwringdetect').updateStatus();
+	ASTGUI.updateFieldToValue('neonmwi_level', config.getProperty('neonmwi_level'));
+	ASTGUI.updateFieldToValue('neonmwi_offlimit', config.getProperty('neonmwi_offlimit'));
+	ASTGUI.updateFieldToValue('mwimode', config.getProperty('mwimode'));
+	_$('enable_disable_checkbox_mwimode').checked = (config.getProperty('mwimode')) ? true : false ;
+	_$('enable_disable_checkbox_mwimode').updateStatus();
 	top.log.debug("end of function: window.onload()");
 	loadConfigFiles.load_hwcfgfile(); // try to load last detected/configured hardware information
 
