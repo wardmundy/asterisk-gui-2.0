@@ -669,8 +669,8 @@ var updateSpanInfo = function(){
 
 	var b = String(CURRENT_SPAN);
 	if( _$('editspan_fac').value == 'CCS/HDB3/CRC4' ){
-		SPANS[b]['framing'] = 'CCS/CRC4';
-		SPANS[b]['coding'] = 'HDB3';
+		SPANS[b]['framing'] = 'CCS/HDB3';
+		SPANS[b]['coding'] = 'CRC4';
 	}else{
 		SPANS[b]['framing'] = _$('editspan_fac').value.split('/')[0];
 		SPANS[b]['coding'] = _$('editspan_fac').value.split('/')[1];;
