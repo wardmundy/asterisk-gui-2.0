@@ -49,12 +49,16 @@ var save_changes= function(){
 		ASTGUI.highlightField( 'dirext' , 'Extension already exists');
 		return;
 	}
+	if (!NEWEXT && ($('#read_extNo:checked').val() || $('#dir_firstname:checked').val())) {
+		ASTGUI.highlightField('dirext', 'Extension must exist if options are checked');
+		return;
+	}
 	var dir_ops = '';
 	dir_ops += ( _$('read_extNo').checked ) ? 'e' : '' ;
 	dir_ops += ( _$('dir_firstname').checked ) ? 'f' : '' ;
 	ASTGUI.miscFunctions.delete_LinesLike({ context_name : ASTGUI.contexts.Directory , beginsWithArr: ['exten='] , filename: 'extensions.conf', hasThisString:'1,Directory(default', cb:function(){} });
 	if( NEWEXT ){
-		var dir_string = NEWEXT + ',1,Directory(default|default|' + dir_ops +')' ;
+		var dir_string = NEWEXT + ',1,Directory(default,default,' + dir_ops +')' ;
 		var u = new listOfSynActions('extensions.conf');
 		u.new_action('append', ASTGUI.contexts.Directory , 'exten', dir_string );
 		u.callActions();
