@@ -38,6 +38,7 @@ var HAS_ANALOGHARDWARE = true; var HAS_DIGITALHARDWARE = true;
 		// if the user does not have any hardware - always set parent.sessionData.REQUIRE_RESTART to false
 var SPANCOUNT_LOCATION = {}; // this object is used to store the number of spans found in each location Ex: SPANCOUNT_LOCATION['PCI Bus 02 Slot 04'] = 4;
 var portsSignalling = {};
+var echocans = {'mg2':'0', 'kb1':'1', 'sec':'2', 'sec2':'3', 'hpec':'4'};
 
 var digital_miscFunctions = {
 	show_analog_signalling_form: function(a){ //digital_miscFunctions.show_analog_signalling_form()
@@ -583,7 +584,11 @@ var loadConfigFiles = {
 					try{
 						if( line.beginsWith('loadzone=')) {
 							ASTGUI.selectbox.selectOption( _$('loadZone'), line.withOut('loadzone=') );
-							return;
+						} else if (line.beginsWith('echocanceller=')) {
+							ASTGUI.selectbox.selectOption( _$('echocan'), echocans[line.withOut('echocanceller=').split(',')[0]]);
+							ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_echocan', 'echocan') ;
+							_$('enable_disable_checkbox_echocan').checked = true;
+							_$('enable_disable_checkbox_echocan').updateStatus();
 						}
 					}catch(err){
 						_$('loadZone').selectedIndex = 0;
@@ -1071,6 +1076,11 @@ var applySettings = {
 			})();
 		}
 
+		if ($('#enable_disable_checkbox_echocan:checked').val() != null) {
+			/* this is a global setting for all ports, and there are no side effects
+			 * if you apply an echocan to a non-existing port */
+			x.new_action('append', context, 'echocanceller', $('#echocan option:selected').text() + ',1-240');
+		}
 		x.new_action('append', context, 'loadzone', _$('loadZone').value );
 		x.new_action('append', context, 'defaultzone', _$('loadZone').value );
 		x.callActions( applySettings.cleanUsersConf );
