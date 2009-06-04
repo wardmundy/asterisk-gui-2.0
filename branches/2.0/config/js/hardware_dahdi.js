@@ -999,6 +999,7 @@ var applySettings = {
 				bchanstring += tmp2 + ppp;
 				dchanstring += tmp3 + SPANS[k]['reserved_ch'];
 			} else {
+				tmp3 = (hardhdlc)? ",":"";
 				bchanstring += tmp2 + ppp;
 				hardhdlc += tmp3 + SPANS[k]['reserved_ch'];
 			}
