@@ -304,7 +304,19 @@ var showtable = function(){ // navigates through the SPANS object and presents a
 				ASTGUI.domActions.tr_addCell( newRow, {html: tmp , colspan :6, bgcolor : '#B0B9D0' , align : 'center' } );
 			}
 
-			var singalling_defs = {pri_net: 'PRI - Net', pri_cpe: 'PRI - CPE', em: 'E & M',em_w: 'E & M -- Wink', featd:'E & M -- featd(DTMF)', fxo_ks:'FXOKS', fxo_ls:'FXOLS'  };
+			var singalling_defs = {
+				pri_net: 'PRI - Net',
+				pri_cpe: 'PRI - CPE',
+				bri_net_ptmp: 'BRI PtP - Net',
+				bri_cpe_ptmp: 'BRI PtP - CPE',
+				bri_net: 'BRI PtP - Net',
+				bri_cpe: 'BRI PtP - CPE',
+				em: 'E & M',
+				em_w: 'E & M -- Wink',
+				featd:'E & M -- featd(DTMF)',
+				fxo_ks:'FXOKS',
+				fxo_ls:'FXOLS'
+			};
 
 			var sno = tbl.rows.length + 1;
 			var newRow = tbl.insertRow(-1);
