@@ -88,7 +88,7 @@ var selectedTrunk_editOptions_form = function(w){
 		ASTGUI.updateFieldToValue( _$(fld) ,  fld_value );
 	} );
 
-	if (parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TURNK]['callerid'] && parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['callerid'] != 'asreceived') {
+	if (parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['callerid'] && parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['callerid'] != 'asreceived') {
 		ASTGUI.updateFieldToValue(_$('dummy_customCid'), parent.sessionData.pbxinfo.trunks.analog[EDIT_TRUNK].callerid);
 		ASTGUI.updateFieldToValue( _$('dummy_callerid'), 'custom');
 	}
