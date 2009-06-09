@@ -351,6 +351,27 @@
 			<span>Neon MWI voltage Level:</span><input id="neonmwi_level" size=2>
 			<span>Neon MWI off Limit (ms):</span><input id="neonmwi_offlimit" size=4>
 		</div>
+		<div>
+			<span>VPM Settings:</span>
+		</div>
+		<div>
+			<span>Echo Cancellation NLP Type <img src="images/tooltip_info.gif" tip="en,opermode_settings,8" class='tooltipinfo'> :</span>
+			<select id="vpmnlptype">
+				<option value="0">None</option>
+				<option value="1">Mute</option>
+				<option value="2">Random Noise</option>
+				<option value="3">Hoth Noise</option>
+				<option value="4">Suppression NLP (default)</option>
+			</select>
+		</div>
+		<div>
+			<span>Echo Cancellation NLP Threshold <img src="images/tooltip_info.gif" tip="en,opermode_settings,9" class='tooltipinfo'> :</span>
+			<select id="vpmnlpthresh"></select>
+		</div>
+		<div>
+			<span>Echo Cancellation NLP Max Suppression <img src="images/tooltip_info.gif" tip="en,opermode_settings,10" class='tooltipinfo'> :</span>
+			<select id="vpmnlpmaxsupp"></select>
+		</div>
 	</div>
 	<div style="text-align:center; overflow:auto;left:40">
 		<span class='guiButtonCancel' id="cancel_b" onclick='window.location.reload();'>Cancel Changes</span>
