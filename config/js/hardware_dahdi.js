@@ -245,7 +245,7 @@ var editSPAN = function(l){ // show values for SPAN l in the edit_span dialog bo
 	}
 
 	if(SPANS[l]['framing'] && SPANS[l]['coding']) {
-		if( SPANS[l]['framing'] == 'CCS/CRC4' ){
+		if( SPANS[l]['framing'] == 'CCS/HDB3' ){
 			ASTGUI.selectbox.selectOption( _$('editspan_fac') , 'CCS/HDB3/CRC4' );
 		}else{
 			ASTGUI.selectbox.selectOption( _$('editspan_fac') , SPANS[l]['framing'] + '/' + SPANS[l]['coding'] );
@@ -616,6 +616,41 @@ var loadConfigFiles = {
 						var y = ASTGUI.parseContextLine.read(line)[1] ;
 						var span_no = y.split(',')[0];
 						var src_span = y.split(',')[1];
+						switch(true) {
+						case y.contains('ccs,hdb3,crc4'):
+							var framing = 'CCS';
+							var coding = 'HDB3/CRC4';
+							break;
+						case (y.contains('ccs,hdb3') && !y.contains('ccs,hdb3,crc4')):
+							var framing = 'CCS';
+							var coding = 'HDB3';
+							break;
+						case y.contains('ccs,ami'):
+							var framing = 'CCS';
+							var coding = 'AMI';
+							break;
+						case y.contains('d4,b8zs'):
+							var framing = 'D4';
+							var coding = 'B8ZS';
+							break;
+						case y.contains('esf,ami'):
+							var framing = 'ESF';
+							var coding = 'AMI';
+							break;
+						case y.contains('d4,ami'):
+							var framing = 'D4';
+							var coding = 'AMI';
+							break;
+						case y.contains('esf,b8zs'):
+							var framing = 'esf';
+							var coding = 'b8zs';
+							break;
+						default:
+							var framing = '';
+							var coding = '';
+						}
+						SPANS[span_no]['framing'] = framing;
+						SPANS[span_no]['coding'] = coding;
 						if(SPANS[span_no]){ SPANS[span_no]['syncsrc'] = src_span; }
 					}
 					}catch(err){}
