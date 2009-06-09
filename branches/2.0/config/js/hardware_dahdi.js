@@ -828,6 +828,10 @@ var applySettings = {
 			u.new_action('update', 'general', 'fwringdetect', $('#fwringdetect').val());
 		}
 
+		u.new_action('update', 'general', 'vpmnlptype', $('#vpmnlptype').val());
+		u.new_action('update', 'general', 'vpmnlpthresh', $('#vpmnlpthresh').val());
+		u.new_action('update', 'general', 'vpmnlpmaxsupp', $('#vpmnlpmaxsupp').val());
+
 		u.callActions();
 		u.clearActions();
 	
@@ -881,6 +885,13 @@ var applySettings = {
 				params += " neonmwi_monitor=0";
 			}
 		}
+
+		h = ASTGUI.getFieldValue('vpmnlptype') ;
+			if(h){ params += " vpmnlptype=" + h; }
+		h = ASTGUI.getFieldValue('vpmnlpthresh') ;
+			if(h){ params += " vpmnlpthresh=" + h; }
+		h = ASTGUI.getFieldValue('vpmnlpmaxsupp');
+			if(h){ params += " vpmnlpmaxsupp=" + h; }
 	
 		var cmd2 = "echo \"" + params + "\" >> /etc/modprobe.conf ";
 	
@@ -1219,6 +1230,9 @@ var localajaxinit = function(){
 	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_fxshonormode', 'fxshonormode') ;
 	ASTGUI.domActions.enableDisableByCheckBox ('enable_disable_checkbox_alawoverride', 'alawoverride') ;
 	ASTGUI.COMBOBOX.call( _$('zap_moduleName'), DRIVERS_LIST, 195);
+	ASTGUI.selectbox.populateOptions('vpmnlpthresh', 50);
+	ASTGUI.selectbox.populateOptions('vpmnlpmaxsupp', 50);
+	ASTGUI.selectbox.insert_before('vpmnlpmaxsupp', '0', '0', 0);
 
 	var config = context2json ({
 		filename: ASTGUI.globals.configfile, 
@@ -1252,6 +1266,9 @@ var localajaxinit = function(){
 	ASTGUI.updateFieldToValue('mwimode', config.getProperty('mwimode'));
 	_$('enable_disable_checkbox_mwimode').checked = (config.getProperty('mwimode')) ? true : false ;
 	_$('enable_disable_checkbox_mwimode').updateStatus();
+	ASTGUI.updateFieldToValue('vpmnlptype', config.getProperty('vpmnlptype') || '4');
+	ASTGUI.updateFieldToValue('vpmnlpthresh', config.getProperty('vpmnlpthresh') || '24');
+	ASTGUI.updateFieldToValue('vpmnlpmaxsupp', config.getProperty('vpmnlpmaxsupp') || '24');
 	top.log.debug("end of function: window.onload()");
 	loadConfigFiles.load_hwcfgfile(); // try to load last detected/configured hardware information
 
