@@ -101,7 +101,12 @@
 	}
 
 	.advanced > div > input, .advanced > div > select {
+		margin: 2px 0 3px 0;
 		text-align: left;
+	}
+
+	#vpmsettings {
+		display: none;
 	}
 
 	.pageheading{
@@ -351,9 +356,9 @@
 			<span>Neon MWI voltage Level:</span><input id="neonmwi_level" size=2>
 			<span>Neon MWI off Limit (ms):</span><input id="neonmwi_offlimit" size=4>
 		</div>
-		<div>
-			<span>VPM Settings:</span>
-		</div>
+	</div>
+	<div id="vpmsettings" class="advanced">
+		<div class="pageheading">VPM Settings</div>
 		<div>
 			<span>Echo Cancellation NLP Type <img src="images/tooltip_info.gif" tip="en,opermode_settings,8" class='tooltipinfo'> :</span>
 			<select id="vpmnlptype">

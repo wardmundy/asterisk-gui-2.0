@@ -431,6 +431,10 @@ var loadConfigFiles = {
 		var n = config2json({ configFile_output: ztsc, usf : 1 });
 
 		for( var l in n ){ if(n.hasOwnProperty(l)){
+			if (n[l]['devicetype'].contains('VPMADT032')) {
+				$('#vpmsettings').show();
+			}
+
 			if(n[l]['type'] == 'analog'){
 				DETECTEDHARDWARE[ n[l]['location'] ] = {};
 				DETECTEDHARDWARE[ n[l]['location'] ]['device'] = n[l]['devicetype'];
