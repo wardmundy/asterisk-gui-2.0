@@ -461,6 +461,8 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		var c = config2json({filename:'users.conf', usf:1});
 		// we should actually be using usf:0 to handle cases like 'allow', 'disallow' defined in multiple lines
 		// but for the time being we will continue with the assumption that they are all defined in one line
+		
+		var users_conf = listofSynActions('users.conf');
 
 		sessionData.pbxinfo['users'] = new ASTGUI.customObject ; // reset all users info
 		if(!sessionData.pbxinfo['trunks']){ sessionData.pbxinfo['trunks'] = new ASTGUI.customObject ; }
@@ -492,6 +494,10 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				}
 //				if( c[d]['zapchan'] && (!c[d]['hasiax'] || c[d]['hasiax'] =='no') && (!c[d]['hassip'] || c[d]['hassip'] =='no')){
 				if( c[d].hasOwnProperty('zapchan') || c[d].hasOwnProperty('dahdichan') ){
+					if (c[d].hasOwnProperty('zapchan') && sessionData.PLATFORM.isABE) {
+						users_conf.new_action('delete', c, 'zapchan', '');
+						users_conf.new_action('append', c, 'dahdichan', c[d].zapchan);
+					}
 					// if is an analog trunk - note that here we are NOT expecting a 'FXO channel(FXS signalled) on a T1/E1'
 					// we assume that all the ports in zapchan are actual analog FXO ports
 					// a trunk for T1/E1 analog channels would begin with 'span_'
@@ -499,6 +505,8 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					continue;
 				}
 			}
+
+			users_conf.callActions();
 
 			if( d.beginsWith('span_') && ( c[d].hasOwnProperty('zapchan') || c[d].hasOwnProperty('dahdichan') ) ){
 				sessionData.pbxinfo['trunks']['pri'][d] = c[d];
