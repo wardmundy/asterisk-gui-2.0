@@ -1317,18 +1317,18 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	users_conf.new_action('newcat', name, '', '');
 
 	/* now, lets iterate thru and append to the trunk context! */
-	sessionData.pbxinfo.trunks[type][name] = {};
+	top.sessionData.pbxinfo.trunks[type][name] = {};
 	for (var v in trunk) {
 		if (!trunk.hasOwnProperty(v) || v === 'allow' || v === 'disallow') {
 			continue;
 		}
 
-		sessionData.pbxinfo.trunks[type][name][v] = trunk[v];
+		top.sessionData.pbxinfo.trunks[type][name][v] = trunk[v];
 		users_conf.new_action('append', name, v, trunk[v]);
 	}
-	sessionData.pbxinfo.trunks[type][name]['disallow'] = trunk['disallow'];
+	top.sessionData.pbxinfo.trunks[type][name]['disallow'] = trunk['disallow'];
 	users_conf.new_action('append', name, 'disallow', trunk['disallow']);
-	sessionData.pbxinfo.trunks[type][name]['allow'] = trunk['allow'];
+	top.sessionData.pbxinfo.trunks[type][name]['allow'] = trunk['allow'];
 	users_conf.new_action('append', name, 'allow', trunk['allow']);
 
 	if (type === 'analog') {
@@ -1369,7 +1369,7 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 		users_conf.new_action('delcat', name, '', '');
 		users_conf.callActions(); /* Not going to bother catching errors */
 
-		delete sessionData.pbxinfo.trunks[type][name];
+		delete top.sessionData.pbxinfo.trunks[type][name];
 		return false;
 	}
 
