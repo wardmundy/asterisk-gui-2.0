@@ -836,7 +836,7 @@ var miscFunctions = {
 		if( fr == 'yes') {
 			count_down(480);
 		}else{
-			count_down(60);
+			count_down(120);
 		}
 	},
 
