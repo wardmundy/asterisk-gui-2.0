@@ -9,4 +9,4 @@
 
 MISDNCONF="/etc/misdn-init.conf"
 MISDNFILE="/etc/asterisk/applymisdn.conf"
-grep -v "\[general\]" ${MISDNFILE} | grep -v "\;" > ${MISDNCONF}
+grep -v "\[general\]" ${MISDNFILE} | grep -v "\;" | sed 's/ = /=/g' > ${MISDNCONF}
