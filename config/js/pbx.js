@@ -248,13 +248,12 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					if (result.contains('Response: Error')) {
 						top.log.error('Error trying to updating applyzap.conf with echocanceller info.');
 						top.log.error(result);
-						return false;
+					} else {
+						/* copy applyzap.conf to /etc/dahdi/system.conf */
+						ASTGUI.systemCmd(sessionData.directories.script_generateZaptel + ' applysettings', function() {
+								ASTGUI.dialog.alertmsg('Changes to your hardware configs has been made. <BR> Your hardware might not work properly until you reboot!');
+						});
 					}
-
-					/* copy applyzap.conf to /etc/dahdi/system.conf */
-					ASTGUI.systemCmd(sessionData.directories.script_generateZaptel + ' applysettings', function() {
-							ASTGUI.dialog.alertmsg('Changes to your hardware configs has been made. <BR> Your hardware might not work properly until you reboot!');
-					});
 				}
 			}
 		})();
@@ -499,7 +498,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		// we should actually be using usf:0 to handle cases like 'allow', 'disallow' defined in multiple lines
 		// but for the time being we will continue with the assumption that they are all defined in one line
 		
-		var users_conf = listofSynActions('users.conf');
+		var users_conf = listOfSynActions('users.conf');
 
 		sessionData.pbxinfo['users'] = new ASTGUI.customObject ; // reset all users info
 		if(!sessionData.pbxinfo['trunks']){ sessionData.pbxinfo['trunks'] = new ASTGUI.customObject ; }
@@ -543,8 +542,6 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				}
 			}
 
-			users_conf.callActions();
-
 			if( d.beginsWith('span_') && ( c[d].hasOwnProperty('zapchan') || c[d].hasOwnProperty('dahdichan') ) ){
 				sessionData.pbxinfo['trunks']['pri'][d] = c[d];
 				continue;
@@ -572,6 +569,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				continue;
 			}
 		}}
+		users_conf.callActions();
 	}, // end of readcfg.UsersConf();
 
 	MisdnConf: function(){ // readcfg.MisdnConf();
