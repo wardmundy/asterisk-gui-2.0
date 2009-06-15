@@ -306,8 +306,10 @@ var save_electrical = function(){
 	});
 
 	if ($('#dummy_callerid').val() == 'asreceived') {
+		parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['callerid'] = 'asreceived';
 		x.new_action('update', EDIT_TRUNK, 'callerid', 'asreceived');
 	} else {
+		parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['callerid'] = $('#dummy_customCid').val();
 		x.new_action('update', EDIT_TRUNK, 'callerid', $('#dummy_customCid').val());
 	}
 
