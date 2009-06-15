@@ -1499,7 +1499,7 @@ pbx.trunks.list = function(types) {
 		types.bri = true;
 		types.iax = true;
 		types.pri = true;
-		types.provider = true;
+		types.providers = true;
 		types.sip = true;
 	}
 
