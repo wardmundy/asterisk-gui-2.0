@@ -208,6 +208,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				});
 				return;
 			}else{
+				var has_echo_can = false;
 				q.each(function(line){
 					if ( !line.beginsWith('fx') ){ return ;}
 					if( line.beginsWith('fxoks=') || line.beginsWith('fxsks=') ){
@@ -218,7 +219,43 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 						var lsports = ASTGUI.miscFunctions.chanStringToArray( line.afterChar('=') );
 						sessionData.PORTS_SIGNALLING.ls = sessionData.PORTS_SIGNALLING.ls.concat(lsports);
 					}
+
+					if (line.beginsWith('echocanceller=')) {
+						has_echo_can = true;
+					}
 				});
+
+				/* write echocanceller if it doesn't exist */
+				if (!has_echo_can && sessionData.PLATFORM.isABE) {
+					/* applyzap.conf might not exist yet */
+					ASTGUI.miscFunctions.createConfig('applyzap.conf', function(){});
+
+					/* setup applyzap's basics */
+					var apply_zap = listofSynActions('applyzap.conf');
+					apply_zap.new_action('delcat', 'general', '', '');
+					apply_zap.new_action('newcat', 'general', '', '');
+
+					/* keep all info from the current config */
+					q.each(function(line) {
+						apply_zap.new_action('append', 'general', line.split('=')[0], line.split('=')[1]);
+					});
+
+					/* add the echocanceller line */
+					apply_zap.new_action('append', 'general', 'echocanceller', 'mg2,1-240');
+
+					/* send changes to asterisk */
+					var result = apply_zap.callActions();
+					if (result.contains('Response: Error')) {
+						top.log.error('Error trying to updating applyzap.conf with echocanceller info.');
+						top.log.error(result);
+						return false;
+					}
+
+					/* copy applyzap.conf to /etc/dahdi/system.conf */
+					ASTGUI.systemCmd(sessionData.directories.script_generateZaptel + ' applysettings', function() {
+							ASTGUI.dialog.alertmsg('Changes to your hardware configs has been made. <BR> Your hardware might not work properly until you reboot!');
+					});
+				}
 			}
 		})();
 
