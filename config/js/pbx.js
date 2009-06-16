@@ -531,8 +531,8 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 //				if( c[d]['zapchan'] && (!c[d]['hasiax'] || c[d]['hasiax'] =='no') && (!c[d]['hassip'] || c[d]['hassip'] =='no')){
 				if( c[d].hasOwnProperty('zapchan') || c[d].hasOwnProperty('dahdichan') ){
 					if (c[d].hasOwnProperty('zapchan') && sessionData.PLATFORM.isABE) {
-						users_conf.new_action('delete', c, 'zapchan', '');
-						users_conf.new_action('append', c, 'dahdichan', c[d].zapchan);
+						users_conf.new_action('delete', d, 'zapchan', '');
+						users_conf.new_action('append', d, 'dahdichan', c[d]['zapchan']);
 					}
 					// if is an analog trunk - note that here we are NOT expecting a 'FXO channel(FXS signalled) on a T1/E1'
 					// we assume that all the ports in zapchan are actual analog FXO ports
@@ -565,6 +565,10 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 			//if( !d.beginsWith('span_') && !d.beginsWith('trunk_') && c[d].hasOwnProperty('context') && c[d]['context'].beginsWith(ASTGUI.contexts.CallingPlanPrefix) ){ // if is none of above we can assume it is a user context
 			// TODO : we can also base the logic on 'hasexten' , cause all trunks have hasexten='yes' and users don't
 			if( !d.beginsWith('span_') && !d.beginsWith('trunk_') ){ // if is none of above we can assume it is a user context
+				if (c[d].hasOwnProperty('zapchan') && sessionData.PLATFORM.isABE) {
+					users_conf.new_action('delete', d, 'zapchan', '');
+					users_conf.new_action('append', d, 'dahdichan', c[d]['zapchan']);
+				}
 				sessionData.pbxinfo['users'][d] = c[d];
 				continue;
 			}
