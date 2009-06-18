@@ -23,135 +23,41 @@
 <head>
 	<link href="stylesheets/schwing.css" media="all" rel="stylesheet" type="text/css" />
 	<style type="text/css">
-		body {
-			background-color: #efefef;
-		}
+		body { background-color: #efefef; }
 
-		#right_container {
-			float: right;
-			width: 60%;
-		}
+		#right_container { float: right; width: 60%; }
+		#left_container { width: 40%; }
+		#bottom_container { clear: both; }
 
-		#left_container {
-			width: 40%;
-		}
+		.section { -moz-border-radius: 8px; -webkit-border-radius: 8px; background-color: #ffffff; border: 1px solid #6b79a5; margin: 4px; padding: 4px; }
+			.section .title { color: #6b79a5; font-size: 16px; font-weight: bold; }
+			.section .enabled { color: #000000; }
+			.section .disabled { color: #666666; }
 
-		#bottom_container {
-			clear: both;
-		}
+		#call_parking .feature label, #feature_map .feature label, #feature_options .feature label { float: left; margin-right: 5px; text-align: right; }
+			#call_parking .feature label { width: 200px; }
+			#feature_options .feature label { width: 150px; }
+			#feature_map .feature label { width: 120px; }
+			#feature_map .checkbox { float: left; padding: 0px; margin: 4px; }
+			.feature label { width: 200px; }
 
-		.section {
-			-moz-border-radius: 8px;
-			-webkit-border-radius: 8px;
-			background-color: #ffffff;
-			border: 1px solid #6b79a5;
-			margin: 4px;
-			padding: 4px;
-		}
+		.ui-tabs-panel { text-align: left; }
 
-		.section .title {
-			color: #6b79a5;
-			font-size: 16px;
-			font-weight: bold;
-		}
+		#application_map_list { margin-top 5px; margin-bottom 10px; padding: 1px; text-align: center; width: 96%; }
+			#application_map_list thead tr { background: #6b79a5; color: #ced7ef; }
+			#application_map_list thead th { font-weight: bold; }
+			#application_map_list tr td { padding: 3px; }
+			#application_map_list tr.even { background: #dfdfdf; }
+			#application_map_list tr.odd { background: #ffffff; }
+			#application_map_list td.buttons, th.buttons { width: 100px; }
 
-		#feature_map .checkbox {
-			float: left;
-			padding: 0px;
-			margin: 4px;
-		}
+		#dial_options { height: 305px; }
 
-		#call_parking .feature label, #feature_map .feature label, #feature_options .feature label {
-			float: left;
-			margin-right: 5px;
-			text-align: right;
-		}
 
-		#call_parking .feature label {
-			width: 200px;
-		}
-
-		#feature_options .feature label {
-			width: 150px;
-		}
-
-		#feature_map .feature label {
-			width: 120px;
-		}
-
-		.feature label {
-			width: 200px;
-		}
-
-		.section .enabled {
-			color: #000000;
-		}
-
-		.section .disabled {
-			color: #666666;
-		}
-
-		.ui-tabs-panel {
-			text-align: left;
-		}
-
-		#application_map_list {
-			margin-top 5px;
-			margin-bottom 10px;
-			padding: 1px;
-			text-align: center;
-			width: 96%;
-		}
-
-		#application_map_list thead tr {
-			background: #6b79a5;
-			color: #ced7ef;
-		}
-
-		#application_map_list thead th {
-			font-weight: bold;
-		}
-
-		#application_map_list tr td {
-			padding: 3px;
-		}
-
-		#application_map_list tr.even {
-			background: #dfdfdf;
-		}
-
-		#application_map_list tr.odd {
-			background: #ffffff;
-		}
-
-		#dial_options {
-			height: 305px;
-		}
-
-		td.buttons, th.buttons {
-			width: 100px;
-		}
-
-		.update {
-			background-color: #ffc58a;
-			border: 1px dotted #e8440c;
-			display: none;
-			padding: 2px;
-			padding-left: 4px;
-			padding-right: 4px;
-		}
-
-		.error {
-			background-color: #ffaeae;
-		}
-
-		.hidden {
-			display: none;
-		}
-
-		.template {
-			display: none;
-		}
+		.update { background-color: #ffc58a; border: 1px dotted #e8440c; display: none; padding: 2px; padding-left: 4px; padding-right: 4px; }
+		.error { background-color: #ffaeae; }
+		.hidden { display: none; }
+		.template { display: none; }
 	</style>
 </head>
 <body>
