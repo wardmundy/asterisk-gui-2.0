@@ -24,337 +24,155 @@
 <link href="stylesheets/ui-tabs.css" media="all" rel="Stylesheet" type="text/css" />
 <link href="stylesheets/tables.css" media="all" rel="Stylesheet" type="text/css" />
 <style type="text/css">
+	body { background-color: #EFEFEF; }
+	.clear { clear: both; }
+	.notinuse { color: red; }
+	.inuse { color: #ef8700; } 
+	.template { display: none; }
+	img.loadTrunks, img.loadQueues { cursor: pointer; }
+	img.title_img { float: left; }
 
-body {
-	background-color: #EFEFEF;
-}
+	div.column { display: block; }
+	div.left { float:left; width: 60%; }
+	div.right { float:right; width: 40%; }
 
-div.column {
-	display: block;
-}
+	div.content_container { -moz-border-radius: 8px; -webkit-border-radius: 8px; background-color: #FFFFFF; border: 1px solid #6b79a5; }
+	div.content_container, div.info_container { margin: 8px; padding: 1px; padding-top: 5px; }
+		div.content_container .title, div.info_container .title { font-weight: bold; font-size: 16px; color: #6b79a5; }
 
-div.left {
-	float:left;
-	width: 60%;
-}
+	#sysstat_left_container { margin-right: 4px; }
+	#sysstat_right_container, #sysstat_botright_container { margin-left: 4px; }
+	#sysstat_hdr_container { margin-top: 8px; }
 
-div.right {
-	float:right;
-	width: 40%;
-}
+	div.handle { 
+		-moz-border-radius-topleft: 4px; 
+		-moz-border-radius-topright: 4px; 
+		-webkit-border-radius-topleft: 4px; 
+		-webkit-border-radius-topright: 4px; 
+		cursor: move; 
+		padding-left: 10px; 
+	}
+	div.title span.minimaxi { color: #000000; cursor: pointer; display: block; float: right; font-size: 12px; margin-right: 20px; }
 
-div.content_container {
-	background-color: #FFFFFF;
-	border: 1px solid #6b79a5;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
-}
+	#legend { float: right; text-align: center; margin: 0px 20px 0px 30px; padding:0px; font-weight: normal; color: #000000; }
+	#extensions_list { margin-top: 5px; }
 
-div.content_container, div.info_container {
-	margin: 8px;
-	padding: 1px;
-	padding-top: 5px;
-}
+	div.content { -moz-border-radius: 4px; -webkit-border-radius: 4px; background-color: #ffffff; margin: 10px 4px 10px 4px; }
+		div.content div.body { -moz-border-radius: 4px; -webkit-border-radius: 4px; }
 
-#sysstat_left_container {
-	margin-right: 4px;
-}
+	div.placeholder {
+		-moz-border-radius: 4px; 
+		-webkit-border-radius: 4px; 
+		background-color: #dddddd; 
+		border: 1px dotted #6b79a5; 
+		margin: 4px; 
+		height: 50px; 
+	}
 
-#sysstat_right_container, #sysstat_botright_container {
-	margin-left: 4px;
-}
+	#sys_status_queues div.column { display: block; }
+	#sys_status_queues div.left { float:left; width: 50%; }
+	#sys_status_queues div.right { float:right; width: 50%; }
+	#sys_status_queues div.container { margin: 2px; }
 
-#sysstat_hdr_container {
-	margin-top: 8px;
-}
+	#queue_left_container { margin-right: 1px; }
+	#queue_right_container { margin-left: 1px; }
 
-div.handle {
-	cursor: move;
-	padding-left: 10px;
-	-moz-border-radius-topleft: 4px;
-	-moz-border-radius-topright: 4px;
-	-webkit-border-radius-topleft: 4px;
-	-webkit-border-radius-topright: 4px;
-}
+	div.queue, div.conf_room { margin-bottom: 4px; }
+		div.queue div.title, div.conf_room div.title { 
+			-moz-border-radius-topleft: 4px; 
+			-moz-border-radius-topright: 4px; 
+			-webkit-border-radius-topleft: 4px; 
+			-webkit-border-radius-topright: 4px; 
+			background-color: #6b79a5; 
+			color: #ffffff; 
+			font-size: 12px; 
+			font-weight: bold; 
+			height: 20px; 
+			padding-left: 10px; 
+			vertical-align: center; 
+		}
+		div.queue div.body, div.conf_room div.body {
+			-moz-border-radius-topleft: 0px;
+			-moz-border-radius-topright: 0px;
+			-webkit-border-radius-topleft: 0px;
+			-webkit-border-radius-topright: 0px;
+			background-color: #ef8700;
+			border: 1px solid #ef8700;
+			border-top: 0px;
+		}
+		div.queue div.body div.calls { display: block; float: left; }
+			div.queue div.body div.calls table { width: auto; }
+				div.queue div.body div.calls table tbody tr.new { color: green; }
+				div.queue div.body div.calls table tbody tr.average { color: orange; }
+				div.queue div.body div.calls table tbody tr.old { color: red; }
+		div.queue div.body div.agents div.agent {
+			-moz-border-radius: 4px;
+			-moz-border-radius: 4px;
+			background-color: #ffffff;
+			border: 1px solid #6b79a5;
+			display: block;
+			float: left;
+			margin: 2px;
+			padding: 1px;
+			text-align: center;
+		}
+		div.queue div.body div.agents div.template { display: none; }
+		div.queue div.body div.stats {
+			-moz-border-radius-bottomleft: 4px;
+			-moz-border-radius-bottomright: 4px;
+			-webkit-border-radius-bottomleft: 4px;
+			-webkit-border-radius-bottomright: 4px;
+			background-color: #efefef;
+			font-weight: bold;
+			padding: 2px;
+		}
+			div.queue div.body div.stats span { font-weight: normal; }
 
-div.title span.minimaxi {
-	color: #000000;
-	cursor: pointer;
-	display: block;
-	float: right;
-	font-size: 12px;
-	margin-right: 20px;
-}
+		div.conf_room div.actions { display: block; float: left; width: 67px; text-align: center; }
+			div.conf_room div.actions  > ul {
+				background-color: #6b79a5;
+				border: 1px solid #ffffff;
+				color: #ffffff;
+				font-weight: bold;
+				list-style: none;
+				margin: 4px;
+				padding: 4px;
+			}
+				div.conf_room div.actions > ul li {
+					background-color: #ffffff;
+					border: 1px solid #efefef;
+					color: #000000;
+					font-weight: normal;
+					text-align: center;
+				}
+			div.conf_room div.actions .action { cursor: pointer; }
+				div.conf_room div.actions a, div.conf_room div.actions a:visited { text-decoration: none; color: #000000; }
+				div.conf_room div.actions a:hover { color: #ef8700; }
+			div.conf_room div.members { display: relative; padding-left: 67px; right: 67px; }
+				div.conf_room div.members > table.list { -moz-border-radius-bottomright: 4px; -webkit-border-radius-bottomright: 4px; }
+					div.conf_room div.members > table.list tbody td { padding-left: 5px; }
+				div.conf_room div.members .checkbox { width: 20px; }
+				div.conf_room div.members .person { width: 1px; }
 
-#legend {
-	float: right;
-	text-align: center;
-	margin-left: 30px;
-	margin-right: 20px;
-	margin-top: 0px;
-	margin-bottom:0px;
-	padding:0px;
-	font-weight: normal;
-	color: #000000;
-}
-
-#extensions_list {
-	margin-top: 5px;
-}
-
-div.content {
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	background-color: #ffffff;
-	margin: 4px;
-	margin-top: 10px;
-	margin-bottom: 10px;
-}
-
-div.content div.body {
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-}
-
-div.content_container .title, div.info_container .title {
-	font-weight: bold;
-	font-size: 16px;
-	color: #6b79a5;
-}
-
-div.placeholder {
-	background-color: #dddddd;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border: 1px dotted #6b79a5;
-	margin: 4px;
-	height: 50px;
-}
-
-.clear {
-	clear: both;
-}
-
-img.title_img {
-	float: left;
-}
-
-#sys_status_queues div.column {
-	display: block;
-}
-
-#sys_status_queues div.left {
-	float:left;
-	width: 50%;
-}
-
-#sys_status_queues div.right {
-	float:right;
-	width: 50%;
-}
-
-#sys_status_queues div.container {
-	margin: 2px;
-}
-
-#queue_left_container {
-	margin-right: 1px;
-}
-
-#queue_right_container {
-	margin-left: 1px;
-}
-
-div.queue, div.conf_room {
-	margin-bottom: 4px;
-}
-
-div.queue div.title, div.conf_room div.title {
-	-moz-border-radius-topleft: 4px;
-	-moz-border-radius-topright: 4px;
-	-webkit-border-radius-topleft: 4px;
-	-webkit-border-radius-topright: 4px;
-	background-color: #6b79a5;
-	color: #ffffff;
-	font-size: 12px;
-	font-weight: bold;
-	height: 20px;
-	padding-left: 10px;
-	vertical-align: center;
-}
-
-div.queue div.body, div.conf_room div.body {
-	-moz-border-radius-topleft: 0px;
-	-moz-border-radius-topright: 0px;
-	-webkit-border-radius-topleft: 0px;
-	-webkit-border-radius-topright: 0px;
-	background-color: #ef8700;
-	border: 1px solid #ef8700;
-	border-top: 0px;
-}
-
-div.queue div.body div.calls {
-	display: block;
-	float: left;
-}
-
-div.queue div.body div.calls table {
-	width: auto;
-}
-
-div.queue div.body div.calls table tbody tr.new {
-	color: green;
-}
-
-div.queue div.body div.calls table tbody tr.average {
-	color: orange;
-}
-
-div.queue div.body div.calls table tbody tr.old {
-	color: red;
-}
-
-div.queue div.body div.agents {
-}
-
-div.queue div.body div.agents div.agent {
-	-moz-border-radius: 4px;
-	-moz-border-radius: 4px;
-	background-color: #ffffff;
-	border: 1px solid #6b79a5;
-	display: block;
-	float: left;
-	margin: 2px;
-	padding: 1px;
-	text-align: center;
-}
-
-div.queue div.body div.agents div.template {
-	display: none;
-}
-
-div.queue div.body div.stats {
-	-moz-border-radius-bottomleft: 4px;
-	-moz-border-radius-bottomright: 4px;
-	-webkit-border-radius-bottomleft: 4px;
-	-webkit-border-radius-bottomright: 4px;
-	background-color: #efefef;
-	font-weight: bold;
-	padding: 2px;
-}
-
-div.queue div.body div.stats span {
-	font-weight: normal;
-}
-
-div.conf_room div.actions {
-	display: block;
-	float: left;
-	width: 67px;
-	text-align: center;
-}
-
-div.conf_room div.actions  > ul {
-	background-color: #6b79a5;
-	border: 1px solid #ffffff;
-	color: #ffffff;
-	font-weight: bold;
-	list-style: none;
-	margin: 4px;
-	padding: 4px;
-}
-
-div.conf_room div.actions > ul li {
-	background-color: #ffffff;
-	border: 1px solid #efefef;
-	color: #000000;
-	font-weight: normal;
-	text-align: center;
-}
-
-div.conf_room div.actions .action {
-	cursor: pointer;
-}
-
-div.conf_room div.actions a, div.conf_room div.actions a:visited {
-	text-decoration: none;
-	color: #000000;
-}
-
-div.conf_room div.actions a:hover {
-	color: #ef8700;
-}
-
-div.conf_room div.members {
-	display: relative;
-	padding-left: 67px;
-	right: 67px;
-}
-
-div.conf_room div.members > table.list {
-	-moz-border-radius-bottomright: 4px;
-	-webkit-border-radius-bottomright: 4px;
-}
-
-div.conf_room div.members > table.list tbody td {
-	padding-left: 5px;
-}
-
-div.conf_room div.members .checkbox {
-	width: 20px;
-}
-
-div.conf_room div.members .person {
-	width: 1px;
-}
-
-#extensions_sections {
-	height: 18px;
-	text-indent: 20px;
-}
-
-#extensions_sections .section {
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	background-color: #ef8700;
-	border: 1px solid #ffffff;
-	color: #ffffff;
-	cursor: pointer;
-	font-size: 10px;
-	font-weight: bold;
-	margin-left: 2px;
-	padding: 1px;
-	padding-left: 4px;
-	padding-right: 4px;
-}
-
-#extensions_sections .active {
-	background-color: #ffffff;
-	border: 1px solid #6b79a5;
-	color: #6b79a5;
-	cursor: default;
-}
-
-.notinuse {
-	color: red;
-}
-
-.inuse {
-	color: #ef8700;
-}
-
-.template {
-	display: none;
-}
-
-img.loadTrunks, img.loadQueues {
-	cursor: pointer;
-}
-
+	#extensions_sections { height: 18px; text-indent: 20px; }
+		#extensions_sections .section {
+			-moz-border-radius: 4px;
+			-webkit-border-radius: 4px;
+			background-color: #ef8700;
+			border: 1px solid #ffffff;
+			color: #ffffff;
+			cursor: pointer;
+			font: 10px bold;
+			margin-left: 2px;
+			padding: 1px 4px 1px 4px;
+		}
+		#extensions_sections .active {
+			background-color: #ffffff;
+			border: 1px solid #6b79a5;
+			color: #6b79a5;
+			cursor: default;
+		}
 </style>
-<!-- End Initial CSS -->
-
-
 <body>
 	<div class="iframeTitleBar">
 		System Status
