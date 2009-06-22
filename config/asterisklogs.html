@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C/DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <!--
  * Asterisk-GUI	- an Asterisk configuration interface
  *
@@ -19,51 +20,53 @@
  * at the top of the source tree.
  *
 -->
-<script src="js/jquery.js"></script>
-<script src="js/astman.js"></script>
-<script src="js/jquery.tooltip.js"></script>
-<script src="js/jquery.date_input.js"></script>
-<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
-<style type="text/css">
+<html>
+<head>
+	<title>System Log</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1" />
 
-
-</style>
-<script>
-
-var load_tmp_logs = function(){
-	var sel_date = _$("log_date").value.trim() ;
-	if(!sel_date ){ return ; }
-	var ld = Number( sel_date.split(' ')[0] );
-	var space = (ld < 10 ) ? '  ' : ' ' ;
-	var lm = sel_date.split(' ')[1]; lm = lm.trim();
-	var tmp_cmd = "/bin/grep /var/log/asterisk/messages -e '" + lm + space + ld + " ' " ;
-	parent.ASTGUI.dialog.waitWhile(' Loading Asterisk Logs ...');
-	top.log.debug(tmp_cmd);
-	ASTGUI.systemCmdWithOutput( tmp_cmd , function(output){
-		parent.ASTGUI.dialog.hide();
-		_$('todaylog').innerHTML = (output) ? "<PRE>" + output.escapeHTML() + "</PRE>" : "No log messages found on this Day" ;
-	});
-};
-
-var localajaxinit = function(){
-	top.document.title = 'System Log';
-	$("#log_date").date_input();
-		var rz = function(){ var i = $(window).height(); _$('todaylog').style.height = (i - 35); };
-		ASTGUI.events.add( window , 'resize', rz );
-		rz();
-	ASTGUI.systemCmdWithOutput( " echo '' ", function(output){}); // clean up output file
-};
-
-</script>
+	<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+	<style type="text/css"></style>
+</head>
 <body bgcolor="EFEFEF">
+	<div class="iframeTitleBar">
+		Asterisk Log messages 
+		<span class="refresh_icon" onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
+		<input size=10 id="log_date">
+		<span class="guiButton" onclick="load_tmp_logs();">Go</span>
+	</div>
 
-<div class="iframeTitleBar">
-	Asterisk Log messages 
-	<span class="refresh_icon" onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
-	<input size=10 id="log_date">
-	<span class="guiButton" onclick="load_tmp_logs();">Go</span>
-</div>
+	<div id="todaylog" style="font-family:courier; font-size:8.5pt; margin: 1px ; padding: 1px ; height:475px; overflow :auto;"></div>
 
-<div id="todaylog" style="font-family:courier; font-size:8.5pt; margin: 1px ; padding: 1px ; height:475px; overflow :auto;"></div>
+	<script src="js/jquery.js"></script>
+	<script src="js/astman.js"></script>
+	<script src="js/jquery.tooltip.js"></script>
+	<script src="js/jquery.date_input.js"></script>
+	<script>
 
+	var load_tmp_logs = function(){
+		var sel_date = _$("log_date").value.trim() ;
+		if(!sel_date ){ return ; }
+		var ld = Number( sel_date.split(' ')[0] );
+		var space = (ld < 10 ) ? '  ' : ' ' ;
+		var lm = sel_date.split(' ')[1]; lm = lm.trim();
+		var tmp_cmd = "/bin/grep /var/log/asterisk/messages -e '" + lm + space + ld + " ' " ;
+		parent.ASTGUI.dialog.waitWhile(' Loading Asterisk Logs ...');
+		top.log.debug(tmp_cmd);
+		ASTGUI.systemCmdWithOutput( tmp_cmd , function(output){
+			parent.ASTGUI.dialog.hide();
+			_$('todaylog').innerHTML = (output) ? "<PRE>" + output.escapeHTML() + "</PRE>" : "No log messages found on this Day" ;
+		});
+	};
+
+	var localajaxinit = function(){
+		top.document.title = 'System Log';
+		$("#log_date").date_input();
+			var rz = function(){ var i = $(window).height(); _$('todaylog').style.height = (i - 35); };
+			ASTGUI.events.add( window , 'resize', rz );
+			rz();
+		ASTGUI.systemCmdWithOutput( " echo '' ", function(output){}); // clean up output file
+	};
+
+	</script>
 </body>
