@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C/DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <!--
  * Asterisk-GUI	- an Asterisk configuration interface
  *
@@ -18,7 +19,21 @@
  * at the top of the source tree.
  *
 -->
-<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+<html>
+<head>
+	<title>Asterisk CLI</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1" />
+
+	<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+</head>
+<body onload="localajaxinit()"  bgcolor="#FFFFFF">
+<div style="font-size : 12px; padding : 4px 6px 4px 6px; border-style : solid none solid none; border-top-color : #BDC7E7; border-bottom-color : #182052; border-width : 1px 0px 1px 0px; background-color : #ef8700; color : #ffffff;">
+	<span style="cursor: pointer; cursor: hand;" onclick="window.location.href=window.location.href;" >&nbsp;<img src="images/refresh.png" title=" Refresh" border=0 >&nbsp;</span>
+	<span style="margin-left: 4px;font-weight:bold;">
+	Asterisk CLI>&nbsp;<input id="cli_cmd" onKeyDown="sendCommand(event)" size=65>
+	</span>
+</div>
+<div style="padding : 0px 1px 0px 2px; overflow :auto; font-size : 12px;" id="cli_output"></div>
 <script>
 var DOM_CLI_CMD ;
 var CLIINDEX = 0;
@@ -86,12 +101,5 @@ var localajaxinit = function(){
 }
 
 </script>
-<body onload="localajaxinit()"  bgcolor="#FFFFFF">
-<div style="font-size : 12px; padding : 4px 6px 4px 6px; border-style : solid none solid none; border-top-color : #BDC7E7; border-bottom-color : #182052; border-width : 1px 0px 1px 0px; background-color : #ef8700; color : #ffffff;">
-	<span style="cursor: pointer; cursor: hand;" onclick="window.location.href=window.location.href;" >&nbsp;<img src="images/refresh.png" title=" Refresh" border=0 >&nbsp;</span>
-	<span style="margin-left: 4px;font-weight:bold;">
-	Asterisk CLI>&nbsp;<input id="cli_cmd" onKeyDown="sendCommand(event)" size=65>
-	</span>
-</div>
-<div style="padding : 0px 1px 0px 2px; overflow :auto; font-size : 12px;" id="cli_output"></div>
 </body>
+</html>
