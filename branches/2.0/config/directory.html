@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C/DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <!--
  * Asterisk-GUI	- an Asterisk configuration interface
  *
@@ -18,57 +19,14 @@
  * at the top of the source tree.
  *
 -->
-<script src="js/jquery.js"></script>
-<script src="js/astman.js"></script>
-<script src="js/jquery.tooltip.js"></script>
-<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
-<style type="text/css">
+<html>
+<head>
+	<title>Directory Preferences</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1" />
 
-</style>
-<script>
-var DIR_EXT ;
-
-var localajaxinit = function(){
-	top.document.title = 'Directory Preferences' ;
-	var c = context2json({filename: 'extensions.conf', context: ASTGUI.contexts.Directory, usf: 0});
-	for ( var ci = 0 ; ci < c.length ; ci++ ){
-		if( c[ci].toLowerCase().contains('directory(') &&   c[ci].toLowerCase().contains('default') ){
-			DIR_EXT = ASTGUI.parseContextLine.getExten(c[ci]);
-			ASTGUI.updateFieldToValue( 'dirext',  DIR_EXT );
-			var args = ASTGUI.parseContextLine.getArgs(c[ci]);
-			_$('read_extNo').checked = ( args.length == 3 && args[2].contains('e') ) ? true : false;
-			_$('dir_firstname').checked = ( args.length == 3 && args[2].contains('f') ) ? true : false;
-			break;
-		}
-	}
-};
-
-var save_changes= function(){
-	var NEWEXT = ASTGUI.getFieldValue('dirext');
-	if( NEWEXT && NEWEXT != DIR_EXT && parent.miscFunctions.ifExtensionAlreadyExists(NEWEXT) ){
-		ASTGUI.highlightField( 'dirext' , 'Extension already exists');
-		return;
-	}
-	if (!NEWEXT && ($('#read_extNo:checked').val() || $('#dir_firstname:checked').val())) {
-		ASTGUI.highlightField('dirext', 'Extension must exist if options are checked');
-		return;
-	}
-	var dir_ops = '';
-	dir_ops += ( _$('read_extNo').checked ) ? 'e' : '' ;
-	dir_ops += ( _$('dir_firstname').checked ) ? 'f' : '' ;
-	ASTGUI.miscFunctions.delete_LinesLike({ context_name : ASTGUI.contexts.Directory , beginsWithArr: ['exten='] , filename: 'extensions.conf', hasThisString:'1,Directory(default', cb:function(){} });
-	if( NEWEXT ){
-		var dir_string = NEWEXT + ',1,Directory(default,default,' + dir_ops +')' ;
-		var u = new listOfSynActions('extensions.conf');
-		u.new_action('append', ASTGUI.contexts.Directory , 'exten', dir_string );
-		u.callActions();
-	}
-	parent.sessionData.pbxinfo['localextensions']['defaultDirectory'] = NEWEXT ;
-	ASTGUI.feedback({msg:' Saved !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
-	window.location.reload();
-};
-
-</script>
+	<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+	<style type="text/css"></style>
+</head>
 <body bgcolor="EFEFEF">
 <div class="iframeTitleBar"> 
 	Directory Settings
@@ -99,5 +57,52 @@ var save_changes= function(){
 			</td>
 		</tr>
 	</table>
-</body>
+	<script src="js/jquery.js"></script>
+	<script src="js/astman.js"></script>
+	<script src="js/jquery.tooltip.js"></script>
+	<script>
+	var DIR_EXT ;
 
+	var localajaxinit = function(){
+		top.document.title = 'Directory Preferences' ;
+		var c = context2json({filename: 'extensions.conf', context: ASTGUI.contexts.Directory, usf: 0});
+		for ( var ci = 0 ; ci < c.length ; ci++ ){
+			if( c[ci].toLowerCase().contains('directory(') &&   c[ci].toLowerCase().contains('default') ){
+				DIR_EXT = ASTGUI.parseContextLine.getExten(c[ci]);
+				ASTGUI.updateFieldToValue( 'dirext',  DIR_EXT );
+				var args = ASTGUI.parseContextLine.getArgs(c[ci]);
+				_$('read_extNo').checked = ( args.length == 3 && args[2].contains('e') ) ? true : false;
+				_$('dir_firstname').checked = ( args.length == 3 && args[2].contains('f') ) ? true : false;
+				break;
+			}
+		}
+	};
+
+	var save_changes= function(){
+		var NEWEXT = ASTGUI.getFieldValue('dirext');
+		if( NEWEXT && NEWEXT != DIR_EXT && parent.miscFunctions.ifExtensionAlreadyExists(NEWEXT) ){
+			ASTGUI.highlightField( 'dirext' , 'Extension already exists');
+			return;
+		}
+		if (!NEWEXT && ($('#read_extNo:checked').val() || $('#dir_firstname:checked').val())) {
+			ASTGUI.highlightField('dirext', 'Extension must exist if options are checked');
+			return;
+		}
+		var dir_ops = '';
+		dir_ops += ( _$('read_extNo').checked ) ? 'e' : '' ;
+		dir_ops += ( _$('dir_firstname').checked ) ? 'f' : '' ;
+		ASTGUI.miscFunctions.delete_LinesLike({ context_name : ASTGUI.contexts.Directory , beginsWithArr: ['exten='] , filename: 'extensions.conf', hasThisString:'1,Directory(default', cb:function(){} });
+		if( NEWEXT ){
+			var dir_string = NEWEXT + ',1,Directory(default,default,' + dir_ops +')' ;
+			var u = new listOfSynActions('extensions.conf');
+			u.new_action('append', ASTGUI.contexts.Directory , 'exten', dir_string );
+			u.callActions();
+		}
+		parent.sessionData.pbxinfo['localextensions']['defaultDirectory'] = NEWEXT ;
+		ASTGUI.feedback({msg:' Saved !!', showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
+		window.location.reload();
+	};
+
+	</script>
+</body>
+</html>
