@@ -18,64 +18,14 @@
  * at the top of the source tree.
  *
 -->
-<script src="js/jquery.js"></script>
-<script src="js/astman.js"></script>
-<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
-<style type="text/css">
+<html>
+<head>
+	<title>Reset to Factory Defaults</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1" />
 
-
-</style>
-<script>
-
-var reset_factory = function(){
-	if(!confirm("Are you sure you want to reset ?")) { return true; }
-
-	parent.ASTGUI.dialog.waitWhile(' Resetting to factory defaults ...');
-	if(parent.sessionData.PLATFORM.isAA50 ){
-		var after = function(){
-			parent.ASTGUI.dialog.hide();
-			top.cookies.set( 'configFilesChanged' , 'no' ); // ignore any previous changes -- skip calling save_config
-			parent.miscFunctions.reboot_pbx({
-				msg: 'You appliance has been reset to <i>\'factory defaults\' </i> ',
-				btnNo_text : 'Later'
-			});
-		};
-		parent.ASTGUI.systemCmd( ASTGUI.globals.app_factoryReset, after);
-		return;
-	}
-
-	// if not AA50 - manually reset all config files 
-	var files = ['extensions.conf', 'users.conf', 'agents.conf', 'meetme.conf', 'misdn.conf', 'queues.conf'];
-	files.each(function(file){
-		var c = config2json({filename:file, catlist:'yes'});
-		parent.ASTGUI.dialog.waitWhile(' Resetting file ' + file );
-		c.each( function(cat){
-			var u = new listOfSynActions(file);
-			u.new_action('delcat', cat , '', '');
-			u.callActions();
-		});
-	});
-
-	parent.ASTGUI.dialog.waitWhile(' Reloading Asterisk !');
-	parent.miscFunctions.applyChanges();
-	parent.miscFunctions.logoutFunction.doLogout();
-};
-
-var localajaxinit = function(){
-	top.document.title = "Reset PBX to Default Configuration" ;
-	var fd_text = (parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ) ? 'Factory Reset' : 'Reset Configuration' ;
-	var t = [
-		{url:'preferences.html', desc:'General Preferences' } ,
-		{url:'language.html', desc:'Language' } ,
-		{url:'password.html', desc:'Change Password'},
-		{url:'#', desc: fd_text , selected:true }
-	];
-	t.push( {url:'reboot.html', desc:'Reboot' } );
-	t.push( {url:'flipadvanced.html', desc:'Advanced Options' } );
-	ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
-};
-
-</script>
+	<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+	<style type="text/css"></style>
+</head>
 <body bgcolor="EFEFEF">
 	<div class="iframeTitleBar">
 		Reset to Factory Defaults 
@@ -95,4 +45,59 @@ var localajaxinit = function(){
 	<div style='text-align:center; width: 95%; margin-top:20px'>
 		<span class='guiButton' id='reset_button' onclick='reset_factory();'>Reset to Defaults</span>
 	</div>
+
+	<script src="js/jquery.js"></script>
+	<script src="js/astman.js"></script>
+	<script>
+
+	var reset_factory = function(){
+		if(!confirm("Are you sure you want to reset ?")) { return true; }
+
+		parent.ASTGUI.dialog.waitWhile(' Resetting to factory defaults ...');
+		if(parent.sessionData.PLATFORM.isAA50 ){
+			var after = function(){
+				parent.ASTGUI.dialog.hide();
+				top.cookies.set( 'configFilesChanged' , 'no' ); // ignore any previous changes -- skip calling save_config
+				parent.miscFunctions.reboot_pbx({
+					msg: 'You appliance has been reset to <i>\'factory defaults\' </i> ',
+					btnNo_text : 'Later'
+				});
+			};
+			parent.ASTGUI.systemCmd( ASTGUI.globals.app_factoryReset, after);
+			return;
+		}
+
+		// if not AA50 - manually reset all config files 
+		var files = ['extensions.conf', 'users.conf', 'agents.conf', 'meetme.conf', 'misdn.conf', 'queues.conf'];
+		files.each(function(file){
+			var c = config2json({filename:file, catlist:'yes'});
+			parent.ASTGUI.dialog.waitWhile(' Resetting file ' + file );
+			c.each( function(cat){
+				var u = new listOfSynActions(file);
+				u.new_action('delcat', cat , '', '');
+				u.callActions();
+			});
+		});
+
+		parent.ASTGUI.dialog.waitWhile(' Reloading Asterisk !');
+		parent.miscFunctions.applyChanges();
+		parent.miscFunctions.logoutFunction.doLogout();
+	};
+
+	var localajaxinit = function(){
+		top.document.title = "Reset PBX to Default Configuration" ;
+		var fd_text = (parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE ) ? 'Factory Reset' : 'Reset Configuration' ;
+		var t = [
+			{url:'preferences.html', desc:'General Preferences' } ,
+			{url:'language.html', desc:'Language' } ,
+			{url:'password.html', desc:'Change Password'},
+			{url:'#', desc: fd_text , selected:true }
+		];
+		t.push( {url:'reboot.html', desc:'Reboot' } );
+		t.push( {url:'flipadvanced.html', desc:'Advanced Options' } );
+		ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
+	};
+
+	</script>
 </body>
+</html>
