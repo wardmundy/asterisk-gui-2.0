@@ -18,31 +18,14 @@
  * at the top of the source tree.
  *
 -->
-<script src="js/jquery.js"></script>
-<script src="js/astman.js"></script>
-<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
-<style type="text/css">
+<html>
+<head>
+	<title>Reboot Asterisk</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1" />
 
-
-</style>
-<script>
-
-var localajaxinit = function(){
-	top.document.title = "Reboot Asterisk" ;
-	var t = [
-		{url:'preferences.html', desc:'General Preferences' } ,
-		{url:'language.html', desc:'Language' } ,
-		{url:'password.html', desc:'Change Password'}
-	];
-	if( parent.sessionData.PLATFORM.isAA50 ){
-		t.push({ url:'reset_defaults.html', desc: 'Factory Reset' });
-	}
-	t.push( {url:'#', desc:'Reboot', selected:true } );
-	t.push( {url:'flipadvanced.html', desc:'Advanced Options' } );
-	ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
-};
-
-</script>
+	<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+	<style type="text/css"></style>
+</head>
 <body bgcolor="EFEFEF">
 	<div class="iframeTitleBar">
 		Reboot Asterisk 
@@ -59,4 +42,26 @@ var localajaxinit = function(){
 	<div style='text-align:center; width: 95%; margin-top:40px'>
 		<span class='guiButton' onclick='parent.miscFunctions.reboot_pbx();'>Reboot Now</span>
 	</div>
+
+	<script src="js/jquery.js"></script>
+	<script src="js/astman.js"></script>
+	<script>
+
+	var localajaxinit = function(){
+		top.document.title = "Reboot Asterisk" ;
+		var t = [
+			{url:'preferences.html', desc:'General Preferences' } ,
+			{url:'language.html', desc:'Language' } ,
+			{url:'password.html', desc:'Change Password'}
+		];
+		if( parent.sessionData.PLATFORM.isAA50 ){
+			t.push({ url:'reset_defaults.html', desc: 'Factory Reset' });
+		}
+		t.push( {url:'#', desc:'Reboot', selected:true } );
+		t.push( {url:'flipadvanced.html', desc:'Advanced Options' } );
+		ASTGUI.tabbedOptions( _$('tabbedMenu') , t );
+	};
+
+	</script>
 </body>
+</html>
