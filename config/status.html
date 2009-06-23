@@ -18,81 +18,82 @@
  * at the top of the source tree.
  *
 -->
-<script src="js/jquery.js"></script>
-<script src="js/astman.js"></script>
-<script src="js/status.js"></script>
-<script src="js/jquery.tooltip.js"></script>
-<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
-<style type="text/css">
-	#table_channel_list {
-		border: 1px solid #666666;
-		margin-top: 5px;
-		margin-bottom:10px;
-		width: 96%;
-		text-align: center;
-		padding : 1px;
-	}
-	#table_channel_list tr.frow { background: #6b79a5; color: #CED7EF; }
-	#table_channel_list tr.frow td{ font-weight:bold; }
-	#table_channel_list tr td{ padding : 3px; }
-	#table_channel_list tr.even { background: #DFDFDF; }
-	#table_channel_list tr.odd{ background: #FFFFFF; }
-	#table_channel_list tr.even:hover, #table_channel_list tr.odd:hover {
-		background: #a8b6e5;
-		cursor: default;
-	}
+<html>
+<head>
+	<title>Call Status</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1" />
+
+	<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
+	<style type="text/css">
+		#table_channel_list {
+			border: 1px solid #666666;
+			margin-top: 5px;
+			margin-bottom:10px;
+			width: 96%;
+			text-align: center;
+			padding : 1px;
+		}
+		#table_channel_list tr.frow { background: #6b79a5; color: #CED7EF; }
+		#table_channel_list tr.frow td{ font-weight:bold; }
+		#table_channel_list tr td{ padding : 3px; }
+		#table_channel_list tr.even { background: #DFDFDF; }
+		#table_channel_list tr.odd{ background: #FFFFFF; }
+		#table_channel_list tr.even:hover, #table_channel_list tr.odd:hover {
+			background: #a8b6e5;
+			cursor: default;
+		}
 
 
-	#sqDestinations{
-		height:120px ;
-		background-color:#FFFFFF;
-		padding: 5px;
-		border-width: 1px;
-		border-color: #7E5538;
-		border-style: solid;
-		cursor: default;
-		font: 83%/1.4 arial, helvetica, sans-serif;
-		overflow :auto;
-	}
-	
-	#sqDestinations div {
-		clear :both;
-		padding : 3px 5px 0px 5px;
-		min-height: 20px;
-	}
-	#sqDestinations div:hover {
-		background-color:#DEDEDE;
-	}
-	
-	#sqDestinations div span.step_desc {
-		float: left;
-		/* max-width: 300px; */
-		background: transparent;
-	}
-	#sqDestinations div span.step_desc:hover{
-		background-color:#DEDEDE;
-	}
-	
-	#sqDestinations div span.step_up {
-		float: right;
-		width: 20px;
-		background: transparent url("./images/asterisk-arrow-up.png") no-repeat;
-	}
-	
-	#sqDestinations div span.step_down {
-		float: right;
-		width: 20px;
-		background: transparent url("./images/asterisk-arrow-down.png") no-repeat;
-	}
-	
-	#sqDestinations div span.step_delete {
-		float: right;
-		width: 20px;
-		background: transparent url("./images/delete_circle.png") no-repeat;
-	}
+		#sqDestinations{
+			height:120px ;
+			background-color:#FFFFFF;
+			padding: 5px;
+			border-width: 1px;
+			border-color: #7E5538;
+			border-style: solid;
+			cursor: default;
+			font: 83%/1.4 arial, helvetica, sans-serif;
+			overflow :auto;
+		}
+		
+		#sqDestinations div {
+			clear :both;
+			padding : 3px 5px 0px 5px;
+			min-height: 20px;
+		}
+		#sqDestinations div:hover {
+			background-color:#DEDEDE;
+		}
+		
+		#sqDestinations div span.step_desc {
+			float: left;
+			/* max-width: 300px; */
+			background: transparent;
+		}
+		#sqDestinations div span.step_desc:hover{
+			background-color:#DEDEDE;
+		}
+		
+		#sqDestinations div span.step_up {
+			float: right;
+			width: 20px;
+			background: transparent url("./images/asterisk-arrow-up.png") no-repeat;
+		}
+		
+		#sqDestinations div span.step_down {
+			float: right;
+			width: 20px;
+			background: transparent url("./images/asterisk-arrow-down.png") no-repeat;
+		}
+		
+		#sqDestinations div span.step_delete {
+			float: right;
+			width: 20px;
+			background: transparent url("./images/delete_circle.png") no-repeat;
+		}
 
-</style>
-
+	</style>
+</head>
 <body bgcolor="EFEFEF">
 	<div class="iframeTitleBar"> 
 		Channel Management <span class='refresh_icon' onclick="window.location.reload();" >&nbsp;<img src="images/refresh.png" title=" Refresh " border=0 >&nbsp;</span>
@@ -128,4 +129,9 @@
 		</TABLE>
 	</div>
 
+	<script src="js/jquery.js"></script>
+	<script src="js/astman.js"></script>
+	<script src="js/status.js"></script>
+	<script src="js/jquery.tooltip.js"></script>
 </body>
+</html>
