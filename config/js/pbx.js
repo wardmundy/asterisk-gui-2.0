@@ -569,6 +569,9 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					users_conf.new_action('delete', d, 'zapchan', '');
 					users_conf.new_action('append', d, 'dahdichan', c[d]['zapchan']);
 				}
+				if (!c[d].hasOwnProperty('type')) {
+					users_conf.new_action('append', d, 'type', 'peer');
+				}
 				sessionData.pbxinfo['users'][d] = c[d];
 				continue;
 			}
