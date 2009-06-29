@@ -1836,6 +1836,7 @@ pbx.users.add = function(exten, info, callback) {
 	sessionData.pbxinfo['users'][exten]['allow'] = allow;
 	sessionData.pbxinfo['users'][exten]['mailbox'] = info.mailbox || exten;
 	sessionData.pbxinfo['users'][exten]['call-limit'] = '100';
+	sessionData.pbxinfo['users'][exten]['type'] = 'peer';
 
 	delete info.disallow;
 	delete info.allow;
@@ -1850,6 +1851,7 @@ pbx.users.add = function(exten, info, callback) {
 	x.new_action('append', exten, 'allow', allow);
 	x.new_action('append', exten, 'mailbox', info.mailbox || exten);
 	x.new_action('append', exten, 'call-limit', '100');
+	x.new_action('append', exten, 'type', 'peer');
 
 	if (info.mailbox) {
 		delete info.mailbox;
@@ -1878,6 +1880,9 @@ pbx.users.edit = function(user, info) {
 		top.log.debug('pbx.users.edit: User not found, exiting.');
 		return false;
 	}
+
+	/* ast 1.6.1 now requires type=peer, there should be no harm in adding it to all vers of ast */
+	info.type = 'peer';
 
 	for (var prop in info) {
 		if (info.hasOwnProperty(prop)) {
