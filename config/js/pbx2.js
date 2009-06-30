@@ -1857,6 +1857,10 @@ pbx.users.add = function(exten, info, callback) {
 		delete info.mailbox;
 	}
 
+	if (info['call-limit']) {
+		delete info['call-limit'];
+	}
+
 	if (info.hasOwnProperty('hassip') && info['hassip'].isAstTrue()) {
 		x.new_action('append', exten, 'host', dynamic);
 	}
