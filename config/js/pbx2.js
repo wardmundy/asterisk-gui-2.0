@@ -1279,6 +1279,11 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 			return false;
 		}
 
+		if (!checkForNames(exten)) {
+			top.log.error('pbx.trunks.add: There is already a context with this exten. Maybe a user?');
+			return false;
+		}
+
 		if (basis === 'GUIAssigned') {
 			name = this.nextAvailTrunk();
 		} else if (basis === 'FromProvider') {
@@ -1827,6 +1832,12 @@ pbx.users.add = function(exten, info, callback) {
 		top.log.error('pbx.users.add: info was undefined.');
 		return false;
 	}
+
+	if (!checkForNames(exten)) {
+		top.log.error('pbx.users.add: There is already a context with this exten. Maybe a trunk?');
+		return false;
+	}
+
 	info = ASTGUI.toCustomObject(info);
 
 	var disallow = info.getProperty('disallow') || 'all';
@@ -2276,3 +2287,8 @@ pbx.voice_menus.next = function() {
 	return ASTGUI.contexts.VoiceMenuPrefix + vm.firstAvailable();
 };
 /*---------------------------------------------------------------------------*/
+
+var checkForNames = function(name, users_conf) {
+	var users_conf = users_conf || config2json({ filename: 'user.conf', usf: 0});
+	return users_conf.hasOwnProperty(name) ? false : true;
+};
