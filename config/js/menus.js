@@ -335,7 +335,7 @@ var VoiceMenus_miscFunctions = {
 				case 'Macro':
 					lbl('Macro');
 					$('#newstep_custom').show();
-					tip_chosenStep.innerHTML = "macroname|arg1|arg2 .... Executes a macro using the context 'macro-&lt;macroname&gt;'";
+					tip_chosenStep.innerHTML = "macroname,arg1,arg2 .... Executes a macro using the context 'macro-&lt;macroname&gt;'";
 					break;
 				default:
 					break;
@@ -396,7 +396,7 @@ var VoiceMenus_miscFunctions = {
 				newstep = 'Set(TIMEOUT(digit)=' + ASTGUI.getFieldValue('newstep_seconds') + ')';
 				break;
 			case 'DISA':
-				newstep = 'DISA(' + ASTGUI.getFieldValue('newstep_pwd') + '|' + ASTGUI.getFieldValue('newstep_disaContext') +')';
+				newstep = 'DISA(' + ASTGUI.getFieldValue('newstep_pwd') + top.session.delimiter + ASTGUI.getFieldValue('newstep_disaContext') +')';
 				break;
 			case 'ResponseTimeout':
 				newstep = 'Set(TIMEOUT(response)=' + ASTGUI.getFieldValue('newstep_seconds') + ')';
@@ -446,7 +446,7 @@ var VoiceMenus_miscFunctions = {
 				var tmp_EventName = ASTGUI.getFieldValue('newstep_UserEvent_eventname');
 				var tmp_EventBody = ASTGUI.getFieldValue('newstep_UserEvent_body');
 				if( tmp_EventBody.trim() ){
-					tmp_EventName = tmp_EventName + '|' + tmp_EventBody ;
+					tmp_EventName = tmp_EventName + top.session.delimiter' + tmp_EventBody ;
 				}
 				newstep =  'UserEvent('+ tmp_EventName + ')';
 				break;
