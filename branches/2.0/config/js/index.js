@@ -117,6 +117,9 @@ var onLogInFunctions = {
 				sessionData.PLATFORM.isAST_1_4 = false ;
 				sessionData.PLATFORM.isAST_1_6 = true ;
 				sessionData.PLATFORM.isAST_1_6_1 = resp_lower.contains('1.6.1') ? true : false;
+				ASTGUI.globals.sbcid_1 = 's,1,ExecIf($[ "${CALLERID(num)}"="" ]?SetCallerPres(unavailable))';
+				ASTGUI.globals.sbcid_2 = 's,1,ExecIf($[ "${CALLERID(num)}"="" ]?Set(CALLERID(all)=unknown <0000000>))';
+		sbcid_2 : 's,2,ExecIf($[ "${CALLERID(num)}"="" ],Set,CALLERID(all)=unknown <0000000>)',
 			} else { /* if system is either 1.4 or unknown */
 				sessionData.PLATFORM.isAST_1_4 = true ;
 				sessionData.PLATFORM.isAST_1_6 = false ;
