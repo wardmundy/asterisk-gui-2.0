@@ -1279,7 +1279,7 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 			return false;
 		}
 
-		if (!checkForNames(exten)) {
+		if (!checkForNames(name)) {
 			top.log.error('pbx.trunks.add: There is already a context with this exten. Maybe a user?');
 			return false;
 		}
