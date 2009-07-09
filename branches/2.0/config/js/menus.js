@@ -446,7 +446,7 @@ var VoiceMenus_miscFunctions = {
 				var tmp_EventName = ASTGUI.getFieldValue('newstep_UserEvent_eventname');
 				var tmp_EventBody = ASTGUI.getFieldValue('newstep_UserEvent_body');
 				if( tmp_EventBody.trim() ){
-					tmp_EventName = tmp_EventName + top.session.delimiter' + tmp_EventBody ;
+					tmp_EventName = tmp_EventName + top.session.delimiter + tmp_EventBody ;
 				}
 				newstep =  'UserEvent('+ tmp_EventName + ')';
 				break;
