@@ -1873,7 +1873,7 @@ pbx.users.add = function(exten, info, callback) {
 	}
 
 	if (info.hasOwnProperty('hassip') && info['hassip'].isAstTrue()) {
-		x.new_action('append', exten, 'host', dynamic);
+		x.new_action('append', exten, 'host', 'dynamic');
 	}
 
 	for (var prop in info) {
