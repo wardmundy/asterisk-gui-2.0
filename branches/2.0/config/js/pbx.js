@@ -85,6 +85,9 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					'exten=play_file,n,Playback(${var1})',
 					'exten=play_file,n,Hangup'
 				];
+				if (sessionData.PLATFORM.isAST_1_6) {
+					check_For_Contexts[ASTGUI.contexts.guitools][4] = 'exten=record_vmenu,n,Record(${var1},0,500,k)';
+				}
 		
 				check_For_Contexts[ 'macro-' + ASTGUI.contexts.dialtrunks ] = [
 					// "; Macro by =  Brandon Kruse <bkruse@digium.com> & Matthew O'Gorman mogorman@digium.com",
