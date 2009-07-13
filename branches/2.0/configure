@@ -3809,7 +3809,7 @@ PBX_ZAPTEL=0
 echo $ECHO_N "checking for ZT_TONE_DTMF_BASE in zaptel/zaptel.h... $ECHO_C" >&6; }
 	saved_cppflags="${CPPFLAGS}"
 	if test "x${ZAPTEL_DIR}" != "x"; then
-	    ZAPTEL_INCLUDE= "-I${ZAPTEL_DIR}/include"
+	    ZAPTEL_INCLUDE="-I${ZAPTEL_DIR}/include"
 	fi
 	CPPFLAGS="${CPPFLAGS} ${ZAPTEL_INCLUDE}"
 
