@@ -1874,6 +1874,7 @@ pbx.users.add = function(exten, info, callback) {
 
 	if (info.hasOwnProperty('hassip') && info['hassip'].isAstTrue()) {
 		x.new_action('append', exten, 'host', 'dynamic');
+		delete info['host'];
 	}
 
 	for (var prop in info) {
