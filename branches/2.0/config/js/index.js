@@ -119,11 +119,23 @@ var onLogInFunctions = {
 				sessionData.PLATFORM.isAST_1_6_1 = resp_lower.contains('1.6.1') ? true : false;
 				ASTGUI.globals.sbcid_1 = 's,1,ExecIf($[ "${CALLERID(num)}"="" ]?SetCallerPres(unavailable))';
 				ASTGUI.globals.sbcid_2 = 's,1,ExecIf($[ "${CALLERID(num)}"="" ]?Set(CALLERID(all)=unknown <0000000>))';
+				sessionData.listOfCodecs = { // sessionData.listOfCodecs
+					'ulaw' : 'u-law' ,
+					'alaw' : 'a-law' ,
+					'gsm'  : 'GSM' ,
+					'ilbc' : 'ILBC'  ,
+					'speex': 'SPEEX' ,
+					'g726' : 'G.726' ,
+					'adpcm': 'ADPCM' ,
+					'lpc10': 'LPC10' ,
+					'g729' : 'G.729' ,
+					'g723' : 'G.723' ,
+					'h263' : 'H.263' ,
+					'h263p': 'H.263p',
+					'h264' : 'H.264'
+				};
 
 				/* add video codecs for 1.6 platforms */
-				sessionData.listOfCodecs['h263'] = 'H.263';
-				sessionData.listOfCodecs['h263p'] = 'H.263p';
-				sessionData.listofCodecs['h264'] = 'H.264';
 			} else { /* if system is either 1.4 or unknown */
 				sessionData.PLATFORM.isAST_1_4 = true ;
 				sessionData.PLATFORM.isAST_1_6 = false ;
