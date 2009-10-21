@@ -51,6 +51,8 @@ var chop_Extension = function(a){
 	else if( a.endsWith('.g722') ){ return a.rChop('.g722'); }
 	else if( a.endsWith('.g729') ){ return a.rChop('.g729'); }
 	else if( a.endsWith('.ulaw') ){ return a.rChop('.ulaw'); }
+	else if( a.endsWith('.wav') ){ return a.rChop('.wav'); }
+	else if( a.endsWith('.mp3') ){ return a.rChop('.mp3'); }
 	return a;
 }
 

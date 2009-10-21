@@ -60,6 +60,10 @@ var play_record_file = function(){
 			CURRENT_FILE = CURRENT_FILE.withOut('.g729');
 		}else if( CURRENT_FILE.endsWith('.ulaw') ){
 			CURRENT_FILE = CURRENT_FILE.withOut('.ulaw');
+		}else if( CURRENT_FILE.endsWith('.wav') ){
+			CURRENT_FILE = CURRENT_FILE.withOut('.wav');
+		}else if( CURRENT_FILE.endsWith('.mp3') ){
+			CURRENT_FILE = CURRENT_FILE.withOut('.mp3');
 		}
 		ASTGUI.feedback( { msg:'Play Request Successfull !!', showfor:2 });
 		makeRequest ({
@@ -103,7 +107,7 @@ var record_new_Verify = function (){
 		_$('newvmenu_ext').focus();
 		return true;
 	}
-	CURRENT_FILE = _$('newvmenu_name').value + _$('newvmenu_format').value ; // record in gsm format
+	CURRENT_FILE = _$('newvmenu_name').value + _$('newvmenu_format').value ;
 	$('#recordnew_content').hideWithBg();
 	RecordFile( _$('newvmenu_ext').value );
 };
