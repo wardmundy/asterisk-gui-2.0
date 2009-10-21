@@ -270,6 +270,11 @@ var VoiceMenus_miscFunctions = {
 					$('#newstep_seconds').show();
 					tip_chosenStep.innerHTML = 'Wait for the user to enter a new extension for a specified number of seconds.';
 					break;
+				case 'WaitForRing':
+					lbl('WaitForRing');
+					$('#newstep_seconds').show();
+					tip_chosenStep.innerHTML = 'Pause dialplan execution until next ring for a specified number of seconds.  Cancels answer if no ring occurs.';
+					break;
 				case 'toDestination':
 					lbl('To Destiantion');
 					$('#newstep_gotoDestination').show();
@@ -414,6 +419,9 @@ var VoiceMenus_miscFunctions = {
 				break;
 			case 'WaitExten':
 				newstep = 'WaitExten(' + ASTGUI.getFieldValue('newstep_seconds') + ')';
+				break;
+			case 'WaitForRing':
+				newstep = 'WaitForRing(' + ASTGUI.getFieldValue('newstep_seconds') + ')';
 				break;
 			case 'toDestination':
 				newstep = ASTGUI.getFieldValue('newstep_gotoDestination');
