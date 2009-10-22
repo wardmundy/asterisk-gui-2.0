@@ -33,29 +33,31 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					'default' : {},
 					'macro-stdexten' : [
 						'exten=s,1,Set(__DYNAMIC_FEATURES=${FEATURES})',
-						'exten=s,2,GotoIf($["${FOLLOWME_${ARG1}}" = "1"]?5:3)',
-						'exten=s,3,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})',
-						'exten=s,4,Goto(s-${DIALSTATUS},1)',
-						'exten=s,5,Macro(stdexten-followme,${ARG1},${ARG2})',
-						'exten=s-NOANSWER,1,Voicemail(${ARG1},u)',
+						'exten=s,2,Set(ORIG_ARG1=${ARG1})
+						'exten=s,3,GotoIf($["${FOLLOWME_${ARG1}}" = "1"]?6:4)',
+						'exten=s,4,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})',
+						'exten=s,5,Goto(s-${DIALSTATUS},1)',
+						'exten=s,6,Macro(stdexten-followme,${ARG1},${ARG2})',
+						'exten=s-NOANSWER,1,Voicemail(${ORIG_ARG1},u)',
 						'exten=s-NOANSWER,2,Goto(default,s,1)',
-						'exten=s-BUSY,1,Voicemail(${ARG1},b)',
+						'exten=s-BUSY,1,Voicemail(${ORIG_ARG1},b)',
 						'exten=s-BUSY,2,Goto(default,s,1)',
 						'exten=_s-.,1,Goto(s-NOANSWER,1)',
-						'exten=a,1,VoicemailMain(${ARG1})'
+						'exten=a,1,VoicemailMain(${ORIG_ARG1})'
 					],
 					'macro-stdexten-followme' : [
 						'exten=s,1,Answer',
-						'exten=s,2,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})',
-						'exten=s,3,Set(__FMCIDNUM=${CALLERID(num)})',
-						'exten=s,4,Set(__FMCIDNAME=${CALLERID(name)})',
-						'exten=s,5,Followme(${ARG1},${FOLLOWMEOPTIONS})',
-						'exten=s,6,Voicemail(${ARG1},u)',
-						'exten=s-NOANSWER,1,Voicemail(${ARG1},u)',
-						'exten=s-BUSY,1,Voicemail(${ARG1},b)',
+						'exten=s,2,Set(ORIG_ARG1=${ARG1})',
+						'exten=s,3,Dial(${ARG2},${RINGTIME},${DIALOPTIONS})',
+						'exten=s,4,Set(__FMCIDNUM=${CALLERID(num)})',
+						'exten=s,5,Set(__FMCIDNAME=${CALLERID(name)})',
+						'exten=s,6,Followme(${ORIG_ARG1},${FOLLOWMEOPTIONS})',
+						'exten=s,7,Voicemail(${ORIG_ARG1},u)',
+						'exten=s-NOANSWER,1,Voicemail(${ORIG_ARG1},u)',
+						'exten=s-BUSY,1,Voicemail(${ORIG_ARG1},b)',
 						'exten=s-BUSY,2,Goto(default,s,1)',
 						'exten=_s-.,1,Goto(s-NOANSWER,1)',
-						'exten=a,1,VoicemailMain(${ARG1})'
+						'exten=a,1,VoicemailMain(${ORIG_ARG1})'
 					],
 					'macro-pagingintercom' : [
 						'exten=s,1,SIPAddHeader(Alert-Info: ${PAGING_HEADER})',
