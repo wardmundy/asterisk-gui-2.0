@@ -1592,7 +1592,7 @@ astgui_manageConferences = {
 			if(!line.beginsWith('exten=') ){ return;}
 			var b = ASTGUI.parseContextLine.getExten(line) ;
 			var configOptions = line.afterChar('=');
-			var params = configOptions.betweenXY('|',')');
+			var params = configOptions.split("${EXTEN}")[1].betweenXY('|',')');
 			if( params.contains('a') &&  params.contains('A') ) { // if is a meetMe Admin Login
 				b = ASTGUI.parseContextLine.getArgs(line)[0] ;
 			}
