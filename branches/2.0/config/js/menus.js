@@ -228,7 +228,7 @@ var VoiceMenus_miscFunctions = {
 				case 'Background':
 					lbl('Background');
 					$('#newstep_sound').show();
-					tip_chosenStep.innerHTML = 'Play an audio file while waiting for digits of an extension to go to.';
+					tip_chosenStep.innerHTML = 'Play an audio file while waiting for digits of an extension to go to. (For custom voice prompts, type "record/" before your prompt file name)';
 					break;
 				case 'Busy':
 					lbl('Busy Tone');
@@ -258,7 +258,7 @@ var VoiceMenus_miscFunctions = {
 				case 'Playback':
 					lbl('Play Sound');
 					$('#newstep_sound').show();
-					tip_chosenStep.innerHTML = 'Plays back given file';
+					tip_chosenStep.innerHTML = 'Plays back given file. (For custom voice prompts, type "record/" before your prompt file name)';
 					break;
 				case 'Wait':
 					lbl('Wait');
