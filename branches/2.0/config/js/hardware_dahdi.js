@@ -268,6 +268,13 @@ var editSPAN = function(l){ // show values for SPAN l in the edit_span dialog bo
 		_$('editspan_switchtype').selectedIndex = -1 ;
 	}
 
+	if(SPANS[l]['pridialplan']) {
+		ASTGUI.selectbox.selectOption( _$('editspan_pridialplan'), SPANS[l]['pridialplan']);
+	}
+	if(SPANS[l]['prilocaldialplan']) {
+		ASTGUI.selectbox.selectOption( _$('editspan_prilocaldialplan'), SPANS[l]['prilocaldialplan']);
+	}
+
 	(function (){
 		ASTGUI.selectbox.clear( _$('editspan_syncsrc'));
 		var y = SPANCOUNT_LOCATION[ SPANS[l]['location'] ];
@@ -736,6 +743,8 @@ var updateSpanInfo = function(){
 	SPANS[b]['switchtype'] = _$('editspan_switchtype').value;
 	SPANS[b]['syncsrc'] = _$('editspan_syncsrc').value;
 	SPANS[b]['lbo'] = _$('editspan_lbo').value;
+	SPANS[b]['pridialplan'] = _$('editspan_pridialplan').value;
+	SPANS[b]['prilocaldialplan'] = _$('editspan_prilocaldialplan').value;
 
 	_$('row'+ b).style.background = "#C9AAAA";
 
@@ -990,6 +999,10 @@ var applySettings = {
 				pri_trunk['hassip'] = 'no';
 			x.new_action('update', d , "hasiax", 'no');
 				pri_trunk['hasiax'] = 'no';
+			x.new_action('update', d , "pridialplan", SPANS[k]['pridialplan']);
+				pri_trunk['pridialplan'] = SPANS[k]['pridialplan'];
+			x.new_action('update', d , "prilocaldialplan", SPANS[k]['prilocaldialplan']);
+				pri_trunk['prilocaldialplan'] = SPANS[k]['prilocaldialplan'];
 
 			if ( !SPANS[k]['signalling'].beginsWith('fxo') ){ 
 				// we do not want a context to be set for user stations
