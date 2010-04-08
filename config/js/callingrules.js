@@ -36,7 +36,7 @@ var newCallingRule_form = function(){
 	EDIT_CR_RULE = '';
 
 	_$('cr_dialog_title').innerHTML ='&nbsp;&nbsp;New CallingRule';
-	ASTGUI.resetTheseFields ( [ DOM_new_crl_name, DOM_new_crl_pattern, DOM_new_crl_trunk, DOM_new_crl_tr_stripx, DOM_new_crl_tr_prepend, DOM_new_crl_foChkbx, DOM_new_crl_fotrunk, DOM_new_crl_fotr_stripx, DOM_new_crl_fotr_prepend , 'toLocalDest' , 'new_crl_localDest'] );
+	ASTGUI.resetTheseFields ( [ DOM_new_crl_name, DOM_new_crl_pattern, DOM_new_crl_trunk, DOM_new_crl_tr_stripx, DOM_new_crl_tr_prepend, DOM_new_crl_tr_filter, DOM_new_crl_foChkbx, DOM_new_crl_fotrunk, DOM_new_crl_fotr_stripx, DOM_new_crl_fotr_prepend , DOM_new_crl_fotr_filter, 'toLocalDest' , 'new_crl_localDest'] );
 	_$('toLocalDest').updateStatus();
 	$(DOM_new_CRL_DIV).showWithBg();
 	ASTGUI.feedback({ msg:'New CallingRule !', showfor:1 });
@@ -98,10 +98,13 @@ var load_DOMelements = function(){
 			DOM_new_crl_trunk = _$('new_crl_trunk');
 			DOM_new_crl_tr_stripx = _$('new_crl_tr_stripx');
 			DOM_new_crl_tr_prepend = _$('new_crl_tr_prepend');
+			DOM_new_crl_tr_filter = _$('new_crl_tr_filter');
 		DOM_new_crl_foChkbx = _$('new_crl_foChkbx');
 			DOM_new_crl_fotrunk = _$('new_crl_fotrunk');
 			DOM_new_crl_fotr_stripx = _$('new_crl_fotr_stripx');
 			DOM_new_crl_fotr_prepend = _$('new_crl_fotr_prepend');
+			DOM_new_crl_fotr_filter = _$('new_crl_fotr_filter');
+			DOM_new_crl_tr_filter = _$('new_crl_tr_filter');
 		// new calling rule dom elements
 	(function(){
 		en_db_fofields();
@@ -243,27 +246,27 @@ var restore_default_callingRules = function(){
 	var x = new listOfActions('extensions.conf');
 	x.new_action('delcat', 'CallingRule_Longdistance', '', '');
 	x.new_action('newcat', 'CallingRule_Longdistance', '', '');
-	x.new_action('append', 'CallingRule_Longdistance', 'exten', '_91XXXXXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${EXTEN:1}, , , )' );
+	x.new_action('append', 'CallingRule_Longdistance', 'exten', '_91XXXXXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0-9,${EXTEN:1})}, , , )' );
 
 	x.new_action('delcat', 'CallingRule_IAXTEL', '', '');
 	x.new_action('newcat', 'CallingRule_IAXTEL', '', '');
-	x.new_action('append', 'CallingRule_IAXTEL', 'exten', '_91700XXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${EXTEN:1}, , , )' );
+	x.new_action('append', 'CallingRule_IAXTEL', 'exten', '_91700XXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0-9,${EXTEN:1})}, , , )' );
 	
 	x.new_action('delcat', 'CallingRule_Local_AreaCode', '', '');
 	x.new_action('newcat', 'CallingRule_Local_AreaCode', '', '');
-	x.new_action('append', 'CallingRule_Local_AreaCode', 'exten', '_9256XXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${EXTEN:4}, , , )' );
+	x.new_action('append', 'CallingRule_Local_AreaCode', 'exten', '_9256XXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0-9,${EXTEN:4})}, , , )' );
 
 	x.new_action('delcat', 'CallingRule_International', '', '');
 	x.new_action('newcat', 'CallingRule_International', '', '');
-	x.new_action('append', 'CallingRule_International', 'exten', '_9011XXXXX.,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${EXTEN:1}, , , )' );
+	x.new_action('append', 'CallingRule_International', 'exten', '_9011XXXXX.,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0-9,${EXTEN:1})}, , , )' );
 
 	x.new_action('delcat', 'CallingRule_Local_7_digits', '', '');
 	x.new_action('newcat', 'CallingRule_Local_7_digits', '', '');
-	x.new_action('append', 'CallingRule_Local_7_digits', 'exten', '_9XXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${EXTEN:1}, , , )' );
+	x.new_action('append', 'CallingRule_Local_7_digits', 'exten', '_9XXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0-9,${EXTEN:1})}, , , )' );
 
 	x.new_action('delcat', 'CallingRule_Emergency', '', '');
 	x.new_action('newcat', 'CallingRule_Emergency', '', '');
-	x.new_action('append', 'CallingRule_Emergency', 'exten', '_911!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${EXTEN:0}, , , )' );
+	x.new_action('append', 'CallingRule_Emergency', 'exten', '_911!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0-9,${EXTEN:1})}, , , )' );
 
 
 	x.callActions(function(){
@@ -332,7 +335,7 @@ var new_crl_save_go = function(){
 		}
 
 		var t1_braces = (t1 == 'Skype') ? t1 : '${' + t1 + '}' ;
-		var Trunk_Build_str = ',' + t1_braces + '/' + DOM_new_crl_tr_prepend.value + '${EXTEN:' + tmp_stripx  + '}' ;
+		var Trunk_Build_str = ',' + t1_braces + '/' + DOM_new_crl_tr_prepend.value + '${' + DOM_new_crl_tr_filter.value +',${EXTEN:' + tmp_stripx  + '})}' ;
 		var foTrunk_Build_str = ',' ;
 
 		if(DOM_new_crl_foChkbx.checked){
