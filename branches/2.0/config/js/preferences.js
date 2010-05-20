@@ -75,6 +75,7 @@ function localajaxinit(){
 
 	var cusers = parent.pbx.users.list();
 	var op_tmp ;
+	ASTGUI.selectbox.append( DOM_op_ext, '<none>', '');
 	cusers.each(function(user){
 		op_tmp = 'Goto(default,' + user + ',1)';
 		ASTGUI.selectbox.append( DOM_op_ext , 'User ' + user , op_tmp);
@@ -178,7 +179,9 @@ var save_changes = function(){
 		u.new_action('update', 'globals', 'RINGTIME', ASTGUI.getFieldValue('op_ringTimeOut_Voicemail') );
 
 		u.new_action('delete', 'default', 'exten','' ,'o,1,' + OPEXTENSION );
-		u.new_action('append', 'default', 'exten', 'o,1,' + ASTGUI.getFieldValue(DOM_op_ext) );
+		if (ASTGUI.getFieldValue(DOM_op_ext) != '') {
+			u.new_action('append', 'default', 'exten', 'o,1,' + ASTGUI.getFieldValue(DOM_op_ext) );
+		}
 	u.callActions();
 
 	if( (parent.sessionData.PLATFORM.isAST_1_6 || parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE) && !parent.sessionData.PLATFORM.isAA50_OEM ){
