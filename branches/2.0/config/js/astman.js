@@ -348,6 +348,7 @@ var ASTGUI = {
 	contexts: {
 		guitools : 'asterisk_guitools', // gui tools context
 		dialtrunks : 'trunkdial-failover-0.3', // trunkdial macro with failback trunk and setcid, ASTGUI.contexts.dialtrunks
+		subscribe : 'device-hints',	//subscribecontext for sip.conf (aka devicestate fun)
 		CONFERENCES : 'conferences', // ASTGUI.contexts.CONFERENCES
 		QUEUES : 'queues', //ASTGUI.contexts.QUEUES
 		TrunkDIDPrefix : 'DID_', // context for trunks -  - ASTGUI.contexts.TrunkDIDPrefix 

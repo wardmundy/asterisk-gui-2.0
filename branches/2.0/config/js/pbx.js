@@ -311,6 +311,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 	}, // end of readcfg.guiPreferencesConf();
 
 	ExtensionsConf: function(){ //readcfg.ExtensionsConf();
+		pbx.queues.agents.setup();
 		var c = config2json({filename:'extensions.conf', usf:0});
 		//	look for numberplans, voicemenus, DID_trunk_x (incoming rules), timebasedrules, ringgroups, 
 		//	and store the information in the following objects
@@ -573,9 +574,15 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				if (c[d].hasOwnProperty('zapchan') && sessionData.PLATFORM.isABE) {
 					users_conf.new_action('delete', d, 'zapchan', '');
 					users_conf.new_action('append', d, 'dahdichan', c[d]['zapchan']);
+					c[d]['dahdichan'] = c[d]['zapchan'];
 				}
 				if (!c[d].hasOwnProperty('type')) {
 					users_conf.new_action('append', d, 'type', 'peer');
+					c[d]['type'] = 'peer';
+				}
+				if (!c[d].hasOwnProperty('callcounter')) {
+					users_conf.new_action('append', d, 'callcounter', 'yes');
+					c[d]['callcounter'] = 'yes';
 				}
 				sessionData.pbxinfo['users'][d] = c[d];
 				continue;

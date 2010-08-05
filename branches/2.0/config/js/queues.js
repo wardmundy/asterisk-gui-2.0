@@ -72,14 +72,14 @@ var updateQueuesTable = function(){
 		addCell( newRow , { html:''} );
 	})();
 	(function(){
-		var m = parent.sessionData.pbxinfo.queues ;
+		var m = parent.sessionData.pbxinfo.queues;
 		for( l in m ){ if( m.hasOwnProperty(l) ){
 			if( m[l]['configLine'].contains(',1,agentlogin()') ){
 				loginsettings.agentLogin_line = m[l]['configLine'];
 				_$('login_exten').value = ASTGUI.parseContextLine.getExten(m[l]['configLine']) ;
 				continue;
 			}
-			if( m[l]['configLine'].contains(',1,agentcallbacklogin()') ){
+			if( m[l]['configLine'].contains(',1,Goto(queue-member-manager, handle_member, 1)') ){
 				loginsettings.agentCallbackLogin_line = m[l]['configLine'];
 				_$('login_callback_exten').value = ASTGUI.parseContextLine.getExten(m[l]['configLine']);
 				continue;
@@ -115,6 +115,8 @@ var delete_Queue_confirm = function(q){
 		u.new_action( 'delete', 'default', 'exten', '' , parent.sessionData.pbxinfo.queues[q]['configLine'] );
 	}
 	u.new_action( 'delete', ASTGUI.contexts.QUEUES, 'exten', '' , parent.sessionData.pbxinfo.queues[q]['configLine'] );
+	u.new_action( 'update', 'globals', 'QUEUES', parent.sessionData.pbxinfo.queues_list.split(',').withOut(q).join(','))
+	parent.sessionData.pbxinfo.queues_list = parent.sessionData.pbxinfo.queues_list.split(',').withOut(q).join(',');
 	u.callActions();
 	var w = new listOfSynActions('queues.conf') ;
 	w.new_action('delcat', q, '', '');
@@ -209,6 +211,8 @@ var edit_queue_apply = function(){
 
 		var u = new listOfSynActions('extensions.conf') ;
 		u.new_action('append', ASTGUI.contexts.QUEUES, 'exten', configLine );
+		u.new_action('update', 'globals', 'QUEUES', parent.sessionData.pbxinfo.queues_list + "," + cat);
+		parent.sessionData.pbxinfo.queues_list += "," + cat;
 		u.callActions();
 
 		var x = new listOfActions('queues.conf');
@@ -253,6 +257,9 @@ var edit_queue_apply = function(){
 		else x.new_action('delete', cat, 'context');
 	}
 
+	$('.'+ag_chkbxClass).each(function(a) {
+		x.new_action('delete', cat, 'member', $(this).val() );
+	});
 	var ags = ASTGUI.domActions.get_checked(ag_chkbxClass) ;
 	ags.each( function(ag){
 		x.new_action('append', cat, 'member', ag );
@@ -286,8 +293,14 @@ var load_agents_checkboxes = function(){
 	var agent_count = 0 ;
 	ul.each(function(user){
 		if( parent.sessionData.pbxinfo.users[user]['hasagent'] && parent.sessionData.pbxinfo.users[user]['hasagent'].isAstTrue() ){
-			agent_count++;
-			ul_agents['Agent/' + user] = parent.sessionData.pbxinfo.users[user]['fullname'] + ' (' + user  + ')';
+			if (parent.sessionData.pbxinfo.users[user]['hassip'] && parent.sessionData.pbxinfo.users[user]['hassip'].isAstTrue()) {
+				agent_count++;
+				ul_agents['SIP/' + user] = parent.sessionData.pbxinfo.users[user]['fullname'] + ' - SIP (' + user  + ')';
+			}
+			if (parent.sessionData.pbxinfo.users[user]['hasiax'] && parent.sessionData.pbxinfo.users[user]['hasiax'].isAstTrue()) {
+				agent_count++;
+				ul_agents['IAX2/' + user] = parent.sessionData.pbxinfo.users[user]['fullname'] + ' - IAX (' + user  + ')';
+			}
 		}
 	});
 
@@ -392,9 +405,9 @@ var save_QueueSettings = function(){
  		delete parent.sessionData.pbxinfo.queues[OLD_EXT] ;
 	}
 	if(lce){
-		u.new_action('append', ASTGUI.contexts.QUEUES , 'exten', lce + ',1,agentcallbacklogin()');
+		u.new_action('append', ASTGUI.contexts.QUEUES , 'exten', lce + ',1,Goto(queue-member-manager, handle_member, 1)');
 		parent.sessionData.pbxinfo.queues[lce] = new ASTGUI.customObject;
-		parent.sessionData.pbxinfo.queues[lce]['configLine'] = lce + ',1,agentcallbacklogin()' ;
+		parent.sessionData.pbxinfo.queues[lce]['configLine'] = lce + ',1,Goto(queue-member-manager, handle_member, 1)' ;
 	}
 
 	u.callActions();

@@ -673,6 +673,8 @@ pbx.queues.load = function() {
 		return true;
 	}
 
+	sessionData.pbxinfo.queues = new ASTGUI.customObject;
+	
 	cxt.each(function(line) {
 		if (!line.beginsWith('exten=')) {
 			return;
@@ -688,7 +690,95 @@ pbx.queues.load = function() {
 		sessionData.pbxinfo.queues[exten]['configLine'] = config;
 	});
 
+	var exten_globals = context2json({filename: 'extensions.conf', context: 'globals', usf:0});
+	sessionData.pbxinfo.queues_list = exten_globals[exten_globals.indexOfLike('QUEUES')].afterChar('=');
+
 	return true;
+};
+
+pbx.queues.agents = {};
+
+pbx.queues.agents.setup = function() {
+	//set up extensions.conf
+	var extensions_changes = {
+		'queue-member-manager' : [
+			'handle_member,1,Verbose(2, Looping through queues to log in or out queue members)',
+			'handle_member,n,Set(thisActiveMember=${CHANNEL(channeltype)}/${CHANNEL(peername)})',
+			'handle_member,n,Set(queue_field=1)',
+			'handle_member,n,Set(thisQueueXtn=${CUT(QUEUES,\\,,${queue_field})})',
+			'handle_member,n,While($[${EXISTS(${thisQueueXtn})}])',
+			'handle_member,n,Macro(member-loginlogout)',
+			'handle_member,n,Set(queue_field=$[${queue_field} + 1])',
+			'handle_member,n,Set(thisQueueXtn=${CUT(QUEUES,\\,,${queue_field})})',
+			'handle_member,n,EndWhile()'
+		],
+		'macro-member-loginlogout' : [
+			's,1,Verbose(2, Logging queue member in or out of the request queue)',
+			's,n,Set(thisQueue=${thisQueueXtn})',
+			's,n,Set(queueMembers=${QUEUE_MEMBER_LIST(${thisQueue})})',
+			's,n,MacroIf("${queueMembers}" = ""]?q_login)',
+			's,n,Set(field=1)',
+			's,n,Set(logged_in=0)',
+			's,n,Set(thisQueueMember=${CUT(queueMembers,\\,,${field})})',
+			's,n,While($[${EXISTS(${thisQueueMember})}])',
+			's,n,GotoIf($["${thisQueueMember}" != "${thisActiveMember}"]?check_next)',
+			's,n,Set(logged_in=1)',
+			's,n,ExitWhile()',
+			's,n(check_next),Set(field=$[${field} + 1])',
+			's,n,Set(thisQueueMember=${CUT(queueMembers,\\,,${field})})',
+			's,n,EndWhile()',
+			's,n,MacroIf($[${logged_in} = 0]?q_login:q_logout)'
+		],
+		'macro-q_login' : [
+			's,1,Verbose(2, Logging ${thisActiveMember} into the ${thisQueue} queue)',
+			's,n,AddQueueMember(${thisQueue},${thisActiveMember})',
+			's,n,Playback(silence/1)',
+			's,n,ExecIf($["${AQMSTATUS}" = "ADDED"]?Playback(agent-loginok):Playback(an-error-has-occurred))'
+		],
+		'macro-q_logout' : [
+			's,1,Verbose(2, Logged ${thisActiveMember} out of ${thisQueue} queue)',
+			's,n,RemoveQueueMember(${thisQueue},${thisActiveMember})',
+			's,n,Playback(silence/1)',
+			's,n,ExecIf($["${AQMSTATUS}" = "REMOVED"]?Playback(agent-loggedoff):Playback(an-error-has-occurred))'
+		]
+	};
+	var sip_changes = {
+		'general' : {
+			'subscribecontext' : ASTGUI.contexts.subscribe
+		}
+	};
+
+	var extensions_conf = listOfSynActions('extensions.conf');
+	var extensconfig = config2json({filename: 'extensions.conf', usf:0});
+	for (var cxt_name in extensions_changes) {
+		if (!extensions_changes.hasOwnProperty(cxt_name) || extensconfig.hasOwnProperty(cxt_name)) {
+			continue;
+		}
+
+		extensions_conf.new_action('newcat', cxt_name, '', '');
+		extensconfig[cxt_name] = extensions_changes[cxt_name];
+
+		var cxt = extensions_changes[cxt_name];
+		for (var i=0; i<cxt.length; i++) {
+			var prop = cxt[i];
+			extensions_conf.new_action('append', cxt_name, 'exten', prop);
+		}
+
+		extensions_conf.callActions();
+		extensions_conf.clearActions();
+	}
+	if (!extensconfig['globals'].indexOfLike('QUEUES')) {
+		extensions_conf.new_action('append', 'globals', 'QUEUES', '');
+		extensions_conf.callActions();
+		extensions_conf.clearActions();
+	}
+
+	var sip_conf = listOfSynActions('sip.conf');
+	var sipconfig = config2json({filename: 'sip.conf', usf:0});
+	if (!sipconfig['general'].hasOwnProperty('subscribecontext')) {
+		sip_conf.new_action('append', 'general', 'subscribecontext', sip_changes['general']['subscribecontext']);
+	}
+	sip_conf.callActions();
 };
 /*---------------------------------------------------------------------------*/
 
