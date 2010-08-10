@@ -167,7 +167,9 @@
 		}
 		u.new_action('update', CURRENT_Username, 'secret', newp );
 		u.callActions();
+
 		ASTGUI.feedback( { msg:"Password Updated Successfully", showfor:3 });
+		var t = ASTGUI.cliCommand('manager reload');
 		alert("Password Updated Successfully!!  \n\n You will now be redirected to the login page \n You must relogin using your new password") ;
 		var f = makeSyncRequest({ action :'logoff'});
 		parent.window.location.reload();
