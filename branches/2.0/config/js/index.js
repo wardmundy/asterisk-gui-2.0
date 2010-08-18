@@ -240,6 +240,8 @@ var onLogInFunctions = {
 					var u = new listOfSynActions('manager.conf');
 					u.new_action( 'update', tmp_managerUser, 'write', write_value + ',originate' , write_value );
 					u.callActions();
+					var retval = ASTGUI.cliCommand('manager reload');
+					miscFunctions.logoutFunction.doLogout();
 					return 'manager_updated'; // about to reload
 				}
 			}
@@ -329,7 +331,7 @@ var onLogInFunctions = {
 				ASTGUI.dialog.alertmsg('The GUI does not have necessary privileges. <BR> Please check the manager permissions for the user !');
 				return;
 			}
-			if( crwp == 'postmappings_updated' || crwp == 'manager_updated' ){
+			if( crwp == 'postmappings_updated' ){
 				parent.ASTGUI.dialog.waitWhile(' reloading asterisk ... ');
 				var t = ASTGUI.cliCommand('reload') ;
 				setTimeout( function(){ 
