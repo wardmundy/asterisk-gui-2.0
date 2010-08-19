@@ -236,7 +236,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					ASTGUI.miscFunctions.createConfig('applyzap.conf', function(){});
 
 					/* setup applyzap's basics */
-					var apply_zap = listofSynActions('applyzap.conf');
+					var apply_zap = listOfSynActions('applyzap.conf');
 					apply_zap.new_action('delcat', 'general', '', '');
 					apply_zap.new_action('newcat', 'general', '', '');
 
