@@ -1,0 +1,254 @@
+		------------------------------------
+		== Asterisk-GUI Code Organization ==
+		------------------------------------
+
+This document is intended to lay out the code organization of the Asterisk-GUI
+project. It is intended for those whom are trying to understand more about the
+Asterisk-GUI project on a development level and familiar with Javascript and
+general web development practices.
+
+There was a mailing list post that I posted a while back that discussed a bit of
+the same information in this document, however this is a little more thorough.
+The following link is the archive to that post:
+http://lists.digium.com/pipermail/asterisk-gui/2009-September/002026.html
+
+This file will be split into 5 sections:
+(1) The "Loading" code
+(2) The Session Data
+(3) The PBX object
+(4) Astman.js and ASTGUI 
+(5) Pages and Their JS
+
+		------------------------------------
+		==       The "Loading" Code       ==
+		------------------------------------
+
+* General Knowledge
+-------------------
+
+There are 3 files that you need to be concerned about when trying to deal with
+the code related to logging in and loading the GUI.
+
+The first file is: config/js/index.js. This is the main file for loading the
+GUI. Unfortunately, it's also one of the most disorganized and hardest to
+follow, but that's why I'm here writing this :-) 
+
+So let's start from the beginning. If you go to the bottom of the file you'll 
+notice a function called "after_localajaxinit". This is the function that is 
+called when the GUI is ready to be loaded. You'll notice it does a few platform
+checks, but nothing serious. The big thing inside this function is the 
+"loadGUI" function that (if you wade through it's code) eventually calls
+"onLogInFunctions.checkifLoggedIn();". This kicks off a chain of function calls
+that actually go through all the various functions in the file that handle
+loading tasks. This serious of function calls is the main reason this file (and
+therefore debugging loading issues) is so annoying. Because there is no clear
+order of function calls just by looking at the file. You have to go function by
+function to follow the flow :-/. And many of the functions don't even match
+the scope of their content. For example, this first function (checkifLoggedIn),
+it actually goes beyond just checking if the user is logged in, it also starts
+the platform detection, checking Read/Write permissions, as well as parsing
+the config files.
+
+The next important function is the "parseConfigFiles" function called in the
+checkifLoggedIn. This function goes through a list of config parsing functions
+that can be found in config/js/pbx.js, with a few in config/js/pbx2.js. You'll
+know the difference by the naming scheme. "pbx.<object>.load()" will be found in
+pbx2.js, while "readcfg.<function>" will be in pbx.js. As for organization, in
+pbx.js all the loading/parsing functions are at the top of the file and not
+associated with any particular object, such as conferences, queues, users, etc.
+This is reversed in pbx2.js. The loading/parsing functions in that file are
+associated with an object, which is why you see "pbx.conferences.load()" for
+example. The loading functions are also with their object code and not at the
+top of the file like in pbx.js.
+
+For the most part you can guess what each parsing function in the
+parseConfigFiles function actually does, but there is one exception. The
+"readcfg.checkEssentials();" function does a few things, but its main objective is
+to check the essential contexts in extensions.conf and verify that those
+contexts are as expected (as they are essential to the GUI working properly,
+hence the name of the function). This function is also where you'd go to if you
+want to make any modifications to those essential contexts as the GUI will
+overwrite the context if it differs from what's in the javascript code.
+
+At this time, I'd like to stop and direct your attention to the
+"CONFIG-ASSUMPTIONS" file in this developer_info folder of the project. This
+file lists most, if not all, of the assumptions that the GUI writes and makes
+about config files. This file is closely related to all of the parsing
+functions, so if you are trying to make any modifications, please take a look at
+this file so you can get acquainted with the rules.
+
+* Debugging Tips
+----------------
+
+- Start in config/js/index.js when trying to debug a loading issue.
+- Remember that the functions are called sequentially inside themselves.
+- Remember that config/js/pbx.js still has the majority of the config parsing
+  functions.
+- Sometimes improper write privileges on the DAHDi folder can cause the loading
+  script to loop. Make sure to check all folder permissions if you run into a
+  problem.
+
+		------------------------------------
+		==        The Session Data        ==
+		------------------------------------
+
+* General Knowledge
+-------------------
+The Session Data object, "sessionData", is instantiated in index.html, but
+defined by all the parsing/loading functions in pbx.js and pbx2.js. This object
+holds all of the parsed information about the pbx modules. So for example, the
+pbx.conferences.load() function creates a "sessionData.conferences" member
+object that holds all the conference objects parsed in by the loading function.
+
+I'm sure by now you're probably questioning my usage of the word "object", which
+is completely understandable, so let me explain. I'm actually using proper
+javascript lingo as many things in javascript get classified as generic
+objects. The biggest one is associative arrays, which would be the case for
+sessionData and the conferences member "object" of sessionData. Both of these
+variables are just associate arrays in theory. sessionData is an associative
+array of all the pbx modules (conferences for example). And conferences is just
+an associative array of all the conference bridge objects (an actual theoretical
+object). So hopefully I haven't confused you more, but have made things more
+clearly. Simply stated, to have associative arrays in javascript you have to
+make an object and not an array.
+
+Now to continue. sessionData should be updated every single time a config file
+is updated as the intentions of having the sessionData variables is to have it
+exactly match the state of the config files. There have been many bugs reported
+(and fixed) where a developer had just forgotten to update the sessionData
+variable and the values were correct in the config files, but just showing
+improperly to the user. So remember this if you're trying to debug a similar
+issue.
+
+For a future reference, it was intended that pbx2.js would remove the need for
+sessionData and just all the module objects actually held by their respective
+objects in the pbx2.js file. This has not come about or even been partially
+implemented (like most of pbx2.js), but if anything changes in the future it's
+worth noting now.
+
+* Debugging Tips
+----------------
+
+- Check to make sure that the code lines are using "top" or "parent" to call the
+  sessionData object. Such as: "top.sessionData.X.X".
+- If you are running into inconsistency issues with files and the GUI (where the
+  files are right and the GUI shows wrong), make sure that the editing functions
+  are properly updating the sessionData object when they make updates to the
+  config files.
+
+		------------------------------------
+		==         The PBX Object         ==
+		------------------------------------
+
+* General Knowledge
+-------------------
+
+The pbx object, found in config/js/pbx2.js was a restructure of code from the
+functions in the original pbx.js (config/js/pbx.js) file. Both the organization
+of the code (object and function names) as well as some of the code itself was
+refactored. Hopefully pbx2.js has been a great improvement from pbx.js, but
+decide for yourself. Take a look at the difference in the naming scheme from
+pbx.js to pbx2.js. For example, in pbx.js you had an object called
+astgui_manageusers. And inside that object was a method called "listOfUsers".
+This has now been changed to "pbx.users.list". Much simpler, right? Right. Now
+we progress.
+
+Unfortunately, the pbx2.js was stopped as a work in progress. To my knowledge
+all of the defined functions are actively being used by the GUI (as opposed to
+their counterparts in pbx.js). However, there are still many cases where the
+actual page files have some of the code that should really be in the pbx file.
+For example, a few pages still have the code to edit an object inside the
+page, when it should really be made into an edit function inside the related
+object in pbx2.js.
+
+As noted above, it was originally intended that all the data that is stored in
+the sessionData object would be stored in the pbx object. This hasn't happened
+yet, but may in the future so it's worth noting here.
+
+* Debugging Tips
+----------------
+
+- Not ALL expected functions are actually in pbx2.js, some pages still have code
+  inside their own js files for functions you'd expect to be in pbx2.js
+
+		------------------------------------
+		==      Astman.js and ASTGUI      ==
+		------------------------------------
+
+* General Knowledge
+-------------------
+
+In terms of organization, astman.js is probably the worst file. There are
+probably 3 or 4 "sections" that actually exist in this file. I put quotes around
+the word sections because they aren't actually divided into sections. It's just
+that there is actually about 3 or 4 different goals this file serves.
+
+The first "section" is all the javascript object prototype funness. There are
+many functions we've used to extend the String and Array objects provided in
+javascript. This section has already been abstracted out to 
+config/js/objects.custom.js, although it's not always used. That file is in
+existance for when the astman.js file finally gets split into the various files
+it should be divided into. Anyway, a lot of these functions are used often and
+also easy to read, so I'm not going to spend any more time talking about it, you
+can just go browse the functions easily enough :-)
+
+The second "section" is in the first part of the ASTGUI object (defined in
+config/js/astman.js) and it is the global variables section. This actually 
+includes the "globals" and "contexts" members of the ASTGUI object. These two
+objects hold the majority of the global (constant) variables. There are other
+global variables that are stored elsewhere (in config/index.html), so definitely
+take a look at that file to get familiarized with the differences.
+
+The third and fourth "section" aren't divided up clearly, they just pretty much
+take up the rest of the ASTGUI object in no order with very little organization.
+
+The third "section" I'll classify as HTML manipulators. The majority of these
+are actually functions that could be replaced with existing functions in jQuery.
+There are some that merit their own function, but should be using jQuery
+functions inside of it and aren't. Oh well...
+
+The fouth "section" holds all the ajax and config functions. Again, spread out
+through-out the rest of the file and for the most part, horribly named :-/.
+
+So there was an attempt to properly split up the astman.js file into organized
+files, but this was a work in progress. You'll note that there are: astman2.js,
+objects.custom.js, session.js, log.js, and astgui.js. These files are all files
+that were created as a result of this organization attempt. session.js and
+log.js are actually used, but the other 3 are still on hold until we can
+properly organize the rest of the astman.js file.
+
+* Debugging Tips
+----------------
+
+- Make sure you spelled the functions correctly when using functions from the
+  ASTGUI object.
+- Make sure you are using "top" or "parent" when calling ASTGUI functions.
+
+		------------------------------------
+		==       Pages and Their JS       ==
+		------------------------------------
+
+* General Knowledge
+-------------------
+
+As stated in the CODING-GUIDELINES documentation file, pages with enough
+javascript have their javascript separated into its own js/ file. This applies
+to the majority of the pages, although there are probably 5-10 that don't have
+their own js file.
+
+As for the javascript organization, there is no consistent organization
+guidelines across the js files. There should be, but there isn't. Naming scheme
+aside, there are generally functions that perform the following: load, show/hide form,
+create/add, edit, and delete. 
+
+The pages *should* be using the pbx object functions to manage their related
+modules, but that isn't always the case. So if you're looking to debug or edit
+any of the management code, make sure in both places. Unfortunately, some pages
+are even a mix of pbx functions and local functions.
+
+* Debugging Tips
+----------------
+
+- when loading a page, the load function should be the jQuery.ready() in the
+  page's html file. Older versions of the gui used a localajaxinit function, so
+  if no jQuery.ready function exists, try that.
