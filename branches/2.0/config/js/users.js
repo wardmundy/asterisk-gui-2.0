@@ -420,6 +420,10 @@ var SAVE_USER_FORM = function(){ // SAVE_USER_FORM();
 		ASTGUI.highlightField('edit_OutBoundCallerid', "Too many digits in OutBound CallerId");
 		return;
 	}
+	if(/\D/.test(tmp)){
+		ASTGUI.highlightField('edit_OutBoundCallerid', "Please use numeric characters only.");
+		return;
+	}
 	tmp = '';
 	if( !_$('edit_hasSip').checked && !_$('edit_hasIax').checked && !_$('edit_fxs').value ){
 		ASTGUI.feedback( { msg:'You need to choose a technology or assign an analog station for this user extension.' , showfor: 3, color: 'red' } );
