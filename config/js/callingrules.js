@@ -46,6 +46,9 @@ var edit_CR_form = function(a,b){
 	isNew = false;
 	_$('cr_dialog_title').innerHTML ='&nbsp;&nbsp;Edit Calling Rule';
 
+	DOM_new_crl_tr_filter.value = '';
+	DOM_new_crl_fotr_filter.value = '';
+
 	EDIT_CR = a;
 	EDIT_CR_RULE = b;
 	var tmp_cr = ASTGUI.parseContextLine.obCallingRule(b) ;
@@ -63,11 +66,13 @@ var edit_CR_form = function(a,b){
 
 		DOM_new_crl_tr_stripx.value = tmp_cr.stripdigits_firstTrunk  ;
 		DOM_new_crl_tr_prepend.value = tmp_cr.firstPrepend ;
+		DOM_new_crl_tr_filter.value = tmp_cr.firstFilter;
 		if(tmp_cr.secondTrunk){
 			DOM_new_crl_foChkbx.checked = true 
 			ASTGUI.selectbox.selectOption(DOM_new_crl_fotrunk, tmp_cr.secondTrunk );
 			DOM_new_crl_fotr_stripx.value = tmp_cr.stripdigits_secondTrunk ;
 			DOM_new_crl_fotr_prepend.value = tmp_cr.secondPrepend ;
+			DOM_new_crl_fotr_filter.value = tmp_cr.secondFilter;
 		} else {
 			DOM_new_crl_foChkbx.checked = false;
 		}
@@ -335,12 +340,12 @@ var new_crl_save_go = function(){
 		}
 
 		var t1_braces = (t1 == 'Skype') ? t1 : '${' + t1 + '}' ;
-		var Trunk_Build_str = ',' + t1_braces + '/' + DOM_new_crl_tr_prepend.value + '${' + DOM_new_crl_tr_filter.value +',${EXTEN:' + tmp_stripx  + '})}' ;
+		var Trunk_Build_str = ',' + t1_braces + '/' + DOM_new_crl_tr_prepend.value + '${FILTER(' + DOM_new_crl_tr_filter.value +',${EXTEN:' + tmp_stripx  + '})}' ;
 		var foTrunk_Build_str = ',' ;
 
 		if(DOM_new_crl_foChkbx.checked){
 			var t2_braces = (t2 == 'Skype') ? t2 : '${' + t2 + '}' ;
-			foTrunk_Build_str += t2_braces + '/' + DOM_new_crl_fotr_prepend.value + '${EXTEN:' + tmp_fotr_stripx + '}' ;
+			foTrunk_Build_str += t2_braces + '/' + DOM_new_crl_fotr_prepend.value + '${FILTER(' + DOM_new_crl_fotr_filter.value + ',${EXTEN:' + tmp_fotr_stripx + '})}' ;
 		}
 
 		var t1_cidarg = ( t1 == 'Skype') ? ',' : ',' + t1 ;

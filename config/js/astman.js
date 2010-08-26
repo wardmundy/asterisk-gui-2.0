@@ -1685,11 +1685,60 @@ var ASTGUI = {
 
 		getArgsArrayFromArgsString: function(x){ // expects x as 'context,exten,pri' or 'context,exten,pri'
 			if (typeof x != 'string') return [];
+
+			var nested_parse = function (str, sep) {
+				var buffer = '';
+				var stack = new Array();
+				var depth = 0;
+				var len = str.length;
+				for(var i=0; i<len; i++) {
+					var char = str.charAt(i);
+					switch(char) {
+					case '(':
+						depth++;
+						break;
+					case sep.toString():
+						if (!depth) {
+							if (buffer != '') {
+								stack.push(buffer);
+								buffer = '';
+							}
+
+							continue;
+						}
+
+						break;
+					case ' ':
+						if (!depth) {
+							continue;
+						}
+						break;
+					case ')':
+						if (depth) {
+							depth--;
+						} else {
+							stack.push("" + buffer + char);
+							buffer = '';
+							continue;
+						}
+						break;
+					}
+					buffer += char;
+				}
+
+				if (buffer == '') {
+					stack.push(buffer);
+				}
+
+				return stack;
+			};
+
 			if(x.contains(',') ){
-				return x.split(',');
+				nested_parse(x,',');
+				return nested_parse(x,',');
 			}
 			if(x.contains('|') ){
-				return x.split('|');
+				return nested_parse(x,'|');
 			}
 			return [x] ;
 		},
@@ -1906,16 +1955,26 @@ var ASTGUI = {
 				if(!WhatToDial.contains('${EXTEN')){ // if WhatToDial is in some other format that the gui does not understand
 					// TODO : replace the above if condition with a regular expression to check for the acceptable formats
 					// TODO : THROW ERROR
-					return {name : trunkname, channel : channel, prepend : WhatToDial, stripx : ''};
+					return {name : trunkname, channel : channel, prepend : WhatToDial, stripx : '', filter: ''};
 				}
 				var prepend = WhatToDial.beforeChar('$') ;
-				var extenString = WhatToDial.betweenXY('{','}') ;
+				if (WhatToDial.contains('FILTER')) {
+					var filterstring = WhatToDial.betweenXY('(', ')');
+					filterstring = filterstring.split(',');
+
+					var extenString = filterstring[1].betweenXY('{', '}');
+					var filter = filterstring[0];
+				} else {
+					var extenString = WhatToDial.betweenXY('{','}') ;
+					var filter = '';
+				}
 				var stripXdigitsfromfront = ( extenString.contains(':') ) ? extenString.afterChar(':') || '0' : '0' ;
 			} else { // WhatToDial is a plain extension string such as '911' or 'pari'
 				var prepend = WhatToDial ;
 				var stripXdigitsfromfront = 'ALL' ;
+				var filter = '';
 			}
-			return { name : trunkname, channel : channel, prepend : prepend, stripx : stripXdigitsfromfront };
+			return { name : trunkname, channel : channel, prepend : prepend, stripx : stripXdigitsfromfront, filter: filter};
 		},
 
 		obCallingRule: function(str){ // usage ASTGUI.parseContextLine.obCallingRule(str)
@@ -1953,16 +2012,19 @@ var ASTGUI = {
 					cr.firstTrunk = t1.name ;
 					cr.firstPrepend = t1.prepend ;
 					cr.stripdigits_firstTrunk = t1.stripx ;
+					cr.firstFilter = t1.filter;
 		
 				if( macroargs.length <= 2  || ( macroargs.length > 2 && macroargs[2].trim() == '') ){ // if a failback trunk is not defined
 					cr.secondTrunk = '' ;
 					cr.secondPrepend = '' ;
 					cr.stripdigits_secondTrunk = '' ;
+					cr.secondFilter = '';
 				}else{
 					var t2 = ASTGUI.parseContextLine.parseTrunkDialArgument( macroargs[2] ) ;
 					cr.secondTrunk = t2.name ;
 					cr.secondPrepend = t2.prepend ;
 					cr.stripdigits_secondTrunk = t2.stripx ;
+					cr.secondFilter = t2.filter;
 				}
 			}else{
 				cr.destination = ASTGUI.parseContextLine.getAppWithArgs( str ) ;
