@@ -514,15 +514,20 @@
 				var has_class = $(this).toggleClass('active').hasClass('active');
 				extension_loads[title] = has_class?true:false;
 
-				//traverse sections and show or hide appropriately
+				//traverse sections and hide everything. 
+				$(this).siblings('[title!=all]').andSelf().each( function() {
+					var title = $(this).attr('title');
+					$('#extensions_list .'+title).hide();
+					top.log.debug( 'hiding ' + title);
+				});
+				//traverse sections and show only what we want. 
 				$(this).siblings('[title!=all]').andSelf().each( function() {
 					var show = $(this).hasClass('active');
 					var title = $(this).attr('title');
 					
 					if (show) {
 						$('#extensions_list .'+title).show();
-					} else {
-						$('#extensions_list .'+title).hide();
+						top.log.debug( 'showing ' + title);
 					}
 				});
 
