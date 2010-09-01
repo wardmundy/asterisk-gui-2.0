@@ -355,6 +355,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['callingrules'].en[4] = "<B>FailOver Trunk:</B> Failover trunks can be used to make sure that a call goes through an alternate route, when the primary trunk is busy or down If \"Use Failover Trunk\" is checked and \"Failover trunk\" is defined, then calls that cannot be placed via the regular trunk may have a secondary trunk defined.  If a user's primary trunk is a VoIP trunk, but one wants calls to use the PSTN when the VoIP trunk isn't available, this option is a good idea.";
 	tooltips['callingrules'].en[5] = "<B>Send To Local Destination:</B> If this option is checked and Destination is defined, calls matching the specified pattern may be sent to a local extension.";
 	tooltips['callingrules'].en[6] = "Defines the Trunk that calls, matching the specified pattern, will be placed through.";
+	tooltips['callingrules'].en[7] = "<b>Filter:</b> This mandatory option is used to filter out certain characters.  The characters listed in this field will be permitted, while all others will be filtered out.  For example, a value of '012345' would allow 0, 1, 2, 3, 4, and 5, but filter out 6, 7, 8, and 9.  Note: If this field is left blank, the resultant dial string will be null.";
 
 
 	// Tooltips for Incoming Calls (incoming)
@@ -448,8 +449,9 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['trunks'].en[37] = "<B>Provider Name:</B> A unique label to help you identify this trunk when listed in outbound rules, incoming rules etc.";
 	tooltips['trunks'].en[38] = "<B>Trunk Name:</B> A unique label to help you identify this trunk when listed in outbound rules, incoming rules etc. Ex: 'Port 5' ";
 	tooltips['trunks'].en[39] = "<B>Username:</B> Username that you authenticate with at VoIP provider. Must be unique if <B>Context Naming</B> is based on Username.";
-	tooltips['trunks'].en[40] = "<B>Context Naming:</B> How should Asterisk GUI determine the context name in Asterisk's .conf files.  Asterisk can assign a unique name itself, or you can base it upon the <B>Provider Name</B> or <B>Username</B> that you enter below.  Let Asterisk assign a name unles your VoIP provider requires otherwise.";
+	tooltips['trunks'].en[40] = "<B>Context Naming:</B> How should Asterisk GUI determine the context name in Asterisk's .conf files.  Asterisk can assign a unique name itself, or you can base it upon the <B>Provider Name</B> or <B>Username</B> that you enter below.  Let Asterisk assign a name unles your VoIP provider requires otherwise. <br /> If you plan on using a contact extension, this feature needs to be set to 'Based on Username'. ";
 	tooltips['trunks'].en[41] = "<B>Hostname:</B> IP address or URL for your VoIP providers server.";
+	tooltips['trunks'].en[42] = "<B>Contact Extension:</B> This requires that the context naming of this trunk be based on the username. <br /> If this is disabled, then you will need to recreate this trunk and select 'Context Naming' to be 'Based on Username'.";
 	// END   trunks_voip.html
 	
 
