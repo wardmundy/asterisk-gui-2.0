@@ -71,7 +71,7 @@ var onLogInFunctions = {
 						onLogInFunctions.makePings.stop();
 						top.window.location.replace(top.window.location.href); return true; 
 					}else{
-						top.log.ajax('PING Request: Success');
+						// top.log.ajax('PING Request: Success');
 					}
 				};
 				$.ajax({
