@@ -342,12 +342,12 @@ var followMe_MiscFunctions = {
 		if( tmp_number.contains('-') ) tmp_number = tmp_number.withOut('-');
 		var tmp_dest = tmp_number + ',' + tmp_seconds;
 
-		if( _$('newFM_Order_radio_after').checked ){
+		var tmp_last = CURRENT_DESTINATIONS.lastValue();
+		if( _$('newFM_Order_radio_after').checked || !tmp_last){
 			CURRENT_DESTINATIONS.push(tmp_dest);
 		}
 
-		if ( _$('newFM_Order_radio_alongWith').checked ){
-			var tmp_last = CURRENT_DESTINATIONS.lastValue();
+		if ( _$('newFM_Order_radio_alongWith').checked && tmp_last){
 			CURRENT_DESTINATIONS.replaceLastWith( tmp_last.split(',')[0] + '&' + tmp_dest );
 		}
 
