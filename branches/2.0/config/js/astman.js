@@ -2588,7 +2588,7 @@ var ASTGUI = {
 					}
 					break;
 				case 'numeric_plus':
-					// check if field's value is numeric - otherwise highlight field and return false
+					// check if field's value is numeric or plus sign - otherwise highlight field and return false
 					var fb_msg = (this_field_name) ? this_field_name + ' is a numeric field.<BR> Letters and Punctuation are not allowed in this field.' : 'This is a numeric field.<BR> Letters and Punctuation are not allowed in this field.';
 					if ( /[^0-9\+]/.test(x) ){
 						ASTGUI.highlightField( field, fb_msg );
@@ -2596,7 +2596,7 @@ var ASTGUI = {
 					}
 					break;
 				case 'numeric_plus_w':
-					// check if field's value is numeric - otherwise highlight field and return false
+					// check if field's value is numeric, plus sign, or "w" - otherwise highlight field and return false
 					var fb_msg = (this_field_name) ? this_field_name + ' is a numeric field.<BR> Letters and Punctuation are not allowed in this field.' : 'This is a numeric field.<BR> Letters and Punctuation are not allowed in this field.';
 					if ( /[^0-9w\+]/.test(x) ){
 						ASTGUI.highlightField( field, fb_msg );
@@ -2620,6 +2620,13 @@ var ASTGUI = {
 				case 'alphanumericUndSpace':
 					var fb_msg = (this_field_name) ? this_field_name + ' is a AlphaNumeric field.<BR> Punctuation and Special Characters are not allowed in this field.' : 'This is a AlphaNumeric field.<BR> Punctuation and Special Characters are not allowed in this field.';
 					if ( /[^a-zA-Z_0-9 ]/.test(x) ){
+						ASTGUI.highlightField( field, fb_msg );
+						return false;
+					}
+					break;
+				case 'numeric_pound_star':
+					var fb_msg = (this_field_name) ? 'Invalid Characters in ' + this_field_name  : 'Invalid character in a Dial Pattern field.' + '  Use only numerics, pound, and star.';
+					if ( /[^0-9#\*]/.test(x) ){
 						ASTGUI.highlightField( field, fb_msg );
 						return false;
 					}
