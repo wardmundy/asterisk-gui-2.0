@@ -273,8 +273,8 @@ var listAmap = function(name) {
 		var amap_fields = ['', 'self', '', ''];
 	}
 
-	if (!amap_table.find('tr').length || (amap_table.find('tr').length && amap_table.find('tr.noapps'))) {
-		amap_table.find('tr:not(.template)').remove();
+	if (amap_table.find('tr:not(.template)').length) {
+		amap_table.find('tr.noapps').remove();
 	}
 
 	var row = $('#application_map_list > tbody > tr.template').clone();
@@ -454,6 +454,11 @@ var removeAmap = function(obj) {
 		$(this).remove();
 		$(this).dequeue();
 	});
+	// if number of rows is one, the table is about to be empty
+	if (amap_table.find('tr:not(.template)').length === 1) { 
+		var row = $('<tr>').attr('colspan', '7').addClass('noapps').html('No Application Maps Defined.');
+		amap_table.append(row);
+	}
 };
 
 var validateAmap = function(obj, params, focus) {
