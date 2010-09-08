@@ -1449,7 +1449,7 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	ext_conf.new_action('newcat', ct + ASTGUI.contexts.TrunkDefaultSuffix, '', '');
 	ext_conf.new_action('append', ct, 'include', ct + ASTGUI.contexts.TrunkDefaultSuffix);
 	/* not going to work for analog vv */
-	ext_conf.new_action('update', 'globals', name, tech + '/' + ((type === 'analog')? group : name));
+	ext_conf.new_action('update', 'globals', name, tech + '/' + ((type === 'analog') ? 'g' + group : name));
 
 	resp = '';
 	resp = ext_conf.callActions();
