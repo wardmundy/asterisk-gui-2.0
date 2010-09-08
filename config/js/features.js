@@ -90,7 +90,7 @@ edit_funcs['parkext'] = function(val) {
 
 edit_funcs['parkpos'] = function(val) {
 	/* validate special format */
-	if (!val.match(/[0-9][0-9]*\-[0-9][0-9]*/)) {
+	if (!val.match(/^[0-9][0-9]*\-[0-9][0-9]*$/)) {
 		throw TypeError('Invalid: Please use "&lt;num&gt;-&lt;num&gt;" format');
 	}
 
