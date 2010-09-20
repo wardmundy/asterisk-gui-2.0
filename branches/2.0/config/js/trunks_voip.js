@@ -254,6 +254,7 @@ var edit_VOIPTrunk_save_go = function(){
 			}else{
 				if( parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK].hasOwnProperty('fromdomain') ){
 					delete parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['fromdomain'] ;
+					x.new_action('delete', EDIT_TRUNK , 'fromdomain' );
 				}
 			}
 	
@@ -264,6 +265,7 @@ var edit_VOIPTrunk_save_go = function(){
 			}else{
 				if( parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK].hasOwnProperty('fromuser') ){
 					delete parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['fromuser'] ;
+					x.new_action('delete', EDIT_TRUNK , 'fromuser' );
 				}
 			}
 
@@ -274,6 +276,7 @@ var edit_VOIPTrunk_save_go = function(){
 			}else{
 				if( parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK].hasOwnProperty('authuser') ){
 					delete parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['authuser'] ;
+					x.new_action('delete', EDIT_TRUNK , 'authuser' );
 				}
 			}
 
