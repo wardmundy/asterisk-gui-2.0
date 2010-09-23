@@ -340,12 +340,20 @@ var new_crl_save_go = function(){
 		}
 
 		var t1_braces = (t1 == 'Skype') ? t1 : '${' + t1 + '}' ;
-		var Trunk_Build_str = ',' + t1_braces + '/' + DOM_new_crl_tr_prepend.value + '${FILTER(' + DOM_new_crl_tr_filter.value +',${EXTEN:' + tmp_stripx  + '})}' ;
+		var Trunk_Build_str = '${EXTEN:' + tmp_stripx  + '}';
+		if(DOM_new_crl_tr_filter.value != ''){
+			Trunk_Build_str = '${FILTER(' + DOM_new_crl_tr_filter.value +',' + Trunk_Build_str + ')}' ;
+		}
+		Trunk_Build_str = ',' + t1_braces + '/' + DOM_new_crl_tr_prepend.value + Trunk_Build_str;
 		var foTrunk_Build_str = ',' ;
 
 		if(DOM_new_crl_foChkbx.checked){
 			var t2_braces = (t2 == 'Skype') ? t2 : '${' + t2 + '}' ;
-			foTrunk_Build_str += t2_braces + '/' + DOM_new_crl_fotr_prepend.value + '${FILTER(' + DOM_new_crl_fotr_filter.value + ',${EXTEN:' + tmp_fotr_stripx + '})}' ;
+			foTrunk_Build_str += '${EXTEN:' + tmp_fotr_stripx + '}' ;
+			if(DOM_new_crl_tr_filter.value != ''){
+				foTrunk_Build_str = '${FILTER(' + DOM_new_crl_fotr_filter.value + ',' + foTrunk_Build_str + ')}' ;
+			}
+			foTrunk_Build_str += t2_braces + '/' + DOM_new_crl_fotr_prepend.value + foTrunk_Build_str;
 		}
 
 		var t1_cidarg = ( t1 == 'Skype') ? ',' : ',' + t1 ;
