@@ -79,13 +79,15 @@ var saveChanges = function(){
 	var x = new listOfActions('iax.conf');
 	var AG = ASTGUI.getFieldValue;
 	fieldnames.each( function(fld){
-		var val = AG(fld) ;
-		if (skip_ifempty.contains(fld)) {
-			if (val.trim() == "") {
+		var val = AG(fld).trim();
+		if (val == "") {
+			if (skip_ifempty.contains(fld)) {
 				return;
 			}
+			x.new_action('delete', cat , fld , '') ;
+		}else{
+			x.new_action('update', cat , fld , val) ;
 		}
-		x.new_action('update', cat , fld , val) ;
 	});
 	x.new_action('delete', cat , 'disallow', '' ) ;
 	x.new_action('delete', cat , 'allow', '' ) ;
