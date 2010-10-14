@@ -364,7 +364,7 @@ var save_QueueSettings = function(){
 		return ;
 	}
 	if( le && le == lce ){
-		ASTGUI.highlightField('login_exten' , 'Extension already exists');
+		ASTGUI.highlightField('login_exten' , 'Choose a different callback extension.');
 		return;
 	}
 
