@@ -223,12 +223,34 @@
 									<option value='6'>6</option>
 								</select>
 								<img src="images/tooltip_info.gif" tip="en,users,94" class='tooltipinfo'>
+							</TD>
+						</TR>
+						<TR>
+							<TD>
 								
 								SIP/IAX Password: <input id="edit_secret" size=6>
 								<img src="images/tooltip_info.gif" tip="en,users,2" class='tooltipinfo'>
+ 							
+ 							IAX: Require Call Token: <img src="images/tooltip_info.gif" tip="en,users,32" class='tooltipinfo'>
+ 							<select id="edit_requirecalltoken" dfalt=""> 
+ 								<option value=''></option>
+ 								<option value='yes'>yes</option>
+ 								<option value='no'>no</option>
+ 								<option value='auto'>auto</option>
+ 							</select>
 							</TD>
 						</TR>
-						<TR>	<TD>
+						<TR>
+							<TD>
+ 					<TR>
+ 						<TD>
+ 
+ 							IAX: Max Call Numbers: <img src="images/tooltip_info.gif" tip="en,iax_general,42" class='tooltipinfo'>
+ 							<input type='text' size=4 id='edit_maxcallnumbers' dfalt='' validation='numeric' class="input8">
+ 						</TD>
+ 					</TR>
+ 					<TR>
+ 						<TD>
 								NAT: <input type='checkbox' id='edit_nat' dfalt='yes'> <img src="images/tooltip_info.gif" tip="en,users,22" class='tooltipinfo'>
 								Can Reinvite: <input type='checkbox' id='edit_canreinvite'> <img src="images/tooltip_info.gif" tip="en,users,21" class='tooltipinfo'>
 
@@ -380,8 +402,27 @@
 				<TD><input type=checkbox id='edit_check_multiple_secret'></TD>
 				<TD>
 					SIP/IAX Password: <img src="images/tooltip_info.gif" tip="en,users,2" class='tooltipinfo'>
-					<BR>	<input type=radio id='edit_multiple_seCHoice1' name='edit_multiple_seCHoice'> Use <input id="edit_multiple_secret" size=4> for all users<BR>
-							<input type=radio id='edit_multiple_seCHoice2' name='edit_multiple_seCHoice'> Use Extension as Password
+ 				<BR>	<input type=radio id='edit_multiple_seCHoice1' name='edit_multiple_seCHoice'> Use <input id="edit_multiple_secret" size=4> for all users 
+ 						<input type=radio id='edit_multiple_seCHoice2' name='edit_multiple_seCHoice'> Use Extension as Password
+ 						</TD>
+ 					</TR>
+				<TR>
+					<TD></TD>
+					<TD><strong>IAX Security Settings:</strong></TD>
+				</TR>
+ 					<TR>
+					<TD><input type=checkbox id='edit_check_multiple_iax'></TD>
+ 						<TD>
+ 							IAX: Require Call Token: <img src="images/tooltip_info.gif" tip="en,users,32" class='tooltipinfo'>
+ 							<select id="edit_multiple_requirecalltoken" dfalt=''> 
+ 								<option value=''></option>
+ 								<option value='yes'>yes</option>
+ 								<option value='no'>no</option>
+ 								<option value='auto'>auto</option>
+ 							</select>
+							<br> 
+ 							IAX: Max Call Numbers: <img src="images/tooltip_info.gif" tip="en,iax_general,42" class='tooltipinfo'>
+ 							<input type='text' size=4 id='edit_multiple_maxcallnumbers' dfalt='' validation='numeric' class="input8">
 				</TD>
 			</TR>
 
