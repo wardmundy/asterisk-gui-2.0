@@ -21,7 +21,7 @@
 var isNewUSER;
 var EXTENSION_EDIT;
 var zapchan_Before = '';
-var MULTI_FIELDS = ['edit_check_multiple_obcid','edit_multiple_obcid','edit_check_multiple_dialplan','edit_multiple_dialplan','edit_check_multiple_hasvoicemail','edit_multiple_hasvoicemail','edit_check_multiple_vmsecret', 'edit_multiple_vmCHoice1', 'edit_multiple_vmCHoice2', 'edit_multiple_vmsecret', 'edit_check_multiple_hassip', 'edit_multiple_hassip', 'edit_check_multiple_hasiax', 'edit_multiple_hasiax', 'edit_check_multiple_allow',  'edit_multiple_codec_one', 'edit_multiple_codec_two', 'edit_multiple_codec_three', 'edit_multiple_codec_fourth', 'edit_multiple_codec_fifth', 'edit_check_multiple_flashrxflash',  'edit_multiple_flash', 'edit_multiple_rxflash', 'edit_check_multiple_secret', 'edit_multiple_seCHoice1', 'edit_multiple_seCHoice2', 'edit_multiple_secret', 'edit_check_multiple_nat',  'edit_multiple_nat', 'edit_check_multiple_canreinvite', 'edit_multiple_canreinvite', 'edit_check_multiple_dtmfmode',  'edit_multiple_dtmfmode', 'edit_check_multiple_insecure',  'edit_multiple_insecure', 'edit_check_multiple_3waycalling',  'edit_multiple_3waycalling', 'edit_check_multiple_indirectory',  'edit_multiple_indirectory', 'edit_check_multiple_callwaiting',  'edit_multiple_callwaiting', 'edit_check_multiple_cti',  'edit_multiple_cti', 'edit_check_multiple_isagent',  'edit_multiple_isagent', 'edit_check_multiple_pickupgroup',  'edit_multiple_pickupgroup'];
+var MULTI_FIELDS = ['edit_check_multiple_obcid','edit_multiple_obcid','edit_check_multiple_dialplan','edit_multiple_dialplan','edit_check_multiple_hasvoicemail','edit_multiple_hasvoicemail','edit_check_multiple_vmsecret', 'edit_multiple_vmCHoice1', 'edit_multiple_vmCHoice2', 'edit_multiple_vmsecret', 'edit_check_multiple_hassip', 'edit_multiple_hassip', 'edit_check_multiple_hasiax', 'edit_multiple_hasiax', 'edit_check_multiple_allow',  'edit_multiple_codec_one', 'edit_multiple_codec_two', 'edit_multiple_codec_three', 'edit_multiple_codec_fourth', 'edit_multiple_codec_fifth', 'edit_check_multiple_flashrxflash',  'edit_multiple_flash', 'edit_multiple_rxflash', 'edit_check_multiple_secret', 'edit_check_multiple_iax', 'edit_multiple_seCHoice1', 'edit_multiple_seCHoice2', 'edit_multiple_secret', 'edit_check_multiple_nat',  'edit_multiple_nat', 'edit_check_multiple_canreinvite', 'edit_multiple_canreinvite', 'edit_check_multiple_dtmfmode',  'edit_multiple_dtmfmode', 'edit_check_multiple_insecure',  'edit_multiple_insecure', 'edit_check_multiple_3waycalling',  'edit_multiple_3waycalling', 'edit_check_multiple_indirectory',  'edit_multiple_indirectory', 'edit_check_multiple_callwaiting',  'edit_multiple_callwaiting', 'edit_check_multiple_cti',  'edit_multiple_cti', 'edit_check_multiple_isagent',  'edit_multiple_isagent', 'edit_check_multiple_pickupgroup',  'edit_multiple_pickupgroup', 'edit_multiple_requirecalltoken', 'edit_multiple_maxcallnumbers'];
 
 var show_UserEdit_normal = function(){ // show_UserEdit_normal();
 	$('#edit_User_Advanced_DIV').hideWithBg();
@@ -111,7 +111,8 @@ var initialize_formFields = function(){ // initialize_formFields();
 	ASTGUI.domActions.enableDisableByCheckBox( 'edit_check_multiple_hasiax' , [ 'edit_multiple_hasiax' ] );
 	ASTGUI.domActions.enableDisableByCheckBox( 'edit_check_multiple_allow' , [ 'edit_multiple_codec_one', 'edit_multiple_codec_two', 'edit_multiple_codec_three' , 'edit_multiple_codec_fourth' , 'edit_multiple_codec_fifth'  ] );
 	ASTGUI.domActions.enableDisableByCheckBox( 'edit_check_multiple_flashrxflash' , [ 'edit_multiple_flash', 'edit_multiple_rxflash'  ] );
-	ASTGUI.domActions.enableDisableByCheckBox( 'edit_check_multiple_secret' , [ 'edit_multiple_seCHoice1', 'edit_multiple_seCHoice2', 'edit_multiple_secret'  ] );
+	ASTGUI.domActions.enableDisableByCheckBox( 'edit_check_multiple_secret' , [ 'edit_multiple_seCHoice1', 'edit_multiple_seCHoice2', 'edit_multiple_secret' ] );
+	ASTGUI.domActions.enableDisableByCheckBox( 'edit_check_multiple_iax' , [ 'edit_multiple_requirecalltoken' ,'edit_multiple_maxcallnumbers' ] );
 	ASTGUI.domActions.enableDisableByCheckBox( 'edit_check_multiple_nat' , [ 'edit_multiple_nat' ] );
 	ASTGUI.domActions.enableDisableByCheckBox( 'edit_check_multiple_canreinvite' , [ 'edit_multiple_canreinvite' ] );
 	ASTGUI.domActions.enableDisableByCheckBox( 'edit_check_multiple_dtmfmode' , [ 'edit_multiple_dtmfmode' ] );
@@ -193,7 +194,7 @@ var load_users_table = function(){ // load_users_table
 };
 
 var RESET_USER_FORM_FIELDS = function(){ // RESET_USER_FORM_FIELDS();
-	ASTGUI.resetTheseFields( ['new_ext','edit_fullname','edit_user_dialplan','edit_OutBoundCallerid','edit_hasvoicemail','edit_vmsecret','edit_email','edit_hasSip','edit_hasIax','edit_fxs','edit_flash','edit_rxflash','codec_one','codec_two','codec_three','codec_fourth','codec_fifth','macaddress','linenumber','edit_secret','edit_nat','edit_canreinvite','edit_dtmfmode','edit_insecure', 'edit_mwifrom', 'edit_3wayCalling','edit_inDirectory','edit_callWaiting','edit_cti','edit_isagent','edit_pickupgroup','edit_linekeys'] );
+	ASTGUI.resetTheseFields( ['new_ext','edit_fullname','edit_user_dialplan','edit_OutBoundCallerid','edit_hasvoicemail','edit_vmsecret','edit_email','edit_hasSip','edit_hasIax','edit_fxs','edit_flash','edit_rxflash','codec_one','codec_two','codec_three','codec_fourth','codec_fifth','macaddress','linenumber','edit_secret','edit_nat','edit_canreinvite','edit_dtmfmode','edit_insecure', 'edit_mwifrom', 'edit_3wayCalling','edit_inDirectory','edit_callWaiting','edit_cti','edit_isagent','edit_pickupgroup','edit_linekeys','edit_maxcallnumbers' ,'edit_requirecalltoken'] );
 	_$('edit_fxs').selectedIndex = 0; _$('codec_one').selectedIndex = 0; _$('codec_two').selectedIndex = 0; _$('codec_three').selectedIndex = 0; _$('codec_fourth').selectedIndex = 0; 
 	_$('codec_fifth').selectedIndex = 0; _$('linenumber').selectedIndex = 0; _$('edit_pickupgroup').selectedIndex = 0;
 
@@ -257,6 +258,8 @@ var RESET_USER_FORM_FIELDS = function(){ // RESET_USER_FORM_FIELDS();
 		ASTGUI.updateFieldToValue( 'edit_cti', uinfo.getProperty('hasmanager') );
 		ASTGUI.updateFieldToValue( 'edit_isagent', uinfo.getProperty('hasagent') );
 		ASTGUI.updateFieldToValue( 'edit_pickupgroup', uinfo.getProperty('pickupgroup') );
+		ASTGUI.updateFieldToValue( 'edit_maxcallnumbers', uinfo.getProperty('maxcallnumbers') );
+		ASTGUI.updateFieldToValue( 'edit_requirecalltoken', uinfo.getProperty('requirecalltoken') );
 		zapchan_Before = uinfo.getProperty(top.sessionData.DahdiChannelString);
 	}else{
 			_$('new_ext').disabled = false;
@@ -400,6 +403,9 @@ var check_duplicate_lineNumber = function(){ // check_duplicate_lineNumber()  ch
 var SAVE_USER_FORM = function(){ // SAVE_USER_FORM();
 	if ( !ASTGUI.checkRequiredFields(['new_ext']) ) return ;
 	if ( !ASTGUI.validateFields(['new_ext'] ) ) return ;
+	if ( $('edit_maxcallnumbers').attr('value') && !ASTGUI.validateFields(['edit_maxcallnumbers'] ) ){
+		return;
+	}
 
 	if ( !ASTGUI.getFieldValue('edit_hasSip').isAstTrue() && ASTGUI.getFieldValue('edit_fxs') && !ASTGUI.getFieldValue('macaddress') ){
 		ASTGUI.updateFieldToValue( 'macaddress',  ASTGUI.getFieldValue('new_ext') );
@@ -494,6 +500,16 @@ var SAVE_USER_FORM = function(){ // SAVE_USER_FORM();
 		x.new_action('update', u, 'mwi_from', 		ASTGUI.getFieldValue('edit_mwifrom') );	tmp_obj['mwi_from'] = ASTGUI.getFieldValue('edit_mwifrom') ;
 	}
 		x.new_action('update', u, 'pickupgroup', 	ASTGUI.getFieldValue('edit_pickupgroup') );	tmp_obj['pickupgroup'] = ASTGUI.getFieldValue('edit_pickupgroup') ;
+		if (ASTGUI.getFieldValue('edit_requirecalltoken') == ''){
+			x.new_action('delete', u, 'requirecalltoken','');	tmp_obj['requirecalltoken'] = '';
+		} else {
+			x.new_action('update', u, 'requirecalltoken',	ASTGUI.getFieldValue('edit_requirecalltoken') );	tmp_obj['requirecalltoken'] = ASTGUI.getFieldValue('edit_requirecalltoken') ;
+		}
+		if(ASTGUI.getFieldValue('edit_maxcallnumbers') ){
+			x.new_action('update', u, 'maxcallnumbers', 	ASTGUI.getFieldValue('edit_maxcallnumbers') );	tmp_obj['maxcallnumbers'] = ASTGUI.getFieldValue('edit_maxcallnumbers') ;
+		}else{
+			x.new_action('delete', u, 'maxcallnumbers', '');	tmp_obj['maxcallnumbers'] = '';
+		}
 
 		var tmp_cl = parent.sessionData.pbxinfo.users[u].getProperty('call-limit') ;
 		if( !tmp_cl ){
@@ -629,8 +645,30 @@ var save_multiple_users = function(){ // save_multiple_users()
 			tmp_obj['rxflash'] = ASTGUI.getFieldValue('edit_multiple_rxflash') ;
 		}
 		if( _$('edit_check_multiple_secret').checked ){
-			x.new_action('update', u, 'secret',  ASTGUI.getFieldValue('edit_multiple_secret') );
-			tmp_obj['secret'] = ASTGUI.getFieldValue('edit_multiple_secret') ;
+			if(ASTGUI.getFieldValue('edit_multiple_seCHoice1') == 'on'){
+				x.new_action('update', u, 'secret',  ASTGUI.getFieldValue('edit_multiple_secret') );
+				tmp_obj['secret'] = ASTGUI.getFieldValue('edit_multiple_secret') ;
+			}else if(ASTGUI.getFieldValue('edit_multiple_seCHoice2') == 'on'){
+				x.new_action('update', u, 'secret',  '' );
+				tmp_obj['secret'] = '' ;
+			}
+		}
+		if( _$('edit_check_multiple_iax').checked ){
+			if ( ASTGUI.getFieldValue('edit_multiple_maxcallnumbers') ){
+				if ( !ASTGUI.validateFields(['edit_multiple_maxcallnumbers'] ) ){
+					return;
+				}else{
+					x.new_action('update', u, 'maxcallnumbers',  ASTGUI.getFieldValue('edit_multiple_maxcallnumbers') );
+					tmp_obj['maxcallnumbers'] = ASTGUI.getFieldValue('edit_multiple_maxcallnumbers') ;
+				}
+			}else{
+					x.new_action('delete', u, 'maxcallnumbers', '' );
+					tmp_obj['maxcallnumbers'] = '';
+			}
+			if( ASTGUI.getFieldValue('edit_multiple_requirecalltoken') != ''){
+				x.new_action('update', u, 'requirecalltoken',  ASTGUI.getFieldValue('edit_multiple_requirecalltoken') );
+				tmp_obj['requirecalltoken'] = ASTGUI.getFieldValue('edit_multiple_requirecalltoken') ;
+			}
 		}
 		if( _$('edit_check_multiple_nat').checked ){
 			x.new_action('update', u, 'nat',  ASTGUI.getFieldValue('edit_multiple_nat') );

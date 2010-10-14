@@ -24,7 +24,61 @@
 	<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1" />
 
 	<link href="stylesheets/schwing.css" media="all" rel="Stylesheet" type="text/css" />
-	<style type="text/css"></style>
+	<style type="text/css">
+ 	#callNumberLimits div span.callnumber_delete {
+ 		float: right;
+ 		width: 20px;
+ 		background: transparent url("./images/delete_circle.png") no-repeat;
+ 	}
+ 	#callNumberLimits{
+ 		height:120px ;
+ 		background-color:#FFFFFF;
+ 		padding: 5px;
+ 		border-width: 1px;
+ 		border-color: #7E5538;
+ 		border-style: solid;
+ 		cursor: default;
+ 		font: 83%/1.4 arial, helvetica, sans-serif;
+ 		overflow :auto;
+ 	}
+ 	
+ 	#callNumberLimits div {
+ 		clear :both;
+ 		padding : 3px 5px 0px 5px;
+ 		min-height: 20px;
+ 	}
+ 	#callNumberLimits div:hover {
+ 		background-color:#DEDEDE;
+ 	}
+ 	
+ 	#callNumberLimits div span.step_desc {
+ 		float: left;
+ 		/* max-width: 300px; */
+ 		background: transparent;
+ 	}
+ 	#callNumberLimits div span.step_desc:hover{
+ 		background-color:#DEDEDE;
+ 	}
+ 	
+ 	#callNumberLimits div span.step_up {
+ 		float: right;
+ 		width: 20px;
+ 		background: transparent url("./images/asterisk-arrow-up.png") no-repeat;
+ 	}
+ 	
+ 	#callNumberLimits div span.step_down {
+ 		float: right;
+ 		width: 20px;
+ 		background: transparent url("./images/asterisk-arrow-down.png") no-repeat;
+ 	}
+ 	
+ 	#callNumberLimits div span.step_delete {
+ 		float: right;
+ 		width: 20px;
+ 		background: transparent url("./images/delete_circle.png") no-repeat;
+ 	}
+	
+	</style>
 </head>
 <body bgcolor="EFEFEF">
 	<div class="iframeTitleBar">
@@ -222,6 +276,49 @@
 				</table>
 			</div>
 		
+ 		<div id='iaxoptions_security' style='display: none;'>
+ 			<table class="field_text" align="center" width="100%" cellpadding=3 cellspacing=0 border=0>
+ 			<tr>
+ 				<td align=right width="50%">Call Token Optional: <img src='images/tooltip_info.gif' alt='' class='tooltipinfo' tip='en,iax_general,40'></td>
+ 				<td>&nbsp;<input type='text' size=20 id='calltokenoptional' dfalt='' class="input8" validation='iporrange'></td>
+ 			</tr>
+ 			<tr>
+ 				<td align=right  tip="en,iax_general,41"  width="50%">Max Call Numbers:</td>
+ 				<td>&nbsp;<input type='text' size=4 id='maxcallnumbers' dfalt='' validation='numeric' class="input8"></td>
+ 			</tr>
+ 			<tr>
+ 				<td align=right  tooltip="en,iax_general,42"  width="50%">Max Nonvalidated Call Numbers:</td>
+ 				<td>&nbsp;<input type='text' size=4 id='maxcallnumbers_nonvalidated' dfalt='' validation='numeric' class="input8"></td>
+ 			</tr>
+ 			<tr>
+ 				<td align=right valign=top>Call Number Limits: <img src="images/tooltip_info.gif" tip="en,iax_general,43" class='tooltipinfo'></td>
+ 				<td><div id='callNumberLimits'></div></td>
+ 			</tr>
+ 			<tr class='form_newCallNumberLimit' >
+ 				<td align=right width="50%"></td>
+ 				<td>
+ 					<span class='guiButton' onclick=" showCallNumberLimitsForm(); "><B>Add Call Number Limit</B></span>
+ 				</td>
+ 			</tr>
+ 			<tr class='form_newCallNumberLimit'>
+ 				<td align=right valign=top></td>
+ 				<td align=left width="50%">IP or IP Range: <img src='images/tooltip_info.gif' alt='' class='tooltipinfo' tip='en,iax_general,40'>
+ 				&nbsp;<input type='text' size=20 id='form_newCallNumberLimit_ip' class="input8" validation='iporrange'></td>
+ 			</tr>
+ 			<tr class='form_newCallNumberLimit'>
+ 				<td align=right valign=top></td>
+ 				<td align=left width="50%">Max Call Numbers:
+ 				&nbsp;<input type='text' size=4 id='form_newCallNumberLimit_maxcallnumbers' dfalt='512' validation='numeric' class="input8"></td>
+ 			</tr>
+ 			<tr class='form_newCallNumberLimit'>
+ 				<td align=right width="50%"></td>
+ 				<td>
+ 					<span class='guiButtonCancel' onclick='hideCallNumberLimitsForm();'>Cancel</span>
+ 					<span class='guiButton' onclick='pushNewCallNumberLimit();'> &uarr; Add</span>
+ 				</td>
+ 			</tr>
+ 			</table>
+ 		</div>
 			
 			<div style='margin-top:15px; width:100%; text-align:center;'>
 				<span class='guiButtonCancel' onclick='window.location.reload();' style='margin-left:10px'>Cancel</span>
@@ -232,7 +329,9 @@
 
 	</center>
 	<script src="js/jquery.js"></script>
+ 	<script src="js/jquery.tooltip.js"></script>
 	<script src="js/astman.js"></script>
 	<script src="js/iax.js"></script>
+ 	<script type='text/javascript'>hideCallNumberLimitsForm();</script>
 </body>
 </html>

@@ -58,6 +58,9 @@ _$ = function(x){
 		return this.indexOfLike(str) != -1;
 	};
 	
+	/* This cannot be used if you need to return from the calling
+	function early. The return statement will return from this 
+	anonymous function instead. */
 	Array.prototype.each = function(iterator) {
 		for(var i=0 , j = this.length; i < j ; i++ ){
 			iterator(this[i] , i);
@@ -2065,6 +2068,7 @@ var ASTGUI = {
 			}
 		};
 		var el;
+		top.log.debug("flds is " + flds);
 		for (var i=0; i < flds.length ; i++ ) {
 			el = flds[i] ;
 			if ( typeof el == 'string'){ el = _$(el) ; }
@@ -2656,6 +2660,16 @@ var ASTGUI = {
 					if ( /[^a-zA-Z_0-9\.]/.test(x) ){
 						ASTGUI.highlightField( field, fb_msg );
 						return false;
+					}
+					break;
+				case 'iporrange':
+					var fb_msg = (this_field_name) ? this_field_name + ' does not contain a valid IP address or IP range.' : 'The IP address field does not contain a valid IP address or IP range.' ;
+					var pieces = x.split("/");
+					for (var j = 0; j < pieces.length; j++){
+						if ( !(/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/.test(pieces[j])) ){
+							ASTGUI.highlightField( field, fb_msg );
+							return false;
+						}
 					}
 					break;
 				default:

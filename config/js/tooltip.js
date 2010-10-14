@@ -66,6 +66,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['users'] .en[30] = "<B>Flash</B> sets the amount of time, in milliseconds, that must have passed since the last hook-flash event received by asterisk before it will recognize a second event.  If a second event occurs in less time than defined for Flash, then asterisk will ignore the event.  The default value of Flash is 750 ms, and it can be configured in 1ms increments." ;
 
 	tooltips['users'] .en[31] = "<B>RXFlash</B> sets the amount of time, in milliseconds, that the hook-flash must remain depressed in order for asterisk to consider such an event a valid flash event.  The default value of RXFlash is 1250ms and it can be configured in 1ms increments." ;
+	tooltips['users'] .en[32] = "<B>Require Call Token:</B> Enable or disable requiring call token.  Default is 'yes'. Using 'auto' may lock out users who depend on backward compatibility when peer authentication credentials are shared between physical endpoints.";
 
 	tooltips['users'] .en[94] = "Line Keys is the number of lines that are tied to this SIP registration.";
 
@@ -275,6 +276,9 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['iax_general'].en[36] = "<B>Ignore Expired Peers:</B> if the peers ip registration is expired use the ip information  if available.";
 	tooltips['iax_general'].en[37] = "<B>Disallowed Codecs:</B> set default disallow codecs to the following";
 	tooltips['iax_general'].en[38] = "<B>Allowed Codecs:</B> set allowed codecs to the following.";
+	tooltips['iax_general'].en[40] = "A single IP address or a range of IP addresses for which call token validation is not required in the form \"11.11.11.11\" or \"11.11.11.11/22.22.22.22\".";
+	tooltips['iax_general'].en[41] = "<B>Max Call Numbers:</B> Limits the amount of call numbers allowed for a single IP address.";
+	tooltips['iax_general'].en[42] = "<B>Max Nonvalidated Call Numbers:</B> Limits the amount of nonvalidated call numbers for all IP addresses combined.";
 
 
 	// Tooltips for Options (options)
