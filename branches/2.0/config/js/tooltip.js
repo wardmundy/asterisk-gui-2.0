@@ -351,7 +351,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 		"  <li>! ... Wildcard, causes the matching process to complete as soon as it can unambiguously determine that no other matches are possible.\n" +
 		"</ul>\n" +
 		"For example, the extension _NXXXXXX would match normal 7 digit dialings, while _1NXXNXXXXX would represent a three digit area code plus phone number, proceeded by a one." +
-		"&nbsp;&nbsp;<b>Tip: </b> Use 's' or '_X.' pattern to define a rule for <i>all incoming calls</i>.";
+		"&nbsp;&nbsp;<b>Tip: </b> Use '_X.' pattern to define a rule matching all incoming calls that provide a DID number.  Use 's' to define a rule matching  all incoming calls which do not have a DID number, for example, inbound analog calls.";
 
 	tooltips['callingrules'].en[2] = "<B>Strip:</B> Allows the user to specify the number of digits that will be stripped from  the front of the dialing string before the call is placed via the trunk selected in \"Use Trunk.\"  One might; for example, want users to dial 9 before their long distance calls; however one does not dial 9 before those calls are placed onto analog lines and the PSTN, so one should strip 1 digit from the front before the call is placed.";
 	tooltips['callingrules'].en[3] = "<B>Prepend these digits:</B> Allows the user to specify digits that are prepended before the call is placed via the trunk.  If a user's trunk required 10 digit dialing, but users were more comfortable performing 7 digit dialing, this field could be used to prepend a 3 digit area code to all 7 digit strings before they are placed to the trunk. User may also prepend a 'w' character for analog trunks to provide a slight delay before dialing";
