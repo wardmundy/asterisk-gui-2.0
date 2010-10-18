@@ -67,6 +67,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 
 	tooltips['users'] .en[31] = "<B>RXFlash</B> sets the amount of time, in milliseconds, that the hook-flash must remain depressed in order for asterisk to consider such an event a valid flash event.  The default value of RXFlash is 1250ms and it can be configured in 1ms increments." ;
 	tooltips['users'] .en[32] = "<B>Require Call Token:</B> Enable or disable requiring call token.  Default is 'yes'. Using 'auto' may lock out users who depend on backward compatibility when peer authentication credentials are shared between physical endpoints.";
+	tooltips['users'] .en[33] = "<B>MWI From:</B> When sending MWI NOTIFY requests, use this in the From: header as the \"name\" portion.  Also fill the \"user\" portion of the URI in the From: header with this value if no fromuser is set.";
 
 	tooltips['users'] .en[94] = "Line Keys is the number of lines that are tied to this SIP registration.";
 
