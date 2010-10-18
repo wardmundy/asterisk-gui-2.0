@@ -98,8 +98,8 @@ var initialize_formFields = function(){ // initialize_formFields();
 		ASTGUI.selectbox.populateArray('edit_multiple_codec_fifth', R);
 	})();
 
-	ASTGUI.selectbox.populateOptions( 'edit_pickupgroup', 50 );
-	ASTGUI.selectbox.populateOptions( 'edit_multiple_pickupgroup', 50 );
+	ASTGUI.selectbox.populateOptions( 'edit_pickupgroup', 63 );
+	ASTGUI.selectbox.populateOptions( 'edit_multiple_pickupgroup', 63 );
 
 	ASTGUI.domActions.enableDisableByCheckBox( 'edit_hasSip' , ['edit_nat','edit_canreinvite','edit_dtmfmode','edit_insecure'] );
 
