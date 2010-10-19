@@ -112,6 +112,7 @@ var loadTrunks = function() {
 /* End Digital Trunks */
 };
 
+/* This is ugly because doing it the pretty way is unacceptably slow. */
 var loadExtensions = function() {
 
 	/* List all User Extensions */
@@ -121,32 +122,23 @@ var loadExtensions = function() {
 	ul.each(function(user){ // list each user in table
 		var ud = parent.sessionData.pbxinfo.users[user];
 		var tmp_usertype_a = [];
-		var new_row = $('<tr></tr>');
 
 		/* check to see if the extension has iax and sip */
 		if( ud.getProperty('hassip').isAstTrue() && ud.getProperty('hasiax').isAstTrue() ) {
 			tmp_usertype_a.push( 'SIP/IAX User' );
-			new_row.addClass('iax');
-			new_row.addClass('sip');
+			var new_class = 'iax sip';
 		} else if ( ud.getProperty('hasiax').isAstTrue() ) {
 			tmp_usertype_a.push( '&nbsp;IAX User' );
-			new_row.addClass('iax');
+			var new_class = 'iax';
 		} else if ( ud.getProperty('hassip').isAstTrue() ) {
 			tmp_usertype_a.push( '&nbsp;SIP User' );
-			new_row.addClass('sip');
+			var new_class = 'sip';
 		}
 
 		/* check seperately if it has analog */
 		if (ud.getProperty(top.sessionData.DahdiChannelString) !== '') {
 			tmp_usertype_a.push( 'Analog User (Port ' + ud[top.sessionData.DahdiChannelString] + ')' ) ;
-			new_row.addClass('analog');
-		}
-
-		var tmp_mails = ASTGUI.mailboxCount(user);
-		if( tmp_mails.count_new > 0 ){
-			var tmp_mails_str = '<font color=#888B8D> Messages : <B><font color=red>' + tmp_mails.count_new + '</font>/' + tmp_mails.count_old + '</B></font>' ;
-		}else{
-			var tmp_mails_str = '<font color=#888B8D> Messages : ' + tmp_mails.count_new + '/' + tmp_mails.count_old + '</font>' ;
+			new_class += ' analog'
 		}
 
 		if( !ud.getProperty('context') || ! parent.sessionData.pbxinfo.callingPlans[ud.getProperty('context')] ){
@@ -154,22 +146,37 @@ var loadExtensions = function() {
 		}else{
 			var tmp_userstring = user;
 		}
+		var new_row = "<tr class=\"" + new_class.replace(/^ /,'') + "\">\n";
 
-		$("<td></td>").html(ASTGUI.getUser_DeviceStatus_Image(user)).attr("id","exten_status_"+user).appendTo(new_row);
-		$("<td></td>").html(tmp_userstring).appendTo(new_row);
-		$("<td></td>").html(ud.getProperty('fullname')).appendTo(new_row);
-		$("<td></td>").html(tmp_mails_str).addClass('exten_status').appendTo(new_row);
-		$("<td></td>").html(tmp_usertype_a.join(',&nbsp;')).appendTo(new_row);
+		new_row += "<td><img src=\"images/refresh.png\" border=\"0\" id=\"exten_status_" + user + "\"></td>\n";
+		new_row += "<td>" + tmp_userstring + "</td>\n";
+		new_row += "<td>" + ud.getProperty('fullname') + "</td>\n";
+		new_row += "<td class=\"exten_status\" id=\"exten_mailbox_" + user + "\"></td>\n";
+		new_row += "<td>" + tmp_usertype_a.join(',&nbsp;') + "</td>\n";
 
-		exten_tbody.append(new_row);
-		//addCell( newRow ,
-		//	{	html: tmp_userstring ,
-		//		onclickFunction: function(){
-		//			parent.miscFunctions.click_panel( 'users.html', 'users.html?EXTENSION_EDIT=' + user );
-		//		}
-		//	}
-		//);
+		exten_tbody.append(new_row + "</tr>");
 	});
+	
+	var updateUserStatus = function(user){ // list each user in table
+		if(document.getElementById("exten_status_" + user)){ 
+			document.getElementById("exten_status_" + user).parentNode.innerHTML = ASTGUI.getUser_DeviceStatus_Image(user); 
+			var tmp_mails = ASTGUI.mailboxCount(user); 
+			if( tmp_mails.count_new > 0 ){ 
+				document.getElementById("exten_mailbox_" + user).innerHTML = '<font color=#888B8D> Messages : <B><font color=red>'
+					+ tmp_mails.count_new + '</font>/' + tmp_mails.count_old + '</B></font>' ; 
+			}else{ 
+				document.getElementById("exten_mailbox_" + user).innerHTML = '<font color=#888B8D> Messages : '
+					+ tmp_mails.count_new + '/' + tmp_mails.count_old + '</font>' ; 
+			} 
+		}
+	};
+	var uidx = -1;
+	var id = setInterval(function(){
+		updateUserStatus(ul[uidx++]);
+		if(uidx >= ul.length){
+			clearInterval(id);
+		}
+	}, 100);
 
 	(function(){ // List all RingGroup Extensions
 		var c = parent.sessionData.pbxinfo.ringgroups ;
