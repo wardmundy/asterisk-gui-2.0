@@ -119,6 +119,10 @@ var loadExtensions_ranges = function(){
 	ASTGUI.updateFieldToValue( 'rge_end' , c.getProperty('rge_end') );
 	ASTGUI.updateFieldToValue( 'vmg_start' , c.getProperty('vmg_start') );
 	ASTGUI.updateFieldToValue( 'vmg_end' , c.getProperty('vmg_end') );
+
+	var disabled = c.getProperty('disable_extension_ranges');
+	ASTGUI.updateFieldToValue( 'disable_extension_ranges' , disabled == 'yes' ? 'on' : 'off' );
+	refreshExtensionRangesForm(disabled);
 };
 
 
@@ -169,7 +173,57 @@ var verify_Ranges = function(){
 	return true;
 };
 
+var saveDisableExtensionRanges = function(){
+	var disabled = ASTGUI.getFieldValue("disable_extension_ranges");
+	ASTGUI.updateFieldToValue('disable_extension_ranges', 'no');
+	if(disabled == 'yes'){
+		if(!confirm("The Asterisk GUI uses these settings to help ensure that you cannot create extensions "
+			+ "that may cause problems in Asterisk.  We really do not recommend disabling this feature.   Are "
+			+ "you sure that you want to disable this?  Click OK to disable.")){return;}
+		ASTGUI.updateFieldToValue('disable_extension_ranges', 'yes');
+	}
+	refreshExtensionRangesForm(disabled);
+};
+
+var refreshExtensionRangesForm = function(disabled){
+	if(disabled == 'yes'){
+		_$('ue_start').disabled = true;
+		_$('ue_end').disabled = true;
+		_$('mm_start').disabled = true;
+		_$('mm_end').disabled = true;
+		_$('vme_start').disabled = true;
+		_$('vme_end').disabled = true;
+		_$('rge_start').disabled = true;
+		_$('rge_end').disabled = true;
+		_$('qe_start').disabled = true;
+		_$('qe_end').disabled = true;
+		_$('vmg_start').disabled = true;
+		_$('vmg_end').disabled = true;
+		$('#reset_ranges_button').hide();
+	}else{
+		_$('ue_start').disabled = false;
+		_$('ue_end').disabled = false;
+		_$('mm_start').disabled = false;
+		_$('mm_end').disabled = false;
+		_$('vme_start').disabled = false;
+		_$('vme_end').disabled = false;
+		_$('rge_start').disabled = false;
+		_$('rge_end').disabled = false;
+		_$('qe_start').disabled = false;
+		_$('qe_end').disabled = false;
+		_$('vmg_start').disabled = false;
+		_$('vmg_end').disabled = false;
+		$('#reset_ranges_button').show();
+	}
+};
+
 var save_changes = function(){
+	var disabled = ASTGUI.getFieldValue("disable_extension_ranges");
+	var x = new listOfSynActions(ASTGUI.globals.configfile);
+	x.new_action('update', 'general', 'disable_extension_ranges', disabled );
+	x.callActions();
+	top.sessionData.GUI_PREFERENCES.disable_extension_ranges = disabled;
+
 	if( !verify_Ranges() ){ return; }
 	parent.sessionData.pbxinfo.GLOBALS[ASTGUI.globals.obcidstr] = DOM_obCid_input.value;
 
