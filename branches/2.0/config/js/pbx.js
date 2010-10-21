@@ -307,6 +307,11 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 		}else{
 			sessionData.GUI_PREFERENCES = gp['general'] ;
 		}
+		if(!sessionData.GUI_PREFERENCES.getProperty('disable_extension_ranges')){
+			var u = new listOfSynActions(ASTGUI.globals.configfile) ;
+			u.new_action('append', 'general', 'disable_extension_ranges', 'no');
+			u.callActions();
+		}
 		sessionData.continueParsing = true ;
 	}, // end of readcfg.guiPreferencesConf();
 

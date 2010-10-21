@@ -1494,6 +1494,7 @@ var ASTGUI = {
 		},
 
 		alertIfRangeisNotdefined: function(a , b, for_what){ // ASTGUI.miscFunctions.alertIfRangeisNotdefined();
+			if(parent.sessionData.GUI_PREFERENCES.getProperty('disable_extension_ranges') == 'yes'){ return true; }
 			if(!a || !b){return true;}
 			if( !parent.sessionData.GUI_PREFERENCES.getProperty(a) || !parent.sessionData.GUI_PREFERENCES.getProperty(b) ){
 				ASTGUI.dialog.alertmsg("You do not have an extension range defined for '"+ for_what +"'. Please define your <i>Extension Preferences</I> from the 'Options' panel");
@@ -1503,6 +1504,7 @@ var ASTGUI = {
 		},
 
 		isExtensionInRange: function(ext,a,b){ // ASTGUI.miscFunctions.isExtensionInRange('6000','ue_start','ue_end') ;
+			if(parent.sessionData.GUI_PREFERENCES.getProperty('disable_extension_ranges') == 'yes'){ return true; }
 			var v = parent.sessionData.GUI_PREFERENCES.getProperty(a) ;
 			var w = parent.sessionData.GUI_PREFERENCES.getProperty(b) ;
 			if( !v || !w ){

@@ -66,6 +66,11 @@
 		<fieldset style="max-width:700px;min-width:500px;">
 			<legend><B>&nbsp;Extension preferences:&nbsp;</B></legend>
 			<table cellpadding=2 cellspacing=2 border=0  align=center>
+	 		<tr>
+	 			<td align=right>Disable Extension Ranges:</td>
+	 			<td><input id='disable_extension_ranges' type='checkbox' onclick='saveDisableExtensionRanges()'> 
+	 			</td>
+	 		</tr>
 			<tr>	<td align=right>User Extensions :</td>
 				<td><input id='ue_start' size=4 validation='numeric' required='yes'> to 
 					<input id='ue_end' size=4 validation='numeric' required='yes'> 
@@ -103,8 +108,9 @@
 				</td>
 			</tr>
 
-			<tr>	<td colspan=2 align=center>
-					<span class='guiButton' onclick='reset_ranges_default()'>Reset to defaults</spann>
+	 		<tr>
+	 			<td colspan=2 align=center>
+	 				<span class='guiButton' onclick='reset_ranges_default()' id='reset_ranges_button'>Reset to defaults</spann>
 				</td>
 			</tr>
 
