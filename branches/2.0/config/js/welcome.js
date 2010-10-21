@@ -176,7 +176,7 @@ var loadExtensions = function() {
 		if(uidx >= ul.length){
 			clearInterval(id);
 		}
-	}, 100);
+	}, 300);
 
 	(function(){ // List all RingGroup Extensions
 		var c = parent.sessionData.pbxinfo.ringgroups ;
