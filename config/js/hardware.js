@@ -729,8 +729,8 @@ var applySettings = {
 		u.callActions();
 		u.clearActions();
 	
-		ASTGUI.dialog.waitWhile('updating modprobe.conf ...');
-		var cmd1 = "cp /etc/asterisk/modprobe_default /etc/modprobe.conf";
+		ASTGUI.dialog.waitWhile('updating modprobe configuration ...');
+		var cmd1 = "cp /etc/asterisk/modprobe_default /etc/modprobe.d/dahdi.conf";
 		var params = "options " + ASTGUI.getFieldValue('zap_moduleName') ;
 
 		if( _$('enable_disable_checkbox_opermode').checked ){
@@ -780,7 +780,7 @@ var applySettings = {
 			}
 		}
 	
-		var cmd2 = "echo \"" + params + "\" >> /etc/modprobe.conf ";
+		var cmd2 = "echo \"" + params + "\" >> /etc/modprobe.d/dahdi.conf ";
 	
 		var update_usersConf = function(){
 			// update MWI settings in users.conf
