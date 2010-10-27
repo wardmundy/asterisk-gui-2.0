@@ -7,7 +7,7 @@ markets are included for reference or for actual use and extension.
 Software License
 ================
 Asterisk-GUI HTML and Javascript files
-Copyright (C) 2006-2008 Digium, Inc.
+Copyright (C) 2006-2010 Digium, Inc.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -82,6 +82,11 @@ specifically:
 
     [admin]
     secret = thiswouldbeaninsecurepassword
-    read = system,call,log,verbose,command,agent,config
-    write = system,call,log,verbose,command,agent,config
+    read = system,call,log,verbose,command,agent,config,read,write,originate
+    write = system,call,log,verbose,command,agent,config,read,write,originate
 
+Troubleshooting
+===============
+1) Check your config permissions:
+	$ chown asterisk:asterisk /etc/asterisk/*.conf
+	$ chmod 644 /etc/asterisk/*.conf
