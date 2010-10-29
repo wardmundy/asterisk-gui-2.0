@@ -3,7 +3,7 @@
  *
  * users.html functions
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2010, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
  *
@@ -426,7 +426,7 @@ var SAVE_USER_FORM = function(){ // SAVE_USER_FORM();
 		ASTGUI.highlightField('edit_OutBoundCallerid', "Too many digits in OutBound CallerId");
 		return;
 	}
-	if(/[^\d-\(\)]/.test(tmp)){
+	if(/[^\d-\(\) \+]/.test(tmp)){
 		ASTGUI.highlightField('edit_OutBoundCallerid', "Please use numeric characters only.");
 		return;
 	}
