@@ -426,7 +426,7 @@ var SAVE_USER_FORM = function(){ // SAVE_USER_FORM();
 		ASTGUI.highlightField('edit_OutBoundCallerid', "Too many digits in OutBound CallerId");
 		return;
 	}
-	if(/\D/.test(tmp)){
+	if(/[^\d-\(\)]/.test(tmp)){
 		ASTGUI.highlightField('edit_OutBoundCallerid', "Please use numeric characters only.");
 		return;
 	}
