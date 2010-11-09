@@ -3,9 +3,11 @@
  *
  * Calling Rules functions
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2010, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
+ * Ryan Brindley <rbrindley@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -36,7 +38,7 @@ var newCallingRule_form = function(){
 	EDIT_CR_RULE = '';
 
 	_$('cr_dialog_title').innerHTML ='&nbsp;&nbsp;New CallingRule';
-	ASTGUI.resetTheseFields ( [ DOM_new_crl_name, DOM_new_crl_pattern, DOM_new_crl_trunk, DOM_new_crl_tr_stripx, DOM_new_crl_tr_prepend, DOM_new_crl_tr_filter, DOM_new_crl_foChkbx, DOM_new_crl_fotrunk, DOM_new_crl_fotr_stripx, DOM_new_crl_fotr_prepend , DOM_new_crl_fotr_filter, 'toLocalDest' , 'new_crl_localDest'] );
+	ASTGUI.resetTheseFields ( [ DOM_new_crl_name, DOM_new_crl_pattern, DOM_new_crl_trunk, DOM_new_crl_tr_stripx, DOM_new_crl_tr_prepend, DOM_new_crl_tr_filter, DOM_new_crl_foChkbx, DOM_new_crl_fotrunk, DOM_new_crl_fotr_stripx, DOM_new_crl_fotr_prepend , DOM_new_crl_fotr_filter, 'toLocalDest' , 'new_crl_localDest', 'new_crl_caller_id'] );
 	_$('toLocalDest').updateStatus();
 	$(DOM_new_CRL_DIV).showWithBg();
 	ASTGUI.feedback({ msg:'New CallingRule !', showfor:1 });
@@ -56,6 +58,7 @@ var edit_CR_form = function(a,b){
 	DOM_new_crl_name.value = EDIT_CR.withOut(ASTGUI.contexts.CallingRulePrefix) ;
 	DOM_new_crl_name.disabled = true;
 	DOM_new_crl_pattern.value = tmp_cr.pattern ;
+	DOM_new_crl_caller_id.value = tmp_cr.callerID;
 	_$('new_crl_localDest').selectedIndex = -1;
 	if( tmp_cr.destination ){
 		ASTGUI.selectbox.selectOption('new_crl_localDest', tmp_cr.destination);
@@ -100,6 +103,7 @@ var load_DOMelements = function(){
 		DOM_new_CRL_DIV = _$('new_CRL_DIV');
 		DOM_new_crl_name = _$('new_crl_name');
 		DOM_new_crl_pattern = _$('new_crl_pattern');
+		DOM_new_crl_caller_id= _$('new_crl_caller_id');
 			DOM_new_crl_trunk = _$('new_crl_trunk');
 			DOM_new_crl_tr_stripx = _$('new_crl_tr_stripx');
 			DOM_new_crl_tr_prepend = _$('new_crl_tr_prepend');
@@ -307,12 +311,29 @@ var new_crl_save_go = function(){
 		}
 	}
 
+	var caller_id = ASTGUI.getFieldValue('new_crl_caller_id');
+	if(/[^\w\d\s_\-"<>]/.test(caller_id)){
+		ASTGUI.feedback( { msg:'Invalid Caller ID format!', showfor:2, color:'red' });
+		return ;
+	}
+	if (caller_id && caller_id != 'undefined'){
+		caller_id = ',' + caller_id;
+	}else{
+		caller_id = '';
+	}
+
 	if( _$('toLocalDest').checked ){
 		var tmp_new_crl_localDest = ASTGUI.getFieldValue('new_crl_localDest') ;
 		if( tmp_new_crl_localDest == 'CUSTOM' ){
 			var as = DOM_new_crl_pattern.value + ',1,' + ASTGUI.getFieldValue('new_crl_localDest_CUSTOM') ; ////// <<<<<<<<<<<<<<<<<<<
 		}else{
-			var as = DOM_new_crl_pattern.value + ',1,' + tmp_new_crl_localDest ;
+			var as = DOM_new_crl_pattern.value + ',1,';
+			if(caller_id){
+				var args = ASTGUI.parseContextLine.getArgs(DOM_new_crl_pattern.value + ',1,'+ tmp_new_crl_localDest);
+				as += "Macro(local-callingrule-cid-0.1," + args[0] + ',' + args[1] + ',' + args[2] + caller_id + ')';
+			}else{
+				as += tmp_new_crl_localDest;
+			}
 		}
 	}else{
 		var t1 = ASTGUI.getFieldValue(DOM_new_crl_trunk);
@@ -359,7 +380,7 @@ var new_crl_save_go = function(){
 
 		var t1_cidarg = ( t1 == 'Skype') ? ',' : ',' + t1 ;
 		var t2_cidarg = ( t2 == 'Skype') ? ',' : ',' + t2 ;
-		var as = DOM_new_crl_pattern.value + ',1,Macro(' + ASTGUI.contexts.dialtrunks + Trunk_Build_str + foTrunk_Build_str + t1_cidarg + t2_cidarg + ')' ;
+		var as = DOM_new_crl_pattern.value + ',1,Macro(' + ASTGUI.contexts.dialtrunks + Trunk_Build_str + foTrunk_Build_str + t1_cidarg + t2_cidarg + caller_id + ')' ;
 	}
 
 	if( isNew ){
