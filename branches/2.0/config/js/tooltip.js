@@ -3,7 +3,10 @@
  *
  * Tooltips for various fields across different pages in the gui
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2010, Digium, Inc.
+ *
+ * Ryan Brindley <rbrindley@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -277,7 +280,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['iax_general'].en[36] = "<B>Ignore Expired Peers:</B> if the peers ip registration is expired use the ip information  if available.";
 	tooltips['iax_general'].en[37] = "<B>Disallowed Codecs:</B> set default disallow codecs to the following";
 	tooltips['iax_general'].en[38] = "<B>Allowed Codecs:</B> set allowed codecs to the following.";
-	tooltips['iax_general'].en[40] = "A single IP address or a range of IP addresses for which call token validation is not required in the form \"11.11.11.11\" or \"11.11.11.11/22.22.22.22\".";
+	tooltips['iax_general'].en[40] = "A single IP address or a range of IP addresses for which call token validation is not required in the form <b>11.11.11.11</b> or <b>11.11.11.11/22.22.22.22</b>.";
 	tooltips['iax_general'].en[41] = "<B>Max Call Numbers:</B> Limits the amount of call numbers allowed for a single IP address.";
 	tooltips['iax_general'].en[42] = "<B>Max Nonvalidated Call Numbers:</B> Limits the amount of nonvalidated call numbers for all IP addresses combined.";
 
@@ -360,7 +363,8 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['callingrules'].en[4] = "<B>FailOver Trunk:</B> Failover trunks can be used to make sure that a call goes through an alternate route, when the primary trunk is busy or down If \"Use Failover Trunk\" is checked and \"Failover trunk\" is defined, then calls that cannot be placed via the regular trunk may have a secondary trunk defined.  If a user's primary trunk is a VoIP trunk, but one wants calls to use the PSTN when the VoIP trunk isn't available, this option is a good idea.";
 	tooltips['callingrules'].en[5] = "<B>Send To Local Destination:</B> If this option is checked and Destination is defined, calls matching the specified pattern may be sent to a local extension.";
 	tooltips['callingrules'].en[6] = "Defines the Trunk that calls, matching the specified pattern, will be placed through.";
-	tooltips['callingrules'].en[7] = "<b>Filter:</b> This mandatory option is used to filter out certain characters.  The characters listed in this field will be permitted, while all others will be filtered out.  For example, a value of '012345' would allow 0, 1, 2, 3, 4, and 5, but filter out 6, 7, 8, and 9.  Note: If this field is left blank, the resultant dial string will be null.";
+	tooltips['callingrules'].en[7] = "<b>Filter:</b> This option is used to filter out certain characters.  The characters listed in this field will be permitted, while all others will be filtered out.  For example, a value of '012345' would allow 0, 1, 2, 3, 4, and 5, but filter out 6, 7, 8, and 9.";
+	tooltips['callingrules'].en[8] = "<b>Caller ID:</b> This field takes precedence over any other Caller ID settings that may be configured for users or trunks. Specify a caller id string in the form <b>Name &lt;000-000-0000&gt;</b> or  <b>Name &lt;0000&gt;</b>.  Leaving this setting blank will allow the Caller ID settings configured in other areas to remain in place. Using only a number here will cause the name field to be blank, and the same is true for using a name only.  This field is ignored when the destination is a custom macro or application.";
 
 
 	// Tooltips for Incoming Calls (incoming)

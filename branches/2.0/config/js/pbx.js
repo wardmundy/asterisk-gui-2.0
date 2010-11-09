@@ -3,9 +3,11 @@
  *
  * core parsing functions used in index.html
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2010, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
+ * Ryan Brindley <rbrindley@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -91,19 +93,25 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					check_For_Contexts[ASTGUI.contexts.guitools][4] = 'exten=record_vmenu,n,Record(${var1},0,500,k)';
 				}
 		
+				check_For_Contexts[ 'macro-' + ASTGUI.contexts.localcrcid ] = [
+					'exten=s,1,Set(CALLERID(all)=${IF($[${LEN(${ARG4})} > 2]?${ARG4}:)})',
+					'exten=s,n,Goto(${ARG1},${ARG2},${ARG3})'
+				];
 				check_For_Contexts[ 'macro-' + ASTGUI.contexts.dialtrunks ] = [
-					// "; Macro by =  Brandon Kruse <bkruse@digium.com> & Matthew O'Gorman mogorman@digium.com",
+					// "; Macro by =  Brandon Kruse, Matthew O'Gorman, & Erin Spiceland <espiceland@digium.com>",
 					'exten=s,1,GotoIf($[${LEN(${FMCIDNUM})} > 6]?1-fmsetcid,1)',
-					'exten=s,2,GotoIf($[${LEN(${GLOBAL_OUTBOUNDCIDNAME})} > 1]?1-setgbobname,1)',
-					'exten=s,3,Set(CALLERID(num)=${IF($[${LEN(${CID_${CALLERID(num)}})} > 2]?${CID_${CALLERID(num)}}:)})',
+					'exten=s,n,GotoIf($[${LEN(${GLOBAL_OUTBOUNDCIDNAME})} > 1]?1-setgbobname,1)',
+					'exten=s,n,Set(CALLERID(num)=${IF($[${LEN(${CID_${CALLERID(num)}})} > 2]?${CID_${CALLERID(num)}}:)})',
+					'exten=s,n,Set(CALLERID(all)=${IF($[${LEN(${ARG5})} > 2]?${ARG5}:)})',
 					'exten=s,n,GotoIf($[${LEN(${CALLERID(num)})} > 6]?1-dial,1)',
 					'exten=s,n,Set(CALLERID(all)=${IF($[${LEN(${CID_${ARG3}})} > 6]?${CID_${ARG3}}:${GLOBAL_OUTBOUNDCID})})',
+					'exten=s,n,Set(CALLERID(all)=${IF($[${LEN(${ARG5})} > 2]?${ARG5}:)})',
 					'exten=s,n,Goto(1-dial,1)',
 					'exten=1-setgbobname,1,Set(CALLERID(name)=${GLOBAL_OUTBOUNDCIDNAME})',
 					'exten=1-setgbobname,n,Goto(s,3)',
 					'exten=1-fmsetcid,1,Set(CALLERID(num)=${FMCIDNUM})',
 					'exten=1-fmsetcid,n,Set(CALLERID(name)=${FMCIDNAME})',
-					'exten=1-fmsetcid,n,Goto(1-dial,1)',
+					'exten=1-fmsetcid,n,Goto(s,4)',
 					'exten=1-dial,1,Dial(${ARG1})',
 					'exten=1-dial,n,Gotoif(${LEN(${ARG2})} > 0 ?1-${DIALSTATUS},1:1-out,1)',
 					'exten=1-CHANUNAVAIL,1,Dial(${ARG2})',

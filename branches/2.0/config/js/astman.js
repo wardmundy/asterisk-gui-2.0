@@ -3,10 +3,12 @@
  *
  * Javascript functions for accessing manager over HTTP and Some UI components/functions used in AsteriskGUI.
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2010, Digium, Inc.
  *
  * Mark Spencer <markster@digium.com>
  * Pari Nannapaneni <pari@digium.com>
+ * Ryan Brindley <rbrindley@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -1713,11 +1715,11 @@ var ASTGUI = {
 						}
 
 						break;
-					case ' ':
+					/*case ' ':
 						if (!depth) {
 							continue;
 						}
-						break;
+						break;*/
 					case ')':
 						if (depth) {
 							depth--;
@@ -2010,26 +2012,35 @@ var ASTGUI = {
 			var cr = { };
 			cr.actualString = str ;
 			cr.pattern = ASTGUI.parseContextLine.getExten(str);
-			if( str.contains('Macro(') && str.contains('trunkdial') ){ // if is some version of trunk dial marco
+			cr.callerID = '';
+			if( str.contains('Macro(') ){ 
 				var macroargs = ASTGUI.parseContextLine.getArgs(str);
-				cr.macroname = macroargs[0] ;
-				var t1 = ASTGUI.parseContextLine.parseTrunkDialArgument( macroargs[1] ) ;
-					cr.firstTrunk = t1.name ;
-					cr.firstPrepend = t1.prepend ;
-					cr.stripdigits_firstTrunk = t1.stripx ;
-					cr.firstFilter = t1.filter;
+				if( str.contains('trunkdial') ){ // if is some version of trunk dial marco
+					cr.macroname = macroargs[0] ;
+					var t1 = ASTGUI.parseContextLine.parseTrunkDialArgument( macroargs[1] ) ;
+						cr.firstTrunk = t1.name ;
+						cr.firstPrepend = t1.prepend ;
+						cr.stripdigits_firstTrunk = t1.stripx ;
+						cr.firstFilter = t1.filter;
 		
-				if( macroargs.length <= 2  || ( macroargs.length > 2 && macroargs[2].trim() == '') ){ // if a failback trunk is not defined
-					cr.secondTrunk = '' ;
-					cr.secondPrepend = '' ;
-					cr.stripdigits_secondTrunk = '' ;
-					cr.secondFilter = '';
-				}else{
-					var t2 = ASTGUI.parseContextLine.parseTrunkDialArgument( macroargs[2] ) ;
-					cr.secondTrunk = t2.name ;
-					cr.secondPrepend = t2.prepend ;
-					cr.stripdigits_secondTrunk = t2.stripx ;
-					cr.secondFilter = t2.filter;
+					// Why is the second part of this condition necessary?
+					// if( macroargs.length <= 2  || ( macroargs.length > 2 && macroargs[2].trim() == '') ){ // if a failback trunk is not defined
+					if( macroargs.length <= 3 ){ // if a failover trunk is not defined
+						cr.secondTrunk = '' ;
+						cr.secondPrepend = '' ;
+						cr.stripdigits_secondTrunk = '' ;
+						cr.secondFilter = '';
+					}else{
+						var t2 = ASTGUI.parseContextLine.parseTrunkDialArgument( macroargs[2] ) ;
+						cr.secondTrunk = t2.name ;
+						cr.secondPrepend = t2.prepend ;
+						cr.stripdigits_secondTrunk = t2.stripx ;
+						cr.secondFilter = t2.filter;
+					}	
+
+					if(macroargs.length == 4 || macroargs.length == 6){
+							cr.callerID = macroargs[macroargs.length - 1];
+					}
 				}
 			}else{
 				cr.destination = ASTGUI.parseContextLine.getAppWithArgs( str ) ;

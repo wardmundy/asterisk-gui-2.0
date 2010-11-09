@@ -3,9 +3,11 @@
  *
  * Manage Calling Rules
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2010, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
+ * Ryan Brindley <rbrindley@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -85,6 +87,9 @@
 			<TR>	<TD align="right">Pattern <img src="images/tooltip_info.gif" tip="en,callingrules,1" class='tooltipinfo'> :</TD>
 				<TD><input id="new_crl_pattern" size=20 field_name='Pattern' validation='dialpattern' required='yes'></TD>
 			</TR>
+	 		<TR>	<TD align="right">Caller ID<img src="images/tooltip_info.gif" tip="en,callingrules,8" class='tooltipinfo'> :</TD>
+	 			<TD><input id="new_crl_caller_id" size=20'></TD>
+	 		</TR>
 			<TR>	<TD colspan=2>
 					<fieldset>
 						<legend>&nbsp;<input type=checkbox id='toLocalDest' required="yes"> 
