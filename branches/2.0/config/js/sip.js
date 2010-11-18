@@ -89,7 +89,14 @@ var saveChanges = function(){
 			}
 			x.new_action('delete', cat , fld , '') ;
 		}else{
-			x.new_action('update', cat , fld , val) ;
+			if(fld == "localnet"){
+				x.new_action('delete', cat , fld , '') ;
+				val.split(',').each(function(item){
+					x.new_action('append', cat , fld , item) ;
+				});
+			}else{
+				x.new_action('update', cat , fld , val) ;
+			}
 		}
 	});
 	x.new_action('delete', cat , 'disallow', '' ) ;
