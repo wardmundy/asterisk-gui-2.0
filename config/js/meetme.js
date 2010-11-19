@@ -59,7 +59,9 @@ var updateMeetmesTable = function(){
 		meetme_rooms.sortNumbers();
 		meetme_rooms.each( function(this_room){
 			var this_MEETME = ASTGUI.cloneObject(parent.sessionData.pbxinfo.conferences[this_room]) ;
-			var room_options = this_MEETME['configOptions'].split("${EXTEN}")[1].betweenXY(',',')') ;
+			var a = this_MEETME['configOptions'].split("${EXTEN}");
+			if(a.length <= 1){ return; }
+			var room_options = a[1].betweenXY(',',')') ;
 
 			var newRow = DOM_table_mml.insertRow(-1);
 			newRow.className = ((DOM_table_mml.rows.length)%2==1)?'odd':'even';

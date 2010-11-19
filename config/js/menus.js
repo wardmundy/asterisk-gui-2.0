@@ -3,7 +3,7 @@
  *
  * menus.html functions
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2010, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
  *
@@ -450,7 +450,8 @@ var VoiceMenus_miscFunctions = {
 				if (!parent.ASTGUI.validateFields([_$('newstep_dial_ThisNumber')])) {
 					return;
 				}
-				newstep =  'Macro('+ ASTGUI.contexts.dialtrunks + ',${' + tmp_trunkName + '}/'+ tmp_extern_num +',,'+ tmp_trunkName + ',)' ;
+				var tname = parent.pbx.trunks.getTrunkIdByName(tmp_trunkName);
+				newstep =  'Macro('+ ASTGUI.contexts.dialtrunks + ',${' + tmp_trunkName + '}/'+ tmp_extern_num +',,'+ (tname ? tname : tmp_trunkName) + ',)' ;
 				break;
 			case 'UserEvent':
 				var tmp_EventName = ASTGUI.getFieldValue('newstep_UserEvent_eventname');
@@ -787,7 +788,8 @@ var localajaxinit = function(){
 	})();
 
 	(function(){
-		var t = ASTGUI.cloneObject( parent.pbx.trunks.list() ) ;
+		// list non-analog trunks by trunk.
+		var t = ASTGUI.cloneObject(parent.pbx.trunks.list({iax: true, providers: true, sip: true}));
 		var TMP_FORSORT = [];
 		t.each(function(item){
 			TMP_FORSORT.push( parent.pbx.trunks.getName(item) + ':::::::' +  item);
@@ -798,6 +800,19 @@ var localajaxinit = function(){
 			var a = this_str.split(':::::::');
 			ASTGUI.selectbox.append( trunks_selectbox, 'via Trunk ' + a[0], a[1] );
 		});
+
+		// list analog trunks by group.
+		var g = parent.pbx.trunks.listAllGroups();
+		g.each( function(group){
+			var tr = parent.pbx.trunks.getTrunkNamesByGroup(group);
+			var trstr = tr.join(", ");
+			if (trstr.length > 30){
+				trstr = trstr.substr(30) + '...';
+			}
+			ASTGUI.selectbox.append( trunks_selectbox, 'via ' + parent.pbx.trunks.getGroupDescription(group), "group_" + group);
+		});
+
+
 	})();
 
 	(function(){

@@ -3,7 +3,7 @@
  *
  * Core objects and utilities for their configs
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2010, Digium, Inc.
  *
  * Ryan Brindley <ryan@digium.com>
  *
@@ -1324,6 +1324,115 @@ pbx.trunks = {
 	tech: {analog: 'DAHDI', bri: 'DAHDI', iax: 'IAX2', pri:'DAHDI', sip: 'SIP'}
 };
 
+pbx.trunks.getTrunkIdByName = function(name) {
+	if(name.indexOf('group_' > -1)){
+		var group = name.replace("group_","");
+		var g = this.getTrunkNamesByGroup(group);
+		name = g[0] ? g[0] : name;
+	}
+	var t = this.list();
+	var res = '';
+	t.each(function(item){
+		var type = pbx.trunks.getType(item);
+		if(parent.sessionData.pbxinfo.trunks[type][item]['trunkname'] == name || item == name){
+			res = item;
+		}
+	});
+	return res;
+};
+
+pbx.trunks.getTrunkNamesByGroup = function(group) {
+	var t = this.list({analog: true, bri: true, pri: true});
+	var a = [];
+	t.each(function(item){
+		var type = parent.pbx.trunks.getType(item);
+		var g = parent.sessionData.pbxinfo.trunks[type][item]['group'].toString().split(',');
+		g.each(function(h){
+			if(h == group){
+				var name = parent.sessionData.pbxinfo.trunks[type][item]['trunkname'];
+				if(!a.contains(name)){
+					a.push(parent.sessionData.pbxinfo.trunks[type][item]['trunkname']);
+				}
+			}
+		});
+	});
+	return a.sort();
+};
+
+pbx.trunks.getGroupDescription = function(group){
+	var tr = parent.pbx.trunks.getTrunkNamesByGroup(group);
+	var trstr = tr.join(", ");
+	if (trstr.length > 30){
+		trstr = trstr.substr(30) + '...';
+	}
+	return "Group " + group + " (" + trstr + ")";
+};
+
+pbx.trunks.getDedicatedGroup = function(trunk) {
+	var g = this.listAllGroups();
+	var cur = [];
+	var ded_group = '';
+	g.each(function(group){
+		if(ded_group) { return ded_group; }
+		var t = parent.pbx.trunks.getTrunkNamesByGroup(group);
+		var abort = false;
+		t.each(function(eachtrunk){
+			if(!abort){
+				if(trunk == eachtrunk){
+					ded_group = group;
+					g.push(group);
+				}else{
+					if(ded_group == group){
+						ded_group = '';
+					}
+					abort = true;
+				}
+			}
+		});
+	});
+	return ded_group;
+}
+
+pbx.trunks.makeDedicatedGroup = function() {
+	var newgroup = this.nextAvailGroup();
+	var ext_conf = new listOfSynActions('extensions.conf');
+	ext_conf.new_action('update', 'globals', 'group_' + newgroup, 'DAHDI/g' + newgroup);
+	ext_conf.callActions();
+	return newgroup;
+};
+
+pbx.trunks.listAllGroups = function() {
+	var t = this.list({analog: true, bri: true, pri: true});
+	var a = [];
+	t.each(function(item){
+		var type = parent.pbx.trunks.getType(item);
+		var g = parent.sessionData.pbxinfo.trunks[type][item]['group'].toString().split(',');
+		g.each(function(h){
+			if(!a.contains(h)){
+				a.push(h);
+			}
+		});
+	});
+	return a.sort();
+};
+
+pbx.trunks.formatGroupString = function(group) {
+	var newgroup = this.nextAvailGroup();
+	var oldgroups = group.split(",");
+	// when creating a new group and a dedicated group at the same time,
+	// use the same group for both and don't duplicate it.
+	for(var i = 0; i < oldgroups.length; i++){
+		if (oldgroups[i] == newgroup){ return group; }
+	}
+	if(group.indexOf('New') > -1){
+		var ext_conf = new listOfSynActions('extensions.conf');
+		ext_conf.new_action('update', 'globals', 'group_' + newgroup, 'DAHDI/g' + newgroup);
+		ext_conf.callActions();
+		group = group.replace('New', newgroup);
+	}
+	return group ? group : newgroup;
+};
+
 /**
  * Add a trunk.
  * @param type type of trunk.
@@ -1353,7 +1462,9 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 		delete trunk.dahdichan;
 
 		name = this.nextAvailTrunk();
-		group = this.nextAvailGroup();
+		if (trunk.hasOwnProperty('group')) {
+			group = trunk.group;
+		}
 
 		delete trunk.signalling;
 		delete trunk.channel;
@@ -1435,6 +1546,12 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 			users_conf.new_action('append', name, 'signalling', sg);
 			users_conf.new_action('append', name, 'channel', ch);
 		});
+		if(!group || group.toString().indexOf(',') > 0){
+			group = this.getDedicatedGroup(name);
+			if(!group){
+				group = this.makeDedicatedGroup();
+			}
+		}
 	}
 
 	/* TODO: get listOfActions to return a response so we know everythings ok! */
@@ -1447,9 +1564,12 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	ext_conf.new_action('newcat', ct, '', '');
 	ext_conf.new_action('delcat', ct + ASTGUI.contexts.TrunkDefaultSuffix, '' ,'');
 	ext_conf.new_action('newcat', ct + ASTGUI.contexts.TrunkDefaultSuffix, '', '');
+	ext_conf.callActions();
+	ext_conf.clearActions();
 	ext_conf.new_action('append', ct, 'include', ct + ASTGUI.contexts.TrunkDefaultSuffix);
 	/* not going to work for analog vv */
 	ext_conf.new_action('update', 'globals', name, tech + '/' + ((type === 'analog') ? 'g' + group : name));
+
 
 	resp = '';
 	resp = ext_conf.callActions();
@@ -1470,6 +1590,16 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 
 	callback();
 	return true;
+};
+
+pbx.trunks.isAnalog = function(trunk) {
+	if(trunk.indexOf("group_" == -1)){
+		var type = this.getType(trunk);
+		if(type == 'analog' || type == 'bri' || type == 'pri'){
+			return true;
+		}
+	}
+	return false;
 };
 
 /**
@@ -1519,6 +1649,19 @@ pbx.trunks.getName = function(trunk) {
 		return trunk;
 	}
 
+	/* if we got passed a group somehow, see if it's a dedicated group. 
+	If it is, we can get that trunk's name. */
+	if (trunk.indexOf("group_") > -1){
+		trunk = trunk.replace("group_","");
+		var tr = this.getTrunkNamesByGroup(trunk);
+		if(tr.length == 1){
+			return tr[0];
+		}else{
+			top.log.error("group_" + trunk + "describes multiple trunks. I don't know which one's name you want!");
+			return null;
+		}
+	}
+
 	for (var i=0; i < this.trunk_types.length; i++) {
 		if (sessionData.pbxinfo.trunks[this.trunk_types[i]][trunk]) {
 			if (this.trunk_types[i] === 'bri' && sessionData.pbxinfo.trunks[this.trunk_types[i]][trunk].trunkname) {
@@ -1528,8 +1671,8 @@ pbx.trunks.getName = function(trunk) {
 		}
 	}
 
-	top.log.warn('pbx.trunks.getType: No trunk name found.');
-	top.log.warn('pbx.trunks.getType: Trunk, ' + trunk + ', most like doesn\'t exist');
+	top.log.warn('pbx.trunks.getName: No trunk name found.');
+	top.log.warn('pbx.trunks.getName: Trunk, ' + trunk + ', most likely doesn\'t exist');
 	return null;
 };
 
@@ -1562,6 +1705,9 @@ pbx.trunks.getProviderType = function(trunk) {
  * @return type of trunk.
  */
 pbx.trunks.getType = function(trunk) {
+	if(trunk.indexOf("group_") > -1){
+		return "group";
+	}
 	for (var i=0; i < this.trunk_types.length; i++) {
 		if (sessionData.pbxinfo.trunks[this.trunk_types[i]][trunk]) {
 			return this.trunk_types[i];
@@ -1630,19 +1776,22 @@ pbx.trunks.list = function(types) {
  */
 pbx.trunks.nextAvailGroup = function() {
 	var nums = [];
-	var trunks = this.list({analog: true, pri: true});
-	var type = 'analog';
+	var trunks = this.list({analog: true, bri: true, pri: true});
 
 	if (!trunks.length) {
 		top.log.warn('pbx.trunks.nextAvailGroup: no trunks');
 	}
 
-	trunks.each(function(trunk) {
-		type = (sessionData.pbxinfo.trunks['analog'].hasOwnProperty(trunk)) ? 'analog' : 'pri';
-		nums.push(sessionData.pbxinfo.trunks[type][trunk]['group']);
-	});
-
-	return nums.firstAvailable();
+	//trunks.each(function(trunk) {
+	for (var i = 0; i < trunks.length; i++){
+		trunk = trunks[i];
+		type = parent.pbx.trunks.getType(trunk);
+		var g = sessionData.pbxinfo.trunks[type][trunk]['group'].toString().split(',');
+		for(var j = 0; j < g.length; j++){
+			nums.push(g[j]);
+		}
+	}
+	return nums.sort().firstAvailable();
 };
 
 /**
@@ -1675,6 +1824,7 @@ pbx.trunks.remove = function(trunk) {
 	var exts = config2json({filename: 'extensions.conf', usf:0});
 	var actions = new listOfSynActions('extensions.conf');
 	actions.new_action('delete', 'globals', trunk, '');
+	actions.new_action('delete', 'globals', "CID_" + trunk, '');
 
 	for (var ext in exts) {
 		if (!exts.hasOwnProperty(ext) || !ext.contains(ASTGUI.contexts.TrunkDIDPrefix + trunk)) {
@@ -2340,10 +2490,11 @@ pbx.voice_menus.add = function(name, menu, callback) {
  * @return boolean of success.
  */
 pbx.voice_menus.remove = function(name) {
+	if(!name){ return false; }
 	var acts = new listOfSynActions('extensions.conf');
 	acts.new_action('delcat', name, '', '');
 
-	if (sessionData.pbxinfo.voicemenus[name]['alias_exten'] != '') {
+	if (sessionData.pbxinfo.voicemenus[name] && sessionData.pbxinfo.voicemenus[name]['alias_exten'] != '') {
 		var aext = sessionData.pbxinfo.voicemenus[name]['alias_exten'].lChop('exten=');
 		acts.new_action('delete', ASTGUI.contexts.VoiceMenuExtensions, 'exten', '', aext);
 		acts.new_action('delete', 'default', 'exten', '', aext); /* backward compatibility with gui 1.x */

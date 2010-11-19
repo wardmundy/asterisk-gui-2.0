@@ -93,10 +93,6 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					check_For_Contexts[ASTGUI.contexts.guitools][4] = 'exten=record_vmenu,n,Record(${var1},0,500,k)';
 				}
 		
-				check_For_Contexts[ 'macro-' + ASTGUI.contexts.localcrcid ] = [
-					'exten=s,1,Set(CALLERID(all)=${IF($[${LEN(${ARG4})} > 2]?${ARG4}:)})',
-					'exten=s,n,Goto(${ARG1},${ARG2},${ARG3})'
-				];
 				check_For_Contexts[ 'macro-' + ASTGUI.contexts.dialtrunks ] = [
 					// "; Macro by =  Brandon Kruse, Matthew O'Gorman, & Erin Spiceland <espiceland@digium.com>",
 					'exten=s,1,GotoIf($[${LEN(${FMCIDNUM})} > 6]?1-fmsetcid,1)',
@@ -939,7 +935,7 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 	},
 
 	addAnalogTrunk: function(tr, cbf){ // creates a new analog trunk with the details metioned in tr object, cbf is callback function
-		// usage:: astgui_managetrunks.addAnalogTrunk({ 'zapchan':'2,3,4' , (optional) trunkname:'Ports 2,3,4'} , cbf) ;
+		// usage:: astgui_managetrunks.addAnalogTrunk({ 'zapchan':'2,3,4' , (optional) trunkname:'Ports 2,3,4', (optional) group: '1,2,3'} , cbf) ;
 
 		if( !tr.hasOwnProperty('zapchan') &&  !tr.hasOwnProperty('dahdichan') ){return false;} // zapchan is a required parameter. 
 
@@ -951,9 +947,18 @@ astgui_managetrunks  = { // all the functions related to managing trunks would r
 			var TMP_CHANNELS = tr.dahdichan ;
 			delete tr.dahdichan ;
 		}
-
+		
 		var trunk = astgui_managetrunks.misc.nextAvailableTrunk_x();
-		var group = astgui_managetrunks.misc.nextAvailableGroup();
+		var newgroup = astgui_managetrunks.misc.nextAvailableGroup();
+		var group = '';
+		if( tr.hasOwnProperty('group') ){
+			group = tr.group;
+			if(group.indexOf("New") > -1){
+				group.replace(/New/, newgroup);
+			}
+		}else{
+			group = newgroup;
+		}
 		var ct = ASTGUI.contexts.TrunkDIDPrefix + trunk;
 		// there are no incoming rules for analog trunks - there is only one catch all rule
 		// we only add the fallback extension "exten=s,3,..."  in incoming rules  Ex: 'exten = s,3,Goto(default|6000|1)' 

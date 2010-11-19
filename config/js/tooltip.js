@@ -445,6 +445,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['trunks'].en[33] = "<B>CID Signalling :</B> This option defines the type of Caller ID signalling to use: bell (bell202 as used in the United States), v23 (as used in the UK), v23_jp (as used in Japan), or dtmf (as used in Denmark, Sweden, and Holland).";
 	tooltips['trunks'].en[34] = "Flash Time defines the time, in milliseconds, that is generated for a flash operation.";
 	tooltips['trunks'].en[35] = "Receiver Flash Time defines the time, in milliseconds, that is required for the receiver to recognize a flash operation.";
+	tooltips['trunks'].en[43] = "<B>Groups:</B> This GUI uses groups in the backend and creates a group for every trunk to use by itself.  You can also create new groups and add multiple trunks to each one to use in calling rules so that Asterisk will be able to choose one of several available trunks when handling calls.  To create a new group, you must add a trunk to it by selecting \"New\" while adding or editing a trunk. To delete a group, simply remove all trunks from it.";
 	// end of 'advanced options for analog trunks'
 	
 	// BEGIN trunks_voip.html
