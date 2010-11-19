@@ -62,6 +62,12 @@
 		<TABLE	align=center cellpadding=2 cellspacing=2 border=0>
 		<TR>	<TD align="right">Channels:</TD>
 			<TD><span id='new_ATRNK_cls_container'></span></TD>
+ 		<TD rowspan=2>
+ 			<b>Groups <img src="images/tooltip_info.gif" tip="en,trunks,43" class='tooltipinfo'> : </b><br> 
+ 			<select id='edit_groups' size=5 multiple='multiple'>
+ 				<option value='New'>New</option>
+ 			</select>
+ 		</TD>
 		</TR>
 		<TR>	<TD align="right" valign=top> <b>Trunk Name <img src="images/tooltip_info.gif" tip="en,trunks,38" class='tooltipinfo'> :</b></TD>
 			<TD align="left"> <input id='edit_trunkName' size=20> </TD>
@@ -73,7 +79,7 @@
 			</TD>
 		</TR>
 		<tr id='HIDE_OnNEW_1'>
-			<td class="field_text" colspan=2 align="center">
+			<td class="field_text" colspan=3 align="center">
 				<div><B>Audio Tuning</B></div>
 				The analog ports that you have chosen should be calibrated for optimum performance. Please ensure that your analog lines are plugged in and proceed with calibration.
 				<div style='margin:10px;'>
@@ -84,7 +90,7 @@
 		</tr>
 
 		<tr id='HIDE_OnNEW_2'>
-			<td class="field_text" colspan=2 align="center">
+			<td class="field_text" colspan=3 align="center">
 				<table align=center width="100%">
 					<tr>	<td class="field_text" align="center" valign=top>
 							Normally you should not have to adjust your analog ports beyond the initial calibration. 
@@ -99,7 +105,7 @@
 		</tr>
 
 		<tr id='HIDE_OnNEW_3'>
-			<td class="field_text" colspan=2 align="center">
+			<td class="field_text" colspan=3 align="center">
 					<div><B>Advanced Options</B></div>
 					<table align=center cellpadding=8 cellspacing=0>
 					<tr>	<td align=right>
@@ -217,7 +223,7 @@
 					</TABLE>
 			</td>
 		</tr>
-		<TR>	<TD colspan=2 align=center valign=middle>
+		<TR>	<TD colspan=3 align=center valign=middle>
 				<span class='guiButtonCancel' onclick='ASTGUI.hideDrag(event);'>Cancel</span>
 				<span class='guiButtonEdit' onclick='new_ATRNK_save_go();' id='new_ATRNK_addUpdateButton'>Update</span>
 			</TD>

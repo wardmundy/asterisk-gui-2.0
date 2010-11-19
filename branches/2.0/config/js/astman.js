@@ -62,7 +62,10 @@ _$ = function(x){
 	
 	/* This cannot be used if you need to return from the calling
 	function early. The return statement will return from this 
-	anonymous function instead. */
+	anonymous function instead. 
+	
+	This method can also introduce race conditions if you use the array
+	right after calling it. */
 	Array.prototype.each = function(iterator) {
 		for(var i=0 , j = this.length; i < j ; i++ ){
 			iterator(this[i] , i);
@@ -78,16 +81,19 @@ _$ = function(x){
 	
 	Array.prototype.firstAvailable = function(start) {
 		start = (!start)? 1 : Number( start );
-		if(!this.length)
+		if(!this.length){
 			return start;
-		for( var y=0, x=[], z=this.length ; y < z ; y++ ){
+		}
+		var x = [];
+		for( var y=0 ; y < this.length ; y++ ){
 			var NT = Number(this[y]) ;
 			if( NT < start )
 				continue;
 			x.push(NT);
 		}
-		if( !x.length )
+		if( !x.length ){
 			return start;
+		}
 		while(true){
 			if( x.contains(start) ){
 				start++;
@@ -1108,7 +1114,15 @@ var ASTGUI = {
 			case 'select-one':
 				return el.value ; //.trim()
 				break;
-
+			case 'select-multiple':
+				var res = [];
+				for (var i = 0 ; i < el.options.length; i++){
+					if (el.options[i].selected){
+						res.push(el.options[i].value)
+					}
+				}
+				return res;
+				break;
 			case 'text':
 			case 'textarea':
 			case 'password':
@@ -2198,7 +2212,7 @@ var ASTGUI = {
 			} 
 		},
 
-		append: function(el,txt, val){ // ASTGUI.selectbox.append(el,txt,val);
+		append: function(el, txt, val){ // ASTGUI.selectbox.append(el,txt,val);
 			if ( typeof el == 'string'){ el = _$(el) ; }
 			el.options[el.options.length] = new Option (txt,val);
 		},
@@ -2231,6 +2245,16 @@ var ASTGUI = {
 			for (var x=0; x < el.options.length; x++) {
 				if (el.options[x].value == opt){
 					el.selectedIndex = x;
+				}
+			}
+		},
+
+		selectOptionMultiple: function(el, opt){ // ASTGUI.selectbox.selectOption(el,opt)
+			if ( typeof el == 'string'){ el = _$(el) ; }
+			for (var x=0; x < el.options.length; x++) {
+				if (el.options[x].value == opt){
+					//el.selectedIndex = x;
+					el.options[x].selected = true;
 				}
 			}
 		},
@@ -2566,6 +2590,10 @@ var ASTGUI = {
 				break ;
 			case 'select-one':
 				ASTGUI.selectbox.selectOption(el, val);
+				if( tmp_dfalt && !val ) ASTGUI.selectbox.selectOption(el, tmp_dfalt);
+				break;
+			case 'select-multiple':
+				ASTGUI.selectbox.selectOptionMultiple(el, val);
 				if( tmp_dfalt && !val ) ASTGUI.selectbox.selectOption(el, tmp_dfalt);
 				break;
 			default:

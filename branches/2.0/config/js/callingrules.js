@@ -55,6 +55,9 @@ var edit_CR_form = function(a,b){
 	EDIT_CR_RULE = b;
 	var tmp_cr = ASTGUI.parseContextLine.obCallingRule(b) ;
 
+	DOM_new_crl_trunk.selectedIndex = -1;
+	DOM_new_crl_fotrunk.selectedIndex = -1;
+ 
 	DOM_new_crl_name.value = EDIT_CR.withOut(ASTGUI.contexts.CallingRulePrefix) ;
 	DOM_new_crl_name.disabled = true;
 	DOM_new_crl_pattern.value = tmp_cr.pattern ;
@@ -65,14 +68,37 @@ var edit_CR_form = function(a,b){
 		_$('toLocalDest').checked = true;
 	}else{
 		_$('toLocalDest').checked = false;
-		ASTGUI.selectbox.selectOption(DOM_new_crl_trunk, tmp_cr.firstTrunk );
+ 		/* if the trunk is not analog, we can use this value as is. If it is,
+ 		we need to figure out if it has been converted to a group_X name */
+ 		if(!parent.pbx.trunks.isAnalog(tmp_cr.firstTrunk)){
+ 			ASTGUI.updateFieldToValue(DOM_new_crl_trunk, tmp_cr.firstTrunk);
+ 		}else if(tmp_cr.firstTrunk.indexOf('group_') > -1){
+ 			ASTGUI.updateFieldToValue(DOM_new_crl_trunk, tmp_cr.firstTrunk);
+ 		}else{
+ 			var trunk1_name = parent.pbx.trunks.getName(tmp_cr.firstTrunk);
+ 			var ded_group = parent.pbx.trunks.getDedicatedGroup(trunk1_name);
+ 			// if ded_group is null, the trunk is misconfigured; this should never happen
+ 			ded_group = "group_" + (ded_group ? ded_group : "0");
+ 			ASTGUI.updateFieldToValue(DOM_new_crl_trunk, ded_group);
+ 		}
 
 		DOM_new_crl_tr_stripx.value = tmp_cr.stripdigits_firstTrunk  ;
 		DOM_new_crl_tr_prepend.value = tmp_cr.firstPrepend ;
 		DOM_new_crl_tr_filter.value = tmp_cr.firstFilter;
 		if(tmp_cr.secondTrunk){
 			DOM_new_crl_foChkbx.checked = true 
-			ASTGUI.selectbox.selectOption(DOM_new_crl_fotrunk, tmp_cr.secondTrunk );
+ 			if(!parent.pbx.trunks.isAnalog(tmp_cr.secondTrunk)){
+ 				//ASTGUI.selectbox.selectOption(DOM_new_crl_fotrunk, tmp_cr.secondTrunk);
+ 				ASTGUI.updateFieldToValue(DOM_new_crl_fotrunk, tmp_cr.secondTrunk);
+ 			}else if(tmp_cr.secondTrunk.indexOf('group_') > -1){
+ 				ASTGUI.updateFieldToValue(DOM_new_crl_fotrunk, tmp_cr.secondTrunk);
+ 			}else{
+ 				var trunk2_name = parent.pbx.trunks.getName(tmp_cr.secondTrunk);
+ 				var ded_group = parent.pbx.trunks.getDedicatedGroup(trunk2_name);
+ 				// if ded_group is null, the trunk is misconfigured; this should never happen
+ 				ded_group = "group_" + (ded_group ? ded_group : "0");
+ 				ASTGUI.updateFieldToValue(DOM_new_crl_fotrunk, ded_group);
+ 			}
 			DOM_new_crl_fotr_stripx.value = tmp_cr.stripdigits_secondTrunk ;
 			DOM_new_crl_fotr_prepend.value = tmp_cr.secondPrepend ;
 			DOM_new_crl_fotr_filter.value = tmp_cr.secondFilter;
@@ -120,7 +146,8 @@ var load_DOMelements = function(){
 		ASTGUI.events.add( DOM_new_crl_foChkbx, 'change' , en_db_fofields);
 		ASTGUI.events.add( DOM_new_cr_button , 'click' ,  newCallingRule_form);
 
-		var t = parent.pbx.trunks.list();
+ 		// list non-analog trunks by trunk.
+ 		var t = parent.pbx.trunks.list({iax: true, providers: true, sip: true});
 		var TMP_FORSORT = [];
 		t.each(function(item){
 			TMP_FORSORT.push( parent.pbx.trunks.getName(item) + ':::::::' +  item);
@@ -132,6 +159,13 @@ var load_DOMelements = function(){
 			ASTGUI.selectbox.append( DOM_new_crl_fotrunk , a[0], a[1] );
 		});
 
+ 		// list analog trunks by group.
+ 		var g = parent.pbx.trunks.listAllGroups();
+ 		g.each( function(group){
+ 			ASTGUI.selectbox.append( DOM_new_crl_trunk, parent.pbx.trunks.getGroupDescription(group), 'group_' + group);
+ 			ASTGUI.selectbox.append( DOM_new_crl_fotrunk , parent.pbx.trunks.getGroupDescription(group), 'group_' + group);
+ 		});
+ 
 		var modules_show = ASTGUI.cliCommand('module show');
 		if( modules_show.contains('res_skypeforasterisk') && modules_show.contains('chan_skype') ){
 			ASTGUI.selectbox.append( DOM_new_crl_trunk , 'Skype', 'Skype');
@@ -200,8 +234,8 @@ var update_CRLSTable = function(){
 				addCell( newRow , { html: tmp_cr.pattern });
 
 				if( tmp_cr.hasOwnProperty('firstTrunk') ){
-					addCell( newRow , { html: tmp_cr.firstTrunk ? ( parent.pbx.trunks.getName(tmp_cr.firstTrunk) || '<i><font color=red>Invalid Trunk</font></i>' ) : '<i><font color=red>None Assigned</font></i>' });
-					addCell( newRow , { html: tmp_cr.secondTrunk ? ( parent.pbx.trunks.getName(tmp_cr.secondTrunk) || '<i><font color=red>Invalid Trunk</font></i>' ): '<i>None Selected</i>' });
+ 					addCell( newRow , { html: trunkHtml(tmp_cr.firstTrunk) });
+ 					addCell( newRow , { html: trunkHtml(tmp_cr.secondTrunk) });
 				}else{
 					addCell( newRow , { html:  '<i><font color=blue>Local Destination : ' + ASTGUI.parseContextLine.showAs(tmp_cr.destination) + '</font></i>', align: 'left', colspan : 2 });
 				}
@@ -223,6 +257,21 @@ var update_CRLSTable = function(){
 	})();
 };
 
+var trunkHtml = function(trunk){
+	if(!trunk){ return '<i><font color=red>None Assigned</font></i>'; }
+	var trunk_name = parent.pbx.trunks.getName(trunk);
+	if(trunk_name) { return trunk_name; }
+ 	if(trunk.indexOf('group_' > -1)){ // it's a new-style analog trunk
+		var group = trunk.replace('group_',"");
+		var tr = parent.pbx.trunks.getTrunkNamesByGroup(group);
+		var trstr = tr.join(", ");
+		if (trstr.length > 30){
+			trstr = trstr.substr(30) + '...';
+		}
+		return "Group " + group + "(" + trstr + ")";
+	}
+	return '<i><font color=red>Invalid Trunk\"' + trunk + '\"</font></i>';
+};
 
 var localajaxinit = function() {
 	top.document.title = "Edit Calling Rules";
@@ -255,27 +304,27 @@ var restore_default_callingRules = function(){
 	var x = new listOfActions('extensions.conf');
 	x.new_action('delcat', 'CallingRule_Longdistance', '', '');
 	x.new_action('newcat', 'CallingRule_Longdistance', '', '');
-	x.new_action('append', 'CallingRule_Longdistance', 'exten', '_91XXXXXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0-9,${EXTEN:1})}, , , )' );
+	x.new_action('append', 'CallingRule_Longdistance', 'exten', '_91XXXXXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0123456789,${EXTEN:1})}, , , )' );
 
 	x.new_action('delcat', 'CallingRule_IAXTEL', '', '');
 	x.new_action('newcat', 'CallingRule_IAXTEL', '', '');
-	x.new_action('append', 'CallingRule_IAXTEL', 'exten', '_91700XXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0-9,${EXTEN:1})}, , , )' );
+	x.new_action('append', 'CallingRule_IAXTEL', 'exten', '_91700XXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0123456789,${EXTEN:1})}, , , )' );
 	
 	x.new_action('delcat', 'CallingRule_Local_AreaCode', '', '');
 	x.new_action('newcat', 'CallingRule_Local_AreaCode', '', '');
-	x.new_action('append', 'CallingRule_Local_AreaCode', 'exten', '_9256XXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0-9,${EXTEN:4})}, , , )' );
+	x.new_action('append', 'CallingRule_Local_AreaCode', 'exten', '_9256XXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0123456789,${EXTEN:4})}, , , )' );
 
 	x.new_action('delcat', 'CallingRule_International', '', '');
 	x.new_action('newcat', 'CallingRule_International', '', '');
-	x.new_action('append', 'CallingRule_International', 'exten', '_9011XXXXX.,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0-9,${EXTEN:1})}, , , )' );
+	x.new_action('append', 'CallingRule_International', 'exten', '_9011XXXXX.,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0123456789,${EXTEN:1})}, , , )' );
 
 	x.new_action('delcat', 'CallingRule_Local_7_digits', '', '');
 	x.new_action('newcat', 'CallingRule_Local_7_digits', '', '');
-	x.new_action('append', 'CallingRule_Local_7_digits', 'exten', '_9XXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0-9,${EXTEN:1})}, , , )' );
+	x.new_action('append', 'CallingRule_Local_7_digits', 'exten', '_9XXXXXXX!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0123456789,${EXTEN:1})}, , , )' );
 
 	x.new_action('delcat', 'CallingRule_Emergency', '', '');
 	x.new_action('newcat', 'CallingRule_Emergency', '', '');
-	x.new_action('append', 'CallingRule_Emergency', 'exten', '_911!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0-9,${EXTEN:1})}, , , )' );
+	x.new_action('append', 'CallingRule_Emergency', 'exten', '_911!,1,Macro(' + ASTGUI.contexts.dialtrunks + ',${}/${FILTER(0123456789,${EXTEN:1})}, , , )' );
 
 
 	x.callActions(function(){
@@ -344,6 +393,15 @@ var new_crl_save_go = function(){
 			return ;
 		}
 
+		var g1cid = '';
+		var g2cid = '';
+		if(t1.indexOf("group_") > -1){
+			g1cid = parent.pbx.trunks.getTrunkIdByName(t1);
+		}
+		if(t2.indexOf("group_") > -1){
+			g2cid = parent.pbx.trunks.getTrunkIdByName(t2);
+		}
+
 		var tmp_stripx = DOM_new_crl_tr_stripx.value || '0' ;
 		var tmp_fotr_stripx = DOM_new_crl_fotr_stripx.value || '0' ;
 		var tmp_checkThis = ( DOM_new_crl_pattern.value.beginsWith('_') ) ?  DOM_new_crl_pattern.value.length -1 :  DOM_new_crl_pattern.value.length ;
@@ -378,8 +436,8 @@ var new_crl_save_go = function(){
 		}
 		foTrunk_Build_str = ',' + foTrunk_Build_str;
 
-		var t1_cidarg = ( t1 == 'Skype') ? ',' : ',' + t1 ;
-		var t2_cidarg = ( t2 == 'Skype') ? ',' : ',' + t2 ;
+		var t1_cidarg = ( t1 == 'Skype') ? ',' : ',' + (g1cid ? g1cid : t1);
+		var t2_cidarg = ( t2 == 'Skype') ? ',' : ',' + (g2cid ? g2cid : t2);
 		var as = DOM_new_crl_pattern.value + ',1,Macro(' + ASTGUI.contexts.dialtrunks + Trunk_Build_str + foTrunk_Build_str + t1_cidarg + t2_cidarg + caller_id + ')' ;
 	}
 

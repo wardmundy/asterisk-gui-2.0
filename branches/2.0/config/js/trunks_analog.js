@@ -39,6 +39,17 @@ var checkChannels = function(channels){
 	ASTGUI.domActions.checkSelected(ch_chkbxClass, channels) ;
 };
 
+var populateGroupsSelect = function(){
+	parent.pbx.trunks.listAllGroups().each(function(h){
+		var tr = parent.pbx.trunks.getTrunkNamesByGroup(h);
+		var trstr = tr.join(", ");
+		if (trstr.length > 30){
+			trstr = trstr.substr(30) + '...';
+		}
+		ASTGUI.selectbox.append( _$('edit_groups'), parent.pbx.trunks.getGroupDescription(h), h);
+	});
+};
+
 var disable_usedChannels = function(trunk){ // trunk is (optional, used while editing a trunk, for new trunk leave blank)
 	// FXOS -- list of all Analog channels
 	var used = [];
@@ -65,6 +76,7 @@ var new_analogTrunk_form = function(){
 	$(DOM_new_ATRNK_DIV).showWithBg();
 	ASTGUI.updateFieldToValue( 'edit_trunkName', '' );
 	ASTGUI.resetTheseFields( Electrical_Fields );
+	DOM_edit_groups_select.selectedIndex = -1;
 };
 
 
@@ -87,6 +99,10 @@ var selectedTrunk_editOptions_form = function(w){
 		var fld_value = parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK][fld] || '' ;
 		ASTGUI.updateFieldToValue( _$(fld) ,  fld_value );
 	} );
+
+	DOM_edit_groups_select.selectedIndex = -1;
+	var g = parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['group'].toString().split(',');
+	g.each(function(group){ ASTGUI.updateFieldToValue(DOM_edit_groups_select, group); });
 
 	ASTGUI.updateFieldToValue(_$('dummy_customCid'), '');
 	ASTGUI.updateFieldToValue( _$('dummy_callerid'), 'asreceived');
@@ -120,6 +136,7 @@ var loadDOMelements = function(){
 	DOM_div_electrical = _$('div_electrical');
 	DOM_div_audioLevels = _$('div_audioLevels');
 	VOLUMES_TBL = _$('TABLE_PORTS_VOLUME');
+	DOM_edit_groups_select = _$('edit_groups');
 
 	FXOS.each(function(item){
 		var lbl = document.createElement( 'label' ) ;
@@ -146,6 +163,9 @@ var new_ATRNK_save_go = function(){
 		top.cookies.set( 'require_restart' , 'yes' );
 	}
 
+	var groupstr = ASTGUI.getFieldValue(DOM_edit_groups_select) ? ASTGUI.getFieldValue(DOM_edit_groups_select).join(',') : 'New';
+	groupstr = parent.pbx.trunks.formatGroupString(groupstr);
+	
 	if( ASTGUI.getFieldValue('edit_trunkName') ){
 		var trunk_name = ASTGUI.getFieldValue('edit_trunkName');
 	}else{
@@ -158,7 +178,7 @@ var new_ATRNK_save_go = function(){
 			window.location.reload();
 		};
 
-		var tmp_object = {'zapchan':scs , 'trunkname': trunk_name } ;
+		var tmp_object = {'zapchan':scs , 'trunkname': trunk_name , 'group': groupstr} ;
 		Electrical_Fields.each(function(fld){
 			tmp_object[fld] = ASTGUI.getFieldValue( _$(fld) );
 		});
@@ -171,15 +191,62 @@ var new_ATRNK_save_go = function(){
 
 		parent.pbx.trunks.add('analog', tmp_object , cbf ) ;
 		return;
+	}else{
+		var new_groups = groupstr.split(",");
+
+		var ded_group = parent.pbx.trunks.getDedicatedGroup(parent.pbx.trunks.getName(EDIT_TRUNK));
+		if(!new_groups.contains(ded_group)){
+			/* See if there is another dedicated group */
+			var save_old_groups = parent.sessionData.pbxinfo.trunks['analog'][EDIT_TRUNK]['group'].toString().split(',');
+			parent.sessionData.pbxinfo.trunks['analog'][EDIT_TRUNK]['group'] = new_groups.join(',');
+			if(!parent.pbx.trunks.getDedicatedGroup(parent.pbx.trunks.getName(EDIT_TRUNK))){
+				top.log.debug("Can't remove a trunk from its dedicated group.");
+				new_groups.push(ded_group);
+				parent.sessionData.pbxinfo.trunks['analog'][EDIT_TRUNK]['group'] = new_groups.join(',');
+			}
+		}
 	}
+
+	/* If the user just put a trunk into another trunk's dedicated group, we will allow it
+	   but create a new dedicated group for the other trunk. */
+	var ana_trunks = parent.pbx.trunks.list({analog: true});
+	ana_trunks.each(function(item){
+		var ded_group = parent.pbx.trunks.getDedicatedGroup(parent.pbx.trunks.getName(item));
+		/* make sure the user isn't trying to remove the trunk from its dedicated group */
+		if(!ded_group || new_groups.contains(ded_group)){ /* We've just used another trunk's ded_group */
+			/* should never happen. */
+			var new_ded_group = parent.pbx.trunks.makeDedicatedGroup();
+			var g = parent.sessionData.pbxinfo.trunks['analog'][item]['group'].toString().split(',');
+			g.push(new_ded_group);
+			parent.sessionData.pbxinfo.trunks['analog'][item]['group'] = g.join(',');
+			var x = new listOfSynActions('users.conf');
+			x.new_action('update', item, 'group', parent.sessionData.pbxinfo.trunks['analog'][item]['group']);
+			x.callActions();
+		}
+	});
+	var final_groups = [];
+	for( var i = 0 ; i < new_groups.length; i++){
+		if(new_groups[i]){
+			final_groups.push(new_groups[i]);
+		}
+	}
+	delete new_groups;
+	groupstr = final_groups.join(",");
+	parent.sessionData.pbxinfo.trunks['analog'][EDIT_TRUNK]['group'] = groupstr;
+	var x = new listOfSynActions('extensions.conf');
+	x.new_action('update', 'globals', EDIT_TRUNK, "DAHDI/g" + parent.pbx.trunks.getDedicatedGroup(parent.pbx.trunks.getName(EDIT_TRUNK)));
+	x.callActions();
 
 	// just update the selected channels
 	(function(){
 		var x = new listOfSynActions('users.conf');
 			x.new_action('update', EDIT_TRUNK , DAHDICHANNELSTRING, scs );
+			x.new_action('update', EDIT_TRUNK , 'group', groupstr);
 			x.new_action('delete', EDIT_TRUNK , 'gui_volume', '' );
 			x.new_action('delete', EDIT_TRUNK , 'gui_fxooffset', '' );
 			x.new_action('delete', EDIT_TRUNK , 'rxgain', '' );
+			x.callActions();
+			x.clearActions();
 			x.new_action('delete', EDIT_TRUNK , 'txgain', '' );
 			x.new_action('delete', EDIT_TRUNK , 'signalling', '' );
 			x.new_action('delete', EDIT_TRUNK , 'channel', '' );
@@ -188,6 +255,7 @@ var new_ATRNK_save_go = function(){
 
 		x.new_action('update', EDIT_TRUNK , 'trunkname', trunk_name.guiMetaData() );
 		parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['trunkname'] = trunk_name ;
+		parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK]['group'] = groupstr;
 
 		var zap_channels = ASTGUI.miscFunctions.chanStringToArray(scs);
 
@@ -259,7 +327,7 @@ var delete_trunk_confirm = function(a){
 	EDIT_TRUNK = a;
 
 	var trunk_name = getProperty(parent.sessionData.pbxinfo['trunks']['analog'][EDIT_TRUNK], 'trunkname') || EDIT_TRUNK ;
-	if(!confirm("Delete trunk '"+ trunk_name + "' ?")) { return true; }
+	if(!confirm("Delete trunk '"+ trunk_name + "' ?  If you intend to reconfigure this trunk later, you will have to update any calling rules or voice menu Dial actions which use this trunk.")) { return true; }
 	if( parent.pbx.trunks.remove(EDIT_TRUNK) ){ 
 		ASTGUI.feedback({msg:'Deleted Analog trunk ' + "'" + trunk_name + "'" , showfor: 3 , color: '#5D7CBA', bgcolor: '#FFFFFF'}) ;
 		window.location.reload();
@@ -294,6 +362,7 @@ var localajaxinit = function(){
 			}
 		});
 	})();
+	populateGroupsSelect();
 	loadDOMelements();
 	update_AnalogTrunksTable();
 };
