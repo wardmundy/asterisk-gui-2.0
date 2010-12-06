@@ -283,6 +283,7 @@ tooltips['users'] .en[17] = "<B>Hints:</B> If checked the phone being called wil
 	tooltips['iax_general'].en[40] = "A single IP address or a range of IP addresses for which call token validation is not required in the form <b>11.11.11.11</b> or <b>11.11.11.11/22.22.22.22</b>.";
 	tooltips['iax_general'].en[41] = "<B>Max Call Numbers:</B> Limits the amount of call numbers allowed for a single IP address.";
 	tooltips['iax_general'].en[42] = "<B>Max Nonvalidated Call Numbers:</B> Limits the amount of nonvalidated call numbers for all IP addresses combined.";
+	tooltips['iax_general'].en[43] = "<B>Call Number Limits:</B> Limits the call numbers for a given IP range.";
 
 
 	// Tooltips for Options (options)
