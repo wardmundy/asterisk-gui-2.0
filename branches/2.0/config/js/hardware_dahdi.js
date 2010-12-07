@@ -851,6 +851,7 @@ var applySettings = {
 		ASTGUI.dialog.waitWhile('updating modprobe configuration ...');
 		var cmd1 = "cp /etc/asterisk/modprobe_default /etc/modprobe.d/dahdi.conf";
 		var params = "options " + $('#zap_moduleName').val();
+		var params_to_delete = params;
 
 		if( $('#enable_disable_checkbox_opermode:checked').val() !== null ){
 			var h = $('#opermode').val();
@@ -906,7 +907,7 @@ var applySettings = {
 		h = ASTGUI.getFieldValue('vpmnlpmaxsupp');
 			if(h){ params += " vpmnlpmaxsupp=" + h; }
 	
-		var cmd2 = "echo \"" + params + "\" >> /etc/modprobe.d/dahdi.conf ";
+		var cmd2 = "grep -v \"^" + params_to_delete + "\" /etc/modprobe.d/dahdi.conf > /etc/modprobe.d/dahdi.conf ; echo \"" + params + "\" >> /etc/modprobe.d/dahdi.conf ";
 	
 		var update_usersConf = function(){
 			// update MWI settings in users.conf
@@ -937,11 +938,9 @@ var applySettings = {
 			return;
 		}
 
-		ASTGUI.systemCmd( cmd1, function(){ 
-			ASTGUI.systemCmd( cmd2, function(){ 
-				ASTGUI.dialog.waitWhile('updating Analog Trunks with MWI settings ...');
-				update_usersConf();
-			});
+		ASTGUI.systemCmd( cmd2, function(){ 
+			ASTGUI.dialog.waitWhile('updating Analog Trunks with MWI settings ...');
+			update_usersConf();
 		});
 		
 	},
