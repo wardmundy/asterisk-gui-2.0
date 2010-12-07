@@ -407,7 +407,7 @@ var SAVE_USER_FORM = function(){ // SAVE_USER_FORM();
 		return;
 	}
 
-	if ( !ASTGUI.getFieldValue('edit_hasSip').isAstTrue() && ASTGUI.getFieldValue('edit_fxs') && !ASTGUI.getFieldValue('macaddress') ){
+	if ( ASTGUI.getFieldValue('edit_hasSip').isAstTrue() && !ASTGUI.getFieldValue('edit_fxs') && !ASTGUI.getFieldValue('macaddress') ){
 		ASTGUI.updateFieldToValue( 'macaddress',  ASTGUI.getFieldValue('new_ext') );
 	}else if( ASTGUI.getFieldValue('edit_hasSip').isAstTrue() ){
 		if ( !ASTGUI.validateFields(['macaddress'])) return ;
@@ -525,11 +525,11 @@ var SAVE_USER_FORM = function(){ // SAVE_USER_FORM();
 				var tmp_rxflash = ASTGUI.getFieldValue('edit_rxflash') || '1250';
 				var sg = (parent.sessionData.PORTS_SIGNALLING.ls.contains(fs)) ? 'fxo_ls':'fxo_ks' ;
 
+				x.new_action('delete', u, top.sessionData.DahdiChannelString , '' ) ;
+				x.new_action('append', u, top.sessionData.DahdiChannelString, fs );					tmp_obj[top.sessionData.DahdiChannelString] = fs ;
 				x.new_action('update', u, 'signalling', sg) ;					tmp_obj['signalling'] = sg ;
 				x.new_action('update', u, 'flash',  tmp_flash) ;				tmp_obj['flash'] = tmp_flash ;
 				x.new_action('update', u, 'rxflash', tmp_rxflash ) ;				tmp_obj['rxflash'] = tmp_rxflash ;
-				x.new_action('delete', u, top.sessionData.DahdiChannelString , '' ) ;
-				x.new_action('append', u, top.sessionData.DahdiChannelString, fs );					tmp_obj[top.sessionData.DahdiChannelString] = fs ;
 			}else{
 				x.new_action('delete', u, top.sessionData.DahdiChannelString, '') ;					tmp_obj[top.sessionData.DahdiChannelString] = '' ;
 			}
