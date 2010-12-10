@@ -147,7 +147,7 @@ var load_DOMelements = function(){
 		ASTGUI.events.add( DOM_new_cr_button , 'click' ,  newCallingRule_form);
 
  		// list non-analog trunks by trunk.
- 		var t = parent.pbx.trunks.list({iax: true, providers: true, sip: true});
+ 		var t = parent.pbx.trunks.list({iax: true, providers: true, sip: true, bri: true, pri: true});
 		var TMP_FORSORT = [];
 		t.each(function(item){
 			TMP_FORSORT.push( parent.pbx.trunks.getName(item) + ':::::::' +  item);

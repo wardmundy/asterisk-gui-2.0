@@ -1342,7 +1342,7 @@ pbx.trunks.getTrunkIdByName = function(name) {
 };
 
 pbx.trunks.getTrunkNamesByGroup = function(group) {
-	var t = this.list({analog: true, bri: true, pri: true});
+	var t = this.list({analog: true});
 	var a = [];
 	t.each(function(item){
 		var type = parent.pbx.trunks.getType(item);
@@ -1402,7 +1402,7 @@ pbx.trunks.makeDedicatedGroup = function() {
 };
 
 pbx.trunks.listAllGroups = function() {
-	var t = this.list({analog: true, bri: true, pri: true});
+	var t = this.list({analog: true});
 	var a = [];
 	t.each(function(item){
 		var type = parent.pbx.trunks.getType(item);
@@ -1595,7 +1595,7 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 pbx.trunks.isAnalog = function(trunk) {
 	if(trunk.indexOf("group_" == -1)){
 		var type = this.getType(trunk);
-		if(type == 'analog' || type == 'bri' || type == 'pri'){
+		if(type == 'analog'){
 			return true;
 		}
 	}
