@@ -3,10 +3,11 @@
  *
  * hardware_dahdi.html functions
  *
- * Copyright (C) 2006-2009, Digium, Inc.
+ * Copyright (C) 2006-2010, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
  * Ryan Brindley <ryan@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -132,14 +133,11 @@ var detectHwChanges = function(){ // compare DETECTEDHARDWARE vs CONFIGUREDHARDW
 	if(configured_devices.length == detected_devices.length){
 		for(var l=0; l < configured_devices.length; l++){
 			if(configured_devices[l] != detected_devices[l]){ // devices does not match - but the number of devices match
-				top.log.debug("DEVICES or basechans does not MATCHED");
 				return true;
 			}
 		}
-		top.log.debug("DEVICES and basechans MATCH");
 		return false;
 	}else{	
-		top.log.debug("DEVICES or basechans does not MATCHED");
 		return true;
 	}
 };
@@ -395,7 +393,6 @@ var loadConfigFiles = {
 	//   check if the channels in zapchan are within max and min
 	//   if yes then set the current range values
 	load_hwcfgfile: function(){ // read hwcfgfile (if exists) into CONFIGUREDHARDWARE 
-		top.log.debug("load last configured hardware information, start function: loadConfigFiles.load_hwcfgfile()");
 		var n = config2json({filename:hwcfgfile, usf:1});
 		if( n.getOwnProperties().length == 0 ){ // if file not found or no previous hardware detected
 				hwchanged = -1;
@@ -411,23 +408,19 @@ var loadConfigFiles = {
 			}}
 			loadConfigFiles.run_detectdahdi();
 		}
-		top.log.debug("end of function: loadConfigFiles.load_hwcfgfile()");
 	},
 
 	run_detectdahdi: function(){
-		top.log.debug("start function: loadConfigFiles.run_detectdahdi()");
 
 		ASTGUI.miscFunctions.createConfig( 'applyzap.conf', function(){
 			parent.ASTGUI.systemCmd( top.sessionData.directories.app_DahdiScan , function(){ // run ztscan and then try loading ztscan.conf
 				window.setTimeout( loadConfigFiles.read_DahdiScanConf , 700 ); // leave some time for ztscan to generate ztscan.conf
 			});
-			top.log.debug("end of function: loadConfigFiles.run_detectdahdi()");
 		});
 	},
 
 	//readZtscanConf: function(){
 	read_DahdiScanConf: function(){
-		top.log.debug("start function: loadConfigFiles.read_DahdiScanConf()");
 		var ztsc = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=' + ASTGUI.globals.dahdiScanOutput , async: false }).responseText;
 		var ztsc_Lower = ztsc.toLowerCase();
 		if( ztsc_Lower.contains('response: error') && ztsc_Lower.contains('message: config file not found') ){
@@ -511,12 +504,10 @@ var loadConfigFiles = {
 			}}
 		}}
 		if(hwchanged != -1){ hwchanged = detectHwChanges(); }
-		top.log.debug("end of function: loadConfigFiles.read_DahdiScanConf()");
 		loadConfigFiles.readUsersConf(); // read span_x (where T1/E1 trunks are defined)
 	},
 
 	readUsersConf: function(){
-		top.log.debug("start function: loadConfigFiles.readUsersConf()");
 
 		var usrs = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename=users.conf', async: false }).responseText;
 		var usrs_Lower = usrs.toLowerCase();
@@ -589,12 +580,10 @@ var loadConfigFiles = {
 				}
 			}}
 		})();
-		top.log.debug("end of function: loadConfigFiles.readUsersConf()");
 		showtable();
 	},
 
 	load_zaptel_conf: function(){
-		top.log.debug("start function: loadConfigFiles.load_zaptel_conf()");
 		// we parse zaptel.conf to get the loadzone and syncsrc for each span
 		var tmp_file = ASTGUI.globals.dahdiIncludeFile ;
 		var parseZaptelconf = function(zp){
@@ -680,7 +669,6 @@ var loadConfigFiles = {
 				parseZaptelconf(q);
 			}
 		}
-		top.log.debug("end of function: loadConfigFiles.load_zaptel_conf()");
 	}
 };
 
@@ -797,122 +785,121 @@ var applySettings = {
 	},
 
 	saveOpermodeSettings: function() {
-		ASTGUI.dialog.waitWhile('saving...');
+ 		ASTGUI.dialog.waitWhile('updating modprobe configuration ...');
 		var u = new listOfSynActions(ASTGUI.globals.configfile);
+ 		var module_name = $('#zap_moduleName').val();
+ 		var params = "options " + module_name;
+ 		var params_to_delete = params;
 
 		/* ok, lets update the configfile is the values are set */
 		if ($('#enable_disable_checkbox_opermode:checked').val() != null) {
-			u.new_action('update', 'general', 'opermode', $('#opermode').val());
+ 			var h = $('#opermode').val();
+ 			u.new_action('update', 'general', 'opermode', h);
+ 			if(h){ params += " opermode=" + h; }
+ 		}else{
+ 			u.new_action('delete', 'general', 'opermode', '');
 		}
 
 		if ($('#enable_disable_checkbox_alawoverride:checked').val() != null){
-			u.new_action('update', 'general', 'alawoverride', $('#alawoverride').val());
+ 			h = $('#alawoverride').val();
+ 			u.new_action('update', 'general', 'alawoverride', h);
+ 			if(h){ params += " alawoverride=" + h; }
+ 		}else{
+ 			u.new_action('delete', 'general', 'alawoverride', '');
 		}
 
 		if( $('#enable_disable_checkbox_fxshonormode:checked').val() != null ){
-			u.new_action('update', 'general', 'fxshonormode', $('#fxshonormode').val());
+ 			h = $('#fxshonormode').val();
+ 			u.new_action('update', 'general', 'fxshonormode', h);
+ 			if(h){ params += " fxshonormode=" + h; }
+ 		}else{
+ 			u.new_action('delete', 'general', 'fxshonormode', '');
 		}
 
 		if( $('#enable_disable_checkbox_boostringer:checked').val() != null ){
-			u.new_action('update', 'general', 'boostringer', $('#boostringer').val());
+ 			h = $('#boostringer').val();
+ 			u.new_action('update', 'general', 'boostringer', h);
+ 			if(h){ params += " boostringer=" + h; }
+ 		}else{
+ 			u.new_action('delete', 'general', 'boostringer', '');
 		}
 
-		u.new_action('update', 'general', 'ZAPMODULE_NAME', $('#zap_moduleName').val());
+ 		u.new_action('update', 'general', 'ZAPMODULE_NAME', module_name);
 		u.callActions();
 		u.clearActions();
 
 		if( $('#enable_disable_checkbox_mwimode:checked').val() != null ){
 			u.new_action('update', 'general', 'mwimode', $('#mwimode').val());
 			if( ASTGUI.getFieldValue('mwimode') == 'NEON' ){
-				u.new_action('update', 'general', 'neonmwi_level', $('#neonmwi_level').val());
-				u.new_action('update', 'general', 'neonmwi_offlimit', $('#neonmwi_offlimit').val());
+ 				params += " neonmwi_monitor=1";
+ 				h = $('#neonmwi_level').val();
+ 				if(h){
+ 					params += ' neonmwi_level=' + h;
+ 					u.new_action('update', 'general', 'neonmwi_level', h);
+ 				}else{
+ 					u.new_action('delete', 'general', 'neonmwi_level', '');
+ 				}
+ 
+ 				h = $('#neonmwi_offlimit').val();
+ 				if(h){
+ 					params += ' neonmwi_offlimit=' + h;
+ 					u.new_action('update', 'general', 'neonmwi_offlimit', h);
+ 				}else{
+ 					u.new_action('delete', 'general', 'neonmwi_offlimit', '');
+ 				}
+ 			}else{
+ 				params += " neonmwi_monitor=0";
 			}
+ 		}else{
+ 			u.new_action('delete', 'general', 'mwimode', '');
 		}
 
 		if( $('#enable_disable_checkbox_lowpower:checked').val() != null ){
-			u.new_action('update', 'general', 'lowpower', $('#lowpower').val());
-		}
-
-		if( $('#enable_disable_checkbox_fastringer:checked').val() != null ){
-			u.new_action('update', 'general', 'fastringer', $('#fastringer').val());
-		}
-
-		if( $('#enable_disable_checkbox_fwringdetect:checked').val() != null ){
-			u.new_action('update', 'general', 'fwringdetect', $('#fwringdetect').val());
-		}
-
-		u.new_action('update', 'general', 'vpmnlptype', $('#vpmnlptype').val());
-		u.new_action('update', 'general', 'vpmnlpthresh', $('#vpmnlpthresh').val());
-		u.new_action('update', 'general', 'vpmnlpmaxsupp', $('#vpmnlpmaxsupp').val());
-
-		u.callActions();
-		u.clearActions();
-	
-		ASTGUI.dialog.waitWhile('updating modprobe configuration ...');
-		var cmd1 = "cp /etc/asterisk/modprobe_default /etc/modprobe.d/dahdi.conf";
-		var params = "options " + $('#zap_moduleName').val();
-		var params_to_delete = params;
-
-		if( $('#enable_disable_checkbox_opermode:checked').val() !== null ){
-			var h = $('#opermode').val();
-				if(h){ params += " opermode=" + h; }
-		}
-
-		if( _$('enable_disable_checkbox_alawoverride').checked ){
-			h = $('#alawoverride').val();
-			if(h){ params += " alawoverride=" + h; }
-		}
-
-		if( _$('enable_disable_checkbox_fxshonormode').checked ){
-		h = $('#fxshonormode').val();
-			if(h){ params += " fxshonormode=" + h; }
-		}
-
-		if( _$('enable_disable_checkbox_boostringer').checked ){
-			h = $('#boostringer').val();
-			if(h){ params += " boostringer=" + h; }
-		}
-
-		if( _$('enable_disable_checkbox_lowpower').checked ){
 			h = $('#lowpower').val();
+ 			u.new_action('update', 'general', 'lowpower', h);
 			if(h){ params += " lowpower=" + h; }
+ 		}else{
+ 			u.new_action('delete', 'general', 'lowpower', '');
 		}
 
-		if( _$('enable_disable_checkbox_fastringer').checked ){
+ 		if( $('#enable_disable_checkbox_fastringer:checked').val() != null ){
 			h = $('#fastringer').val();
+ 			u.new_action('update', 'general', 'fastringer', h);
 			if(h){ params += " fastringer=" + h; }
+ 		}else{
+ 			u.new_action('delete', 'general', 'fastringer', '');
 		}
 
-		if( _$('enable_disable_checkbox_fwringdetect').checked ){
+ 		if( $('#enable_disable_checkbox_fwringdetect:checked').val() != null ){
 			h = $('#fwringdetect').val();
+ 			u.new_action('update', 'general', 'fwringdetect', h);
 			if(h == '1'){ params += " fwringdetect=" + h; }
-		}
-
-		if( _$('enable_disable_checkbox_mwimode').checked ){
-			if( $('#mwimode').val()== 'NEON'){
-				params += " neonmwi_monitor=1";
-				var h = $('#neonmwi_level').val();
-				if(h){ params += ' neonmwi_level=' + h ; }
-				var h = $('#neonmwi_offlimit').val();
-				if(h){ params += ' neonmwi_offlimit=' + h ; }
-			}else{
-				params += " neonmwi_monitor=0";
-			}
+ 		}else{
+ 			u.new_action('delete', 'general', 'fwringdetect', '');
 		}
 
 		h = ASTGUI.getFieldValue('vpmnlptype') ;
-			if(h){ params += " vpmnlptype=" + h; }
+ 		if(h){ params += " vpmnlptype=" + h; }
+ 		u.new_action('update', 'general', 'vpmnlptype', h);
+
 		h = ASTGUI.getFieldValue('vpmnlpthresh') ;
-			if(h){ params += " vpmnlpthresh=" + h; }
+ 		if(h){ params += " vpmnlpthresh=" + h; }
+ 		u.new_action('update', 'general', 'vpmnlpthresh', h);
+ 
 		h = ASTGUI.getFieldValue('vpmnlpmaxsupp');
-			if(h){ params += " vpmnlpmaxsupp=" + h; }
+ 		if(h){ params += " vpmnlpmaxsupp=" + h; }
+ 		u.new_action('update', 'general', 'vpmnlpmaxsupp', h);
+ 
+ 		u.callActions();
+ 		u.clearActions();
+  	
 	
 		var cmd2 = "grep -v \"^" + params_to_delete + "\" /etc/modprobe.d/dahdi.conf > /etc/modprobe.d/dahdi.conf ; echo \"" + params + "\" >> /etc/modprobe.d/dahdi.conf ";
 	
 		var update_usersConf = function(){
 			// update MWI settings in users.conf
 			var u = new listOfSynActions('users.conf');
-			if( $('#enable_disable_checkbox_mwimode:checked').val() !== null ){
+			if( $('#enable_disable_checkbox_mwimode:checked').val() != null ){
 				if( $('#mwimode').val()== 'FSK'){
 					u.new_action('update', 'general' , 'mwimonitor', 'fsk');
 					u.new_action('update', 'general' , 'mwilevel', '512');
@@ -1188,7 +1175,6 @@ var applyDigitalSettings = function(){
 
 
 var localajaxinit = function(){
-	top.log.debug("Starting Loading Page digital.html .. start function: window.onload()");
 	portsSignalling = ASTGUI.cloneObject(parent.sessionData.PORTS_SIGNALLING);
 
 	ASTGUI.dialog.waitWhile('Detecting Analog/Digital Hardware ...');
@@ -1285,7 +1271,6 @@ var localajaxinit = function(){
 	ASTGUI.updateFieldToValue('vpmnlptype', config.getProperty('vpmnlptype') || '4');
 	ASTGUI.updateFieldToValue('vpmnlpthresh', config.getProperty('vpmnlpthresh') || '24');
 	ASTGUI.updateFieldToValue('vpmnlpmaxsupp', config.getProperty('vpmnlpmaxsupp') || '24');
-	top.log.debug("end of function: window.onload()");
 	loadConfigFiles.load_hwcfgfile(); // try to load last detected/configured hardware information
 
 };
