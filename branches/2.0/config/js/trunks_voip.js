@@ -89,7 +89,7 @@ var show_Edit_Trunk = function(){
 		ASTGUI.updateFieldToValue( 'edit_VOIPTrunk_Providername' , getProperty(tinfo, 'trunkname') );
 		ASTGUI.updateFieldToValue( 'trunk_fromdomain' , getProperty(tinfo, 'fromdomain') );
 		ASTGUI.updateFieldToValue( 'trunk_fromuser' , getProperty(tinfo, 'fromuser') );
-		ASTGUI.updateFieldToValue( 'trunk_authuser' , getProperty(tinfo, 'authuser').split(":")[0] );
+		ASTGUI.updateFieldToValue( 'trunk_authuser' , getProperty(tinfo, 'authuser') );
 		ASTGUI.updateFieldToValue( 'trunk_insecure' , getProperty(tinfo, 'insecure') );
 		ASTGUI.updateFieldToValue( 'trunk_outboundproxy' , getProperty(tinfo, 'outboundproxy') );
 
@@ -271,7 +271,7 @@ var edit_VOIPTrunk_save_go = function(){
 
 			var tmp_authuser = ASTGUI.getFieldValue('trunk_authuser');
 			if( tmp_authuser ){
-				x.new_action('update', EDIT_TRUNK , 'authuser', tmp_authuser + ":" + ASTGUI.getFieldValue(DOM_edit_VOIPTrunk_Password));
+				x.new_action('update', EDIT_TRUNK , 'authuser', tmp_authuser );
 				parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK]['authuser'] = tmp_authuser ;
 			}else{
 				if( parent.sessionData.pbxinfo.trunks[ttype][EDIT_TRUNK].hasOwnProperty('authuser') ){
