@@ -359,6 +359,7 @@ var ASTGUI = {
 	contexts: {
 		guitools : 'asterisk_guitools', // gui tools context
 		dialtrunks : 'trunkdial-failover-0.3', // trunkdial macro with failback trunk and setcid, ASTGUI.contexts.dialtrunks
+		localcrcid: 'local-callingrule-cid-0.1', // setcid for local calling rules, ASTGUI.contexts.localcrcid
 		subscribe : 'device-hints',	//subscribecontext for sip.conf (aka devicestate fun)
 		CONFERENCES : 'conferences', // ASTGUI.contexts.CONFERENCES
 		QUEUES : 'queues', //ASTGUI.contexts.QUEUES
@@ -2055,6 +2056,9 @@ var ASTGUI = {
 					if(macroargs.length == 4 || macroargs.length == 6){
 							cr.callerID = macroargs[macroargs.length - 1];
 					}
+				}else if( str.contains('local-callingrule') ){ // if is some version of localcrcid macro
+					cr.destination = "Goto(" + macroargs[1] + ',' + macroargs[2] + ',' + macroargs[3] + ')';
+					cr.callerID = macroargs[4] ? macroargs[4] : '';
 				}
 			}else{
 				cr.destination = ASTGUI.parseContextLine.getAppWithArgs( str ) ;
