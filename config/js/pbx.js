@@ -93,6 +93,10 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					check_For_Contexts[ASTGUI.contexts.guitools][4] = 'exten=record_vmenu,n,Record(${var1},0,500,k)';
 				}
 		
+				check_For_Contexts[ 'macro-' + ASTGUI.contexts.localcrcid ] = [
+					'exten=s,1,Set(CALLERID(all)=${IF($[${LEN(${ARG4})} > 2]?${ARG4}:)})',
+					'exten=s,n,Goto(${ARG1},${ARG2},${ARG3})'
+				];
 				check_For_Contexts[ 'macro-' + ASTGUI.contexts.dialtrunks ] = [
 					// "; Macro by =  Brandon Kruse, Matthew O'Gorman, & Erin Spiceland <espiceland@digium.com>",
 					'exten=s,1,GotoIf($[${LEN(${FMCIDNUM})} > 6]?1-fmsetcid,1)',
