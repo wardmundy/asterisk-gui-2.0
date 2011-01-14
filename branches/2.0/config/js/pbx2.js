@@ -1506,7 +1506,6 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 	trunk.allow = 'all';
 	trunk.context = ct || '';
 	trunk.disallow = 'all';
-	trunk.group = group || null;
 	trunk.hasexten = 'no';
 	trunk.hasiax = (type === 'iax') ? 'yes' : 'no';
 	trunk.hassip = (type === 'sip') ? 'yes' : 'no';
@@ -1530,7 +1529,9 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 		}
 
 		top.sessionData.pbxinfo.trunks[type][name][v] = trunk[v];
-		users_conf.new_action('append', name, v, trunk[v]);
+		if(v != null){
+			users_conf.new_action('append', name, v, trunk[v]);
+		}
 	}
 	top.sessionData.pbxinfo.trunks[type][name]['disallow'] = trunk['disallow'];
 	users_conf.new_action('append', name, 'disallow', trunk['disallow']);
@@ -1552,6 +1553,10 @@ pbx.trunks.add = function(type, trunk, callback, basis) {
 				group = this.makeDedicatedGroup();
 			}
 		}
+		trunk.group = group;
+	}
+	if(group){
+		users_conf.new_action('append', name, 'group', group);
 	}
 
 	/* TODO: get listOfActions to return a response so we know everythings ok! */
