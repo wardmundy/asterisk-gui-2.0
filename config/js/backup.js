@@ -283,7 +283,7 @@ function backup_new(){
 		}) ;
 		return ;
 	}else{
-		parent.ASTGUI.systemCmd( "tar -cf " + bkpPath + bkpfile + ' ' +  ' /etc/asterisk', function(){
+		parent.ASTGUI.systemCmd( "tar -chf " + bkpPath + bkpfile + ' ' +  ' /etc/asterisk', function(){
 			ASTGUI.feedback( { msg:'Backup Successful', showfor:2 });
 			parent.ASTGUI.dialog.waitWhile('Reloading List of backup Files');
 			setTimeout( function(){ parent.ASTGUI.dialog.hide(); window.location.reload(); } , 2000 );
