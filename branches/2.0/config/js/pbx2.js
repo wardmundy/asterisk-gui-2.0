@@ -1346,15 +1346,17 @@ pbx.trunks.getTrunkNamesByGroup = function(group) {
 	var a = [];
 	t.each(function(item){
 		var type = parent.pbx.trunks.getType(item);
-		var g = parent.sessionData.pbxinfo.trunks[type][item]['group'].toString().split(',');
-		g.each(function(h){
-			if(h == group){
-				var name = parent.sessionData.pbxinfo.trunks[type][item]['trunkname'];
-				if(!a.contains(name)){
-					a.push(parent.sessionData.pbxinfo.trunks[type][item]['trunkname']);
+		try{
+			var g = parent.sessionData.pbxinfo.trunks[type][item]['group'].toString().split(',');
+			g.each(function(h){
+				if(h == group){
+					var name = parent.sessionData.pbxinfo.trunks[type][item]['trunkname'];
+					if(!a.contains(name)){
+						a.push(parent.sessionData.pbxinfo.trunks[type][item]['trunkname']);
+					}
 				}
-			}
-		});
+			});
+		}catch(e){}
 	});
 	return a.sort();
 };
@@ -1406,12 +1408,13 @@ pbx.trunks.listAllGroups = function() {
 	var a = [];
 	t.each(function(item){
 		var type = parent.pbx.trunks.getType(item);
-		var g = parent.sessionData.pbxinfo.trunks[type][item]['group'].toString().split(',');
-		g.each(function(h){
-			if(!a.contains(h)){
-				a.push(h);
-			}
-		});
+		try{ var g = parent.sessionData.pbxinfo.trunks[type][item]['group'].toString().split(','); 
+			g.each(function(h){
+				if(!a.contains(h)){
+					a.push(h);
+				}
+			});
+		} catch(e){}
 	});
 	return a.sort();
 };
@@ -1791,10 +1794,12 @@ pbx.trunks.nextAvailGroup = function() {
 	for (var i = 0; i < trunks.length; i++){
 		trunk = trunks[i];
 		type = parent.pbx.trunks.getType(trunk);
-		var g = sessionData.pbxinfo.trunks[type][trunk]['group'].toString().split(',');
-		for(var j = 0; j < g.length; j++){
-			nums.push(g[j]);
-		}
+		try{
+			var g = sessionData.pbxinfo.trunks[type][trunk]['group'].toString().split(',');
+			for(var j = 0; j < g.length; j++){
+				nums.push(g[j]);
+			}
+		}catch(e){}
 	}
 	return nums.sort().firstAvailable();
 };

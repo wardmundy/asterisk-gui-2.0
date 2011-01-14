@@ -560,7 +560,28 @@ var onLogInFunctions = {
 			readcfg.dahdiScanConf();
 		}
 
+		onLogInFunctions.checkTrunks();
+
 		miscFunctions.show_advancedMode();
+	},
+	checkTrunks: function(){
+		var trunklist = pbx.trunks.list({analog: true, bri: true, pri: true});
+		
+		trunklist.each(function(trunk){
+			var ded_group = parent.pbx.trunks.getDedicatedGroup(parent.pbx.trunks.getName(trunk));
+			if(!ded_group){
+				var new_ded_group = parent.pbx.trunks.makeDedicatedGroup();
+				parent.sessionData.pbxinfo.trunks[type][trunk]['group'] = new_ded_group;
+				var x = new listOfSynActions('users.conf');
+				x.new_action('update', trunk, 'group', new_ded_group);
+				x.callActions();
+				ded_group = new_ded_group;
+			}
+			var x = new listOfSynActions('extensions.conf');
+			x.new_action('update', 'globals', trunk, 'DAHDI/g' + ded_group);
+			x.new_action('update', 'globals', 'group_' + ded_group, 'DAHDI/g' + ded_group);
+			x.callActions();
+		});
 	}
 };
 
