@@ -356,7 +356,7 @@ var incomingRules_MiscFunctions = {
 		var this_tiName = ASTGUI.getFieldValue('edit_itrl_tf') ;
 		var TMP_NEW_PATTERN = ASTGUI.getFieldValue('edit_itrl_pattern');
 		var dest = $('#edit_itrl_dest').val();
-		var local_dest = $('#edit_itrl_LocalDest_Pattern option:selected').text();
+		var local_dest = ASTGUI.getFieldValue('edit_itrl_LocalDest_Pattern');
 		var time_int_name = $('#edit_itrl_tf option:selected').text();
 		time_int_name = (time_int_name.contains('no Time Intervals')) ? '' : time_int_name;
 
@@ -366,7 +366,6 @@ var incomingRules_MiscFunctions = {
 		}
 
 		if( isNewIR == true ){ // create new Incoming Rule
-			top.log.debug("create new Incoming Rule");
 			parent.ASTGUI.dialog.waitWhile('Creating Incoming Rule ...');
 
 			if (parent.pbx.trunks.rules.add({trunk: this_trunk, name: time_int_name, time_interval: time_int_name, dest: dest, pattern: TMP_NEW_PATTERN, digits: local_dest})) {
