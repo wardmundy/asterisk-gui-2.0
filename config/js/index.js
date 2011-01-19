@@ -569,7 +569,7 @@ var onLogInFunctions = {
 		
 		trunklist.each(function(trunk){
 			var ded_group = parent.pbx.trunks.getDedicatedGroup(parent.pbx.trunks.getName(trunk));
-			if(!ded_group){
+			if(!(/^[\d\,]+$/.test(ded_group))){
 				var new_ded_group = parent.pbx.trunks.makeDedicatedGroup();
 				parent.sessionData.pbxinfo.trunks[type][trunk]['group'] = new_ded_group;
 				var x = new listOfSynActions('users.conf');
