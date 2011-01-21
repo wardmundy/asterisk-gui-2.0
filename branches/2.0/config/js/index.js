@@ -113,7 +113,9 @@ var onLogInFunctions = {
 			$('div[page="cli.html"]').empty();
 		}else{
 			var resp_lower = resp.toLowerCase();
-			if ( resp_lower.contains("branches/1.6")  || resp_lower.contains("asterisk/1.6") ||  resp_lower.contains("svn-branch-1.6") ||  resp_lower.contains("svn-trunk-")  ){
+			if ( resp_lower.contains("branches/1.6")  || resp_lower.contains("asterisk/1.6") ||  resp_lower.contains("svn-branch-1.6")
+					||  resp_lower.contains("svn-trunk-") || resp_lower.contains("branches/1.8")  || resp_lower.contains("asterisk/1.8") 
+					||  resp_lower.contains("svn-branch-1.8") ){
 				sessionData.PLATFORM.isAST_1_4 = false ;
 				sessionData.PLATFORM.isAST_1_6 = true ;
 				sessionData.PLATFORM.isAST_1_6_1 = resp_lower.contains('1.6.1') ? true : false;
