@@ -215,9 +215,9 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				sessionData.continueParsing = false ;
 				ASTGUI.systemCmd( sessionData.directories.app_dahdi_genconf , function(){
 					if( sessionData.DEBUG_MODE ){
-						alert( 'ran ' + sessionData.directories.app_dahdi_genconf + ' \n Click OK to Reload' );
+						alert( 'Error reading ' + ASTGUI.globals.dahdiIncludeFile + ': ' + s + 'Ran ' + sessionData.directories.app_dahdi_genconf + '. Click OK to Reload' );
 					}
-					window.location.reload() ;
+					window.location.reload();
 				});
 				return;
 			}else{
