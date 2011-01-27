@@ -3,7 +3,7 @@
  *
  * Javascript functions for accessing manager over HTTP and Some UI components/functions used in AsteriskGUI.
  *
- * Copyright (C) 2006-2010, Digium, Inc.
+ * Copyright (C) 2006-2011, Digium, Inc.
  *
  * Mark Spencer <markster@digium.com>
  * Pari Nannapaneni <pari@digium.com>
@@ -310,6 +310,21 @@ _$ = function(x){
 
 	String.prototype.withOut = function(k){
 		return this.split(k).join('');
+	};
+
+	String.prototype.versionGreaterOrEqualTo = function(c){
+		var v = this.split(".");
+		var c = c.split(".");
+		for(var i = 0; i < 6; i++){
+			c[i] = parseInt(c[i] || 0);
+			v[i] = parseInt(v[i] || 0);
+			if(v[i] > c[i]){
+				return true;
+			}else if(v[i] < c[i]){
+				return false;
+			}
+		}
+		return true; /* They are equal */
 	};
 
 

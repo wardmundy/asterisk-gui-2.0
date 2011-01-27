@@ -3,7 +3,7 @@
  *
  * hardware_dahdi.html functions
  *
- * Copyright (C) 2006-2010, Digium, Inc.
+ * Copyright (C) 2006-2011, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
  * Ryan Brindley <ryan@digium.com>
@@ -443,6 +443,7 @@ var loadConfigFiles = {
 				continue;
 			} // in this page, we care only about digital spans 
 			//  note: function detectHwChanges checks if there are any changes in analog ports detected
+			top.log.debug("devicetype is " + n[l]['devicetype']);
 			if(  n[l]['description'].toLowerCase().contains('ztdummy') ){ continue;} // ignore ztdummy :-)
 			SPANS[l] = {};
 			for( var k in n[l] ){ if(n[l].hasOwnProperty(k)){ 
@@ -1268,9 +1269,38 @@ var localajaxinit = function(){
 	ASTGUI.updateFieldToValue('mwimode', config.getProperty('mwimode'));
 	_$('enable_disable_checkbox_mwimode').checked = (config.getProperty('mwimode')) ? true : false ;
 	_$('enable_disable_checkbox_mwimode').updateStatus();
-	ASTGUI.updateFieldToValue('vpmnlptype', config.getProperty('vpmnlptype') || '4');
-	ASTGUI.updateFieldToValue('vpmnlpthresh', config.getProperty('vpmnlpthresh') || '24');
-	ASTGUI.updateFieldToValue('vpmnlpmaxsupp', config.getProperty('vpmnlpmaxsupp') || '24');
+
+
+
+	var DAHDI_version = "0";
+	ASTGUI.systemCmdWithOutput( 'cat /sys/module/dahdi/version' , function(output){
+		output = output.trim();
+		if(output){
+			DAHDI_version = output;
+		}else{
+			ASTGUI.systemCmdWithOutput( 'modinfo -F version dahdi' , function(output){
+				output = output.trim();
+				if(output){
+					DAHDI_version = output;
+				}
+			});
+		}
+	});
+	ASTGUI.systemCmdWithOutput( 'cat /proc/cmdline' , function(output){
+		if(DAHDI_version.versionGreaterOrEqualTo("2.4.0") || parent.sessionData.PLATFORM.isAA50){
+			ASTGUI.selectbox.append('vpmnlptype', "NLP Suppression", 4);
+			ASTGUI.selectbox.append('vpmnlptype', "NLP AutoSuppression (default)", 6);
+			ASTGUI.updateFieldToValue( 'vpmnlptype' , config.getProperty('vpmnlptype') || '6' );
+			ASTGUI.updateFieldToValue( 'vpmnlpthresh' , config.getProperty('vpmnlpthresh') || '22' );
+			ASTGUI.updateFieldToValue( 'vpmnlpmaxsupp' , config.getProperty('vpmnlpmaxsupp') || '10' );
+		}else{
+			ASTGUI.selectbox.append('vpmnlptype', "NLP Suppression (default)", 4);
+			ASTGUI.updateFieldToValue( 'vpmnlptype' , config.getProperty('vpmnlptype') || '4' );
+			ASTGUI.updateFieldToValue( 'vpmnlpthresh' , config.getProperty('vpmnlpthresh') || '24' );
+			ASTGUI.updateFieldToValue( 'vpmnlpmaxsupp' , config.getProperty('vpmnlpmaxsupp') || '24' );
+		}
+	});
+
 	loadConfigFiles.load_hwcfgfile(); // try to load last detected/configured hardware information
 
 };

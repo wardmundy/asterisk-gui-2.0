@@ -3,10 +3,11 @@
  *
  * Digital Card Setup / Detection 
  *
- * Copyright (C) 2007-2009, Digium, Inc.
+ * Copyright (C) 2007-2011, Digium, Inc.
  *
  * Brandon Kruse <bkruse@digium.com>
  * Pari Nannapaneni <pari@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -43,7 +44,7 @@
  ** - - - - - - End of ztscan output - - - - - - - - 
  ** in the above output, [3] is the span number and the description says 'Card 2 Span 1' which is 
  ** still valid because 'span 3' is the 'span 1' on 'card 2'
- ** if your ztscan outputs in some other wiered format, this page will go crazy and might not work as expected.
+ ** if your ztscan outputs in some other weird format, this page will go crazy and might not work as expected.
  ** 
  *** in this page, SPANS[l]['syncsrc'] is NOT the syncsrc from ztscan - but it is read from zaptel.conf
  -->
@@ -386,7 +387,7 @@
 
 	<div id="errmsg" style="display:none"></div>
 
-	<div id="edit_span" STYLE="width:500; height:340;display:none;" class='dialog'>
+	<div id="edit_span" STYLE="width:500; display:none;" class='dialog'>
 		<TABLE width="100%" cellpadding=0 cellspacing=0>
 		<TR class="dialog_title_tr">
 			<TD class="dialog_title" onmousedown="ASTGUI.startDrag(event);">
