@@ -3,9 +3,10 @@
  *
  * hardware_aa50.html functions
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2011, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -198,11 +199,11 @@ var applySettings = {
 
 
 var localajaxinit = function(){
-	top.log.debug("Starting Loading Page hardware_aa50.html .. start function: window.onload()");
+	ASTGUI.Log.Debug("Starting Loading Page hardware_aa50.html .. start function: window.onload()");
 	ASTGUI.dialog.waitWhile('Detecting Hardware ...');
 	top.document.title = "Analog Hardware Setup & Configuration";
 	load_currentAnalogSettings();
-	top.log.debug("end of function: window.onload()");
+	ASTGUI.Log.Debug("end of function: window.onload()");
 };
 
 
@@ -358,14 +359,37 @@ var load_currentAnalogSettings = function(){
 
 		parent.ASTGUI.systemCmd( ' touch /etc/asterisk/applyzap.conf', function(){ // run ztscan and then try loading ztscan.conf
 			setTimeout( function(){ 
+				var DAHDI_version = "0";
+				ASTGUI.systemCmdWithOutput( 'cat /sys/module/dahdi/version' , function(output){
+					output = output.trim();
+					if(output){
+						DAHDI_version = output;
+					}else{
+						ASTGUI.systemCmdWithOutput( 'modinfo -F version dahdi' , function(output){
+							output = output.trim();
+							if(output){
+								DAHDI_version = output;
+							}
+						});
+					}
+				});
 				ASTGUI.systemCmdWithOutput( 'cat /proc/cmdline' , function(output){
 					ASTGUI.dialog.hide();
 					if( output.contains('boardrev=C') ){
 						$('.hidevpm').show();
 						isREVC = true;
-						ASTGUI.updateFieldToValue( 'vpmnlptype' , c.getProperty('vpmnlptype') || '4' );
-						ASTGUI.updateFieldToValue( 'vpmnlpthresh' , c.getProperty('vpmnlpthresh') || '24' );
-						ASTGUI.updateFieldToValue( 'vpmnlpmaxsupp' , c.getProperty('vpmnlpmaxsupp') || '24' );
+						if(DAHDI_version.versionGreaterOrEqualTo("2.4.0") || parent.sessionData.PLATFORM.isAA50){
+							ASTGUI.selectbox.append('vpmnlptype', "NLP Suppression", 4);
+							ASTGUI.selectbox.append('vpmnlptype', "NLP AutoSuppression (default)", 6);
+							ASTGUI.updateFieldToValue( 'vpmnlptype' , c.getProperty('vpmnlptype') || '6' );
+							ASTGUI.updateFieldToValue( 'vpmnlpthresh' , c.getProperty('vpmnlpthresh') || '22' );
+							ASTGUI.updateFieldToValue( 'vpmnlpmaxsupp' , c.getProperty('vpmnlpmaxsupp') || '10' );
+						}else{
+							ASTGUI.selectbox.append('vpmnlptype', "NLP Suppression (default)", 4);
+							ASTGUI.updateFieldToValue( 'vpmnlptype' , c.getProperty('vpmnlptype') || '4' );
+							ASTGUI.updateFieldToValue( 'vpmnlpthresh' , c.getProperty('vpmnlpthresh') || '24' );
+							ASTGUI.updateFieldToValue( 'vpmnlpmaxsupp' , c.getProperty('vpmnlpmaxsupp') || '24' );
+						}
 					}
 				});
 			} , 700); 
