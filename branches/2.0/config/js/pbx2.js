@@ -774,7 +774,7 @@ pbx.queues.agents.setup = function() {
 	}
 
 	var sip_conf = listOfSynActions('sip.conf');
-	var sipconfig = config2json({filename: 'sip.conf', usf:0});
+	var sipconfig = config2json({filename: 'sip.conf', usf:1});
 	if (!sipconfig['general'].hasOwnProperty('subscribecontext')) {
 		sip_conf.new_action('append', 'general', 'subscribecontext', sip_changes['general']['subscribecontext']);
 	}
