@@ -492,7 +492,7 @@ var ASTGUI = {
 				field = _$(field); 
 			}
 			var required = $(field).attr('required');
-			if( required && required.isAstTrue() ){
+			if( required ){
 				var x = field.value.trim() ;
 				var pcn = ( field.className ) ? field.className : '' ;
 				if( !x ){
