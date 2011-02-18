@@ -375,7 +375,7 @@ var ASTGUI = {
 		guitools : 'asterisk_guitools', // gui tools context
 		dialtrunks : 'trunkdial-failover-0.3', // trunkdial macro with failback trunk and setcid, ASTGUI.contexts.dialtrunks
 		localcrcid: 'local-callingrule-cid-0.1', // setcid for local calling rules, ASTGUI.contexts.localcrcid
-		subscribe : 'device-hints',	//subscribecontext for sip.conf (aka devicestate fun)
+		subscribe : 'default',	//subscribecontext for sip.conf (aka devicestate fun)
 		CONFERENCES : 'conferences', // ASTGUI.contexts.CONFERENCES
 		QUEUES : 'queues', //ASTGUI.contexts.QUEUES
 		TrunkDIDPrefix : 'DID_', // context for trunks -  - ASTGUI.contexts.TrunkDIDPrefix 
