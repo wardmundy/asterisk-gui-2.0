@@ -243,7 +243,7 @@ pbx.conferences.load = function() {
 		var name = line.betweenXY('=',',');
 		name = name.trim();
 
-		if(!sessionData.pbxinfo.hasOwnProperty(name)) {
+		if(!sessionData.pbxinfo.conferences.hasOwnProperty(name)) {
 			sessionData.pbxinfo.conferences[name] = new ASTGUI.customObject;
 			sessionData.pbxinfo.conferences[name]['configOptions'] = '';
 		}
