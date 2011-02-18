@@ -704,7 +704,7 @@ pbx.queues.agents.setup = function() {
 		'queue-member-manager' : [
 			'handle_member,1,Verbose(2, Looping through queues to log in or out queue members)',
 			'handle_member,n,Set(thisActiveMember=${CHANNEL(channeltype)}/${CHANNEL(peername)})',
-			'handle_member,n,Set(queue_field=1)',
+			'handle_member,n,Set(queue_field=2)',
 			'handle_member,n,Set(thisQueueXtn=${CUT(QUEUES,\\,,${queue_field})})',
 			'handle_member,n,While($[${EXISTS(${thisQueueXtn})}])',
 			'handle_member,n,Macro(member-loginlogout)',
@@ -716,7 +716,6 @@ pbx.queues.agents.setup = function() {
 			's,1,Verbose(2, Logging queue member in or out of the request queue)',
 			's,n,Set(thisQueue=${thisQueueXtn})',
 			's,n,Set(queueMembers=${QUEUE_MEMBER_LIST(${thisQueue})})',
-			's,n,MacroIf("${queueMembers}" = ""]?q_login)',
 			's,n,Set(field=1)',
 			's,n,Set(logged_in=0)',
 			's,n,Set(thisQueueMember=${CUT(queueMembers,\\,,${field})})',
@@ -739,7 +738,7 @@ pbx.queues.agents.setup = function() {
 			's,1,Verbose(2, Logged ${thisActiveMember} out of ${thisQueue} queue)',
 			's,n,RemoveQueueMember(${thisQueue},${thisActiveMember})',
 			's,n,Playback(silence/1)',
-			's,n,ExecIf($["${AQMSTATUS}" = "REMOVED"]?Playback(agent-loggedoff):Playback(an-error-has-occurred))'
+			's,n,ExecIf($["${RQMSTATUS}" = "REMOVED"]?Playback(agent-loggedoff):Playback(an-error-has-occurred))'
 		]
 	};
 	var sip_changes = {

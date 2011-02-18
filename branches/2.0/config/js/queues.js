@@ -79,7 +79,7 @@ var updateQueuesTable = function(){
 				_$('login_exten').value = ASTGUI.parseContextLine.getExten(m[l]['configLine']) ;
 				continue;
 			}
-			if( m[l]['configLine'].contains(',1,Goto(queue-member-manager, handle_member, 1)') ){
+			if( m[l]['configLine'].contains(',1,Goto(queue-member-manager,handle_member,1)') ){
 				loginsettings.agentCallbackLogin_line = m[l]['configLine'];
 				_$('login_callback_exten').value = ASTGUI.parseContextLine.getExten(m[l]['configLine']);
 				continue;
@@ -405,9 +405,9 @@ var save_QueueSettings = function(){
  		delete parent.sessionData.pbxinfo.queues[OLD_EXT] ;
 	}
 	if(lce){
-		u.new_action('append', ASTGUI.contexts.QUEUES , 'exten', lce + ',1,Goto(queue-member-manager, handle_member, 1)');
+		u.new_action('append', ASTGUI.contexts.QUEUES , 'exten', lce + ',1,Goto(queue-member-manager,handle_member,1)');
 		parent.sessionData.pbxinfo.queues[lce] = new ASTGUI.customObject;
-		parent.sessionData.pbxinfo.queues[lce]['configLine'] = lce + ',1,Goto(queue-member-manager, handle_member, 1)' ;
+		parent.sessionData.pbxinfo.queues[lce]['configLine'] = lce + ',1,Goto(queue-member-manager,handle_member,1)' ;
 	}
 
 	u.callActions();
