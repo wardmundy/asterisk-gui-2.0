@@ -216,9 +216,6 @@ var edit_meetMe_apply = function(){
 
 	if( isNewBridge == false ){ // delete/update old bridge values
 		if( parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['configOptions'] ){
-			u.new_action('delete', 'default', 'exten', '', parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['configOptions'] ); // backward compatibility  with old gui
-		}
-		if( parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['configOptions'] ){
 			u.new_action('delete', ASTGUI.contexts.CONFERENCES, 'exten', '', parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['configOptions'] );
 		}
 		if( parent.sessionData.pbxinfo.conferences[EDIT_BRIDGE]['adminOptions'] ){
