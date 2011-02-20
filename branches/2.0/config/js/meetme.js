@@ -35,6 +35,7 @@ var loadDOMElements = function(){
 	DOM_edit_quietMode = _$('edit_quietMode');
 	DOM_edit_waitMarked = _$('edit_waitMarked');
 	DOM_edit_closeLastMarkedUser = _$('edit_closeLastMarkedUser');
+	DOM_edit_recording = _$('edit_recording');
 };
 
 var updateMeetmesTable = function(){
@@ -149,6 +150,7 @@ var show_MeetMe_Form = function(){
 	DOM_edit_quietMode.checked = ( room_options.contains('q') ) ? true : false ;
 	DOM_edit_waitMarked.checked = ( room_options.contains('w') ) ? true : false ;
 	DOM_edit_closeLastMarkedUser.checked = ( room_options.contains('x') ) ? true : false ;
+	DOM_edit_recording.checked = ( room_options.contains('r') ) ? true : false ;
 	DOM_edit_MeetMe_title.innerHTML = 'Edit Conference Bridge ' + EDIT_BRIDGE ;
 	ASTGUI.feedback( { msg:"Edit 'Conference Bridge'", showfor:2 } );
 	$(DOM_edit_MeetMeDiv).showWithBg();
@@ -194,6 +196,7 @@ var edit_meetMe_apply = function(){
 	if( DOM_edit_quietMode.checked) { new_MeetmeOptions.push('q'); }
 	if( DOM_edit_waitMarked.checked) { new_MeetmeOptions.push('w'); }
 	if( DOM_edit_closeLastMarkedUser.checked) { new_MeetmeOptions.push('x'); }
+	if( DOM_edit_recording.checked) { new_MeetmeOptions.push('r'); }
 	if( DOM_edit_waitMarked.checked || DOM_edit_closeLastMarkedUser.checked ){
 		if( !DOM_edit_adminExtension.value.trim() ){
 			ASTGUI.highlightField(DOM_edit_adminExtension, "Please enter an Extension for marked/Admin users");
