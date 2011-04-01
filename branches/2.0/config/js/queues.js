@@ -293,13 +293,18 @@ var load_agents_checkboxes = function(){
 	var agent_count = 0 ;
 	ul.each(function(user){
 		if( parent.sessionData.pbxinfo.users[user]['hasagent'] && parent.sessionData.pbxinfo.users[user]['hasagent'].isAstTrue() ){
+			var added = 0;
 			if (parent.sessionData.pbxinfo.users[user]['hassip'] && parent.sessionData.pbxinfo.users[user]['hassip'].isAstTrue()) {
-				agent_count++;
+				agent_count++; added++;
 				ul_agents['SIP/' + user] = parent.sessionData.pbxinfo.users[user]['fullname'] + ' - SIP (' + user  + ')';
 			}
 			if (parent.sessionData.pbxinfo.users[user]['hasiax'] && parent.sessionData.pbxinfo.users[user]['hasiax'].isAstTrue()) {
-				agent_count++;
+				agent_count++; added++;
 				ul_agents['IAX2/' + user] = parent.sessionData.pbxinfo.users[user]['fullname'] + ' - IAX (' + user  + ')';
+			}
+			if (added == 0){
+				agent_count++;
+				ul_agents['DAHDI/' + user] = parent.sessionData.pbxinfo.users[user]['fullname'] + ' - Analog (' + user  + ')';
 			}
 		}
 	});
