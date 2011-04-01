@@ -3,9 +3,10 @@
  *
  * timezone.html functions
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2011, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -128,7 +129,7 @@ var localajaxinit = function(){
 		}else{
 			var p = op.split("->");
 			if(p.length > 1){
-				p = p[1].strip().split(upload_Path);
+				p = p[1].trim().split(upload_Path);
 				default_tz = p[1];
 			}
 		}

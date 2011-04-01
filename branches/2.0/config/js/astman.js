@@ -10,6 +10,9 @@
  * Ryan Brindley <rbrindley@digium.com>
  * Erin Spiceland <espiceland@digium.com>
  *
+ * Thanks to Steven Levithan (http://stevenlevithan.com) for his
+ * implementation of trim()
+ *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
  * any of the maintainers of this project for assistance;
@@ -288,14 +291,6 @@ _$ = function(x){
 		return this.split('\n').join('<BR>');
 	};
 
-	String.prototype.strip = function(){
-		try {
-			return this.replace(/^\s+|\s+$/g, "");
-		} catch(e) {
-			return s;
-		}
-	};
-
 	String.prototype.times = function(a){
 		return ( a < 1 ) ? '' : new Array(a+1).join(this);
 	};
@@ -304,8 +299,13 @@ _$ = function(x){
 		return this.replace(/<\/?[^>]+>/gi, '');
 	}
 
-	String.prototype.trim = function(){ // alias to strip
-		return this.strip();
+	String.prototype.trim = function(){
+		/* Thanks to Steve Levithan (http://stevenlevithan.com) for this code */
+		var str = this.replace(/^\s\s*/, ''),
+				ws = /\s/,
+				i = str.length;
+		while (ws.test(str.charAt(--i)));
+		return str.slice(0, i+1);
 	};
 
 	String.prototype.withOut = function(k){
@@ -492,7 +492,7 @@ var ASTGUI = {
 				field = _$(field); 
 			}
 			var required = $(field).attr('required');
-			if( required ){
+			if( required && required.toString().isAstTrue() ){
 				var x = field.value.trim() ;
 				var pcn = ( field.className ) ? field.className : '' ;
 				if( !x ){
@@ -608,7 +608,7 @@ var ASTGUI = {
 			}
 			var cookies = ck.split(';');
 			for(var y=0; y < cookies.length; y++){
-				cookies[y] = cookies[y].strip();
+				cookies[y] = cookies[y].trim();
 				if( cookies[y].beginsWith(x +'=') ){
 					return cookies[y].split( x + '=' )[1] ;
 				}

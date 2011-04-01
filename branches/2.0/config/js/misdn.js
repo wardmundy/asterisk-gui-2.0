@@ -3,9 +3,10 @@
  *
  * misdn.html functions
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2011, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -101,12 +102,12 @@ var misdnConfig = {
 						c = b.split(",");
 						c.each( function(d) {
 							if(PORTS[d]){
-								PORTS[d]['portType'] = a.strip(); // set port type of port d to a
+								PORTS[d]['portType'] = a.trim(); // set port type of port d to a
 							}
 						});
 					}else{
 						if(PORTS[b]){
-							PORTS[b]['portType'] = a.strip(); // set port type of port b to a
+							PORTS[b]['portType'] = a.trim(); // set port type of port b to a
 						}
 					}
 				}

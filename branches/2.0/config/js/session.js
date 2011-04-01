@@ -63,7 +63,7 @@ cookies.get = function(varname) {
 
 	var cookies = ck.split(';');
 	for (var i=0; i < cookies.length; i++) {
-		var c = cookies[i].strip();
+		var c = cookies[i].trim();
 		if (c.beginsWith(varname + '=')) {
 			return c.split(varname + '=')[1];
 		}
