@@ -322,7 +322,12 @@ String.prototype.stripTags = function() {
 }
 
 String.prototype.trim = function(){ // alias to strip
-	return this.strip();
+	/* Thanks to Steve Levithan (http://stevenlevithan.com) for this code */
+	var str = this.replace(/^\s\s*/, ''),
+		ws = /\s/,
+		i = str.length;
+	while (ws.test(str.charAt(--i)));
+	return str.slice(0, i+1);
 };
 
 String.prototype.withOut = function(k){
