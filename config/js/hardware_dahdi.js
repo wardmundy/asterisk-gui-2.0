@@ -1075,9 +1075,9 @@ var applySettings = {
 
 		for( var e in fxx ){ if(fxx.hasOwnProperty(e)){	x.new_action('append', context, e, fxx[e]);	}}
 
-		if(bchanstring.strip()){ x.new_action('append', context, 'bchan', bchanstring); }
-		if(dchanstring.strip()){ x.new_action('append', context, 'dchan', dchanstring); }
-		if(hardhdlc.strip()){ x.new_action('append', context, 'hardhdlc', hardhdlc); }
+		if(bchanstring.trim()){ x.new_action('append', context, 'bchan', bchanstring); }
+		if(dchanstring.trim()){ x.new_action('append', context, 'dchan', dchanstring); }
+		if(hardhdlc.trim()){ x.new_action('append', context, 'hardhdlc', hardhdlc); }
 
 		// write back any actual analog ports
 		parent.sessionData.PORTS_SIGNALLING.ls = []; // reset previous signalling data

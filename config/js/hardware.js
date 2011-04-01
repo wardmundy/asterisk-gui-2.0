@@ -3,9 +3,10 @@
  *
  * hardware.html functions
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2011, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -964,8 +965,8 @@ var applySettings = {
 
 		for( var e in fxx ){ if(fxx.hasOwnProperty(e)){	x.new_action('append', context, e, fxx[e]);	}}
 
-		if(bchanstring.strip()){ x.new_action('append', context, 'bchan', bchanstring); }
-		if(dchanstring.strip()){ x.new_action('append', context, 'dchan', dchanstring); }
+		if(bchanstring.trim()){ x.new_action('append', context, 'bchan', bchanstring); }
+		if(dchanstring.trim()){ x.new_action('append', context, 'dchan', dchanstring); }
 
 		// write back any actual analog ports
 		parent.sessionData.PORTS_SIGNALLING.ls = []; // reset previous signalling data
