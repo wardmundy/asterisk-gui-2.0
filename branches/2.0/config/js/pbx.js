@@ -193,7 +193,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 				ASTGUI.systemCmd( sessionData.directories.script_detectdahdi , function(){
 					setTimeout( function(){
 						if( sessionData.DEBUG_MODE ){
-							alert(ASTGUI.globals.dahdiIncludeFile + 'not found, ran script ' + sessionData.directories.script_detectdahdi + ' \n Click OK to Reload');
+							alert(ASTGUI.globals.dahdiIncludeFile + ' not found, ran script ' + sessionData.directories.script_detectdahdi + ' \n Click OK to Reload');
 						}
 						window.location.reload();
 					} , 500 );
