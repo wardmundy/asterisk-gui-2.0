@@ -811,6 +811,9 @@ manager_events.removeQueueCall = function (queue, exten) {
 
 manager_events.updateExtension = function(exten, context, state) {
 	var exten_status_img = $('#exten_status_'+exten.toString()+' img');
+	if (typeof state == 'undefined') {
+		state = "Unknown";
+	}
 	switch(state.toString()) {
 	case '-1':	/* Invalid */
 		var state = 'Invalid';
@@ -872,13 +875,8 @@ manager_events.updateExtension = function(exten, context, state) {
 		break;
 	default:
 		top.log.debug("updateExtension :: We have encountered an unknown extension state of " + state.toString());
-		if ( top.sessionData.DEBUG_MODE ) {
-			alert('updateExtension:\r\n'
-				+'status: '+state.toString()+'\r\n'
-				+'exten: '+exten.toString()+'\r\n'
-				+'context: '+context.toString()+'\r\n'
-			);
-		}
+		var state = 'Unknown';
+		exten_status_img.attr('src','images/status_gray.png');
 		break;
 	}
 
