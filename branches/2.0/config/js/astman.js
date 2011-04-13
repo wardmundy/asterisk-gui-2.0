@@ -1450,8 +1450,12 @@ var ASTGUI = {
 				});
 				x.callActions(ct.cb);
 			//}
-			}catch(err){
-				top.log.error(err.message);
+			} catch(err) {
+				if (err.contains("is null")) { /* Context was already empty */
+					ct.cb();
+				} else {
+					top.log.error(err.message);
+				}
 			}
 		},
 
@@ -1729,8 +1733,8 @@ var ASTGUI = {
 				var depth = 0;
 				var len = str.length;
 				for(var i=0; i<len; i++) {
-					var char = str.charAt(i);
-					switch(char) {
+					var next = str.charAt(i);
+					switch(next) {
 					case '(':
 						depth++;
 						break;
@@ -1754,16 +1758,16 @@ var ASTGUI = {
 						if (depth) {
 							depth--;
 						} else {
-							stack.push("" + buffer + char);
+							stack.push("" + buffer + next);
 							buffer = '';
 							continue;
 						}
 						break;
 					}
-					buffer += char;
+					buffer += next;
 				}
 
-				if (buffer == '') {
+				if (buffer != '') {
 					stack.push(buffer);
 				}
 
@@ -1771,7 +1775,6 @@ var ASTGUI = {
 			};
 
 			if(x.contains(',') ){
-				nested_parse(x,',');
 				return nested_parse(x,',');
 			}
 			if(x.contains('|') ){
@@ -2936,11 +2939,12 @@ var context2json = function(params){
 		return toJSO( params.configFile_output );
 	};
 
-	top.log.ajax("AJAX Request : reading '" +  params.filename + "'");
 
 	if( top.sessionData.FileCache.hasOwnProperty(params.filename) &&  top.sessionData.FileCache[params.filename].modified == false){ // if file is in cache and is not modified since
+		top.log.debug("reading '" +  params.filename + "' from cache.");
 		var s = top.sessionData.FileCache[params.filename].content ;
 	}else{
+		top.log.ajax("AJAX Request : reading '" +  params.filename + "'");
 		if( parent.sessionData.PLATFORM.isAST_1_6 ){
 			var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename='+params.filename+'&category='+params.context, async: false }).responseText;
 		}else{
