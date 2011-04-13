@@ -2690,21 +2690,19 @@ jQuery.extend({
 
 		var requestDone = false;
 		///// ADDED FOR ASTERISK GUI //////
-			try{
-				if( ASTGUI && s.url.contains('action=updateconfig&') ){
-						// update cache status flag for the modified file
-						var tmp_filename = ASTGUI.parseGETparam( s.url , 'srcfilename');
-						if( !top.sessionData.FileCache.hasOwnProperty(tmp_filename) ){ top.sessionData.FileCache[tmp_filename] = {}; }
-						top.sessionData.FileCache[tmp_filename].modified = true;
+		try{
+			if( ASTGUI && s.url.contains('action=updateconfig&') ){
+				// update cache status flag for the modified file
+				var tmp_filename = ASTGUI.parseGETparam( s.url , 'srcfilename');
+				if( !top.sessionData.FileCache.hasOwnProperty(tmp_filename) ){ top.sessionData.FileCache[tmp_filename] = {}; }
+				top.sessionData.FileCache[tmp_filename].modified = true;
 
-					if( s.url.contains('&srcfilename=http.conf&') ){
-
-					}else{
-						top.cookies.set( 'configFilesChanged' , 'yes' );
-						parent.$('#applyChanges_Button').show();
-					}
+				if( !s.url.contains('&srcfilename=http.conf&') ){
+					top.cookies.set( 'configFilesChanged' , 'yes' );
+					parent.$('#applyChanges_Button').show();
 				}
-			}catch(err){}
+			}
+		}catch(err){}
 		///// 
 		// Create the request object; Microsoft failed to properly
 		// implement the XMLHttpRequest in IE7, so we use the ActiveXObject when it is available
