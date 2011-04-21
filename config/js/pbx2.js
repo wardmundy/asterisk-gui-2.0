@@ -2105,29 +2105,22 @@ pbx.users.add = function(exten, info, callback) {
 	x.filename('users.conf');
 	x.new_action('delcat', exten, '', '');
 	x.new_action('newcat', exten, '', '');
-	x.new_action('append', exten, 'username', exten);
-	x.new_action('append', exten, 'transfer', 'yes');
-	x.new_action('append', exten, 'disallow', disallow);
-	x.new_action('append', exten, 'allow', allow);
-	x.new_action('append', exten, 'mailbox', info.mailbox || exten);
-	x.new_action('append', exten, 'call-limit', '100');
-	x.new_action('append', exten, 'type', 'peer');
-
-	if (info.mailbox) {
-		delete info.mailbox;
-	}
-
-	if (info['call-limit']) {
-		delete info['call-limit'];
-	}
+	info['username'] = exten;
+	info['transfer'] = 'yes';
+	info['disallow'] = disallow;
+	info['allow'] = allow;
+	info['mailbox'] = info.mailbox || exten;
+	info['call-limit'] = '100';
+	info['type'] = 'peer';
+	info['callcounter'] = 'yes';
 
 	if (info.hasOwnProperty('hassip') && info['hassip'].isAstTrue()) {
-		x.new_action('append', exten, 'host', 'dynamic');
-		delete info['host'];
+		info['host'] = 'dynamic';
 	}
 
 	for (var prop in info) {
-		if (info.hasOwnProperty(prop)) {
+		if (prop != '' && !(info[prop] instanceof Function)) {
+			top.log.debug("adding " + prop + "=" + info[prop]);
 			x.new_action('append', exten, prop, info[prop]);
 		}
 	}
@@ -2540,6 +2533,6 @@ pbx.voice_menus.next = function() {
 /*---------------------------------------------------------------------------*/
 
 var checkForNames = function(name, users_conf) {
-	var users_conf = users_conf || config2json({ filename: 'user.conf', usf: 0});
+	var users_conf = users_conf || config2json({ filename: 'users.conf', usf: 0});
 	return users_conf.hasOwnProperty(name) ? false : true;
 };
