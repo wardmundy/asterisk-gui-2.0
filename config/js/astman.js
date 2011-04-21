@@ -2902,9 +2902,11 @@ var context2json = function(params){
 		var catno = -1 ;
 		var l_catno , catname , tlc , subfield , v, subfield_a, subfield_b;
 		var catfound = false;
+		var cat_for_cache = "";
 		for(var r=0, tl =  t.length ; r < tl ; r++){
 			tlc = t[r].toLowerCase();
 			if( tlc.beginsWith("category-") ){
+				cat_for_cache = t[r] + "\n";
 				catname = t[r].afterChar(':');
 				catname = catname.trim() ;
 				if( catname != params.context){ catno = -1; continue; }
@@ -2913,6 +2915,7 @@ var context2json = function(params){
 			}
 			if( catno == -1 ){ continue; }
 			if( tlc.beginsWith("line-") ){
+				cat_for_cache += t[r] + "\n";
 				var l_catno = Number( t[r].betweenXY('-','-') );
 				if( l_catno != catno ){ continue; }
 
@@ -2920,8 +2923,8 @@ var context2json = function(params){
 				subfield = subfield.trim();
 				if(params.usf){
 					v = subfield.indexOf('=');
-					subfield_a = subfield.substring(0,v);//subfield variable
-					subfield_b =  subfield.substr(v+1) ;//subfield variable value
+					subfield_a = subfield.substring(0,v); //subfield variable
+					subfield_b = subfield.substr(v+1); //subfield variable value
 					if( cat.hasOwnProperty(subfield_a) ){
 						cat[subfield_a] += ',' + subfield_b ;
 					}else{
@@ -2932,42 +2935,49 @@ var context2json = function(params){
 				}
 			}
 		}
-		return (catfound)?cat : null ;
+		top.sessionData.FileCache[params.filename] = {};
+		if (!params.context) { params.context = "default"; }
+		top.sessionData.FileCache[params.filename][params.context] = {};
+		top.sessionData.FileCache[params.filename][params.context].content = cat_for_cache;
+		top.sessionData.FileCache[params.filename][params.context].modified = false;
+		return catfound ? cat : null;
 	};
+
 
 	if( params.hasOwnProperty('configFile_output') ){
 		return toJSO( params.configFile_output );
 	};
 
 
-	if( top.sessionData.FileCache.hasOwnProperty(params.filename) &&  top.sessionData.FileCache[params.filename].modified == false){ // if file is in cache and is not modified since
-		top.log.debug("reading '" +  params.filename + "' from cache.");
-		var s = top.sessionData.FileCache[params.filename].content ;
-	}else{
+	if (params.context
+			&& top.sessionData.FileCache.hasOwnProperty(params.filename)
+			&& top.sessionData.FileCache[params.filename].hasOwnProperty(params.context)
+			&& top.sessionData.FileCache[params.filename][params.context].modified == false
+			&& top.sessionData.FileCache[params.filename].modified == false) { // the context we want is up to date in cache
+		top.log.debug("reading '" +  params.filename + "(" + params.context + ")" + "' from cache.");
+		var s = top.sessionData.FileCache[params.filename][params.context].content;
+	} else {
 		top.log.ajax("AJAX Request : reading '" +  params.filename + "'");
-		if( parent.sessionData.PLATFORM.isAST_1_6 ){
+		if (!parent.sessionData.PLATFORM.isAST_1_4) {
 			var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename='+params.filename+'&category='+params.context, async: false }).responseText;
-		}else{
+		} else {
 			var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename='+params.filename, async: false}).responseText;
 		}
 
-		top.sessionData.FileCache[params.filename] = {};
-		top.sessionData.FileCache[params.filename].content = s;
-		top.sessionData.FileCache[params.filename].modified = false;
+		if(s.contains('Response: Error') && ( s.contains('Message: Config file not found') || s.contains('Message: Permission denied') ) ){
+			// return ASTGUI.globals.fnf; // return 'file not found'
+			if(s.contains('Message: Config file not found'))
+				top.log.error( ' config file(' + params.filename +') not found ' );
+			if(s.contains('Message: Permission denied'))
+				top.log.error('permission denied for reading file ' + params.filename );
+
+			return (params.usf) ? new ASTGUI.customObject : [] ;
+		}
+		if( s.contains('Response: Error') ){
+			return (params.usf) ? new ASTGUI.customObject : [] ;
+		}
 	}
 
-	if(s.contains('Response: Error') && ( s.contains('Message: Config file not found') || s.contains('Message: Permission denied') ) ){
-		// return ASTGUI.globals.fnf; // return 'file not found'
-		if(s.contains('Message: Config file not found'))
-			top.log.error( ' config file(' + params.filename +') not found ' );	
-		if(s.contains('Message: Permission denied'))
-			top.log.error('permission denied for reading file ' + params.filename );
-
-		return (params.usf) ? new ASTGUI.customObject : [] ;
-	}
-	if( s.contains('Response: Error') ){
-		return (params.usf) ? new ASTGUI.customObject : [] ;
-	}
 	return toJSO(s);
 };
 
@@ -2996,11 +3006,18 @@ var config2json = function( params ){
 		var a = new ASTGUI.customObject ;
 		var json_data = "";
 		var t = z.split("\n");
-		var catname, subfield, v, subfield_a , subfield_b; 
+		var catname, subfield, v, subfield_a , subfield_b;
+		var cat_for_cache = [];
 		for(var r=0, tl =  t.length ; r < tl ; r++){
 			if( t[r].toLowerCase().beginsWith("category") ){
 				catname = t[r].afterChar(':'); // category 
 				catname = catname.trim() ;
+				if (!catname) { catname = "default"; }
+				if (!top.sessionData.FileCache[params.filename][catname]) {
+					top.sessionData.FileCache[params.filename][catname] = {};
+				}
+				top.sessionData.FileCache[params.filename][catname].content = t[r] + "\n";
+				top.sessionData.FileCache[params.filename][catname].modified = false;
 				if(!a[catname]){ // contexts could be spread at different places in the config file
 					if(!p){
 						a[catname] = [];
@@ -3009,9 +3026,10 @@ var config2json = function( params ){
 					}
 				}
 			}else if ( t[r].toLowerCase().beginsWith("line") ){
+				top.sessionData.FileCache[params.filename][catname].content += t[r] + "\n";
 				subfield = t[r].afterChar(':'); // subfield
 				subfield = subfield.trim();
-					if(!p){
+				if(!p){
 					a[catname].push(subfield);
 				}else{
 					v = subfield.indexOf("=");
