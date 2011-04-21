@@ -3,9 +3,10 @@
  *
  * Top level index page
  *
- * Copyright (C) 2011, Digium, Inc.
+ * Copyright (C) 2009-2011, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -309,7 +310,10 @@
 			'g723' : 'G.723'
 		},
 		directories:{},// sessionData.directories
-		FileCache:{}, // Object to Cache config files .. sessionData.FileCache['users.conf'].content , sessionData.FileCache['users.conf'].modified
+		FileCache:{}, 		/* Object to Cache config files:
+					sessionData.FileCache['users.conf'][context].content,
+					sessionData.FileCache['users.conf'].modified
+					sessionData.FileCache['users.conf'][context].modified, */ 
 		FXO_PORTS_DETECTED : [], // so that we do not have to parse ztscan output each time where we want this list
 					// sessionData.FXO_PORTS_DETECTED
 		FXS_PORTS_DETECTED : [], // so that we do not have to parse ztscan output each time where we want this list
