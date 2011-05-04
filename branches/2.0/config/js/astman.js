@@ -1238,7 +1238,7 @@ var ASTGUI = {
 			}
 			if((line.beginsWith(host) || (this_IP && line.beginsWith(this_IP + ' ')))  && line.contains(' ' + uname_lc + ' ')) {
 				var vals = line_orig.split(/[ \t][ \t]*/); /* Host, Username, Refresh, State, Reg.Time */
-				var sip_index = parent.sessionData.PLATFORM.isAST_1_6_1 ? 4 : 3;
+				var sip_index = ASTGUI.version.gteq("1.6.1") ? 4 : 3;
 				var state = (ttype === 'sip') ? vals[sip_index] : vals[5];
 				switch(state) {
 				case 'registered':
@@ -1326,6 +1326,70 @@ var ASTGUI = {
 		}
 	},
 
+	version: {
+		/* other is greater than sessionData.AsteriskVersion */
+		gt: function (other) {
+			var res = ASTGUI.version.greater_than_equal_to(other);
+			return res != 'equal' && res;
+		},
+
+		/* other is less than sessionData.AsteriskVersion */
+		lt: function (other) {
+			return !ASTGUI.version.greater_than_equal_to(other);
+		},
+
+		/* other is less than or equal to sessionData.AsteriskVersion */
+		lteq: function (other) {
+			var res = ASTGUI.version.greater_than_equal_to(other);
+			return res == 'equal' || !res;
+		},
+
+		/* other is greater than or equal to sessionData.AsteriskVersion */
+		gteq: function (other) {
+			var res = ASTGUI.version.greater_than_equal_to(other);
+			return res == 'equal' || res;
+		},
+
+		/* other is equal to sessionData.AsteriskVersion */
+		eq: function (other) {
+			var res = ASTGUI.version.greater_than_equal_to(other);
+			return res == 'equal';
+		},
+
+		/* This is the meat of the version comparision.  Return false if other is
+		 * greater than sessionData.AsteriskVersion, true if other is less than 
+		 * sessionData.AsteriskVersion, and equal if they are equal. */
+		greater_than_equal_to: function (other) {
+			if (!top.sessionData.AsteriskVersion) { return false; }
+			if (top.sessionData.AsteriskBranch == 'trunk') { return true; }
+			var thisversion = top.sessionData.AsteriskVersion || top.sessionData.AsteriskBranch;
+			var thispieces = thisversion.split('.');
+			var otherpieces = other.split('.');
+			for (var i = 0; i < ((thispieces.length < otherpieces.length) ? thispieces.length : otherpieces.length); i++) {
+				if (thispieces[i] > otherpieces[i]) {
+					return true;
+				} else if (thispieces[i] < otherpieces[i]) {
+					return false;
+				}
+			}
+			while (thispieces[i] || otherpieces[i] || i < 10) {
+					if (thispieces[i] == undefined) {
+						if (otherpieces[i] == undefined) {
+							return "equal";
+						} else {
+							return false;
+						}
+					} else if (otherpieces[i] == undefined) {
+						return true;
+					} else if (thispieces[i] > otherpieces[i]) {
+						return true;
+					}
+				i++;
+			}
+			return "equal";
+		}
+	},
+
 	miscFunctions: {
 		getChunksFromManagerOutput : function( op , usf){
 			// ASTGUI.miscFunctions.getChunksFromManagerOutput( output_str ) ;
@@ -1366,12 +1430,12 @@ var ASTGUI = {
 		},
 
 		createConfig : function( fileName, callback){ // ASTGUI.miscFunctions.createConfig( 'filaName', function(){ } ) ;
-			if ( typeof fileName != 'string') callback() ;
-			if( parent.sessionData.PLATFORM.isAST_1_6 ){
+			if (typeof fileName != 'string') callback();
+			if (ASTGUI.version.gteq("1.6.0")) {
 				var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=createconfig&filename='+ fileName , async: false }).responseText;
 				callback();
-			}else{
-				ASTGUI.systemCmd( 'touch ' + top.sessionData.directories.asteriskConfig + fileName, callback );
+			} else {
+				ASTGUI.systemCmd('touch ' + top.sessionData.directories.asteriskConfig + fileName, callback);
 			}
 		},
 
@@ -1434,7 +1498,7 @@ var ASTGUI = {
 
 		empty_context: function( ct ){ // ASTGUI.miscFunctions.empty_context({ filename:'somefile.conf', context : 'context_x', cb : fn })
 			try{
-			//if( parent.sessionData.PLATFORM.isAST_1_6 ){
+			//if (ASTGUI.version.gteq("1.6.0")) {
 			//	var u = new listOfSynActions(ct.filename);
 			//	u.new_action('emptycat', ct.context , '', '' ) ;
 			//	u.callActions();
@@ -2958,7 +3022,7 @@ var context2json = function(params){
 		var s = top.sessionData.FileCache[params.filename][params.context].content;
 	} else {
 		top.log.ajax("AJAX Request : reading '" +  params.filename + "'");
-		if (!parent.sessionData.PLATFORM.isAST_1_4) {
+		if (top.sessionData.AsteriskVersion && ASTGUI.version.gteq("1.6.0")) {
 			var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename='+params.filename+'&category='+params.context, async: false }).responseText;
 		} else {
 			var s = $.ajax({ url: ASTGUI.paths.rawman+'?action=getconfig&filename='+params.filename, async: false}).responseText;
@@ -3095,7 +3159,7 @@ var listOfSynActions = function(file){
 	this.params.action = 'updateconfig';
 	this.params.srcfilename = file;
 	this.params.dstfilename = file;
-	if( !parent.sessionData.PLATFORM.isAST_1_4 ){
+	if (ASTGUI.version.gteq("1.6.0")) {
 		this.FILE_CONTENT = config2json({ filename: file , usf:0 }) ;
 	}
 	this.actionCount = 0;
@@ -3104,7 +3168,7 @@ var listOfSynActions = function(file){
 listOfSynActions.prototype = {
 	new_action: function(action, cat, name, value, match){
 		var s="";
-		if( !parent.sessionData.PLATFORM.isAST_1_4 && this.FILE_CONTENT != null ){
+		if (ASTGUI.version.gteq("1.6.0") && this.FILE_CONTENT != null ) {
 			// the update/delete/delcat commands fail in Asterisk 1.6.X/trunk if the corresponding category/variables are not found
 			// In Asterisk 1.4 we do not have to do this check
 			switch( action ){
@@ -3146,7 +3210,7 @@ listOfSynActions.prototype = {
 		this.params = {} ;
 		this.params.action = 'updateconfig';
 		this.params.srcfilename = this.params.dstfilename = fn;
-		if( !parent.sessionData.PLATFORM.isAST_1_4 ){
+		if (ASTGUI.version.gteq("1.6.0")) {
 			this.FILE_CONTENT = config2json({ filename: fn , usf:0 }) ;
 		}
 	},
@@ -3183,7 +3247,7 @@ var listOfActions = function(fn){
 	this.actions = {};
 	if(fn){ 
 		this.filename = fn;
-		if( !parent.sessionData.PLATFORM.isAST_1_4 ){
+		if (ASTGUI.version.gteq("1.6.0")) {
 			this.FILE_CONTENT = config2json({ filename: fn , usf:0 }) ;
 		}
 	}
@@ -3192,7 +3256,7 @@ var listOfActions = function(fn){
 listOfActions.prototype = {
 	filename: function(fn){
 		this.filename = fn;
-		if( !parent.sessionData.PLATFORM.isAST_1_4 ){
+		if (ASTGUI.version.gteq("1.6.0")) {
 			this.FILE_CONTENT = config2json({ filename: fn , usf:0 }) ;
 		}
 	},
@@ -3201,7 +3265,7 @@ listOfActions.prototype = {
 	},
 	build_action: function(action, count, cat, name, value, match){
 		var s="";
-		if( !parent.sessionData.PLATFORM.isAST_1_4 && this.FILE_CONTENT != null ){
+		if (ASTGUI.version.gteq("1.6.0") && this.FILE_CONTENT != null ) {
 			// the update/delete/delcat commands fail in Asterisk 1.6.X/trunk if the corresponding category/variables are not found
 			// In Asterisk 1.4 we do not have to do this check
 			switch( action ){

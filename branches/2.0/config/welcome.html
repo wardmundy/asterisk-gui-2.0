@@ -3,9 +3,10 @@
  *
  * System status
  *
- * Copyright (C) 2008, Digium, Inc.
+ * Copyright (C) 2008-2011, Digium, Inc.
  *
  * Ryan Brindley <rbrindley@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -572,11 +573,11 @@
 	
 	/* set vars that determine which name to use for manager events */
 	mgr.newchannel = {};
-	mgr.newchannel.channelstate = (top.sessionData.PLATFORM.isAST_1_6) ? 'channelstatedesc' : 'state';
+	mgr.newchannel.channelstate = ASTGUI.version.gteq("1.6.0") ? 'channelstatedesc' : 'state';
 	mgr.newcallerid = {};
-	mgr.newcallerid.calleridnum = (top.sessionData.PLATFORM.isAST_1_6) ? 'calleridnum' : 'callerid';
+	mgr.newcallerid.calleridnum = ASTGUI.version.gteq("1.6.0") ? 'calleridnum' : 'callerid';
 	mgr.newstate = {};
-	mgr.newstate.channelstate = (top.sessionData.PLATFORM.isAST_1_6) ? 'channelstatedesc' : 'state';
+	mgr.newstate.channelstate = ASTGUI.version.gteq("1.6.0") ? 'channelstatedesc' : 'state';
 
 	manager_events.watch();
 
