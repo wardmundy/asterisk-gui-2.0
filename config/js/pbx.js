@@ -3,7 +3,7 @@
  *
  * core parsing functions used in index.html
  *
- * Copyright (C) 2006-2010, Digium, Inc.
+ * Copyright (C) 2006-2011, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
  * Ryan Brindley <rbrindley@digium.com>
@@ -89,7 +89,7 @@ readcfg = {	// place where we tell the framework how and what to parse/read from
 					'exten=play_file,n,Playback(${var1})',
 					'exten=play_file,n,Hangup'
 				];
-				if (sessionData.PLATFORM.isAST_1_6) {
+				if (ASTGUI.version.gteq("1.6.0")) {
 					check_For_Contexts[ASTGUI.contexts.guitools][4] = 'exten=record_vmenu,n,Record(${var1},0,500,k)';
 				}
 		

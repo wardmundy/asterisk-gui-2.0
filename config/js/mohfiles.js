@@ -3,9 +3,10 @@
  *
  * mohfiles.html functions
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2011, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -34,7 +35,7 @@ var onUploadForm_load = function(){
 };
 
 var onUploadForm_beforeUploading = function(){
-	if( !parent.sessionData.PLATFORM.isAA50 && !parent.sessionData.PLATFORM.isABE  && top.sessionData.PLATFORM.isAST_1_4 ){
+	if (!parent.sessionData.PLATFORM.isAA50 && !parent.sessionData.PLATFORM.isABE  && ASTGUI.version.lt("1.6.0")) {
 		alert("File Uploads are supported in Asterisk 1.6.0/trunk");
 		return;
 	}

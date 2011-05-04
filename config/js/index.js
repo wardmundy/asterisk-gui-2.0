@@ -3,9 +3,10 @@
  *
  * Login functions and other misc functions for index.html
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2011, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -91,13 +92,12 @@ var onLogInFunctions = {
 
 	detectPlatform: function(resp){
 		sessionData.AsteriskVersionString = resp;
+		onLogInFunctions.parseVersion(resp);
 
 		// logic for platform detection, 
 		if( sessionData.PLATFORM.isAA50 || sessionData.PLATFORM.isABE ){
 			if( sessionData.PLATFORM.isAA50 ){
- 				sessionData.PLATFORM.isOSA = false ;
-				sessionData.PLATFORM.isAST_1_4 = false ;
-				sessionData.PLATFORM.isAST_1_6 = false ;
+				sessionData.PLATFORM.isOSA = false ;
 				sessionData.listOfCodecs = {
 					'ulaw' : 'u-law' ,
 					'alaw' : 'a-law' ,
@@ -113,12 +113,7 @@ var onLogInFunctions = {
 			$('div[page="cli.html"]').empty();
 		}else{
 			var resp_lower = resp.toLowerCase();
-			if ( resp_lower.contains("branches/1.6")  || resp_lower.contains("asterisk/1.6") ||  resp_lower.contains("svn-branch-1.6")
-					||  resp_lower.contains("svn-trunk-") || resp_lower.contains("branches/1.8")  || resp_lower.contains("asterisk/1.8") 
-					||  resp_lower.contains("svn-branch-1.8") ){
-				sessionData.PLATFORM.isAST_1_4 = false ;
-				sessionData.PLATFORM.isAST_1_6 = true ;
-				sessionData.PLATFORM.isAST_1_6_1 = resp_lower.contains('1.6.1') ? true : false;
+			if (ASTGUI.version.gteq("1.6.0")){
 				ASTGUI.globals.sbcid_1 = 's,1,ExecIf($[ "${CALLERID(num)}"="" ]?SetCallerPres(unavailable))';
 				ASTGUI.globals.sbcid_2 = 's,2,ExecIf($[ "${CALLERID(num)}"="" ]?Set(CALLERID(all)=unknown <0000000>))';
 				sessionData.listOfCodecs = { // sessionData.listOfCodecs
@@ -138,9 +133,34 @@ var onLogInFunctions = {
 				};
 
 				/* add video codecs for 1.6 platforms */
-			} else { /* if system is either 1.4 or unknown */
-				sessionData.PLATFORM.isAST_1_4 = true ;
-				sessionData.PLATFORM.isAST_1_6 = false ;
+			}
+		}
+	},
+
+	parseVersion: function(ver) {
+		sessionData.AsteriskVersion = '';
+		sessionData.AsteriskBranch = '';
+		sessionData.AsteriskSVNRevision = 0;
+		if (ver.match(/SVN-(.*)-r(\d+)/i)) {
+			sessionData.AsteriskBranch = RegExp.$1;
+			sessionData.AsteriskSVNRevision = RegExp.$2;
+		}
+		if (ver.match(/SVN-trunk/i)) {
+			sessionData.AsteriskVersion = '1.8';
+		}
+		if (ver.match(/SVN-.*-([\d\.]+)-/i) || (ver.match(/\./) && ver.match(/([\d\.]+)/i))) {
+			sessionData.AsteriskVersion = RegExp.$1;
+		}
+		if (!sessionData.AsteriskBranch && sessionData.AsteriskVersion) {
+			var p = sessionData.AsteriskVersion.split('.');
+			sessionData.AsteriskBranch = p[0];
+			if (p.length > 1){
+				sessionData.AsteriskBranch += '.' + p[1];
+				if (p[0] == 1 && p[1] == 6) {
+					if (p.length > 2){
+						sessionData.AsteriskBranch += '.' + p[2];
+					}
+				}
 			}
 		}
 	},
@@ -200,7 +220,7 @@ var onLogInFunctions = {
 			}
 		}
 
-		if( sessionData.PLATFORM.isAST_1_6 ){ // make sure all the required upload paths are there
+		if (ASTGUI.version.gteq("1.6.0")) { // make sure all the required upload paths are there
 			u.clearActions();
 			var pu = false;
 			if(!http_conf.hasOwnProperty('post_mappings') ){
@@ -231,7 +251,7 @@ var onLogInFunctions = {
 		u.callActions();
 		top.cookies.set( 'rwaccess' , 'yes' );
 
-		if( sessionData.PLATFORM.isAST_1_6 ){
+		if (ASTGUI.version.gteq("1.6.0")) {
 			// make sure originate privilege is defined in asterisk 1.6
 			// This was introduced in Asterisk 1.6 and users upgrading from 1.4 do not have this
 			var tmp_managerUser = top.cookies.get('username') ;
@@ -337,7 +357,7 @@ var onLogInFunctions = {
 				parent.ASTGUI.dialog.waitWhile(' reloading asterisk ... ');
 				var t = ASTGUI.cliCommand('reload') ;
 				setTimeout( function(){ 
-					if( sessionData.PLATFORM.isAST_1_6 ){
+					if (ASTGUI.version.gteq("1.6.0")) {
 						alert('                          Config files updated. '
 							+ '\n' + ' Please stop Asterisk and Start over for the changes to take effect' );
 					}
@@ -685,7 +705,7 @@ var miscFunctions = {
 			ASTGUI.updateaValue({ file: ASTGUI.globals.configfile , context :'general', variable :'config_gui_version', value : sessionData.gui_version });
 		}
 		var u = _$('applyChanges_Button');
-		if (sessionData.PLATFORM.isAST_1_4) {
+		if (ASTGUI.version.lt("1.6.0")) {
 			var t = ASTGUI.cliCommand('reload') ;
 		} else {
 			var t = ASTGUI.cliCommand('module reload');
@@ -1139,7 +1159,7 @@ var after_localajaxinit = function(){
 		 * both commas and pipes aren't supported, such as when
 		 * doing time intervals for includes :-/
 		 * */
-		if (!sessionData.PLATFORM.isAST_1_6) {
+		if (ASTGUI.version.lt("1.6.0")) {
 			top.session.delimiter = '|';
 		}
 	};

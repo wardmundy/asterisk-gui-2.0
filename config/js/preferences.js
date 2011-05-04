@@ -3,9 +3,10 @@
  *
  * preferences.html functions
  *
- * Copyright (C) 2006-2008, Digium, Inc.
+ * Copyright (C) 2006-2011, Digium, Inc.
  *
  * Pari Nannapaneni <pari@digium.com>
+ * Erin Spiceland <espiceland@digium.com>
  *
  * See http://www.asterisk.org for more information about
  * the Asterisk project. Please do not directly contact
@@ -32,7 +33,7 @@ var loadDOMelements = function(){
 
 function localajaxinit(){
 	top.document.title = "General Preferences" ;
-	if( (parent.sessionData.PLATFORM.isAST_1_6 || parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE) && !parent.sessionData.PLATFORM.isAA50_OEM ){
+	if ((ASTGUI.version.gteq("1.6.0") || parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE) && !parent.sessionData.PLATFORM.isAA50_OEM) {
 		$('.16_Only').show();
 		(function(){
 			var c = config2json( { filename: 'phoneprov.conf' , usf: 0 } );
@@ -238,7 +239,7 @@ var save_changes = function(){
 		}
 	u.callActions();
 
-	if( (parent.sessionData.PLATFORM.isAST_1_6 || parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE) && !parent.sessionData.PLATFORM.isAA50_OEM ){
+	if ((ASTGUI.version.gteq("1.6.0") || parent.sessionData.PLATFORM.isAA50 || parent.sessionData.PLATFORM.isABE) && !parent.sessionData.PLATFORM.isAA50_OEM) {
 		u.clearActions('phoneprov.conf');
 		u.new_action('delete', 'polycom', 'setvar','', 'IDLEIMAGE_ACTIVE=1' );
 		u.new_action('delete', 'polycom', 'setvar','', 'IDLEIMAGE_ACTIVE=0' );
