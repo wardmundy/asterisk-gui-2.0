@@ -1362,30 +1362,41 @@ var ASTGUI = {
 		greater_than_equal_to: function (other) {
 			if (!top.sessionData.AsteriskVersion) { return false; }
 			if (top.sessionData.AsteriskBranch == 'trunk') { return true; }
+			if (top.sessionData.VersionCache[other] != undefined
+					&& (top.sessionData.VersionCache[other] == true
+					|| top.sessionData.VersionCache[other] == false
+					|| top.sessionData.VersionCache[other] == "equal")) {
+				return top.sessionData.VersionCache[other];
+			}
 			var thisversion = top.sessionData.AsteriskVersion || top.sessionData.AsteriskBranch;
 			var thispieces = thisversion.split('.');
 			var otherpieces = other.split('.');
 			for (var i = 0; i < ((thispieces.length < otherpieces.length) ? thispieces.length : otherpieces.length); i++) {
 				if (thispieces[i] > otherpieces[i]) {
+					top.sessionData.VersionCache[other] = true;
 					return true;
 				} else if (thispieces[i] < otherpieces[i]) {
+					top.sessionData.VersionCache[other] = false;
 					return false;
 				}
 			}
 			while (thispieces[i] || otherpieces[i] || i < 10) {
-					if (thispieces[i] == undefined) {
-						if (otherpieces[i] == undefined) {
-							return "equal";
-						} else {
-							return false;
-						}
+					if (thispieces[i] == otherpieces[i]) {
+						top.sessionData.VersionCache[other] = "equal";
+						return "equal";
+					} else if (thispieces[i] == undefined) {
+						top.sessionData.VersionCache[other] = false;
+						return false;
 					} else if (otherpieces[i] == undefined) {
+						top.sessionData.VersionCache[other] = true;
 						return true;
 					} else if (thispieces[i] > otherpieces[i]) {
+						top.sessionData.VersionCache[other] = true;
 						return true;
 					}
 				i++;
 			}
+			top.sessionData.VersionCache[other] = "equal";
 			return "equal";
 		}
 	},
