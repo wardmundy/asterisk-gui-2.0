@@ -58,7 +58,7 @@ var localajaxinit = function(){
 		var val = ( c[fld] ) ? c[fld] : '';
 		AU(fld,val) ;
 	});
-	var disallowed = false;
+	var disallowed = [];
 	var real_codecs;
 	ASTGUI.CODECSLIST.populateCodecsList(_$('allow'));
 	if( c.hasOwnProperty('allow') ){ real_codecs = c['allow']; }
